@@ -9,10 +9,7 @@
         "sourceMap": false,
         "noEmitOnError": true,
         "moduleResolution": "Node",
-        "allowSyntheticDefaultImports": true,
-        "paths": {
-            "shared/*" : ["../node_modules/nostromo-shared/*"]
-        }
+        "allowSyntheticDefaultImports": true
     },
     "include": ["./"]
 }
