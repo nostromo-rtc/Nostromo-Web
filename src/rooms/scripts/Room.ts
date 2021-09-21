@@ -22,7 +22,7 @@ import
     NewProducerInfo,
     CloseConsumerInfo,
     ChatMsgInfo
-} from "shared/types/RoomTypes";
+} from "nostromo-shared/types/RoomTypes";
 
 // callback при transport.on("connect")
 type CallbackOnConnect = {

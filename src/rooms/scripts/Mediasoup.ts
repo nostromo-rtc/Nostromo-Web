@@ -1,5 +1,5 @@
 import * as mediasoup from 'mediasoup-client';
-import { NewConsumerInfo, NewWebRtcTransportInfo } from 'shared/types/RoomTypes';
+import { NewConsumerInfo, NewWebRtcTransportInfo } from 'nostromo-shared/types/RoomTypes';
 import { HandleCriticalError } from "./AppError";
 import MediasoupTypes = mediasoup.types;
 export { MediasoupTypes };

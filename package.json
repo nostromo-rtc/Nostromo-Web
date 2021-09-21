@@ -6,6 +6,10 @@
     "build": "tsc -p src/tsconfig.json && webpack",
     "postinstall": "npm run build"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/SgAkErRu/nostromo-web.git"
+  },
   "author": "SgAkErRu",
   "license": "BSD-3-Clause",
   "dependencies": {

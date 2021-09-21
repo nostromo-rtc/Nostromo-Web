@@ -1,7 +1,7 @@
 import { io, Socket } from "socket.io-client";
 
-import { NewRoomInfo } from "shared/types/AdminTypes";
-import { VideoCodec } from "shared/types/RoomTypes";
+import { NewRoomInfo } from "nostromo-shared/types/AdminTypes";
+import { VideoCodec } from "nostromo-shared/types/RoomTypes";
 
 type Room = {
     id: string,
