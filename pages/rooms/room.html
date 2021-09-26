@@ -42,7 +42,7 @@
         <div id="videos"></div>
         <section id="chatSection">
             <span>Чат:</span>
-            <textarea id="chat" readonly></textarea>
+            <div id="chat" readonly></div>
             <p hidden>Выбор собеседника:
                 <select id="chatOptions">
                     <option disabled selected value="default">не выбрано...</option>
@@ -53,14 +53,11 @@
                 <button id="btn_sendMessage" accesskey="enter" autofocus>Отправить</button>
             </div>
         </section>
-        <section id="fileSection" hidden>
-            <span>Отправка файлов:</span>
-            <form id="fileInfo">
-                <input type="file" id="fileInput" name="files" />
-            </form>
-            <button id="btn_sendFile">Отправить файл</button>
-            <a id="downloadLink"></a>
-            <progress id="receiveProgress" hidden></progress>
+        <section id="fileSection">
+            <span>Отправка файлов:</span><br>
+            <input type="file" id="fileInput" name="file" /><br>
+            <button id="btn_sendFile">Отправить файл</button><br>
+            <progress id="sendProgress" hidden></progress>
         </section>
     </div>
 

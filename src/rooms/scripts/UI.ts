@@ -15,36 +15,55 @@ export class UI
 {
     // кнопки
     private _buttons: Map<string, HTMLButtonElement> = this.prepareButtons();
-    public get buttons(): Map<string, HTMLButtonElement> { return this._buttons; }
+    public get buttons(): Map<string, HTMLButtonElement>
+    { return this._buttons; }
 
     // название комнаты
     private _roomName = document.getElementById('roomName') as HTMLSpanElement;
-    public get roomName(): string { return this._roomName.innerText; }
-    public set roomName(name: string) { this._roomName.innerText = name; }
+    public get roomName(): string
+    { return this._roomName.innerText; }
+    public set roomName(name: string)
+    { this._roomName.innerText = name; }
 
     // метка локального видео
     private localVideoLabel: HTMLSpanElement = this.prepareLocalVideoLabel();
 
     // контейнер с видеоэлементами
     private _allVideos = new Map<string, HTMLVideoElement>();
-    public get allVideos(): Map<string, HTMLVideoElement> { return this._allVideos; }
-    public get localVideo(): HTMLVideoElement | undefined { return this._allVideos.get('localVideo'); }
+    public get allVideos(): Map<string, HTMLVideoElement>
+    { return this._allVideos; }
+    public get localVideo(): HTMLVideoElement | undefined
+    { return this._allVideos.get('localVideo'); }
 
     // чат
-    private _chat = document.getElementById('chat') as HTMLTextAreaElement;
-    public get chat() : HTMLTextAreaElement { return this._chat; }
+    private _chat = document.getElementById('chat') as HTMLDivElement;
+    public get chat() : HTMLDivElement
+    { return this._chat; }
+
+    // поле для выбора файла
+    private _fileInput = document.getElementById('fileInput') as HTMLInputElement;
+    public get fileInput() : HTMLInputElement
+    { return this._fileInput; }
+
+    // прогресс отправки файла
+    private _sendProgress = document.getElementById("sendProgress") as HTMLProgressElement;
+    public get sendProgress() : HTMLProgressElement
+    { return this._sendProgress; }
 
     // сообщение пользователя, отправляемое в чат
     private _messageText = document.getElementById('messageText') as HTMLTextAreaElement;
-    public get messageText() : HTMLTextAreaElement { return this._messageText; }
+    public get messageText() : HTMLTextAreaElement
+    { return this._messageText; }
 
     // настройки захвата видео
     private captureSettings = document.getElementById('captureSettings') as HTMLSelectElement;
-    public get currentCaptureSetting(): string { return this.captureSettings.value; }
+    public get currentCaptureSetting(): string
+    { return this.captureSettings.value; }
 
     // поле для ввода имени пользователя
     private _usernameInput = document.getElementById('usernameInput') as HTMLInputElement;
-    public get usernameInputValue(): string { return this._usernameInput.value; }
+    public get usernameInputValue(): string
+    { return this._usernameInput.value; }
 
     // количество строк и столбцов в раскладке
     private videoRows = 2;

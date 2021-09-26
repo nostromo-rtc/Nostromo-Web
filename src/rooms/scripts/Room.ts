@@ -21,7 +21,8 @@ import
     ConnectWebRtcTransportInfo,
     NewProducerInfo,
     CloseConsumerInfo,
-    ChatMsgInfo
+    ChatMsgInfo,
+    ChatFileInfo
 } from "nostromo-shared/types/RoomTypes";
 
 // callback при transport.on("connect")
@@ -37,7 +38,6 @@ type CallbackOnProduce = {
 type Errback = {
     (error?: unknown): void;
 };
-
 interface ConsumerAppData
 {
     /** Consumer был поставлен на паузу со стороны клиента (плеер на паузе) */
@@ -93,18 +93,102 @@ export class Room
         this.handleSocketEvents();
 
         // обработка чатов
+        this.handleChat();
+
+        // обработка отправки файла
+        this.ui.buttons.get('sendFile')!.addEventListener('click', () =>
+        {
+            this.handleFileUpload();
+        });
+    }
+
+    private handleFileUpload()
+    {
+        const file = this.ui.fileInput.files?.item(0);
+        if (file)
+        {
+            console.log("[Room] > Отправляем файл:", file.name, file.size / (1024 * 1024));
+
+            const formData = new FormData();
+            formData.append(file.name, file);
+
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "/api/upload", true);
+
+            // отображаем прогресс
+            const progress = this.ui.sendProgress;
+            progress.max = 100;
+            xhr.upload.addEventListener("progress", (event) =>
+            {
+                if (event.lengthComputable)
+                {
+                    progress.value = (event.loaded / event.total) * 100;
+                }
+            });
+
+            xhr.addEventListener("load", () =>
+            {
+                console.log(`[Room] > Отправка файла завершена! fileId: ${xhr.responseText}`);
+
+                const chatFileInfo: ChatFileInfo = {
+                    username: localStorage['username'] as string,
+                    fileId: xhr.responseText,
+                    filename: file.name,
+                    size: file.size
+                };
+                this.addNewFileLink(chatFileInfo);
+                this.socket.emit('chatFile', chatFileInfo);
+
+                progress.hidden = true;
+                this.ui.fileInput.value = "";
+            });
+
+            xhr.send(formData);
+            progress.hidden = false;
+        }
+    }
+
+    private addNewFileLink({ username, fileId, filename, size }: ChatFileInfo)
+    {
+        const timestamp = this.getTimestamp();
+
+        const msgParagraph: HTMLParagraphElement = document.createElement("p");
+        msgParagraph.innerHTML = `[${timestamp}] ${username}: `;
+
+        const link: HTMLAnchorElement = document.createElement("a");
+        link.href = `${window.location.origin}/file/${fileId}`;
+        link.text = `${filename} (${(size / (1024 * 1024)).toFixed(3)}) Mb`;
+        link.target = "_blank";
+
+        msgParagraph.append(link);
+
+        this.ui.chat.append(msgParagraph);
+        this.ui.chat.scrollTop = this.ui.chat.scrollHeight;
+    }
+
+    private handleChat()
+    {
         this.ui.buttons.get('sendMessage')!.addEventListener('click', () =>
         {
             const message: string = this.ui.messageText.value.toString().trim();
 
             if (message)
             {
-                const timestamp = this.getTimestamp();
-                this.ui.chat.innerHTML += `[${timestamp}] (Общий) Я: ${message}` + "\n";
-                this.ui.chat.scrollTop = this.ui.chat.scrollHeight;
+                this.addNewChatMsg(localStorage['username'], message);
                 this.socket.emit('chatMsg', message);
             }
         });
+    }
+
+    private addNewChatMsg(username: string, message: string)
+    {
+        const timestamp = this.getTimestamp();
+
+        const msgParagraph = document.createElement('p');
+        msgParagraph.innerHTML = `[${timestamp}] ${username}: ${message}`;
+
+        this.ui.chat.append(msgParagraph);
+        this.ui.chat.scrollTop = this.ui.chat.scrollHeight;
     }
 
     private handleSocketEvents()
@@ -233,9 +317,13 @@ export class Room
         // сообщение в чат
         this.socket.on('chatMsg', ({ name, msg }: ChatMsgInfo) =>
         {
-            const timestamp = this.getTimestamp();
-            this.ui.chat.innerHTML += `[${timestamp}] (Общий) Собеседник ${name}: ${msg}` + "\n";
-            this.ui.chat.scrollTop = this.ui.chat.scrollHeight;
+            this.addNewChatMsg(name, msg);
+        });
+
+        // файл в чате
+        this.socket.on('chatFile', (chatFileInfo: ChatFileInfo) =>
+        {
+            this.addNewFileLink(chatFileInfo);
         });
 
         // новый consumer (новый входящий медиапоток)

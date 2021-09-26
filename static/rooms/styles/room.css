@@ -21,9 +21,16 @@
 #chat {
     height: 200px;
     resize: vertical;
-    font-size:14pt;
-    line-height:1.8;
+    font-size:13pt;
+    border: 1px solid gray;
+    overflow: auto;
 }
+
+#chat p {
+    margin-top: 0;
+    margin-bottom: 12px;
+}
+
 #messageText
 {
     flex: 1 1 95%;

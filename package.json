@@ -13,7 +13,7 @@
   "author": "SgAkErRu",
   "license": "BSD-3-Clause",
   "dependencies": {
-    "nostromo-shared": "gitlab:sgakerru/nostromo-shared#master",
+    "nostromo-shared": "gitlab:sgakerru/nostromo-shared#dev",
     "mediasoup-client": "gitlab:sgakerru/mediasoup-client#3.6.36-patched",
     "@types/howler": "^2.2.3",
     "howler": "^2.2.3",
