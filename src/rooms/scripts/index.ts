@@ -1,4 +1,6 @@
 import { UI } from './UI';
+import { Mediasoup } from './Mediasoup';
+import { FileHandler } from "./FileHandler";
 import { Room } from './Room';
 import { HandleCriticalError } from "./AppError";
 
@@ -16,4 +18,6 @@ window.addEventListener("error", (ev: ErrorEvent) =>
 });
 
 const ui = new UI();
-const room = new Room(ui);
+const mediasoup = new Mediasoup();
+const fileHandler = new FileHandler();
+const room = new Room(ui, mediasoup, fileHandler);

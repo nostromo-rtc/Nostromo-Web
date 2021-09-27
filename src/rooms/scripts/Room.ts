@@ -1,5 +1,7 @@
 import { UI } from "./UI";
 import { UserMedia } from './UserMedia';
+import { FileHandler } from "./FileHandler";
+
 import { io, Socket } from "socket.io-client";
 
 import { HandleCriticalError, TransportFailedError } from "./AppError";
@@ -57,32 +59,39 @@ export class Room
     private ui: UI;
 
     // для работы с веб-сокетами
-    private socket: Socket = io('/room', {
-        'transports': ['websocket']
-    });
+    private socket: Socket;
 
     // для захватов медиапотоков пользователя
     private userMedia: UserMedia;
 
+    // для работы с mediasoup-client
+    private mediasoup: Mediasoup;
+
+    // для заливки файлов
+    private fileHandler: FileHandler;
+
     // максимальный битрейт для видео
-    static KILO = 1024;
-    static MEGA = 1024 * 1024;
-    private maxVideoBitrate = 10 * Room.MEGA;
-    private maxAudioBitrate = 64 * Room.KILO;
+    private readonly KILO = 1024;
+    private readonly MEGA = 1024 * 1024;
+    private maxVideoBitrate = 10 * this.MEGA;
+    private maxAudioBitrate = 64 * this.KILO;
 
     // задержка после входа на воспроизведение звуковых оповещений
     private soundDelayAfterJoin = true;
 
-    // для работы с mediasoup-client
-    private mediasoup: Mediasoup;
-
-    constructor(ui: UI)
+    constructor(_ui: UI, _mediasoup: Mediasoup, _fileHandler: FileHandler)
     {
         console.debug("[Room] > ctor");
 
-        this.ui = ui;
-        this.mediasoup = new Mediasoup();
+        this.ui = _ui;
+
+        this.socket = io('/room', {
+            'transports': ['websocket']
+        });
+
         this.userMedia = new UserMedia(this.ui, this);
+        this.mediasoup = _mediasoup;
+        this.fileHandler = _fileHandler;
 
         // обработка кнопок
         this.handleButtons();
@@ -96,56 +105,36 @@ export class Room
         this.handleChat();
 
         // обработка отправки файла
-        this.ui.buttons.get('sendFile')!.addEventListener('click', () =>
-        {
-            this.handleFileUpload();
-        });
+        this.handleFileUpload();
     }
 
     private handleFileUpload()
     {
-        const file = this.ui.fileInput.files?.item(0);
-        if (file)
+        this.ui.buttons.get('sendFile')!.addEventListener('click', async () =>
         {
-            console.log("[Room] > Отправляем файл:", file.name, file.size / (1024 * 1024));
-
-            const formData = new FormData();
-            formData.append(file.name, file);
-
-            const xhr = new XMLHttpRequest();
-            xhr.open("POST", "/api/upload", true);
-
-            // отображаем прогресс
+            const fileInput = this.ui.fileInput;
+            const file = fileInput.files?.item(0);
             const progress = this.ui.sendProgress;
-            progress.max = 100;
-            xhr.upload.addEventListener("progress", (event) =>
-            {
-                if (event.lengthComputable)
-                {
-                    progress.value = (event.loaded / event.total) * 100;
-                }
-            });
 
-            xhr.addEventListener("load", () =>
-            {
-                console.log(`[Room] > Отправка файла завершена! fileId: ${xhr.responseText}`);
+            // если нечего загружать
+            if (!file) return;
 
-                const chatFileInfo: ChatFileInfo = {
-                    username: localStorage['username'] as string,
-                    fileId: xhr.responseText,
-                    filename: file.name,
-                    size: file.size
-                };
-                this.addNewFileLink(chatFileInfo);
-                this.socket.emit('chatFile', chatFileInfo);
+            // загружаем файл
+            const fileId = await this.fileHandler.fileUpload(file, progress);
+            fileInput.value = "";
 
-                progress.hidden = true;
-                this.ui.fileInput.value = "";
-            });
+            // локально добавляем ссылку на файл в чат
+            const chatFileInfo: ChatFileInfo = {
+                username: localStorage['username'] as string,
+                fileId,
+                filename: file.name,
+                size: file.size
+            };
+            this.addNewFileLink(chatFileInfo);
 
-            xhr.send(formData);
-            progress.hidden = false;
-        }
+            // сообщаем серверу, чтобы разослал всем ссылку в чате
+            this.socket.emit('chatFile', fileId);
+        });
     }
 
     private addNewFileLink({ username, fileId, filename, size }: ChatFileInfo)
@@ -370,7 +359,7 @@ export class Room
             if (this.maxVideoBitrate != bitrate)
             {
                 this.maxVideoBitrate = bitrate;
-                console.debug('[Room] > New maxVideoBitrate in Mbit', bitrate / Room.MEGA);
+                console.debug('[Room] > New maxVideoBitrate in Mbit', bitrate / this.MEGA);
 
                 for (const producer of this.mediasoup.getProducers())
                 {
