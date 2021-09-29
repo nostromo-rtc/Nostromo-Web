@@ -16,6 +16,8 @@ export class UserMedia
     private ui: UI;
     private parent: Room;
 
+    // TODO: попробовать сделать явную инициализацию первым треком
+    // а то вроде бы Chrome не любит пустые MediaStream
     private stream = new MediaStream();
 
     private streamConstraintsMic: MediaStreamConstraints = {
