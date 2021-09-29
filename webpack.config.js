@@ -59,8 +59,12 @@ module.exports = {
                 test: /\.tsx?$/,
                 use: "ts-loader",
                 exclude: "/node_modules/"
+            },
+            {
+                test: /\.svg$/,
+                type: 'asset/source'
             }
-        ],
+        ]
     },
     resolve: {
         extensions: [".tsx", ".ts", ".js"]

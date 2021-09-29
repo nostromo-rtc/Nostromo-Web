@@ -1,5 +1,6 @@
 import Plyr from 'plyr';
 import { Howl } from 'howler';
+import svgSprite from "plyr/dist/plyr.svg";
 
 // Plyr добавляет поле с плеером в класс HTMLVideoElement
 declare global
@@ -89,6 +90,12 @@ export class UI
         { this.handleBtnToggleSounds(btn_toggleSounds!); });
 
         this.showUserName();
+
+        const spritePlyr = document.createElement("div");
+        spritePlyr.id = "sprite-plyr";
+        //spritePlyr.innerHTML = atob(svgSprite.replace(/data:image\/svg\+xml;base64,/, ''));
+        spritePlyr.innerHTML = svgSprite;
+        document.body.append(spritePlyr);
     }
 
     private handleBtnToggleSounds(btn_toggleSounds: HTMLButtonElement)
@@ -309,7 +316,8 @@ export class UI
             keyboard: { focused: false, global: false },
             clickToPlay: false,
             muted: (video.id == 'localVideo') ? true : this.mutePolicy,
-            controls: ['play-large', 'play', 'mute', 'volume', 'pip', 'fullscreen']
+            controls: ['play-large', 'play', 'mute', 'volume', 'pip', 'fullscreen'],
+            loadSprite: false
         });
 
         // добавляем стиль (чтобы было как fluid у videojs)
