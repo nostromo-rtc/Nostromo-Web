@@ -145,7 +145,7 @@ export class Room
         msgParagraph.innerHTML = `[${timestamp}] ${username}: `;
 
         const link: HTMLAnchorElement = document.createElement("a");
-        link.href = `${window.location.origin}/file/${fileId}`;
+        link.href = `${window.location.origin}/files/${fileId}`;
         link.text = `${filename} (${(size / (1024 * 1024)).toFixed(3)}) Mb`;
         link.target = "_blank";
 

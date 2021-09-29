@@ -1,5 +1,5 @@
-import indexSocketHandler from './indexSocketHandler.js';
-import authSocketHandler from './authSocketHandler.js';
+import indexSocketHandler from './indexSocketHandler';
+import authSocketHandler from './authSocketHandler';
 
 // создаем обработчики интерфейса и обработчики сокетов
 

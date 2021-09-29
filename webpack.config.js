@@ -1,7 +1,7 @@
 const path = require('path');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
-const BUILD_DIR = path.join('temp-build/');
+const BUILD_DIR = path.join('src/');
 const OUT_DIR = path.join('static/');
 
 const ADMIN_PATHNAME = path.join('admin/scripts/index');
@@ -14,9 +14,9 @@ const VENDOR_CSS_PATHNAME = path.join('public/styles/vendor');
 module.exports = {
     mode: "production",
     entry: {
-        [INDEX_PATHNAME]: path.join(__dirname, BUILD_DIR + INDEX_PATHNAME + '.js'),
-        [ADMIN_PATHNAME]: path.join(__dirname, BUILD_DIR + ADMIN_PATHNAME + '.js'),
-        [ROOM_PATHNAME]: path.join(__dirname, BUILD_DIR + ROOM_PATHNAME + '.js')
+        [INDEX_PATHNAME]: path.join(__dirname, BUILD_DIR + INDEX_PATHNAME + '.ts'),
+        [ADMIN_PATHNAME]: path.join(__dirname, BUILD_DIR + ADMIN_PATHNAME + '.ts'),
+        [ROOM_PATHNAME]: path.join(__dirname, BUILD_DIR + ROOM_PATHNAME + '.ts')
     },
     output: {
         path: path.join(__dirname, OUT_DIR),
@@ -55,6 +55,14 @@ module.exports = {
                     "css-loader"
                 ],
             },
+            {
+                test: /\.tsx?$/,
+                use: "ts-loader",
+                exclude: "/node_modules/"
+            }
         ],
+    },
+    resolve: {
+        extensions: [".tsx", ".ts", ".js"]
     }
 };

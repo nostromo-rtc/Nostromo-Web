@@ -1,3 +1,3 @@
-import adminSocketHandler from './adminSocketHandler.js';
+import adminSocketHandler from './adminSocketHandler';
 // создаем обработчик сокетов
 const adminSocketHandlerInstance = new adminSocketHandler();
