@@ -10,25 +10,34 @@ declare global
     }
 }
 
-// Класс, получающий медиапотоки пользователя
+/** Класс, получающий медиапотоки пользователя. */
 export class UserMedia
 {
-    private ui: UI;
-    private parent: Room;
+    /** Объект для работы с интерфейсом. */
+    private readonly ui: UI;
+    /** Объект - комната. */
+    private readonly parent: Room;
 
     // TODO: попробовать сделать явную инициализацию первым треком
     // а то вроде бы Chrome не любит пустые MediaStream
+
+    /** Медиапоток. */
     private stream = new MediaStream();
 
-    private streamConstraintsMic: MediaStreamConstraints = {
+    /** Настройки медиапотока при захвате микрофона. */
+    private readonly streamConstraintsMic: MediaStreamConstraints = {
         audio: true, video: false
     };
-    private streamConstraintsCam: MediaStreamConstraints = {
+
+    /** Настройки медиапотока при захвате веб-камеры. */
+    private readonly streamConstraintsCam: MediaStreamConstraints = {
         audio: false, video: true
     };
 
+    /** Микрофон на паузе? */
     private micPaused = false;
 
+    /** Настройки медиапотока при захвате видеоизображения экрана. */
     private captureConstraints: Map<string, MediaStreamConstraints>;
 
     constructor(_ui: UI, _parent: Room)
@@ -52,7 +61,7 @@ export class UserMedia
             () => this.toggleMic());
     }
 
-    // -- получение видео (веб-камера) или аудио (микрофон) потока -- //
+    /** Получение видео (веб-камера) или аудио (микрофон) потока. */
     private async getUserMedia(
         streamConstraints: MediaStreamConstraints
     ): Promise<void>
@@ -74,7 +83,7 @@ export class UserMedia
         }
     }
 
-    // -- захват видео с экрана юзера -- //
+    /** Захват видео с экрана юзера. */
     private async getDisplayMedia(): Promise<void>
     {
         try
@@ -93,7 +102,8 @@ export class UserMedia
         }
     }
 
-    private async handleMediaStream(mediaStream: MediaStream)
+    /** Обработка медиапотока. */
+    private async handleMediaStream(mediaStream: MediaStream) : Promise<void>
     {
         for (const newTrack of mediaStream.getTracks())
         {
@@ -142,6 +152,7 @@ export class UserMedia
         }
     }
 
+    /** Остановить медиадорожку. */
     private stopTrack(oldVideoTrack: MediaStreamTrack): void
     {
         // stop не вызывает событие ended,
@@ -151,7 +162,7 @@ export class UserMedia
         this.removeTrackFromStream(oldVideoTrack);
     }
 
-    // обработка закончившихся (ended) треков
+    /** Обработка закончившихся (ended) дорожек. */
     private handleEndedTrack(track: MediaStreamTrack): void
     {
         track.addEventListener('ended', () =>
@@ -171,7 +182,7 @@ export class UserMedia
         });
     }
 
-    // удалить медиадорожку из локального стрима
+    /** Удалить медиадорожку из локального стрима. */
     private removeTrackFromStream(track: MediaStreamTrack): void
     {
         this.stream.removeTrack(track);
@@ -195,6 +206,7 @@ export class UserMedia
         }
     }
 
+    /** Включить/выключить микрофон. */
     private toggleMic(): void
     {
         const audioTrack: MediaStreamTrack = this.stream.getAudioTracks()[0];
@@ -216,7 +228,7 @@ export class UserMedia
         }
     }
 
-    // подготовить опции с разрешениями
+    /** Подготовить опции с разрешениями захватываемого видеоизображения. */
     private prepareCaptureConstraints(): Map<string, MediaStreamConstraints>
     {
         const _constraints = new Map<string, MediaStreamConstraints>();
