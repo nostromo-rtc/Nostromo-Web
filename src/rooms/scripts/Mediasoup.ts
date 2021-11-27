@@ -2,7 +2,10 @@ import * as mediasoup from 'mediasoup-client';
 import { NewConsumerInfo, NewWebRtcTransportInfo } from 'nostromo-shared/types/RoomTypes';
 import { HandleCriticalError } from "./AppError";
 import MediasoupTypes = mediasoup.types;
+import Consumer = MediasoupTypes.Consumer;
+import Producer = MediasoupTypes.Producer;
 export { MediasoupTypes };
+
 
 export type TransportProduceParameters = {
     kind: MediasoupTypes.MediaKind,
@@ -10,31 +13,48 @@ export type TransportProduceParameters = {
     appData: unknown;
 };
 
-// Класс, получающий медиапотоки пользователя
+/** Класс, обрабатывающий медиапотоки пользователя. */
 export class Mediasoup
 {
-    private _device!: MediasoupTypes.Device;
-    public get device(): MediasoupTypes.Device { return this._device; }
+    /*
+     * Mediasoup device представляет собой конечную точку,
+     * которая подключается к серверу для отправки
+     * и/или получения медиапотоков.
+     */
+    public readonly device!: MediasoupTypes.Device;
 
-    // транспортный канал для отправки потоков
+    /** Транспортный канал для отправки потоков. */
     private _sendTransport?: MediasoupTypes.Transport;
-    public get sendTransport(): MediasoupTypes.Transport | undefined { return this._sendTransport; }
+    public get sendTransport(): MediasoupTypes.Transport | undefined
+    {
+        return this._sendTransport;
+    }
 
-    // транспортный канал для приема потоков
+    /** Транспортный канал для приёма потоков. */
     private _recvTransport?: MediasoupTypes.Transport;
-    public get recvTransport(): MediasoupTypes.Transport | undefined { return this._recvTransport; }
+    public get recvTransport(): MediasoupTypes.Transport | undefined
+    {
+        return this._recvTransport;
+    }
 
-    private _consumers = new Map<string, MediasoupTypes.Consumer>();
-    private _producers = new Map<string, MediasoupTypes.Producer>();
+    /** Потребители. */
+    private consumers = new Map<string, Consumer>();
 
-    /** @key trackId @value consumerId */
-    private _linkMapTrackConsumer = new Map<string, string>();
+    /** Производители. */
+    private producers = new Map<string, Producer>();
+
+    /**
+     * Контейнер-связка Id потребителя и Id медиадорожки.
+     * @key trackId
+     * @value consumerId
+     */
+    private linkMapTrackConsumer = new Map<string, string>();
 
     constructor()
     {
         try
         {
-            this._device = new mediasoup.Device();
+            this.device = new mediasoup.Device();
         }
         catch (error)
         {
@@ -42,11 +62,13 @@ export class Mediasoup
         }
     }
 
-    // загружаем mediasoup device от rtpCapabilities с сервера
+    /** Загрузить mediasoup device от rtpCapabilities (кодеки) с сервера. */
     public async loadDevice(routerRtpCapabilities: MediasoupTypes.RtpCapabilities): Promise<void>
     {
         await this.device.load({ routerRtpCapabilities });
     }
+
+    /** Создать транспортный канал для приёма медиапотоков. */
     public createRecvTransport(transport: NewWebRtcTransportInfo): void
     {
         const { id, iceParameters, iceCandidates, dtlsParameters } = transport;
@@ -58,6 +80,8 @@ export class Mediasoup
             dtlsParameters
         });
     }
+
+    /** Создать транспортный канал для отдачи медиапотоков. */
     public createSendTransport(transport: NewWebRtcTransportInfo): void
     {
         const { id, iceParameters, iceCandidates, dtlsParameters } = transport;
@@ -69,7 +93,9 @@ export class Mediasoup
             dtlsParameters
         });
     }
-    public async createConsumer(newConsumerInfo: NewConsumerInfo): Promise<MediasoupTypes.Consumer>
+
+    /** Создать потребителя медиапотока. */
+    public async createConsumer(newConsumerInfo: NewConsumerInfo): Promise<Consumer>
     {
         const { id, producerId, kind, rtpParameters } = newConsumerInfo;
 
@@ -80,13 +106,14 @@ export class Mediasoup
             rtpParameters
         });
 
-        this._consumers.set(consumer.id, consumer);
-        this._linkMapTrackConsumer.set(consumer.track.id, consumer.id);
+        this.consumers.set(consumer.id, consumer);
+        this.linkMapTrackConsumer.set(consumer.track.id, consumer.id);
 
         return consumer;
     }
 
-    public async createProducer(track: MediaStreamTrack, maxBitrate: number): Promise<MediasoupTypes.Producer>
+    /** Создать изготовителя медиапотока. */
+    public async createProducer(track: MediaStreamTrack, maxBitrate: number): Promise<Producer>
     {
         const producer = await this.sendTransport!.produce({
             track,
@@ -102,45 +129,46 @@ export class Mediasoup
             ]
         });
 
-        this._producers.set(producer.id, producer);
+        this.producers.set(producer.id, producer);
 
         return producer;
     }
 
-    // получить consumer по id
-    public getConsumer(consumerId: string): MediasoupTypes.Consumer | undefined
+    /** Получить consumer по Id. */
+    public getConsumer(consumerId: string): Consumer | undefined
     {
-        return this._consumers.get(consumerId);
+        return this.consumers.get(consumerId);
     }
 
-    // получить consumer по id его track'а
+    /** Получить consumer по Id его track'а. */
     public getConsumerByTrackId(trackId: string): string | undefined
     {
-        return this._linkMapTrackConsumer.get(trackId);
+        return this.linkMapTrackConsumer.get(trackId);
     }
 
-    // удалить consumer
-    public deleteConsumer(consumer: MediasoupTypes.Consumer): boolean
+    /** Удалить consumer. */
+    public deleteConsumer(consumer: Consumer): boolean
     {
-        const res1 = this._consumers.delete(consumer.id);
-        const res2 = this._linkMapTrackConsumer.delete(consumer.track.id);
+        const res1 = this.consumers.delete(consumer.id);
+        const res2 = this.linkMapTrackConsumer.delete(consumer.track.id);
         return (res1 && res2);
     }
 
-    // получить producer по id
-    public getProducer(producerId: string): MediasoupTypes.Producer | undefined
+    /** Получить producer по Id. */
+    public getProducer(producerId: string): Producer | undefined
     {
-        return this._producers.get(producerId);
+        return this.producers.get(producerId);
     }
 
-    // получить всех producers (итератор)
-    public getProducers(): IterableIterator<MediasoupTypes.Producer>
+    /** Получить всех producers (итератор). */
+    public getProducers(): IterableIterator<Producer>
     {
-        return this._producers.values();
+        return this.producers.values();
     }
-    // удалить producer
-    public deleteProducer(producer: MediasoupTypes.Producer): boolean
+
+    /** Удалить producer. */
+    public deleteProducer(producer: Producer): boolean
     {
-        return this._producers.delete(producer.id);
+        return this.producers.delete(producer.id);
     }
 }
