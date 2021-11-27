@@ -2,7 +2,7 @@ import Plyr from 'plyr';
 import { Howl } from 'howler';
 import svgSprite from "plyr/dist/plyr.svg";
 
-// Plyr добавляет поле с плеером в класс HTMLVideoElement
+// Plyr добавляет поле с плеером в класс HTMLVideoElement.
 declare global
 {
     interface HTMLVideoElement
@@ -11,70 +11,76 @@ declare global
     }
 }
 
-// Класс для работы с интерфейсом (веб-страница)
+/** Класс для работы с интерфейсом (веб-страница). */
 export class UI
 {
-    // кнопки
-    private _buttons: Map<string, HTMLButtonElement> = this.prepareButtons();
-    public get buttons(): Map<string, HTMLButtonElement>
-    { return this._buttons; }
+    /** Кнопки. */
+    public readonly buttons: Map<string, HTMLButtonElement> = this.prepareButtons();
 
-    // название комнаты
+    /** Название комнаты. */
     private _roomName = document.getElementById('roomName') as HTMLSpanElement;
     public get roomName(): string
-    { return this._roomName.innerText; }
+    {
+        return this._roomName.innerText;
+    }
     public set roomName(name: string)
-    { this._roomName.innerText = name; }
+    {
+        this._roomName.innerText = name;
+    }
 
-    // метка локального видео
+    /** Текстовая метка локального видео. */
     private localVideoLabel: HTMLSpanElement = this.prepareLocalVideoLabel();
 
-    // контейнер с видеоэлементами
+    /** Контейнер с видеоэлементами. */
     private _allVideos = new Map<string, HTMLVideoElement>();
     public get allVideos(): Map<string, HTMLVideoElement>
-    { return this._allVideos; }
+    {
+        return this._allVideos;
+    }
+
+    /** Видеоэлемент локального видео. */
     public get localVideo(): HTMLVideoElement | undefined
-    { return this._allVideos.get('localVideo'); }
+    {
+        return this._allVideos.get('localVideo');
+    }
 
-    // чат
-    private _chat = document.getElementById('chat') as HTMLDivElement;
-    public get chat() : HTMLDivElement
-    { return this._chat; }
+    /** Чат. */
+    public readonly chat = document.getElementById('chat') as HTMLDivElement;
 
-    // поле для выбора файла
-    private _fileInput = document.getElementById('fileInput') as HTMLInputElement;
-    public get fileInput() : HTMLInputElement
-    { return this._fileInput; }
+    /** Поле для выбора файла. */
+    public readonly fileInput = document.getElementById('fileInput') as HTMLInputElement;
 
-    // прогресс отправки файла
-    private _sendProgress = document.getElementById("sendProgress") as HTMLProgressElement;
-    public get sendProgress() : HTMLProgressElement
-    { return this._sendProgress; }
+    /** Прогресс отправки файла. */
+    public readonly sendProgress = document.getElementById("sendProgress") as HTMLProgressElement;
 
-    // сообщение пользователя, отправляемое в чат
-    private _messageText = document.getElementById('messageText') as HTMLTextAreaElement;
-    public get messageText() : HTMLTextAreaElement
-    { return this._messageText; }
+    /** Сообщение пользователя, отправляемое в чат. */
+    public readonly messageText = document.getElementById('messageText') as HTMLTextAreaElement;
 
-    // настройки захвата видео
+    /** Список разрешений захвата видеоизображения. */
     private captureSettings = document.getElementById('captureSettings') as HTMLSelectElement;
+
+    /** Получить выбранное пользователем разрешение для захвата видеоизображения. */
     public get currentCaptureSetting(): string
-    { return this.captureSettings.value; }
+    {
+        return this.captureSettings.value;
+    }
 
-    // поле для ввода имени пользователя
-    private _usernameInput = document.getElementById('usernameInput') as HTMLInputElement;
-    public get usernameInputValue(): string
-    { return this._usernameInput.value; }
+    /** Поле для ввода имени пользователя. */
+    public readonly usernameInput = document.getElementById('usernameInput') as HTMLInputElement;
 
-    // количество строк и столбцов в раскладке
+    /** Количество строк в раскладке. */
     private videoRows = 2;
+
+    /** Количество столбцов в раскладке. */
     private videoColumns = 2;
 
-    // текущая политика Mute для видео (свойство muted)
+    /** Текущая политика Mute для видео (свойство muted). */
     private mutePolicy = true;
 
-    // звуки-оповещения
+    /** Звук-оповещение о входе нового пользователя. */
     public joinedSound = new Howl({ src: '/rooms/sounds/joined.mp3' });
+
+    /** Звук-оповещение об уходе пользователя. */
     public leftSound = new Howl({ src: '/rooms/sounds/left.mp3' });
 
     constructor()
@@ -98,7 +104,8 @@ export class UI
         document.body.append(spritePlyr);
     }
 
-    private handleBtnToggleSounds(btn_toggleSounds: HTMLButtonElement)
+    /** Обработчик toogle-кнопки включения/выключения звуков собеседника. */
+    private handleBtnToggleSounds(btn_toggleSounds: HTMLButtonElement) : void
     {
         if (this.mutePolicy)
         {
@@ -116,28 +123,31 @@ export class UI
         }
     }
 
+    /** Добавить новое разрешение захватываемого видеоизображения. */
     public addCaptureSetting(label: string, value: string): void
     {
         const newSetting = new Option(label, value);
         this.captureSettings.add(newSetting);
     }
 
+    /** Подготовить контейнер map с кнопками. */
     private prepareButtons(): Map<string, HTMLButtonElement>
     {
         const buttons = new Map<string, HTMLButtonElement>();
 
-        buttons.set('getUserMediaMic',  document.getElementById('btn_getUserMediaMic')  as HTMLButtonElement);
-        buttons.set('toggleMic',        document.getElementById('btn_toggleMic')        as HTMLButtonElement);
-        buttons.set('getUserMediaCam',  document.getElementById('btn_getUserMediaCam')  as HTMLButtonElement);
-        buttons.set('getDisplayMedia',  document.getElementById('btn_getDisplayMedia')  as HTMLButtonElement);
-        buttons.set('sendMessage',      document.getElementById('btn_sendMessage')      as HTMLButtonElement);
-        buttons.set('sendFile',         document.getElementById('btn_sendFile')         as HTMLButtonElement);
-        buttons.set('toggleSounds',     document.getElementById('btn_toggleSounds')     as HTMLButtonElement);
-        buttons.set('setNewUsername',   document.getElementById('btn_setNewUsername')   as HTMLButtonElement);
+        buttons.set('getUserMediaMic', document.getElementById('btn_getUserMediaMic') as HTMLButtonElement);
+        buttons.set('toggleMic', document.getElementById('btn_toggleMic') as HTMLButtonElement);
+        buttons.set('getUserMediaCam', document.getElementById('btn_getUserMediaCam') as HTMLButtonElement);
+        buttons.set('getDisplayMedia', document.getElementById('btn_getDisplayMedia') as HTMLButtonElement);
+        buttons.set('sendMessage', document.getElementById('btn_sendMessage') as HTMLButtonElement);
+        buttons.set('sendFile', document.getElementById('btn_sendFile') as HTMLButtonElement);
+        buttons.set('toggleSounds', document.getElementById('btn_toggleSounds') as HTMLButtonElement);
+        buttons.set('setNewUsername', document.getElementById('btn_setNewUsername') as HTMLButtonElement);
 
         return buttons;
     }
 
+    /** Обработка событий для виджета, куда вводится сообщение пользователя, отправляемое в чат. */
     private prepareMessageText(): void
     {
         this.messageText.addEventListener('keydown', (e) =>
@@ -145,32 +155,34 @@ export class UI
             if (e.key == 'Enter' && !e.shiftKey)
             {
                 e.preventDefault();
-                this._buttons.get('sendMessage')!.click();
+                this.buttons.get('sendMessage')!.click();
                 this.messageText.value = '';
             }
         });
     }
 
+    /** Установить новое имя для пользователя. */
     public setNewUsername(): void
     {
-        localStorage['username'] = this._usernameInput.value;
+        localStorage['username'] = this.usernameInput.value;
         this.showUserName();
     }
 
+    /** Показать имя пользователя. */
     private showUserName(): void
     {
         if (localStorage['username'] == undefined) localStorage['username'] = 'Гость';
-        this._usernameInput.value = localStorage['username'] as string;
+        this.usernameInput.value = localStorage['username'] as string;
         this.localVideoLabel.innerText = localStorage['username'] as string;
     }
 
-    // включить звук для всех видео
+    /** Включить звук для всех видео. */
     private enableSounds(): void
     {
         this.disableSounds(false);
     }
 
-    // выключить звук для всех видео
+    /** Выключить звук для всех видео. */
     private disableSounds(disable = true): void
     {
         for (const video of this._allVideos)
@@ -183,7 +195,7 @@ export class UI
         this.mutePolicy = disable;
     }
 
-    // добавить новый видеоэлемент собеседника
+    /** Добавить новый видеоэлемент для нового собеседника. */
     public addVideo(remoteVideoId: string, name: string): void
     {
         const newVideoItem = document.createElement('div');
@@ -216,13 +228,13 @@ export class UI
         this.resizeVideos();
     }
 
-    // обновления метки видеоэлемента собеседника
+    /** Обновления текстовой метки видеоэлемента собеседника. */
     public updateVideoLabel(remoteVideoId: string, newName: string): void
     {
         document.getElementById(`remoteVideoLabel-${remoteVideoId}`)!.innerText = newName;
     }
 
-    // удалить видео собеседника (и опцию для чата/файлов тоже)
+    /** Удалить видео собеседника (и обновить раскладку). */
     public removeVideo(id: string): void
     {
         const videoItem = document.getElementById(`remoteVideoItem-${id}`);
@@ -241,8 +253,10 @@ export class UI
         }
     }
 
-    // подсчитать количество столбцов и строк в раскладке
-    // в зависимости от количества собеседников
+    /**
+     *  Подсчитать количество столбцов и строк в раскладке
+     *  в зависимости от количества собеседников.
+     */
     private calculateLayout(): void
     {
         const videoCount = this._allVideos.size;
@@ -255,26 +269,38 @@ export class UI
         else if (videoCount > this.videoColumns * this.videoRows)
         {
             // если количество столбцов не равно количеству строк, значит увеличиваем количество строк
-            if (this.videoColumns != this.videoRows) ++this.videoRows;
+            if (this.videoColumns != this.videoRows)
+            {
+                ++this.videoRows;
+            }
             // иначе увеличиваем количество столбцов
-            else ++this.videoColumns;
+            else
+            {
+                ++this.videoColumns;
+            }
         } // пересчитываем сетку и после выхода пользователей
         else if (videoCount < this.videoColumns * this.videoRows)
         {
             if (this.videoColumns == this.videoRows &&
-                (videoCount <= this.videoColumns * (this.videoRows - 1))) { --this.videoRows; }
+                (videoCount <= this.videoColumns * (this.videoRows - 1)))
+            {
+                --this.videoRows;
+            }
             else if (this.videoColumns != this.videoRows &&
-                (videoCount <= (this.videoColumns - 1) * this.videoRows)) { --this.videoColumns; }
+                (videoCount <= (this.videoColumns - 1) * this.videoRows))
+            {
+                --this.videoColumns;
+            }
         }
     }
 
-    // перестроить раскладку
+    /** Перестроить раскладку. */
     private resizeVideos(): void
     {
         const header_offset = 82.5;
-        const nav_offset    = 150;
-        const offset        = 30;
-        const aspect_ratio  = 16 / 9;
+        const nav_offset = 150;
+        const offset = 30;
+        const aspect_ratio = 16 / 9;
         // max_h для регулирования размеров видео, чтобы оно вмещалось в videoRows (количество) строк
         const max_h = ((document.documentElement.clientHeight - header_offset) / this.videoRows) - offset;
         const flexBasis = ((document.documentElement.clientWidth - nav_offset) / this.videoColumns) - offset;
@@ -285,7 +311,7 @@ export class UI
         }
     }
 
-    // подготовить локальный видеоэлемент
+    /** Подготовить локальный видеоэлемент. */
     private prepareLocalVideo(): void
     {
         const localVideoItem = document.createElement('div');
@@ -307,6 +333,7 @@ export class UI
         this.prepareVideoPlayer(localVideo);
     }
 
+    /** Подготовить плеер для локального видеоэлемента. */
     private prepareVideoPlayer(video: HTMLVideoElement)
     {
         const player = new Plyr(video, {
@@ -328,7 +355,7 @@ export class UI
         this.hideControls(player);
     }
 
-    // скрыть элементы управления у плеера
+    /** Скрыть элементы управления у плеера. */
     public hideControls(player: Plyr, hide = true): void
     {
         player.elements.controls!.hidden = hide;
@@ -337,14 +364,14 @@ export class UI
         btns_play[0].hidden = hide;
     }
 
-    // скрыть регулировку звука у плеера
+    /** Скрыть регулировку звука у плеера. */
     public hideVolumeControl(player: Plyr, hide = true): void
     {
         const volumeDiv: HTMLDivElement = player.elements.controls!.querySelector('.plyr__volume')!;
         volumeDiv.hidden = hide;
     }
 
-    // показать элементы управления у плеера
+    /** Показать элементы управления у плеера. */
     public showControls(player: Plyr, hasAudio: boolean): void
     {
         // не скрывать элементы управления
@@ -355,6 +382,7 @@ export class UI
         this.hideVolumeControl(player, !hasAudio);
     }
 
+    /** Подготовить текстовую метку для локального видеоэлемента. */
     private prepareLocalVideoLabel(): HTMLSpanElement
     {
         const label = document.createElement('span');
