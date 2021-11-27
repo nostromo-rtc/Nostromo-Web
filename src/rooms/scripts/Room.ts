@@ -27,12 +27,12 @@ import
     ChatFileInfo
 } from "nostromo-shared/types/RoomTypes";
 
-// callback при transport.on("connect")
+/** Callback при transport.on("connect"). */
 type CallbackOnConnect = {
     (): void;
 };
 
-// callback при transport.on("produce")
+/** Callback при transport.on("produce"). */
 type CallbackOnProduce = {
     ({ id }: { id: string; }): void;
 };
@@ -40,6 +40,8 @@ type CallbackOnProduce = {
 type Errback = {
     (error?: unknown): void;
 };
+
+/** Дополнительные данные для Consumer. */
 interface ConsumerAppData
 {
     /** Consumer был поставлен на паузу со стороны клиента (плеер на паузе) */
@@ -52,31 +54,37 @@ interface ConsumerAppData
     serverPaused: boolean;
 }
 
-// класс - комната
+/** Класс - комната. */
 export class Room
 {
-    // для работы с интерфейсом
-    private ui: UI;
+    /** Объект для работы с интерфейсом. */
+    private readonly ui: UI;
 
-    // для работы с веб-сокетами
-    private socket: Socket;
+    /** Объект для работы с веб-сокетами. */
+    private readonly socket: Socket;
 
-    // для захватов медиапотоков пользователя
-    private userMedia: UserMedia;
+    /** Объект для захватов медиапотоков пользователя. */
+    private readonly userMedia: UserMedia;
 
-    // для работы с mediasoup-client
-    private mediasoup: Mediasoup;
+    /** Объект для работы с библиотекой mediasoup-client. */
+    private readonly mediasoup: Mediasoup;
 
-    // для заливки файлов
-    private fileHandler: FileHandler;
+    /** Объект для загрузки файлов. */
+    private readonly fileHandler: FileHandler;
 
-    // максимальный битрейт для видео
+    /** Кило. */
     private readonly KILO = 1024;
+
+    /** Мега. */
     private readonly MEGA = 1024 * 1024;
+
+    /** Максимальный битрейт для видеодорожек. */
     private maxVideoBitrate = 10 * this.MEGA;
+
+    /** Максимальный битрейт для аудиодорожек. */
     private maxAudioBitrate = 64 * this.KILO;
 
-    // задержка после входа на воспроизведение звуковых оповещений
+    /** Задержка после входа на воспроизведение звуковых оповещений. */
     private soundDelayAfterJoin = true;
 
     constructor(_ui: UI, _mediasoup: Mediasoup, _fileHandler: FileHandler)
@@ -108,6 +116,7 @@ export class Room
         this.handleFileUpload();
     }
 
+    /** Обработка загрузки файлов. */
     private handleFileUpload()
     {
         this.ui.buttons.get('sendFile')!.addEventListener('click', async () =>
@@ -137,6 +146,7 @@ export class Room
         });
     }
 
+    /** Добавить ссылку на файл filename в чат. */
     private addNewFileLink({ username, fileId, filename, size }: ChatFileInfo)
     {
         const timestamp = this.getTimestamp();
@@ -155,6 +165,7 @@ export class Room
         this.ui.chat.scrollTop = this.ui.chat.scrollHeight;
     }
 
+    /** Обработка событий интерфейса связанных с чатом. */
     private handleChat()
     {
         this.ui.buttons.get('sendMessage')!.addEventListener('click', () =>
@@ -169,6 +180,7 @@ export class Room
         });
     }
 
+    /** Вывести новое сообщение в чате. */
     private addNewChatMsg(username: string, message: string)
     {
         const timestamp = this.getTimestamp();
@@ -180,6 +192,7 @@ export class Room
         this.ui.chat.scrollTop = this.ui.chat.scrollHeight;
     }
 
+    /** Обработка событий Socket. */
     private handleSocketEvents()
     {
         this.socket.on('connect', () =>
@@ -402,7 +415,7 @@ export class Room
         });
     }
 
-    // обрабатываем паузу и снятие паузы на плеере
+    /** Обработка паузы и снятие паузы на плеере. */
     private pauseAndPlayEventsPlayerHandler(id: string)
     {
         const remoteVideo = this.ui.allVideos.get(id);
@@ -464,6 +477,7 @@ export class Room
         remoteVideo.addEventListener('play', () => listenerFunc(false));
     }
 
+    /** Получить время в формате 00:00:00 (24 часа). */
     private getTimestamp(): string
     {
         const timestamp = (new Date).toLocaleString("en-us", {
@@ -475,20 +489,20 @@ export class Room
         return timestamp;
     }
 
-    // обработка нажатий на кнопки
+    /** Обработка нажатий на кнопки. */
     private handleButtons(): void
     {
         this.ui.buttons.get('setNewUsername')!.addEventListener('click', () =>
         {
             this.ui.setNewUsername();
 
-            console.debug('[Room] > Ник был изменен на', this.ui.usernameInputValue);
+            console.debug('[Room] > Ник был изменен на', this.ui.usernameInput.value);
 
-            this.socket.emit('newUsername', this.ui.usernameInputValue);
+            this.socket.emit('newUsername', this.ui.usernameInput.value);
         });
     }
 
-    // получение rtpCapabilities сервера и инициализация ими mediasoup device
+    /** Получение rtpCapabilities (кодеки) сервера и инициализация ими mediasoup device. */
     private async routerRtpCapabilities(routerRtpCapabilities: MediasoupTypes.RtpCapabilities): Promise<void>
     {
         await this.mediasoup.loadDevice(routerRtpCapabilities);
@@ -501,7 +515,7 @@ export class Room
         this.socket.emit('createWebRtcTransport', !consuming);
     }
 
-    // обработка общих событий для входящего и исходящего транспортных каналов
+    /** Обработка общих событий для входящего и исходящего транспортных каналов. */
     private handleCommonTransportEvents(localTransport: MediasoupTypes.Transport): void
     {
         localTransport.on('connect', (
@@ -538,7 +552,7 @@ export class Room
         });
     }
 
-    // создаем транспортный канал для приема потоков
+    /** Cоздать транспортный канал для приема потоков. */
     private createRecvTransport(transport: NewWebRtcTransportInfo): void
     {
         // создаем локальный транспортный канал
@@ -553,7 +567,7 @@ export class Room
         // теперь, когда транспортный канал для приема потоков создан
         // войдем в комнату - т.е сообщим имя и наши rtpCapabilities
         const info: JoinInfo = {
-            name: this.ui.usernameInputValue,
+            name: this.ui.usernameInput.value,
             rtpCapabilities: this.mediasoup.device.rtpCapabilities
         };
 
@@ -561,7 +575,7 @@ export class Room
         this.socket.emit('join', info);
     }
 
-    // создаем транспортный канал для отдачи потоков
+    /** Создать транспортный канал для отдачи потоков. */
     private createSendTransport(transport: NewWebRtcTransportInfo): void
     {
         // создаем локальный транспортный канал
@@ -577,7 +591,7 @@ export class Room
         this.handleSendTransportEvents(localTransport);
     }
 
-    // обработка событий исходящего транспортного канала
+    /** Обработка событий исходящего транспортного канала. */
     private handleSendTransportEvents(localTransport: MediasoupTypes.Transport): void
     {
         localTransport.on('produce', (
@@ -609,7 +623,7 @@ export class Room
         });
     }
 
-    // новый входящий медиапоток
+    /** Обработка события - новый входящий медиапоток. */
     private async newConsumer(newConsumerInfo: NewConsumerInfo): Promise<void>
     {
         const consumer = await this.mediasoup.createConsumer(newConsumerInfo);
@@ -659,7 +673,7 @@ export class Room
         }
     }
 
-    // добавить медиапоток (одну дорожку) в подключение
+    /** Добавить медиапоток (одну дорожку) в подключение. */
     public async addMediaStreamTrack(track: MediaStreamTrack): Promise<void>
     {
         const maxBitrate = (track.kind == 'video') ? this.maxVideoBitrate : this.maxAudioBitrate;
@@ -668,7 +682,7 @@ export class Room
         await this.mediasoup.createProducer(track, maxBitrate);
     }
 
-    // обновить существующее медиа
+    /** Обновить существующую медиадорожку. */
     public async updateMediaStreamTrack(oldTrackId: string, track: MediaStreamTrack): Promise<void>
     {
         const producer = Array.from(this.mediasoup.getProducers())
@@ -677,7 +691,7 @@ export class Room
         if (producer) await producer.replaceTrack({ track });
     }
 
-    // удалить медиапоток (дорожку) из подключения
+    /** Удалить медиапоток (дорожку) из подключения. */
     public removeMediaStreamTrack(trackId: string): void
     {
         const producer = Array.from(this.mediasoup.getProducers())
@@ -691,7 +705,7 @@ export class Room
         }
     }
 
-    // поставить медиапоток (дорожку) на паузу
+    /** Поставить медиапоток (дорожку) на паузу. */
     public pauseMediaStreamTrack(trackId: string): void
     {
         const producer = Array.from(this.mediasoup.getProducers())
@@ -704,7 +718,7 @@ export class Room
         }
     }
 
-    // снять медиапоток (дорожку) с паузы
+    /** Снять медиапоток (дорожку) с паузы. */
     public resumeMediaStreamTrack(trackId: string): void
     {
         const producer = Array.from(this.mediasoup.getProducers())
