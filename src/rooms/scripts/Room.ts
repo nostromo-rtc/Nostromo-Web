@@ -117,7 +117,7 @@ export class Room
     }
 
     /** Обработка загрузки файлов. */
-    private handleFileUpload()
+    private handleFileUpload(): void
     {
         this.ui.buttons.get('sendFile')!.addEventListener('click', async () =>
         {
@@ -147,7 +147,10 @@ export class Room
     }
 
     /** Добавить ссылку на файл filename в чат. */
-    private addNewFileLink({ username, fileId, filename, size }: ChatFileInfo)
+    private addNewFileLink({ username,
+        fileId,
+        filename,
+        size }: ChatFileInfo): void
     {
         const timestamp = this.getTimestamp();
 
@@ -166,7 +169,7 @@ export class Room
     }
 
     /** Обработка событий интерфейса связанных с чатом. */
-    private handleChat()
+    private handleChat() : void
     {
         this.ui.buttons.get('sendMessage')!.addEventListener('click', () =>
         {
@@ -181,7 +184,7 @@ export class Room
     }
 
     /** Вывести новое сообщение в чате. */
-    private addNewChatMsg(username: string, message: string)
+    private addNewChatMsg(username: string, message: string) : void
     {
         const timestamp = this.getTimestamp();
 
@@ -193,7 +196,7 @@ export class Room
     }
 
     /** Обработка событий Socket. */
-    private handleSocketEvents()
+    private handleSocketEvents() : void
     {
         this.socket.on('connect', () =>
         {
@@ -416,7 +419,7 @@ export class Room
     }
 
     /** Обработка паузы и снятие паузы на плеере. */
-    private pauseAndPlayEventsPlayerHandler(id: string)
+    private pauseAndPlayEventsPlayerHandler(id: string): void
     {
         const remoteVideo = this.ui.allVideos.get(id);
         if (!remoteVideo) return;
