@@ -1,5 +1,4 @@
 import { UI } from "./UI";
-import { UserMedia } from './UserMedia';
 import { FileHandler } from "./FileHandler";
 
 import { io, Socket } from "socket.io-client";
@@ -63,9 +62,6 @@ export class Room
     /** Объект для работы с веб-сокетами. */
     private readonly socket: Socket;
 
-    /** Объект для захватов медиапотоков пользователя. */
-    private readonly userMedia: UserMedia;
-
     /** Объект для работы с библиотекой mediasoup-client. */
     private readonly mediasoup: Mediasoup;
 
@@ -97,7 +93,6 @@ export class Room
             'transports': ['websocket']
         });
 
-        this.userMedia = new UserMedia(this.ui, this);
         this.mediasoup = _mediasoup;
         this.fileHandler = _fileHandler;
 

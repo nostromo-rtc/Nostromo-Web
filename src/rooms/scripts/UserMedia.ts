@@ -15,8 +15,9 @@ export class UserMedia
 {
     /** Объект для работы с интерфейсом. */
     private readonly ui: UI;
+
     /** Объект - комната. */
-    private readonly parent: Room;
+    private readonly room: Room;
 
     // TODO: попробовать сделать явную инициализацию первым треком
     // а то вроде бы Chrome не любит пустые MediaStream
@@ -40,12 +41,12 @@ export class UserMedia
     /** Настройки медиапотока при захвате видеоизображения экрана. */
     private captureConstraints: Map<string, MediaStreamConstraints>;
 
-    constructor(_ui: UI, _parent: Room)
+    constructor(_ui: UI, _room: Room)
     {
         console.debug("[UserMedia] > ctor");
 
-        this.ui = _ui;          // интерфейс
-        this.parent = _parent;  // родительский класс
+        this.ui = _ui;
+        this.room = _room;
         this.captureConstraints = this.prepareCaptureConstraints();
 
         this.ui.buttons.get('getUserMediaMic')!.addEventListener('click',
@@ -117,7 +118,7 @@ export class UserMedia
                 {
                     presentSameKindMedia = true;
                     this.stopTrack(oldTrack);
-                    await this.parent.updateMediaStreamTrack(oldTrack.id, newTrack);
+                    await this.room.updateMediaStreamTrack(oldTrack.id, newTrack);
                 }
             }
 
@@ -147,7 +148,7 @@ export class UserMedia
             // если не было
             if (!presentSameKindMedia)
             {
-                await this.parent.addMediaStreamTrack(newTrack);
+                await this.room.addMediaStreamTrack(newTrack);
             }
         }
     }
@@ -168,7 +169,7 @@ export class UserMedia
         track.addEventListener('ended', () =>
         {
             this.removeTrackFromStream(track);
-            this.parent.removeMediaStreamTrack(track.id);
+            this.room.removeMediaStreamTrack(track.id);
             if (track.kind == 'audio')
             {
                 // поскольку аудиодорожка была удалена, значит новая точно
@@ -214,14 +215,14 @@ export class UserMedia
         const btn_toggleMic = this.ui.buttons.get('toggleMic');
         if (!this.micPaused)
         {
-            this.parent.pauseMediaStreamTrack(audioTrack.id);
+            this.room.pauseMediaStreamTrack(audioTrack.id);
             btn_toggleMic!.innerText = 'Включить микрофон';
             btn_toggleMic!.classList.replace('background-red', 'background-green');
             this.micPaused = true;
         }
         else
         {
-            this.parent.resumeMediaStreamTrack(audioTrack.id);
+            this.room.resumeMediaStreamTrack(audioTrack.id);
             btn_toggleMic!.innerText = 'Выключить микрофон';
             btn_toggleMic!.classList.replace('background-green', 'background-red');
             this.micPaused = false;
