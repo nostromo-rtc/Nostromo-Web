@@ -35,7 +35,7 @@ function getErrorMsg(error: Error): ErrorMsg
     }
 }
 
-export function HandleCriticalError(error: Error) : void
+export function handleCriticalError(error: Error) : void
 {
     const { consoleMsg, alertMsg } = getErrorMsg(error);
     console.error(consoleMsg, error);

@@ -3,7 +3,7 @@ import { FileHandler } from "./FileHandler";
 
 import { io, Socket } from "socket.io-client";
 
-import { HandleCriticalError, TransportFailedError } from "./AppError";
+import { handleCriticalError, TransportFailedError } from "./AppError";
 
 import
 {
@@ -83,6 +83,9 @@ export class Room
     /** Задержка после входа на воспроизведение звуковых оповещений. */
     private soundDelayAfterJoin = true;
 
+    /** Id комнаты. */
+    private roomId: string;
+
     constructor(_ui: UI, _mediasoup: Mediasoup, _fileHandler: FileHandler)
     {
         console.debug("[Room] > ctor");
@@ -95,6 +98,9 @@ export class Room
 
         this.mediasoup = _mediasoup;
         this.fileHandler = _fileHandler;
+
+        // TODO: изменить способ получения Id комнаты
+        this.roomId = document.location.pathname.split('/').slice(-1)[0];
 
         // обработка кнопок
         this.handleButtons();
@@ -124,7 +130,7 @@ export class Room
             if (!file) return;
 
             // загружаем файл
-            const fileId = await this.fileHandler.fileUpload(file, progress);
+            const fileId = await this.fileHandler.fileUpload(this.roomId, file, progress);
             fileInput.value = "";
 
             // локально добавляем ссылку на файл в чат
@@ -164,7 +170,7 @@ export class Room
     }
 
     /** Обработка событий интерфейса связанных с чатом. */
-    private handleChat() : void
+    private handleChat(): void
     {
         this.ui.buttons.get('sendMessage')!.addEventListener('click', () =>
         {
@@ -179,7 +185,7 @@ export class Room
     }
 
     /** Вывести новое сообщение в чате. */
-    private addNewChatMsg(username: string, message: string) : void
+    private addNewChatMsg(username: string, message: string): void
     {
         const timestamp = this.getTimestamp();
 
@@ -191,7 +197,7 @@ export class Room
     }
 
     /** Обработка событий Socket. */
-    private handleSocketEvents() : void
+    private handleSocketEvents(): void
     {
         this.socket.on('connect', () =>
         {
@@ -545,7 +551,7 @@ export class Room
             // так и не получилось подключиться
             if (state == "failed")
             {
-                HandleCriticalError(new TransportFailedError("ICE connection state change is failed."));
+                handleCriticalError(new TransportFailedError("ICE connection state change is failed."));
             }
         });
     }

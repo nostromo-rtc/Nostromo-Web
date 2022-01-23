@@ -1,6 +1,6 @@
 import * as mediasoup from 'mediasoup-client';
 import { NewConsumerInfo, NewWebRtcTransportInfo } from 'nostromo-shared/types/RoomTypes';
-import { HandleCriticalError } from "./AppError";
+import { handleCriticalError } from "./AppError";
 import MediasoupTypes = mediasoup.types;
 import Consumer = MediasoupTypes.Consumer;
 import Producer = MediasoupTypes.Producer;
@@ -58,7 +58,7 @@ export class Mediasoup
         }
         catch (error)
         {
-            HandleCriticalError(error as Error);
+            handleCriticalError(error as Error);
         }
     }
 

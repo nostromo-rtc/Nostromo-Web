@@ -3,19 +3,19 @@ import { Mediasoup } from './Mediasoup';
 import { UserMedia } from './UserMedia';
 import { FileHandler } from "./FileHandler";
 import { Room } from './Room';
-import { HandleCriticalError } from "./AppError";
+import { handleCriticalError } from "./AppError";
 
 import 'plyr/dist/plyr.css';
 
 
 window.addEventListener("unhandledrejection", (ev: PromiseRejectionEvent) =>
 {
-    HandleCriticalError(ev.reason);
+    handleCriticalError(ev.reason);
 });
 
 window.addEventListener("error", (ev: ErrorEvent) =>
 {
-    HandleCriticalError(ev.error);
+    handleCriticalError(ev.error);
 });
 
 /** Для работы с интерфейсом. */
