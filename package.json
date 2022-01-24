@@ -13,22 +13,22 @@
   "author": "SgAkErRu",
   "license": "BSD-3-Clause",
   "dependencies": {
-    "@types/howler": "^2.2.3",
-    "@typescript-eslint/eslint-plugin": "^4.31.0",
-    "@typescript-eslint/parser": "^4.31.0",
+    "@types/howler": "^2.2.4",
+    "@typescript-eslint/eslint-plugin": "^5.10.1",
+    "@typescript-eslint/parser": "^5.10.1",
     "buffer": "^6.0.3",
-    "css-loader": "^6.2.0",
-    "eslint": "^7.32.0",
+    "css-loader": "^6.5.1",
+    "eslint": "^8.7.0",
     "howler": "^2.2.3",
     "mediasoup-client": "gitlab:sgakerru/mediasoup-client#3.6.36-patched",
-    "mini-css-extract-plugin": "^2.2.0",
+    "mini-css-extract-plugin": "^2.5.2",
     "nostromo-shared": "gitlab:sgakerru/nostromo-shared#dev",
-    "plyr": "^3.6.8",
-    "socket.io-client": "^4.1.3",
+    "plyr": "^3.6.12",
+    "socket.io-client": "^4.4.1",
     "ts-loader": "^9.2.6",
-    "typescript": "^4.4.3",
-    "webpack": "^5.42.0",
-    "webpack-cli": "^4.7.2"
+    "typescript": "^4.5.5",
+    "webpack": "^5.67.0",
+    "webpack-cli": "^4.9.2"
   },
   "homepage": "https://gitlab.com/SgAkErRu/nostromo-web#readme"
 }
