@@ -2,6 +2,8 @@ import { FileHandlerConstants } from "nostromo-shared/types/FileHandlerTypes";
 import { handleCriticalError } from "./AppError";
 import { TusHeadRequest, TusOptionsRequest, TusPatchRequest, TusPostCreationRequest } from "./FileHandlerTusProtocol";
 
+type FileHasBeenUploadedCallback = (fileId: string, file: File) => void;
+
 /** Класс - обработчик файлов. */
 export class FileHandler
 {
@@ -131,7 +133,12 @@ export class FileHandler
     }
 
     /** Загрузить файл на сервер. */
-    public async fileUpload(roomId: string, file: File, progress: HTMLProgressElement): Promise<string>
+    public async fileUpload(
+        roomId: string,
+        file: File,
+        progress: HTMLProgressElement,
+        cb: FileHasBeenUploadedCallback
+    ): Promise<void>
     {
         /// TODO: на телефоне lastModified выдает текущую дату.
         /// Нужно придумать другой способ - через хэш или уточнять у юзера.
@@ -156,7 +163,7 @@ export class FileHandler
                 // Удалим fileId из локального хранилища.
                 localStorage.removeItem(fileMetadata);
                 // Попробуем загрузить файл заново.
-                return await this.fileUpload(roomId, file, progress);
+                return await this.fileUpload(roomId, file, progress, cb);
             }
         }
 
@@ -169,7 +176,10 @@ export class FileHandler
             // то просто возвращаем Id файла.
             if (Number(uploadOffset) == file.size)
             {
-                return resolve(fileId);
+                // Вызываем коллбек для отправки ссылки на файл в чат.
+                cb(fileId, file);
+
+                return resolve();
             }
 
             const req = new TusPatchRequest(fileId, uploadOffset);
@@ -190,7 +200,10 @@ export class FileHandler
 
                 if (xhr.status == req.successfulStatusCode)
                 {
-                    resolve(fileId);
+                    // Вызываем коллбек для отправки ссылки на файл в чат.
+                    cb(fileId, file);
+
+                    resolve();
                 }
                 else
                 {
@@ -214,14 +227,14 @@ export class FileHandler
             {
                 console.log(`[FileHandler] > Ошибка во время отправления файла!`, event);
                 // Попробуем загрузить файл заново.
-                return await this.fileUpload(roomId, file, progress);
+                return await this.fileUpload(roomId, file, progress, cb);
             });
 
             xhr.addEventListener("timeout", async (event) =>
             {
                 console.log(`[FileHandler] > Timeout во время отправления файла!`, event);
                 // Попробуем загрузить файл заново.
-                return await this.fileUpload(roomId, file, progress);
+                return await this.fileUpload(roomId, file, progress, cb);
             });
 
             // Отправляем файл, учитывая Upload-Offset.

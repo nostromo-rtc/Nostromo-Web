@@ -129,21 +129,26 @@ export class Room
             // если нечего загружать
             if (!file) return;
 
-            // загружаем файл
-            const fileId = await this.fileHandler.fileUpload(this.roomId, file, progress);
-            fileInput.value = "";
+            /** После того, как файл успешно загрузился на сервер. */
+            const handleUploadedFile = (fileId: string, file: File) =>
+            {
+                // Убираем из input-виджета выбранный файл.
+                this.ui.fileInput.value = "";
+                // Локально добавляем ссылку на файл в чат.
+                const chatFileInfo: ChatFileInfo = {
+                    username: localStorage['username'] as string,
+                    fileId,
+                    filename: file.name,
+                    size: file.size
+                };
+                this.addNewFileLink(chatFileInfo);
 
-            // локально добавляем ссылку на файл в чат
-            const chatFileInfo: ChatFileInfo = {
-                username: localStorage['username'] as string,
-                fileId,
-                filename: file.name,
-                size: file.size
+                // Сообщаем серверу, чтобы разослал всем ссылку в чате.
+                this.socket.emit('chatFile', fileId);
             };
-            this.addNewFileLink(chatFileInfo);
 
-            // сообщаем серверу, чтобы разослал всем ссылку в чате
-            this.socket.emit('chatFile', fileId);
+            // Пытаемся загрузить файл.
+            await this.fileHandler.fileUpload(this.roomId, file, progress, handleUploadedFile);
         });
     }
 
