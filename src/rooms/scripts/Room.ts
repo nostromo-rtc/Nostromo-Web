@@ -120,35 +120,71 @@ export class Room
     /** Обработка загрузки файлов. */
     private handleFileUpload(): void
     {
+        /** Лямбда-функция обработчик - после того, как файл успешно загрузился на сервер. */
+        const handleUploadedFile = (fileId: string, file: File, progressComponent: HTMLDivElement) =>
+        {
+            // Удаляем компонент с прогрессом загрузки файла.
+            progressComponent.remove();
+
+            // Локально добавляем ссылку на файл в чат.
+            const chatFileInfo: ChatFileInfo = {
+                username: localStorage['username'] as string,
+                fileId,
+                filename: file.name,
+                size: file.size
+            };
+            this.addNewFileLink(chatFileInfo);
+
+            // Сообщаем серверу, чтобы разослал всем ссылку в чате.
+            this.socket.emit('chatFile', fileId);
+        };
+
         this.ui.buttons.get('sendFile')!.addEventListener('click', async () =>
         {
             const fileInput = this.ui.fileInput;
-            const file = fileInput.files?.item(0);
-            const progress = this.ui.sendProgress;
 
-            // если нечего загружать
-            if (!file) return;
+            /** Список файлов. */
+            const files = fileInput.files;
 
-            /** После того, как файл успешно загрузился на сервер. */
-            const handleUploadedFile = (fileId: string, file: File) =>
+            // Если нечего загружать.
+            if (!files || files.length == 0)
             {
-                // Убираем из input-виджета выбранный файл.
-                this.ui.fileInput.value = "";
-                // Локально добавляем ссылку на файл в чат.
-                const chatFileInfo: ChatFileInfo = {
-                    username: localStorage['username'] as string,
-                    fileId,
-                    filename: file.name,
-                    size: file.size
+                return;
+            }
+
+            const progressFileList = new Map<File, HTMLDivElement>();
+
+            for (const file of files)
+            {
+                // Создадим в UI компонент для прогресса загрузки файла.
+                const progressComponent = this.ui.createProgressComponent(file);
+                progressFileList.set(file, progressComponent);
+
+                // Обрабатываем нажатие на кнопку остановки загрузки.
+                (progressComponent.children[2] as HTMLButtonElement).onclick = () => {
+                    console.debug("Удаление файла из очереди загрузки...", file);
+                    progressComponent.remove();
+                    progressFileList.delete(file);
                 };
-                this.addNewFileLink(chatFileInfo);
+            }
 
-                // Сообщаем серверу, чтобы разослал всем ссылку в чате.
-                this.socket.emit('chatFile', fileId);
-            };
+            for (const file of files)
+            {
+                if (progressFileList.has(file))
+                {
+                    console.debug("Пытаемся загрузить файл:", file);
+                    // Пытаемся загрузить файл.
+                    await this.fileHandler.fileUpload(
+                        this.roomId,
+                        file,
+                        progressFileList.get(file)!,
+                        handleUploadedFile
+                    );
+                }
+            }
 
-            // Пытаемся загрузить файл.
-            await this.fileHandler.fileUpload(this.roomId, file, progress, handleUploadedFile);
+            // Очищаем input-виджет со списком файлов.
+            this.ui.fileInput.value = "";
         });
     }
 
@@ -165,7 +201,7 @@ export class Room
 
         const link: HTMLAnchorElement = document.createElement("a");
         link.href = `${window.location.origin}/files/${fileId}`;
-        link.text = `${filename} (${(size / (1024 * 1024)).toFixed(3)}) Mb`;
+        link.text = `${filename} (${(size / (1024 * 1024)).toFixed(3)} MB)`;
         link.target = "_blank";
 
         msgParagraph.append(link);
@@ -183,7 +219,7 @@ export class Room
 
             if (message)
             {
-                this.addNewChatMsg(localStorage['username'], message);
+                this.addNewChatMsg(localStorage['username'] as string, message);
                 this.socket.emit('chatMsg', message);
             }
         });
@@ -344,7 +380,7 @@ export class Room
         });
 
         // на сервере consumer был поставлен на паузу, сделаем тоже самое и на клиенте
-        this.socket.on('pauseConsumer', (consumerId) =>
+        this.socket.on('pauseConsumer', (consumerId: string) =>
         {
             const consumer = this.mediasoup.getConsumer(consumerId);
             if (!consumer) return;
@@ -356,7 +392,7 @@ export class Room
         });
 
         // на сервере consumer был снят с паузы, сделаем тоже самое и на клиенте
-        this.socket.on('resumeConsumer', (consumerId) =>
+        this.socket.on('resumeConsumer', (consumerId: string) =>
         {
             const consumer = this.mediasoup.getConsumer(consumerId);
             if (!consumer) return;

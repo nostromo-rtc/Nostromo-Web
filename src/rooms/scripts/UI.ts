@@ -50,8 +50,8 @@ export class UI
     /** Поле для выбора файла. */
     public readonly fileInput = document.getElementById('fileInput') as HTMLInputElement;
 
-    /** Прогресс отправки файла. */
-    public readonly sendProgress = document.getElementById("sendProgress") as HTMLProgressElement;
+    /** Контейнер с прогрессами отправки файлов. */
+    public readonly filesProgress = document.getElementById('files-progress') as HTMLDivElement;
 
     /** Сообщение пользователя, отправляемое в чат. */
     public readonly messageText = document.getElementById('messageText') as HTMLTextAreaElement;
@@ -388,5 +388,32 @@ export class UI
         const label = document.createElement('span');
         label.classList.add('videoLabel');
         return label;
+    }
+
+    public createProgressComponent(file: File): HTMLDivElement
+    {
+        /** Компонент прогресса для файла. */
+        const progressComponent = document.createElement('div');
+
+        /** Заголовок компонента прогресса (название и размер). */
+        const progressTitle = document.createElement('p');
+        progressTitle.textContent = `${file.name} (${(file.size / (1024 * 1024)).toFixed(3)} MB)`;
+        progressComponent.append(progressTitle);
+
+        /** Прогресс-бар. */
+        const progress = document.createElement('progress');
+        progress.max = 100;
+        progressComponent.append(progress);
+
+        /** Кнопка для остановки загрузки. */
+        const abortBtn = document.createElement('button');
+        abortBtn.textContent = "Отмена";
+
+        progressComponent.append(abortBtn);
+
+        // Добавим компонент к общему контейнеру с прогрессами.
+        this.filesProgress.append(progressComponent);
+
+        return progressComponent;
     }
 }

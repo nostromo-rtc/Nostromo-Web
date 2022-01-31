@@ -2,7 +2,7 @@ import { FileHandlerConstants } from "nostromo-shared/types/FileHandlerTypes";
 import { handleCriticalError } from "./AppError";
 import { TusHeadRequest, TusOptionsRequest, TusPatchRequest, TusPostCreationRequest } from "./FileHandlerTusProtocol";
 
-type FileHasBeenUploadedCallback = (fileId: string, file: File) => void;
+type FileHasBeenUploadedCallback = (fileId: string, file: File, progressComponent: HTMLDivElement) => void;
 
 /** Класс - обработчик файлов. */
 export class FileHandler
@@ -136,7 +136,7 @@ export class FileHandler
     public async fileUpload(
         roomId: string,
         file: File,
-        progress: HTMLProgressElement,
+        progressComponent: HTMLDivElement,
         cb: FileHasBeenUploadedCallback
     ): Promise<void>
     {
@@ -147,6 +147,17 @@ export class FileHandler
         // Ищем fileId в локальном хранилище.
         const fileId = localStorage.getItem(fileMetadata) ?? await this.createFileOnServer(roomId, file);
         localStorage.setItem(`${file.name},${file.size},${file.lastModified}`, fileId);
+
+        // Присваиваем id для компонента с прогрессом.
+        progressComponent.id = `progress-file-${fileId}`;
+
+        /// TODO: пока так, через children, когда будет React - переделаю.
+        /** Статус загрузки файла. */
+        const progressTitle = progressComponent.children[0] as HTMLProgressElement;
+        /** Прогресс-бар. */
+        const progressBar = progressComponent.children[1] as HTMLProgressElement;
+        /** Кнопка для остановки загрузки файла. */
+        const abortBtn = progressComponent.children[2] as HTMLButtonElement;
 
         console.debug("FileId: ", fileId);
 
@@ -163,7 +174,7 @@ export class FileHandler
                 // Удалим fileId из локального хранилища.
                 localStorage.removeItem(fileMetadata);
                 // Попробуем загрузить файл заново.
-                return await this.fileUpload(roomId, file, progress, cb);
+                return await this.fileUpload(roomId, file, progressComponent, cb);
             }
         }
 
@@ -177,7 +188,7 @@ export class FileHandler
             if (Number(uploadOffset) == file.size)
             {
                 // Вызываем коллбек для отправки ссылки на файл в чат.
-                cb(fileId, file);
+                cb(fileId, file, progressComponent);
 
                 return resolve();
             }
@@ -196,12 +207,11 @@ export class FileHandler
             xhr.addEventListener("load", () =>
             {
                 console.log(`[FileHandler] > Отправка файла завершена!`);
-                progress.hidden = true;
 
                 if (xhr.status == req.successfulStatusCode)
                 {
                     // Вызываем коллбек для отправки ссылки на файл в чат.
-                    cb(fileId, file);
+                    cb(fileId, file, progressComponent);
 
                     resolve();
                 }
@@ -213,13 +223,19 @@ export class FileHandler
             });
 
             // Отображаем прогресс.
-            progress.max = 100;
             xhr.upload.addEventListener("progress", (event) =>
             {
+                const bytesToMegabytes = (bytes: number) : string =>
+                {
+                    return `${(bytes / (1024 * 1024)).toFixed(3)}`;
+                };
+
                 if (event.lengthComputable)
                 {
-                    const numberUploadOffset = Number(uploadOffset);
-                    progress.value = ((numberUploadOffset + event.loaded) / file.size) * 100;
+                    const bytesLoaded = Number(uploadOffset) + event.loaded;
+
+                    progressTitle.textContent = `${file.name} (${bytesToMegabytes(bytesLoaded)} / ${bytesToMegabytes(file.size)} MB)`;
+                    progressBar.value = (bytesLoaded / file.size) * 100;
                 }
             });
 
@@ -227,21 +243,26 @@ export class FileHandler
             {
                 console.log(`[FileHandler] > Ошибка во время отправления файла!`, event);
                 // Попробуем загрузить файл заново.
-                return await this.fileUpload(roomId, file, progress, cb);
+                return await this.fileUpload(roomId, file, progressComponent, cb);
             });
 
             xhr.addEventListener("timeout", async (event) =>
             {
                 console.log(`[FileHandler] > Timeout во время отправления файла!`, event);
                 // Попробуем загрузить файл заново.
-                return await this.fileUpload(roomId, file, progress, cb);
+                return await this.fileUpload(roomId, file, progressComponent, cb);
             });
+
+            // Обрабатываем нажатие на кнопку остановки загрузки.
+            abortBtn.onclick = () => {
+                console.debug("Остановка загрузки файла...", file);
+                xhr.abort();
+                progressComponent.remove();
+                return resolve();
+            };
 
             // Отправляем файл, учитывая Upload-Offset.
             xhr.send(file.slice(Number(uploadOffset)));
-
-            // Показываем прогресс-бар.
-            progress.hidden = false;
         });
     }
 }
