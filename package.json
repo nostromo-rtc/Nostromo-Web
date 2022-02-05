@@ -20,7 +20,7 @@
     "css-loader": "^6.5.1",
     "eslint": "^8.7.0",
     "howler": "^2.2.3",
-    "mediasoup-client": "gitlab:sgakerru/mediasoup-client#3.6.36-patched",
+    "mediasoup-client": "^3.6.50",
     "mini-css-extract-plugin": "^2.5.2",
     "nostromo-shared": "gitlab:sgakerru/nostromo-shared#dev",
     "plyr": "^3.6.12",
