@@ -57,12 +57,21 @@ export class UI
     public readonly messageText = document.getElementById('messageText') as HTMLTextAreaElement;
 
     /** Список разрешений захвата видеоизображения. */
-    private captureSettings = document.getElementById('captureSettings') as HTMLSelectElement;
+    public readonly captureSettingsDisplay = document.getElementById('captureSettingsDisplay') as HTMLSelectElement;
+
+    /** Список разрешений захвата веб-камеры. */
+    public readonly captureSettingsCam = document.getElementById('captureSettingsCam') as HTMLSelectElement;
 
     /** Получить выбранное пользователем разрешение для захвата видеоизображения. */
-    public get currentCaptureSetting(): string
+    public get currentCaptureSettingDisplay(): string
     {
-        return this.captureSettings.value;
+        return this.captureSettingsDisplay.value;
+    }
+
+    /** Получить выбранное пользователем разрешение для захвата веб-камеры. */
+    public get currentCaptureSettingCam(): string
+    {
+        return this.captureSettingsCam.value;
     }
 
     /** Поле для ввода имени пользователя. */
@@ -105,7 +114,7 @@ export class UI
     }
 
     /** Обработчик toogle-кнопки включения/выключения звуков собеседника. */
-    private handleBtnToggleSounds(btn_toggleSounds: HTMLButtonElement) : void
+    private handleBtnToggleSounds(btn_toggleSounds: HTMLButtonElement): void
     {
         if (this.mutePolicy)
         {
@@ -124,10 +133,10 @@ export class UI
     }
 
     /** Добавить новое разрешение захватываемого видеоизображения. */
-    public addCaptureSetting(label: string, value: string): void
+    public addCaptureSetting(settings: HTMLSelectElement, label: string, value: string): void
     {
         const newSetting = new Option(label, value);
-        this.captureSettings.add(newSetting);
+        settings.add(newSetting);
     }
 
     /** Подготовить контейнер map с кнопками. */

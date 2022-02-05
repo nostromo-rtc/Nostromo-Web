@@ -6,7 +6,7 @@ declare global
     interface MediaTrackConstraintSet
     {
         autoGainControl?: ConstrainBoolean,
-        noiseSuppression?: ConstrainBoolean
+        noiseSuppression?: ConstrainBoolean;
     }
 }
 
@@ -39,7 +39,10 @@ export class UserMedia
     private micPaused = false;
 
     /** Настройки медиапотока при захвате видеоизображения экрана. */
-    private captureConstraints: Map<string, MediaStreamConstraints>;
+    private captureConstraintsDisplay: Map<string, MediaStreamConstraints>;
+
+    /** Настройки медиапотока при захвате изображения веб-камеры. */
+    private captureConstraintsCam: Map<string, MediaStreamConstraints>;
 
     constructor(_ui: UI, _room: Room)
     {
@@ -47,13 +50,16 @@ export class UserMedia
 
         this.ui = _ui;
         this.room = _room;
-        this.captureConstraints = this.prepareCaptureConstraints();
+        this.captureConstraintsDisplay = this.prepareCaptureDisplayConstraints();
+        this.captureConstraintsCam = this.prepareCaptureCamConstraints();
 
         this.ui.buttons.get('getUserMediaMic')!.addEventListener('click',
             async () => await this.getUserMedia(this.streamConstraintsMic));
 
         this.ui.buttons.get('getUserMediaCam')!.addEventListener('click',
-            async () => await this.getUserMedia(this.streamConstraintsCam));
+            async () => await this.getUserMedia(
+                this.captureConstraintsCam.get(this.ui.currentCaptureSettingCam)!
+            ));
 
         this.ui.buttons.get('getDisplayMedia')!.addEventListener('click',
             async () => await this.getDisplayMedia());
@@ -69,6 +75,7 @@ export class UserMedia
     {
         try
         {
+            console.debug(streamConstraints);
             const mediaStream: MediaStream = await navigator.mediaDevices.getUserMedia(streamConstraints);
 
             console.debug("[UserMedia] > getUserMedia success:", mediaStream);
@@ -91,7 +98,8 @@ export class UserMedia
         {
             // захват экрана
             const mediaStream: MediaStream = await navigator.mediaDevices
-                .getDisplayMedia(this.captureConstraints.get(this.ui.currentCaptureSetting));
+                .getDisplayMedia(this.captureConstraintsDisplay
+                    .get(this.ui.currentCaptureSettingDisplay));
 
             console.debug("[UserMedia] > getDisplayMedia success:", mediaStream.getTracks());
 
@@ -104,7 +112,7 @@ export class UserMedia
     }
 
     /** Обработка медиапотока. */
-    private async handleMediaStream(mediaStream: MediaStream) : Promise<void>
+    private async handleMediaStream(mediaStream: MediaStream): Promise<void>
     {
         for (const newTrack of mediaStream.getTracks())
         {
@@ -230,7 +238,7 @@ export class UserMedia
     }
 
     /** Подготовить опции с разрешениями захватываемого видеоизображения. */
-    private prepareCaptureConstraints(): Map<string, MediaStreamConstraints>
+    private prepareCaptureDisplayConstraints(): Map<string, MediaStreamConstraints>
     {
         const _constraints = new Map<string, MediaStreamConstraints>();
 
@@ -239,7 +247,7 @@ export class UserMedia
                 frameRate: 30,
                 width: 2560, height: 1440
             },
-            audio: { echoCancellation: false, noiseSuppression: false,  }
+            audio: { echoCancellation: false, noiseSuppression: false, }
         };
 
         const constraints1080p: MediaStreamConstraints = {
@@ -298,29 +306,103 @@ export class UserMedia
             audio: { echoCancellation: false, noiseSuppression: false }
         };
 
+        const settingsDisplay = this.ui.captureSettingsDisplay;
+
         _constraints.set('1440p', constraints1440p);
-        this.ui.addCaptureSetting('2560x1440', '1440p');
+        this.ui.addCaptureSetting(settingsDisplay, '2560x1440', '1440p');
 
         _constraints.set('1080p', constraints1080p);
-        this.ui.addCaptureSetting('1920x1080', '1080p');
+        this.ui.addCaptureSetting(settingsDisplay, '1920x1080', '1080p');
 
         _constraints.set('1080p@60', constraints1080p60);
-        this.ui.addCaptureSetting('1920x1080@60', '1080p@60');
+        this.ui.addCaptureSetting(settingsDisplay, '1920x1080@60', '1080p@60');
 
         _constraints.set('720p', constraints720p);
-        this.ui.addCaptureSetting('1280x720', '720p');
+        this.ui.addCaptureSetting(settingsDisplay, '1280x720', '720p');
 
         _constraints.set('720p@60', constraints720p60);
-        this.ui.addCaptureSetting('1280x720@60', '720p@60');
+        this.ui.addCaptureSetting(settingsDisplay, '1280x720@60', '720p@60');
 
         _constraints.set('480p', constraints480p);
-        this.ui.addCaptureSetting('854x480', '480p');
+        this.ui.addCaptureSetting(settingsDisplay, '854x480', '480p');
 
         _constraints.set('360p', constraints360p);
-        this.ui.addCaptureSetting('640x360', '360p');
+        this.ui.addCaptureSetting(settingsDisplay, '640x360', '360p');
 
         _constraints.set('240p', constraints240p);
-        this.ui.addCaptureSetting('426x240', '240p');
+        this.ui.addCaptureSetting(settingsDisplay, '426x240', '240p');
+
+        _constraints.set('default', constraints720p);
+
+        return _constraints;
+    }
+
+    /** Подготовить опции с разрешениями захватываемого изображения с веб-камеры. */
+    private prepareCaptureCamConstraints(): Map<string, MediaStreamConstraints>
+    {
+        const _constraints = new Map<string, MediaStreamConstraints>();
+
+        const constraints1440p: MediaStreamConstraints = {
+            video: {
+                width: 2560, height: 1440
+            },
+            audio: false
+        };
+
+        const constraints1080p: MediaStreamConstraints = {
+            video: {
+                width: 1920, height: 1080
+            },
+            audio: false
+        };
+
+        const constraints720p: MediaStreamConstraints = {
+            video: {
+                width: 1280, height: 720
+            },
+            audio: false
+        };
+
+        const constraints480p: MediaStreamConstraints = {
+            video: {
+                width: 640, height: 480
+            },
+            audio: false
+        };
+
+        const constraints360p: MediaStreamConstraints = {
+            video: {
+                width: 480, height: 360
+            },
+            audio: false
+        };
+
+        const constraints240p: MediaStreamConstraints = {
+            video: {
+                width: 320, height: 240
+            },
+            audio: false
+        };
+
+        const settingsCam = this.ui.captureSettingsCam;
+
+        _constraints.set('1440p', constraints1440p);
+        this.ui.addCaptureSetting(settingsCam, '2560x1440', '1440p');
+
+        _constraints.set('1080p', constraints1080p);
+        this.ui.addCaptureSetting(settingsCam, '1920x1080', '1080p');
+
+        _constraints.set('720p', constraints720p);
+        this.ui.addCaptureSetting(settingsCam, '1280x720', '720p');
+
+        _constraints.set('480p', constraints480p);
+        this.ui.addCaptureSetting(settingsCam, '640x480', '480p');
+
+        _constraints.set('360p', constraints360p);
+        this.ui.addCaptureSetting(settingsCam, '480x360', '360p');
+
+        _constraints.set('240p', constraints240p);
+        this.ui.addCaptureSetting(settingsCam, '320x240', '240p');
 
         _constraints.set('default', constraints720p);
 
