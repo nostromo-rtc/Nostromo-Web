@@ -8,14 +8,18 @@ type Room = {
     name: string;
 };
 
+type User = {
+    id: string,
+    name: string;
+};
+
 // Класс для работы с сокетами при авторизации в панель администратора
 export default class adminSocketHandler
 {
-
     private socket: Socket = io(`/admin`, {
         'transports': ['websocket']
     });
-    private latestRoomId: number = 0;
+    private latestRoomId = 0;
 
     private videoCodecSelect?: HTMLSelectElement;
 
@@ -50,11 +54,26 @@ export default class adminSocketHandler
                 this.setRoomList(roomList);
                 this.latestRoomId = roomIndex;
             });
-            const btn_createRoom = document.getElementById('btn_createRoom')! as HTMLButtonElement;
-            const btn_deleteRoom = document.getElementById('btn_deleteRoom')! as HTMLButtonElement;
+
+            // Привязываемся к событию изменения списка юзеров.
+            this.socket.on('userList', (userList: User[]) =>
+            {
+                this.setUserList(userList);
+            });
+
+            // Если комната какая-то выбрана, то сообщаем серверу,
+            // что хотим получать список юзеров этой комнаты.
+            const roomSelect = document.getElementById('roomSelect') as HTMLSelectElement;
+            const selectedRoomOption = roomSelect.item(roomSelect.selectedIndex);
+            if (selectedRoomOption && selectedRoomOption.value != "default")
+            {
+                this.getUserList(selectedRoomOption.value);
+            }
 
             this.prepareVideoCodecSelect();
 
+            const btn_createRoom = document.getElementById('btn_createRoom')! as HTMLButtonElement;
+            const btn_deleteRoom = document.getElementById('btn_deleteRoom')! as HTMLButtonElement;
             btn_createRoom.addEventListener('click', () => { this.createRoom(); });
             btn_deleteRoom.addEventListener('click', () => { this.deleteRoom(); });
         }
@@ -92,7 +111,7 @@ export default class adminSocketHandler
                 {
                     e.preventDefault();
                     joinButton.click();
-                };
+                }
             });
 
             return true;
@@ -118,8 +137,6 @@ export default class adminSocketHandler
         const roomLink = document.getElementById('roomLink') as HTMLInputElement;
         if (roomLink.hidden) roomLink.hidden = false;
         roomLink.value = `${window.location.origin}/rooms/${this.latestRoomId}?p=${pass}`;
-        roomLink.select();
-        document.execCommand("copy");
     }
 
     private deleteRoom(): void
@@ -129,8 +146,11 @@ export default class adminSocketHandler
         if (roomId && roomId != "default")
         {
             this.socket.emit('deleteRoom', roomId);
-            let option = document.querySelector(`option[value='${roomId}']`);
-            if (option) option.remove();
+            const option = document.querySelector(`option[value='${roomId}']`);
+            if (option)
+            {
+                option.remove();
+            }
         }
     }
 
@@ -139,10 +159,44 @@ export default class adminSocketHandler
         const roomSelect = document.getElementById('roomSelect') as HTMLSelectElement;
         for (const room of roomList)
         {
-            let newOption = document.createElement('option');
+            const newOption = document.createElement('option');
             newOption.value = room['id'];
             newOption.innerText = `[${room['id']}] ${room['name']}`;
-            roomSelect!.appendChild(newOption);
+
+            roomSelect.add(newOption);
+        }
+
+        roomSelect.addEventListener('change', () =>
+        {
+            const selectedRoomOption = roomSelect.item(roomSelect.selectedIndex);
+            if (selectedRoomOption)
+            {
+                this.getUserList(selectedRoomOption.value);
+            }
+        });
+    }
+
+    /** Сообщаем серверу, что хотим получать список юзеров этой комнаты. */
+    private getUserList(roomId: string): void
+    {
+        console.log("emit");
+        this.socket.emit('userList', roomId);
+    }
+
+    /** Присваиваем список юзеров. */
+    private setUserList(userList: User[]): void
+    {
+        const userSelect = document.getElementById('userSelect') as HTMLSelectElement;
+
+        userSelect.length = 0;
+
+        for (const user of userList)
+        {
+            const newOption = document.createElement('option');
+            newOption.value = user['id'];
+            newOption.innerText = `${user['name']} [${user['id']}]`;
+
+            userSelect.add(newOption);
         }
     }
 
@@ -150,9 +204,9 @@ export default class adminSocketHandler
     {
         const roomSelect = document.getElementById('roomSelect') as HTMLSelectElement;
         const id = ++this.latestRoomId;
-        let newOption = document.createElement('option');
+        const newOption = document.createElement('option');
         newOption.value = id.toString();
         newOption.innerText = `[${id}] ${roomName}`;
-        roomSelect!.appendChild(newOption);
+        roomSelect.add(newOption);
     }
 }
