@@ -1,6 +1,6 @@
-import { FileHandlerConstants } from "nostromo-shared/types/FileHandlerTypes";
+import { FileServiceConstants } from "nostromo-shared/types/FileServiceTypes";
 import { handleCriticalError } from "./AppError";
-import { TusHeadRequest, TusOptionsRequest, TusPatchRequest, TusPostCreationRequest } from "./FileHandlerTusProtocol";
+import { TusHeadRequest, TusOptionsRequest, TusPatchRequest, TusPostCreationRequest } from "./FileServiceTusProtocol";
 
 type FileHasBeenUploadedCallback = (fileId: string, file: File, progressComponent: HTMLDivElement) => void;
 
@@ -26,8 +26,8 @@ export class FileHandler
         {
             if (xhr.status == optionsReq.successfulStatusCode)
             {
-                if (xhr.getResponseHeader("Tus-Version") != FileHandlerConstants.TUS_VERSION
-                    || xhr.getResponseHeader("Tus-Resumable") != FileHandlerConstants.TUS_VERSION)
+                if (xhr.getResponseHeader("Tus-Version") != FileServiceConstants.TUS_VERSION
+                    || xhr.getResponseHeader("Tus-Resumable") != FileServiceConstants.TUS_VERSION)
                 {
                     handleCriticalError(new Error("Wrong TUS version!"));
                 }

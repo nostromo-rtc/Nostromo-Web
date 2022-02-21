@@ -1,12 +1,12 @@
-import { FileHandlerConstants, FileHandlerRequest, HttpMethod, IncomingHttpHeaders } from "nostromo-shared/types/FileHandlerTypes";
+import { FileServiceConstants, FileServiceRequest, HttpMethod, IncomingHttpHeaders } from "nostromo-shared/types/FileServiceTypes";
 import { Buffer } from "buffer/";
 
-export class TusHeadRequest implements FileHandlerRequest
+export class TusHeadRequest implements FileServiceRequest
 {
     public method: HttpMethod = "HEAD";
-    public path: string = FileHandlerConstants.FILES_ROUTE;
+    public path: string = FileServiceConstants.FILES_ROUTE;
     public headers: IncomingHttpHeaders = {
-        "Tus-Resumable": FileHandlerConstants.TUS_VERSION
+        "Tus-Resumable": FileServiceConstants.TUS_VERSION
     };
     public badTusVersionStatusCode = 412;
     public notFoundStatusCode = 404;
@@ -19,12 +19,12 @@ export class TusHeadRequest implements FileHandlerRequest
     }
 }
 
-export class TusPatchRequest implements FileHandlerRequest
+export class TusPatchRequest implements FileServiceRequest
 {
     public method: HttpMethod = "PATCH";
-    public path: string = FileHandlerConstants.FILES_ROUTE;
+    public path: string = FileServiceConstants.FILES_ROUTE;
     public headers: IncomingHttpHeaders = {
-        "Tus-Resumable": FileHandlerConstants.TUS_VERSION,
+        "Tus-Resumable": FileServiceConstants.TUS_VERSION,
         "Content-Type": "application/offset+octet-stream"
     };
     public badTusVersionStatusCode = 412;
@@ -42,19 +42,19 @@ export class TusPatchRequest implements FileHandlerRequest
     }
 }
 
-export class TusOptionsRequest implements FileHandlerRequest
+export class TusOptionsRequest implements FileServiceRequest
 {
     public method: HttpMethod = "OPTIONS";
-    public path: string = FileHandlerConstants.FILES_ROUTE;
+    public path: string = FileServiceConstants.FILES_ROUTE;
     public successfulStatusCode = 204;
 }
 
-export class TusPostCreationRequest implements FileHandlerRequest
+export class TusPostCreationRequest implements FileServiceRequest
 {
     public method: HttpMethod = "POST";
-    public path: string = FileHandlerConstants.FILES_ROUTE;
+    public path: string = FileServiceConstants.FILES_ROUTE;
     public headers: IncomingHttpHeaders = {
-        "Tus-Resumable": FileHandlerConstants.TUS_VERSION
+        "Tus-Resumable": FileServiceConstants.TUS_VERSION
     };
     public badTusVersionStatusCode = 412;
     public badUploadLentghStatusCode = 400;

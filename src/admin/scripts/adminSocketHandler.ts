@@ -1,4 +1,5 @@
 import { io, Socket } from "socket.io-client";
+import { SocketEvents as SE } from "nostromo-shared/types/SocketEvents";
 
 import { NewRoomInfo } from "nostromo-shared/types/AdminTypes";
 import { VideoCodec } from "nostromo-shared/types/RoomTypes";
@@ -37,7 +38,7 @@ export default class adminSocketHandler
             console.log(err.message);
         });
 
-        this.socket.on('result', (success: boolean) =>
+        this.socket.on(SE.Result, (success: boolean) =>
         {
             if (success) location.reload();
             else
@@ -49,14 +50,14 @@ export default class adminSocketHandler
 
         if (!this.onAuthPage())
         {
-            this.socket.on('roomList', (roomList: Room[], roomIndex: number) =>
+            this.socket.on(SE.RoomList, (roomList: Room[], roomIndex: number) =>
             {
                 this.setRoomList(roomList);
                 this.latestRoomId = roomIndex;
             });
 
             // Привязываемся к событию изменения списка юзеров.
-            this.socket.on('userList', (userList: User[]) =>
+            this.socket.on(SE.UserList, (userList: User[]) =>
             {
                 this.setUserList(userList);
             });
@@ -102,7 +103,7 @@ export default class adminSocketHandler
 
             joinButton.addEventListener('click', () =>
             {
-                this.socket.emit('joinAdmin', passInput.value);
+                this.socket.emit(SE.AdminAuth, passInput.value);
             });
 
             passInput.addEventListener('keydown', (e) =>
@@ -131,7 +132,7 @@ export default class adminSocketHandler
             videoCodec
         };
 
-        this.socket.emit('createRoom', newRoomInfo);
+        this.socket.emit(SE.CreateRoom, newRoomInfo);
         this.addRoomListItem(name);
 
         const roomLink = document.getElementById('roomLink') as HTMLInputElement;
@@ -145,7 +146,7 @@ export default class adminSocketHandler
         const roomId = roomSelect.value;
         if (roomId && roomId != "default")
         {
-            this.socket.emit('deleteRoom', roomId);
+            this.socket.emit(SE.DeleteRoom, roomId);
             const option = document.querySelector(`option[value='${roomId}']`);
             if (option)
             {
@@ -179,8 +180,7 @@ export default class adminSocketHandler
     /** Сообщаем серверу, что хотим получать список юзеров этой комнаты. */
     private getUserList(roomId: string): void
     {
-        console.log("emit");
-        this.socket.emit('userList', roomId);
+        this.socket.emit(SE.UserList, roomId);
     }
 
     /** Присваиваем список юзеров. */

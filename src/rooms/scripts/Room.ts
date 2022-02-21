@@ -1,7 +1,8 @@
 import { UI } from "./UI";
-import { FileHandler } from "./FileHandler";
+import { FileHandler } from "./FileService";
 
 import { io, Socket } from "socket.io-client";
+import { SocketEvents as SE } from "nostromo-shared/types/SocketEvents";
 
 import { handleCriticalError, TransportFailedError } from "./AppError";
 
@@ -14,8 +15,7 @@ import
 
 import
 {
-    SocketId,
-    NewUserInfo,
+    UserInfo,
     JoinInfo,
     NewConsumerInfo,
     NewWebRtcTransportInfo,
@@ -136,7 +136,7 @@ export class Room
             this.addNewFileLink(chatFileInfo);
 
             // Сообщаем серверу, чтобы разослал всем ссылку в чате.
-            this.socket.emit('chatFile', fileId);
+            this.socket.emit(SE.ChatFile, fileId);
         };
 
         this.ui.buttons.get('sendFile')!.addEventListener('click', async () =>
@@ -161,7 +161,8 @@ export class Room
                 progressFileList.set(file, progressComponent);
 
                 // Обрабатываем нажатие на кнопку остановки загрузки.
-                (progressComponent.children[2] as HTMLButtonElement).onclick = () => {
+                (progressComponent.children[2] as HTMLButtonElement).onclick = () =>
+                {
                     console.debug("Удаление файла из очереди загрузки...", file);
                     progressComponent.remove();
                     progressFileList.delete(file);
@@ -220,7 +221,7 @@ export class Room
             if (message)
             {
                 this.addNewChatMsg(localStorage['username'] as string, message);
-                this.socket.emit('chatMsg', message);
+                this.socket.emit(SE.ChatMsg, message);
             }
         });
     }
@@ -249,7 +250,7 @@ export class Room
         });
 
         // получаем RTP возможности сервера
-        this.socket.on('routerRtpCapabilities', async (
+        this.socket.on(SE.RouterRtpCapabilities, async (
             routerRtpCapabilities: MediasoupTypes.RtpCapabilities
         ) =>
         {
@@ -257,30 +258,34 @@ export class Room
         });
 
         // локально создаем транспортный канал для приема потоков
-        this.socket.on('createRecvTransport', (transport: NewWebRtcTransportInfo) =>
+        this.socket.on(SE.CreateConsumerTransport, (transport: NewWebRtcTransportInfo) =>
         {
-            this.createRecvTransport(transport);
+            this.createConsumerTransport(transport);
         });
 
         // локально создаем транспортный канал для отдачи потоков
-        this.socket.on('createSendTransport', (transport: NewWebRtcTransportInfo) =>
+        this.socket.on(SE.CreateProducerTransport, (transport: NewWebRtcTransportInfo) =>
         {
-            this.createSendTransport(transport);
+            this.createProducerTransport(transport);
         });
 
         // на сервере закрылся транспорт, поэтому надо закрыть его и здесь
-        this.socket.on('closeTransport', (transportId: string) =>
+        this.socket.on(SE.CloseTransport, (transportId: string) =>
         {
             if (this.mediasoup.sendTransport?.id == transportId)
+            {
                 this.mediasoup.sendTransport.close();
+            }
 
             if (this.mediasoup.recvTransport?.id == transportId)
+            {
                 this.mediasoup.recvTransport.close();
+            }
         });
 
         // на сервере закрылся producer (так как закрылся транспорт),
         // поэтому надо закрыть его и здесь
-        this.socket.on('closeProducer', (producerId: string) =>
+        this.socket.on(SE.CloseProducer, (producerId: string) =>
         {
             const producer = this.mediasoup.getProducer(producerId);
 
@@ -293,7 +298,7 @@ export class Room
 
         // на сервере закрылся consumer (так как закрылся транспорт или producer на сервере),
         // поэтому надо закрыть его и здесь
-        this.socket.on('closeConsumer', ({ consumerId, producerUserId }: CloseConsumerInfo) =>
+        this.socket.on(SE.CloseConsumer, ({ consumerId, producerUserId }: CloseConsumerInfo) =>
         {
             const consumer = this.mediasoup.getConsumer(consumerId);
 
@@ -332,55 +337,57 @@ export class Room
         });
 
         // получаем название комнаты
-        this.socket.on('roomName', (roomName: string) =>
+        this.socket.on(SE.RoomName, (roomName: string) =>
         {
             this.ui.roomName = roomName;
             document.title += ' - ' + roomName;
         });
 
         // получаем макс. битрейт для аудио
-        this.socket.on('maxAudioBitrate', (bitrate: number) =>
+        this.socket.on(SE.MaxAudioBitrate, (bitrate: number) =>
         {
             this.maxAudioBitrate = bitrate;
         });
 
         // новый пользователь (т.е другой)
-        this.socket.on('newUser', ({ id, name }: NewUserInfo) =>
+        this.socket.on(SE.NewUser, ({ id, name }: UserInfo) =>
         {
             this.ui.addVideo(id, name);
 
             this.pauseAndPlayEventsPlayerHandler(id);
 
             if (!this.soundDelayAfterJoin)
+            {
                 this.ui.joinedSound.play();
+            }
         });
 
         // другой пользователь поменял имя
-        this.socket.on('newUsername', ({ id, name }: NewUserInfo) =>
+        this.socket.on(SE.NewUsername, ({ id, name }: UserInfo) =>
         {
             this.ui.updateVideoLabel(id, name);
         });
 
         // сообщение в чат
-        this.socket.on('chatMsg', ({ name, msg }: ChatMsgInfo) =>
+        this.socket.on(SE.ChatMsg, ({ name, msg }: ChatMsgInfo) =>
         {
             this.addNewChatMsg(name, msg);
         });
 
         // файл в чате
-        this.socket.on('chatFile', (chatFileInfo: ChatFileInfo) =>
+        this.socket.on(SE.ChatFile, (chatFileInfo: ChatFileInfo) =>
         {
             this.addNewFileLink(chatFileInfo);
         });
 
         // новый consumer (новый входящий медиапоток)
-        this.socket.on('newConsumer', async (newConsumerInfo: NewConsumerInfo) =>
+        this.socket.on(SE.NewConsumer, async (newConsumerInfo: NewConsumerInfo) =>
         {
             await this.newConsumer(newConsumerInfo);
         });
 
         // на сервере consumer был поставлен на паузу, сделаем тоже самое и на клиенте
-        this.socket.on('pauseConsumer', (consumerId: string) =>
+        this.socket.on(SE.PauseConsumer, (consumerId: string) =>
         {
             const consumer = this.mediasoup.getConsumer(consumerId);
             if (!consumer) return;
@@ -392,7 +399,7 @@ export class Room
         });
 
         // на сервере consumer был снят с паузы, сделаем тоже самое и на клиенте
-        this.socket.on('resumeConsumer', (consumerId: string) =>
+        this.socket.on(SE.ResumeConsumer, (consumerId: string) =>
         {
             const consumer = this.mediasoup.getConsumer(consumerId);
             if (!consumer) return;
@@ -411,7 +418,7 @@ export class Room
         });
 
         // новое значение макс. битрейта видео
-        this.socket.on('maxVideoBitrate', async (bitrate: number) =>
+        this.socket.on(SE.NewMaxVideoBitrate, async (bitrate: number) =>
         {
             // если битрейт изменился
             if (this.maxVideoBitrate != bitrate)
@@ -432,7 +439,7 @@ export class Room
         });
 
         // другой пользователь отключился
-        this.socket.on('userDisconnected', (remoteUserId: SocketId) =>
+        this.socket.on(SE.UserDisconnected, (remoteUserId: string) =>
         {
             console.info("[Room] > remoteUser disconnected:", `[${remoteUserId}]`);
 
@@ -447,7 +454,7 @@ export class Room
         });
 
         // наше веб-сокет соединение разорвано
-        this.socket.on('disconnect', (reason) =>
+        this.socket.on(SE.Disconnect, (reason) =>
         {
             console.warn("[Room] > Вы были отсоединены от веб-сервера (websocket disconnect)", reason);
 
@@ -495,7 +502,7 @@ export class Room
 
                     // просим поставить на паузу consumer на сервере
                     // т.е сообщаем о нашем намерении поставить на паузу
-                    this.socket.emit('pauseConsumer', consumer.id);
+                    this.socket.emit(SE.PauseConsumer, consumer.id);
                 }
                 else
                 {
@@ -513,7 +520,7 @@ export class Room
 
                     // просим снять с паузы consumer на сервере
                     // т.е сообщаем о нашем намерении снять с паузы
-                    this.socket.emit('resumeConsumer', consumer.id);
+                    this.socket.emit(SE.ResumeConsumer, consumer.id);
                 }
             }
         };
@@ -543,7 +550,7 @@ export class Room
 
             console.debug('[Room] > Ник был изменен на', this.ui.usernameInput.value);
 
-            this.socket.emit('newUsername', this.ui.usernameInput.value);
+            this.socket.emit(SE.NewUsername, this.ui.usernameInput.value);
         });
     }
 
@@ -554,10 +561,10 @@ export class Room
 
         // запрашиваем создание транспортного канала на сервере для приема потоков
         const consuming = true;
-        this.socket.emit('createWebRtcTransport', consuming);
+        this.socket.emit(SE.CreateWebRtcTransport, consuming);
 
         // и для отдачи наших потоков
-        this.socket.emit('createWebRtcTransport', !consuming);
+        this.socket.emit(SE.CreateWebRtcTransport, !consuming);
     }
 
     /** Обработка общих событий для входящего и исходящего транспортных каналов. */
@@ -573,7 +580,7 @@ export class Room
                     transportId: localTransport.id,
                     dtlsParameters
                 };
-                this.socket.emit('connectWebRtcTransport', info);
+                this.socket.emit(SE.ConnectWebRtcTransport, info);
 
                 // сообщаем транспорту, что параметры были переданы на сервер
                 callback();
@@ -598,7 +605,7 @@ export class Room
     }
 
     /** Cоздать транспортный канал для приема потоков. */
-    private createRecvTransport(transport: NewWebRtcTransportInfo): void
+    private createConsumerTransport(transport: NewWebRtcTransportInfo): void
     {
         // создаем локальный транспортный канал
         this.mediasoup.createRecvTransport(transport);
@@ -617,11 +624,11 @@ export class Room
         };
 
         console.info('[Room] > Входим в комнату...');
-        this.socket.emit('join', info);
+        this.socket.emit(SE.Ready, info);
     }
 
     /** Создать транспортный канал для отдачи потоков. */
-    private createSendTransport(transport: NewWebRtcTransportInfo): void
+    private createProducerTransport(transport: NewWebRtcTransportInfo): void
     {
         // создаем локальный транспортный канал
         this.mediasoup.createSendTransport(transport);
@@ -651,11 +658,11 @@ export class Room
                     rtpParameters: parameters.rtpParameters
                 };
 
-                this.socket.emit('newProducer', info);
+                this.socket.emit(SE.NewProducer, info);
 
                 // сообщаем транспорту, что параметры были переданы на сервер
                 // и передаем транспорту id серверного producer
-                this.socket.once('newProducer', (id: string) =>
+                this.socket.once(SE.NewProducer, (id: string) =>
                 {
                     callback({ id });
                 });
@@ -714,7 +721,7 @@ export class Room
         }
         else // иначе сообщаем серверу, чтобы он снял с паузы consumer
         {
-            this.socket.emit('resumeConsumer', consumer.id);
+            this.socket.emit(SE.ResumeConsumer, consumer.id);
         }
     }
 
@@ -746,7 +753,7 @@ export class Room
         {
             producer.close();
             this.mediasoup.deleteProducer(producer);
-            this.socket.emit('closeProducer', producer.id);
+            this.socket.emit(SE.CloseProducer, producer.id);
         }
     }
 
@@ -759,7 +766,7 @@ export class Room
         if (producer)
         {
             producer.pause();
-            this.socket.emit('pauseProducer', producer.id);
+            this.socket.emit(SE.PauseProducer, producer.id);
         }
     }
 
@@ -772,7 +779,7 @@ export class Room
         if (producer)
         {
             producer.resume();
-            this.socket.emit('resumeProducer', producer.id);
+            this.socket.emit(SE.ResumeProducer, producer.id);
         }
     }
 }

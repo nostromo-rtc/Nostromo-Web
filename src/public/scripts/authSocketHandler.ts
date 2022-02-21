@@ -1,4 +1,5 @@
 import { io, Socket } from "socket.io-client";
+import { SocketEvents as SE } from "nostromo-shared/types/SocketEvents";
 
 // Класс для работы с сокетами при авторизации
 export default class authSocketHandler
@@ -25,13 +26,13 @@ export default class authSocketHandler
             console.log(err.message);
         });
 
-        this.socket.on('roomName', (roomName: string) =>
+        this.socket.on(SE.RoomName, (roomName: string) =>
         {
             (document.getElementById('roomName') as HTMLSpanElement).innerText = roomName;
             (document.getElementById('auth') as HTMLDivElement).hidden = false;
         });
 
-        this.socket.on('result', (success: boolean) =>
+        this.socket.on(SE.Result, (success: boolean) =>
         {
             if (success) location.reload();
             else (document.getElementById('result') as HTMLParagraphElement).innerText = "Неправильный пароль!";
@@ -40,7 +41,7 @@ export default class authSocketHandler
         this.btn_join.addEventListener('click', () =>
         {
             const pass: string = (document.getElementById('pass') as HTMLInputElement).value;
-            this.socket.emit('joinRoom', pass);
+            this.socket.emit(SE.JoinRoom, pass);
         });
 
         this.passInput.addEventListener('keydown', (e) =>
@@ -49,7 +50,7 @@ export default class authSocketHandler
             {
                 e.preventDefault();
                 this.btn_join.click();
-            };
+            }
         });
     }
 }

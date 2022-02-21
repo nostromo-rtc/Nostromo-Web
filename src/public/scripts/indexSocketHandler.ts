@@ -1,4 +1,5 @@
 import { io, Socket } from "socket.io-client";
+import { SocketEvents as SE } from "nostromo-shared/types/SocketEvents";
 
 type Room = {
     id: string,
@@ -31,11 +32,11 @@ export default class indexSocketHandler
             console.log(err.message);
         });
 
-        this.socket.on('roomList', (rooms: Room[]) => this.createRoomList(rooms));
-        this.socket.on('newRoom', (room: Room) => this.addRoomToList(room));
-        this.socket.on('deletedRoom', (id: string) => this.removeRoomFromList(id));
+        this.socket.on(SE.RoomList, (rooms: Room[]) => this.createRoomList(rooms));
+        this.socket.on(SE.RoomCreated, (room: Room) => this.addRoomToList(room));
+        this.socket.on(SE.RoomDeleted, (id: string) => this.removeRoomFromList(id));
 
-        this.socket.on('disconnect', () => this.onDisconnect());
+        this.socket.on(SE.Disconnect, () => this.onDisconnect());
     }
 
     private createRoomList(rooms: Room[]): void
@@ -48,7 +49,7 @@ export default class indexSocketHandler
 
     private addRoomToList(room: Room): void
     {
-        let roomListItem = document.createElement('a');
+        const roomListItem = document.createElement('a');
         roomListItem.classList.add('roomListItem');
         roomListItem.id = room.id;
         roomListItem.href = `/rooms/${room['id']}`;
@@ -59,7 +60,7 @@ export default class indexSocketHandler
 
     private removeRoomFromList(id: string): void
     {
-        let room = document.getElementById(id);
+        const room = document.getElementById(id);
         if (room) room.remove();
     }
 

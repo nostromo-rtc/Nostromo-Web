@@ -1,7 +1,7 @@
 import { UI } from './UI';
 import { Mediasoup } from './Mediasoup';
 import { UserMedia } from './UserMedia';
-import { FileHandler } from "./FileHandler";
+import { FileHandler } from "./FileService";
 import { Room } from './Room';
 import { handleCriticalError } from "./AppError";
 
