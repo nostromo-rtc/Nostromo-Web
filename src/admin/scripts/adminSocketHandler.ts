@@ -1,18 +1,8 @@
 import { io, Socket } from "socket.io-client";
 import { SocketEvents as SE } from "nostromo-shared/types/SocketEvents";
 
-import { NewRoomInfo } from "nostromo-shared/types/AdminTypes";
-import { VideoCodec } from "nostromo-shared/types/RoomTypes";
-
-type Room = {
-    id: string,
-    name: string;
-};
-
-type User = {
-    id: string,
-    name: string;
-};
+import { NewRoomInfo, RoomLinkInfo } from "nostromo-shared/types/AdminTypes";
+import { VideoCodec, UserInfo } from "nostromo-shared/types/RoomTypes";
 
 // Класс для работы с сокетами при авторизации в панель администратора
 export default class adminSocketHandler
@@ -20,9 +10,10 @@ export default class adminSocketHandler
     private socket: Socket = io(`/admin`, {
         'transports': ['websocket']
     });
-    private latestRoomId = 0;
 
     private videoCodecSelect?: HTMLSelectElement;
+
+    private latestSubscribedRoomId: string | undefined;
 
     constructor()
     {
@@ -50,14 +41,13 @@ export default class adminSocketHandler
 
         if (!this.onAuthPage())
         {
-            this.socket.on(SE.RoomList, (roomList: Room[], roomIndex: number) =>
+            this.socket.on(SE.RoomList, (roomList: RoomLinkInfo[]) =>
             {
                 this.setRoomList(roomList);
-                this.latestRoomId = roomIndex;
             });
 
             // Привязываемся к событию изменения списка юзеров.
-            this.socket.on(SE.UserList, (userList: User[]) =>
+            this.socket.on(SE.UserList, (userList: UserInfo[]) =>
             {
                 this.setUserList(userList);
             });
@@ -68,7 +58,7 @@ export default class adminSocketHandler
             const selectedRoomOption = roomSelect.item(roomSelect.selectedIndex);
             if (selectedRoomOption && selectedRoomOption.value != "default")
             {
-                this.getUserList(selectedRoomOption.value);
+                this.subscribeUserList(selectedRoomOption.value);
             }
 
             this.prepareVideoCodecSelect();
@@ -84,11 +74,11 @@ export default class adminSocketHandler
     {
         this.videoCodecSelect = document.getElementById('videoCodec')! as HTMLSelectElement;
 
-        const Vp9Option = new Option(VideoCodec.VP9, VideoCodec.VP9, true);
-        this.videoCodecSelect.add(Vp9Option);
-
         const Vp8Option = new Option(VideoCodec.VP8, VideoCodec.VP8);
         this.videoCodecSelect.add(Vp8Option);
+
+        const Vp9Option = new Option(VideoCodec.VP9, VideoCodec.VP9, true);
+        this.videoCodecSelect.add(Vp9Option);
 
         const H264Option = new Option(VideoCodec.H264, VideoCodec.H264);
         this.videoCodecSelect.add(H264Option);
@@ -133,11 +123,23 @@ export default class adminSocketHandler
         };
 
         this.socket.emit(SE.CreateRoom, newRoomInfo);
-        this.addRoomListItem(name);
+
+        this.socket.once(SE.RoomCreated, (info: RoomLinkInfo) =>
+        {
+            this.roomCreated(info, pass);
+        });
+    }
+
+    private roomCreated(info: RoomLinkInfo, pass: string): void
+    {
+        this.addRoomListItem(info);
 
         const roomLink = document.getElementById('roomLink') as HTMLInputElement;
-        if (roomLink.hidden) roomLink.hidden = false;
-        roomLink.value = `${window.location.origin}/rooms/${this.latestRoomId}?p=${pass}`;
+        if (roomLink.hidden)
+        {
+            roomLink.hidden = false;
+        }
+        roomLink.value = `${window.location.origin}/rooms/${info.id}?p=${pass}`;
     }
 
     private deleteRoom(): void
@@ -155,7 +157,7 @@ export default class adminSocketHandler
         }
     }
 
-    private setRoomList(roomList: Room[]): void
+    private setRoomList(roomList: RoomLinkInfo[]): void
     {
         const roomSelect = document.getElementById('roomSelect') as HTMLSelectElement;
         for (const room of roomList)
@@ -172,19 +174,33 @@ export default class adminSocketHandler
             const selectedRoomOption = roomSelect.item(roomSelect.selectedIndex);
             if (selectedRoomOption)
             {
-                this.getUserList(selectedRoomOption.value);
+                // Отписываемся от предыдущей комнаты.
+                if (this.latestSubscribedRoomId)
+                {
+                    this.unsubscribeUserList(this.latestSubscribedRoomId);
+                }
+
+                const roomId = selectedRoomOption.value;
+                this.subscribeUserList(roomId);
+                this.latestSubscribedRoomId = roomId;
             }
         });
     }
 
     /** Сообщаем серверу, что хотим получать список юзеров этой комнаты. */
-    private getUserList(roomId: string): void
+    private subscribeUserList(roomId: string): void
     {
-        this.socket.emit(SE.UserList, roomId);
+        this.socket.emit(SE.SubscribeUserList, roomId);
+    }
+
+    /** Сообщаем серверу, что больше не хотим получать список юзеров этой комнаты. */
+    private unsubscribeUserList(roomId: string): void
+    {
+        this.socket.emit(SE.UnsubscribeUserList, roomId);
     }
 
     /** Присваиваем список юзеров. */
-    private setUserList(userList: User[]): void
+    private setUserList(userList: RoomLinkInfo[]): void
     {
         const userSelect = document.getElementById('userSelect') as HTMLSelectElement;
 
@@ -200,13 +216,12 @@ export default class adminSocketHandler
         }
     }
 
-    private addRoomListItem(roomName: string): void
+    private addRoomListItem(info: RoomLinkInfo): void
     {
         const roomSelect = document.getElementById('roomSelect') as HTMLSelectElement;
-        const id = ++this.latestRoomId;
         const newOption = document.createElement('option');
-        newOption.value = id.toString();
-        newOption.innerText = `[${id}] ${roomName}`;
+        newOption.value = info.id;
+        newOption.innerText = `[${info.id}] ${info.name}`;
         roomSelect.add(newOption);
     }
 }
