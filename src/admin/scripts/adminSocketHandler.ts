@@ -84,6 +84,24 @@ export default class adminSocketHandler
                     this.kickUser(userSelect.value);
                 }
             });
+
+            const btn_stopUserVideo = document.getElementById("btn_stopUserVideo") as HTMLButtonElement;
+            btn_stopUserVideo.addEventListener("click", () =>
+            {
+                if (userSelect.value != "default")
+                {
+                    this.stopUserVideo(userSelect.value);
+                }
+            });
+
+            const btn_stopUserAudio = document.getElementById("btn_stopUserAudio") as HTMLButtonElement;
+            btn_stopUserAudio.addEventListener("click", () =>
+            {
+                if (userSelect.value != "default")
+                {
+                    this.stopUserAudio(userSelect.value);
+                }
+            });
         }
     }
 
@@ -246,5 +264,17 @@ export default class adminSocketHandler
     private kickUser(userId: string)
     {
         this.socket.emit(SE.KickUser, userId);
+    }
+
+    /** Прекратить захват видео у пользователя. */
+    private stopUserVideo(userId: string)
+    {
+        this.socket.emit(SE.StopUserVideo, userId);
+    }
+
+    /** Прекратить захват аудио у пользователя. */
+    private stopUserAudio(userId: string)
+    {
+        this.socket.emit(SE.StopUserAudio, userId);
     }
 }

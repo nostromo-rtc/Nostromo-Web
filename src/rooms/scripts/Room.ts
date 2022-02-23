@@ -447,11 +447,32 @@ export class Room
             this.ui.leftSound.play();
         });
 
+        // Необходимо перейти на другую страницу.
         this.socket.on(SE.Redirect, (where: string) =>
         {
             if (where == "main-page")
             {
                 document.location.replace("/");
+            }
+        });
+
+        this.socket.on(SE.StopUserVideo, () =>
+        {
+            const btn = this.ui.buttons.get("stopMediaVideo")!;
+
+            if (!btn.hidden)
+            {
+                btn.click();
+            }
+        });
+
+        this.socket.on(SE.StopUserAudio, () =>
+        {
+            const btn = this.ui.buttons.get("stopMediaAudio")!;
+
+            if (!btn.hidden)
+            {
+                btn.click();
             }
         });
 
