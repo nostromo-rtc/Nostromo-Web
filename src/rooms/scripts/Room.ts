@@ -447,6 +447,14 @@ export class Room
             this.ui.leftSound.play();
         });
 
+        this.socket.on(SE.Redirect, (where: string) =>
+        {
+            if (where == "main-page")
+            {
+                document.location.replace("/");
+            }
+        });
+
         // ошибка при соединении нашего веб-сокета
         this.socket.on('connect_error', (err: Error) =>
         {

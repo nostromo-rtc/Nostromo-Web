@@ -11,6 +11,10 @@ export default class adminSocketHandler
         'transports': ['websocket']
     });
 
+    private generalSocket: Socket = io(`/`, {
+        'transports': ['websocket']
+    });
+
     private videoCodecSelect?: HTMLSelectElement;
 
     private latestSubscribedRoomId: string | undefined;
@@ -31,7 +35,10 @@ export default class adminSocketHandler
 
         this.socket.on(SE.Result, (success: boolean) =>
         {
-            if (success) location.reload();
+            if (success)
+            {
+                location.reload();
+            }
             else
             {
                 const result = document.getElementById('result') as HTMLParagraphElement;
@@ -47,7 +54,7 @@ export default class adminSocketHandler
             });
 
             // Привязываемся к событию изменения списка юзеров.
-            this.socket.on(SE.UserList, (userList: UserInfo[]) =>
+            this.generalSocket.on(SE.UserList, (userList: UserInfo[]) =>
             {
                 this.setUserList(userList);
             });
@@ -67,6 +74,16 @@ export default class adminSocketHandler
             const btn_deleteRoom = document.getElementById('btn_deleteRoom')! as HTMLButtonElement;
             btn_createRoom.addEventListener('click', () => { this.createRoom(); });
             btn_deleteRoom.addEventListener('click', () => { this.deleteRoom(); });
+
+            const userSelect = document.getElementById('userSelect') as HTMLSelectElement;
+            const btn_kickUser = document.getElementById("btn_kickUser") as HTMLButtonElement;
+            btn_kickUser.addEventListener('click', () =>
+            {
+                if (userSelect.value != "default")
+                {
+                    this.kickUser(userSelect.value);
+                }
+            });
         }
     }
 
@@ -190,13 +207,13 @@ export default class adminSocketHandler
     /** Сообщаем серверу, что хотим получать список юзеров этой комнаты. */
     private subscribeUserList(roomId: string): void
     {
-        this.socket.emit(SE.SubscribeUserList, roomId);
+        this.generalSocket.emit(SE.SubscribeUserList, roomId);
     }
 
     /** Сообщаем серверу, что больше не хотим получать список юзеров этой комнаты. */
     private unsubscribeUserList(roomId: string): void
     {
-        this.socket.emit(SE.UnsubscribeUserList, roomId);
+        this.generalSocket.emit(SE.UnsubscribeUserList, roomId);
     }
 
     /** Присваиваем список юзеров. */
@@ -223,5 +240,11 @@ export default class adminSocketHandler
         newOption.value = info.id;
         newOption.innerText = `[${info.id}] ${info.name}`;
         roomSelect.add(newOption);
+    }
+
+    /** Выгнать выбранного пользователя из комнаты. */
+    private kickUser(userId: string)
+    {
+        this.socket.emit(SE.KickUser, userId);
     }
 }
