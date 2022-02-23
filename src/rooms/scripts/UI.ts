@@ -152,6 +152,8 @@ export class UI
         buttons.set('sendFile', document.getElementById('btn_sendFile') as HTMLButtonElement);
         buttons.set('toggleSounds', document.getElementById('btn_toggleSounds') as HTMLButtonElement);
         buttons.set('setNewUsername', document.getElementById('btn_setNewUsername') as HTMLButtonElement);
+        buttons.set('stopMediaAudio', document.getElementById('btn_stopMediaAudio') as HTMLButtonElement);
+        buttons.set('stopMediaVideo', document.getElementById('btn_stopMediaVideo') as HTMLButtonElement);
 
         return buttons;
     }

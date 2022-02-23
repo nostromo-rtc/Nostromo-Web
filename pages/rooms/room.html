@@ -29,7 +29,7 @@
             <button id="btn_toggleSounds" class="bold background-green">Включить звуки собеседников</button>
             <span class="vl">|</span>
             <button id="btn_getUserMediaMic">Захватить микрофон</button>
-            <button hidden id="btn_toggleMic" class="bold background-red">Выключить микрофон</button>
+            <button hidden id="btn_toggleMic" class="bold background-orange">Выключить микрофон</button>
             <span class="vl">|</span>
             <button id="btn_getUserMediaCam">Захватить веб-камеру</button>
             <span class="vl">&larr;</span>
@@ -42,6 +42,9 @@
             <select id="captureSettingsDisplay">
                 <option disabled selected value="default">Выберите разрешение</option>
             </select>
+            <span class="vl">|</span>
+            <button id="btn_stopMediaAudio" class="bold background-red" hidden>Прекратить захват аудиодорожки</button>
+            <button id="btn_stopMediaVideo" class="bold background-red" hidden>Прекратить захват видеодорожки</button>
         </div>
         <div id="videos"></div>
         <section id="chatSection">
@@ -68,4 +71,5 @@
     <script src="/scripts/vendor.js"></script>
     <script src="/rooms/scripts/index.js"></script>
 </body>
+
 </html>

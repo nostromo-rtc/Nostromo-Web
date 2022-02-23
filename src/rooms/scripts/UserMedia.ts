@@ -30,11 +30,6 @@ export class UserMedia
         audio: true, video: false
     };
 
-    /** Настройки медиапотока при захвате веб-камеры. */
-    private readonly streamConstraintsCam: MediaStreamConstraints = {
-        audio: false, video: true
-    };
-
     /** Микрофон на паузе? */
     private micPaused = false;
 
@@ -53,19 +48,49 @@ export class UserMedia
         this.captureConstraintsDisplay = this.prepareCaptureDisplayConstraints();
         this.captureConstraintsCam = this.prepareCaptureCamConstraints();
 
-        this.ui.buttons.get('getUserMediaMic')!.addEventListener('click',
-            async () => await this.getUserMedia(this.streamConstraintsMic));
+        this.ui.buttons.get('getUserMediaMic')!.addEventListener('click', async () =>
+        {
+            await this.getUserMedia(this.streamConstraintsMic);
+        });
 
-        this.ui.buttons.get('getUserMediaCam')!.addEventListener('click',
-            async () => await this.getUserMedia(
-                this.captureConstraintsCam.get(this.ui.currentCaptureSettingCam)!
-            ));
+        this.ui.buttons.get('getUserMediaCam')!.addEventListener('click', async () =>
+        {
+            await this.getUserMedia(this.captureConstraintsCam
+                .get(this.ui.currentCaptureSettingCam)!);
+        });
 
-        this.ui.buttons.get('getDisplayMedia')!.addEventListener('click',
-            async () => await this.getDisplayMedia());
+        const stopAudioBtn = this.ui.buttons.get("stopMediaAudio")!;
+        const stopVideoBtn = this.ui.buttons.get("stopMediaVideo")!;
 
-        this.ui.buttons.get('toggleMic')!.addEventListener('click',
-            () => this.toggleMic());
+        stopAudioBtn.addEventListener("click", () =>
+        {
+            const track = this.stream.getAudioTracks()[0];
+
+            track.stop();
+            this.removeEndedTrack(track);
+
+            stopAudioBtn.hidden = true;
+        });
+
+        stopVideoBtn.addEventListener("click", () =>
+        {
+            const track = this.stream.getVideoTracks()[0];
+
+            track.stop();
+            this.removeEndedTrack(track);
+
+            stopVideoBtn.hidden = true;
+        });
+
+        this.ui.buttons.get('getDisplayMedia')!.addEventListener('click', async () =>
+        {
+            await this.getDisplayMedia();
+        });
+
+        this.ui.buttons.get('toggleMic')!.addEventListener('click', () =>
+        {
+            this.toggleMic();
+        });
     }
 
     /** Получение видео (веб-камера) или аудио (микрофон) потока. */
@@ -125,7 +150,7 @@ export class UserMedia
                 if (oldTrack.kind == newTrack.kind)
                 {
                     presentSameKindMedia = true;
-                    this.stopTrack(oldTrack);
+                    this.stopTrackBeforeReplace(oldTrack);
                     await this.room.updateMediaStreamTrack(oldTrack.id, newTrack);
                 }
             }
@@ -139,7 +164,10 @@ export class UserMedia
             // чтобы убрать зависнувший последний кадр.
             // Иначе баг на Chrome: если в стриме только аудиодорожка,
             // то play/pause на видеоэлементе не будут работать, а звук будет все равно идти.
-            if (!streamWasActive) this.ui.localVideo!.load();
+            if (!streamWasActive)
+            {
+                this.ui.localVideo!.load();
+            }
 
             // так как добавили новую дорожку, включаем отображение элементов управления
             // регулятор громкости не показываем
@@ -151,49 +179,70 @@ export class UserMedia
 
             // подключаем медиапоток к HTML-элементу <video> (localVideo)
             if (!this.ui.localVideo!.srcObject)
+            {
                 this.ui.localVideo!.srcObject = this.stream;
+            }
 
-            // если не было
+            // Если не было, то есть добавляем новую медиадорожку.
             if (!presentSameKindMedia)
             {
                 await this.room.addMediaStreamTrack(newTrack);
+
+                if (newTrack.kind == "video")
+                {
+                    this.ui.buttons.get("stopMediaVideo")!.hidden = false;
+                }
+                else
+                {
+                    this.ui.buttons.get("stopMediaAudio")!.hidden = false;
+                }
             }
         }
     }
 
     /** Остановить медиадорожку. */
-    private stopTrack(oldVideoTrack: MediaStreamTrack): void
+    private stopTrackBeforeReplace(oldVideoTrack: MediaStreamTrack): void
     {
         // stop не вызывает событие ended,
         // поэтому удаляем трек из стрима сами
         oldVideoTrack.stop();
-        console.debug("[UserMedia] > stopTrack", oldVideoTrack);
-        this.removeTrackFromStream(oldVideoTrack);
+        console.debug("[UserMedia] > stopTrackBeforeReplace", oldVideoTrack);
+        this.removeTrackFromLocalStream(oldVideoTrack);
     }
 
-    /** Обработка закончившихся (ended) дорожек. */
+    /** Обработка закончившейся (ended) дорожки. */
     private handleEndedTrack(track: MediaStreamTrack): void
     {
         track.addEventListener('ended', () =>
         {
-            this.removeTrackFromStream(track);
-            this.room.removeMediaStreamTrack(track.id);
-            if (track.kind == 'audio')
-            {
-                // поскольку аудиодорожка была удалена, значит новая точно
-                // должна быть не на паузе
-                const toggleMicButton = this.ui.buttons.get('toggleMic')!;
-                toggleMicButton.innerText = 'Выключить микрофон';
-                toggleMicButton.classList.replace('background-green', 'background-red');
-                toggleMicButton.hidden = true;
-                this.micPaused = false;
-            }
+            this.removeEndedTrack(track);
         });
     }
 
-    /** Удалить медиадорожку из локального стрима. */
-    private removeTrackFromStream(track: MediaStreamTrack): void
+    /** Удалить закончившуюся (ended) дорожку. */
+    private removeEndedTrack(track: MediaStreamTrack)
     {
+        console.debug("[UserMedia] > removeEndedTrack", track);
+
+        this.removeTrackFromLocalStream(track);
+        this.room.removeMediaStreamTrack(track.id);
+        if (track.kind == 'audio')
+        {
+            // поскольку аудиодорожка была удалена, значит новая точно
+            // должна быть не на паузе
+            const toggleMicButton = this.ui.buttons.get('toggleMic')!;
+            toggleMicButton.innerText = 'Выключить микрофон';
+            toggleMicButton.classList.replace('background-green', 'background-red');
+            toggleMicButton.hidden = true;
+            this.micPaused = false;
+        }
+    }
+
+    /** Удалить медиадорожку из локального стрима. */
+    private removeTrackFromLocalStream(track: MediaStreamTrack): void
+    {
+        console.debug("[UserMedia] > removeTrackFromLocalStream", track);
+
         this.stream.removeTrack(track);
         if (track.kind == 'video')
         {

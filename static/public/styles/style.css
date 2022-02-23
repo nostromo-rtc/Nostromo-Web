@@ -119,6 +119,10 @@ body {
     background-color: lightgreen;
 }
 
+.background-orange {
+    background-color: rgb(248, 178, 152);
+}
+
 .background-red {
     background-color: lightcoral;
 }
