@@ -1,7 +1,7 @@
 import { UI } from './UI';
 import { Mediasoup } from './Mediasoup';
 import { UserMedia } from './UserMedia';
-import { FileHandler } from "./FileService";
+import { FileService } from "./FileService";
 import { Room } from './Room';
 import { handleCriticalError } from "./AppError";
 
@@ -23,7 +23,7 @@ const ui = new UI();
 /** Для работы с медиапотоками на уровне Mediasoup (Consumers и Producers). */
 const mediasoup = new Mediasoup();
 /** Для работы с файлами. */
-const fileHandler = new FileHandler();
+const fileHandler = new FileService();
 /** Комната. */
 const room = new Room(ui, mediasoup, fileHandler);
 /** Для работы с локальными медиапотоками пользователя. */

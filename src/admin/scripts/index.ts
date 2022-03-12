@@ -1,3 +1,3 @@
-import adminSocketHandler from './adminSocketHandler';
+import AdminSocketService from './AdminSocketService';
 // создаем обработчик сокетов
-const adminSocketHandlerInstance = new adminSocketHandler();
+const adminSocketHandlerInstance = new AdminSocketService();

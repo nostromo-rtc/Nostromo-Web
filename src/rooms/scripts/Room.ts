@@ -1,5 +1,5 @@
 import { UI } from "./UI";
-import { FileHandler } from "./FileService";
+import { FileService } from "./FileService";
 
 import { io, Socket } from "socket.io-client";
 import { SocketEvents as SE } from "nostromo-shared/types/SocketEvents";
@@ -66,7 +66,7 @@ export class Room
     private readonly mediasoup: Mediasoup;
 
     /** Объект для загрузки файлов. */
-    private readonly fileHandler: FileHandler;
+    private readonly fileService: FileService;
 
     /** Кило. */
     private readonly KILO = 1024;
@@ -86,7 +86,7 @@ export class Room
     /** Id комнаты. */
     private roomId: string;
 
-    constructor(_ui: UI, _mediasoup: Mediasoup, _fileHandler: FileHandler)
+    constructor(_ui: UI, _mediasoup: Mediasoup, _fileService: FileService)
     {
         console.debug("[Room] > ctor");
 
@@ -97,7 +97,7 @@ export class Room
         });
 
         this.mediasoup = _mediasoup;
-        this.fileHandler = _fileHandler;
+        this.fileService = _fileService;
 
         // TODO: изменить способ получения Id комнаты
         this.roomId = document.location.pathname.split('/').slice(-1)[0];
@@ -175,7 +175,7 @@ export class Room
                 {
                     console.debug("Пытаемся загрузить файл:", file);
                     // Пытаемся загрузить файл.
-                    await this.fileHandler.fileUpload(
+                    await this.fileService.fileUpload(
                         this.roomId,
                         file,
                         progressFileList.get(file)!,
@@ -272,14 +272,14 @@ export class Room
         // на сервере закрылся транспорт, поэтому надо закрыть его и здесь
         this.socket.on(SE.CloseTransport, (transportId: string) =>
         {
-            if (this.mediasoup.sendTransport?.id == transportId)
+            if (this.mediasoup.producerTransport?.id == transportId)
             {
-                this.mediasoup.sendTransport.close();
+                this.mediasoup.producerTransport.close();
             }
 
-            if (this.mediasoup.recvTransport?.id == transportId)
+            if (this.mediasoup.consumerTransport?.id == transportId)
             {
-                this.mediasoup.recvTransport.close();
+                this.mediasoup.consumerTransport.close();
             }
         });
 
@@ -637,13 +637,13 @@ export class Room
     private createConsumerTransport(transport: NewWebRtcTransportInfo): void
     {
         // создаем локальный транспортный канал
-        this.mediasoup.createRecvTransport(transport);
+        this.mediasoup.createConsumerTransport(transport);
 
         // если он не создался
-        if (!this.mediasoup.recvTransport) return;
+        if (!this.mediasoup.consumerTransport) return;
 
         // если все же создался, обработаем события этого транспорта
-        this.handleCommonTransportEvents(this.mediasoup.recvTransport);
+        this.handleCommonTransportEvents(this.mediasoup.consumerTransport);
 
         // теперь, когда транспортный канал для приема потоков создан
         // войдем в комнату - т.е сообщим имя и наши rtpCapabilities
@@ -660,20 +660,20 @@ export class Room
     private createProducerTransport(transport: NewWebRtcTransportInfo): void
     {
         // создаем локальный транспортный канал
-        this.mediasoup.createSendTransport(transport);
+        this.mediasoup.createProducerTransport(transport);
 
-        const localTransport = this.mediasoup.sendTransport;
+        const localTransport = this.mediasoup.producerTransport;
 
         // если он не создался
         if (!localTransport) return;
 
         this.handleCommonTransportEvents(localTransport);
 
-        this.handleSendTransportEvents(localTransport);
+        this.handleProducerTransportEvents(localTransport);
     }
 
     /** Обработка событий исходящего транспортного канала. */
-    private handleSendTransportEvents(localTransport: MediasoupTypes.Transport): void
+    private handleProducerTransportEvents(localTransport: MediasoupTypes.Transport): void
     {
         localTransport.on('produce', (
             parameters: TransportProduceParameters, callback: CallbackOnProduce, errback: Errback

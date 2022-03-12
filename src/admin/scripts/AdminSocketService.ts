@@ -5,7 +5,7 @@ import { NewRoomInfo, RoomLinkInfo } from "nostromo-shared/types/AdminTypes";
 import { VideoCodec, UserInfo } from "nostromo-shared/types/RoomTypes";
 
 // Класс для работы с сокетами при авторизации в панель администратора
-export default class adminSocketHandler
+export default class AdminSocketService
 {
     private socket: Socket = io(`/admin`, {
         'transports': ['websocket']
@@ -21,7 +21,7 @@ export default class adminSocketHandler
 
     constructor()
     {
-        console.debug("adminSocketHandler ctor");
+        console.debug("AdminSocketService ctor");
         this.socket.on('connect', () =>
         {
             console.info("Создано подключение веб-сокета");
@@ -105,7 +105,7 @@ export default class adminSocketHandler
         }
     }
 
-    private prepareVideoCodecSelect()
+    private prepareVideoCodecSelect(): void
     {
         this.videoCodecSelect = document.getElementById('videoCodec')! as HTMLSelectElement;
 

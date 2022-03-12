@@ -2,7 +2,7 @@ import { io, Socket } from "socket.io-client";
 import { SocketEvents as SE } from "nostromo-shared/types/SocketEvents";
 
 // Класс для работы с сокетами при авторизации
-export default class authSocketHandler
+export default class AuthSocketService
 {
 
     private socket: Socket = io("/auth", {

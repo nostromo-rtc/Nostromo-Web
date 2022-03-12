@@ -5,7 +5,7 @@ import { TusHeadRequest, TusOptionsRequest, TusPatchRequest, TusPostCreationRequ
 type FileHasBeenUploadedCallback = (fileId: string, file: File, progressComponent: HTMLDivElement) => void;
 
 /** Класс - обработчик файлов. */
-export class FileHandler
+export class FileService
 {
     private readonly MEGA = 1024 * 1024;
 

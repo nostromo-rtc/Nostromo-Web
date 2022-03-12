@@ -1,13 +1,9 @@
 import { io, Socket } from "socket.io-client";
 import { SocketEvents as SE } from "nostromo-shared/types/SocketEvents";
-
-type Room = {
-    id: string,
-    name: string;
-};
+import { RoomLinkInfo } from "nostromo-shared/types/AdminTypes";
 
 // Класс для работы с сокетами на главной странице
-export default class indexSocketHandler
+export default class IndexSocketService
 {
     private socket: Socket = io("/", {
         'transports': ['websocket']
@@ -32,14 +28,14 @@ export default class indexSocketHandler
             console.log(err.message);
         });
 
-        this.socket.on(SE.RoomList, (rooms: Room[]) => this.createRoomList(rooms));
-        this.socket.on(SE.RoomCreated, (room: Room) => this.addRoomToList(room));
+        this.socket.on(SE.RoomList, (rooms: RoomLinkInfo[]) => this.createRoomList(rooms));
+        this.socket.on(SE.RoomCreated, (room: RoomLinkInfo) => this.addRoomToList(room));
         this.socket.on(SE.RoomDeleted, (id: string) => this.removeRoomFromList(id));
 
         this.socket.on(SE.Disconnect, () => this.onDisconnect());
     }
 
-    private createRoomList(rooms: Room[]): void
+    private createRoomList(rooms: RoomLinkInfo[]): void
     {
         for (const room of rooms)
         {
@@ -47,7 +43,7 @@ export default class indexSocketHandler
         }
     }
 
-    private addRoomToList(room: Room): void
+    private addRoomToList(room: RoomLinkInfo): void
     {
         const roomListItem = document.createElement('a');
         roomListItem.classList.add('roomListItem');

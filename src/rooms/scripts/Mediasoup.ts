@@ -24,17 +24,17 @@ export class Mediasoup
     public readonly device!: MediasoupTypes.Device;
 
     /** Транспортный канал для отправки потоков. */
-    private _sendTransport?: MediasoupTypes.Transport;
-    public get sendTransport(): MediasoupTypes.Transport | undefined
+    private _producerTransport?: MediasoupTypes.Transport;
+    public get producerTransport(): MediasoupTypes.Transport | undefined
     {
-        return this._sendTransport;
+        return this._producerTransport;
     }
 
     /** Транспортный канал для приёма потоков. */
-    private _recvTransport?: MediasoupTypes.Transport;
-    public get recvTransport(): MediasoupTypes.Transport | undefined
+    private _consumerTransport?: MediasoupTypes.Transport;
+    public get consumerTransport(): MediasoupTypes.Transport | undefined
     {
-        return this._recvTransport;
+        return this._consumerTransport;
     }
 
     /** Потребители. */
@@ -69,11 +69,11 @@ export class Mediasoup
     }
 
     /** Создать транспортный канал для приёма медиапотоков. */
-    public createRecvTransport(transport: NewWebRtcTransportInfo): void
+    public createConsumerTransport(transport: NewWebRtcTransportInfo): void
     {
         const { id, iceParameters, iceCandidates, dtlsParameters } = transport;
 
-        this._recvTransport = this.device.createRecvTransport({
+        this._consumerTransport = this.device.createRecvTransport({
             id,
             iceParameters,
             iceCandidates,
@@ -82,11 +82,11 @@ export class Mediasoup
     }
 
     /** Создать транспортный канал для отдачи медиапотоков. */
-    public createSendTransport(transport: NewWebRtcTransportInfo): void
+    public createProducerTransport(transport: NewWebRtcTransportInfo): void
     {
         const { id, iceParameters, iceCandidates, dtlsParameters } = transport;
 
-        this._sendTransport = this.device.createSendTransport({
+        this._producerTransport = this.device.createSendTransport({
             id,
             iceParameters,
             iceCandidates,
@@ -99,7 +99,7 @@ export class Mediasoup
     {
         const { id, producerId, kind, rtpParameters } = newConsumerInfo;
 
-        const consumer = await this.recvTransport!.consume({
+        const consumer = await this.consumerTransport!.consume({
             id,
             producerId,
             kind,
@@ -115,7 +115,7 @@ export class Mediasoup
     /** Создать изготовителя медиапотока. */
     public async createProducer(track: MediaStreamTrack, maxBitrate: number): Promise<Producer>
     {
-        const producer = await this.sendTransport!.produce({
+        const producer = await this.producerTransport!.produce({
             track,
             zeroRtpOnPause: true,
             codecOptions:
