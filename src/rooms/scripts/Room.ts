@@ -340,7 +340,7 @@ export class Room
         this.socket.on(SE.RoomName, (roomName: string) =>
         {
             this.ui.roomName = roomName;
-            document.title += ' - ' + roomName;
+            document.title += ` "${roomName}"`;
         });
 
         // получаем макс. битрейт для аудио
