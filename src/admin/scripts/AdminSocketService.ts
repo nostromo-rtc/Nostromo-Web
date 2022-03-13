@@ -102,6 +102,18 @@ export default class AdminSocketService
                     this.stopUserAudio(userSelect.value);
                 }
             });
+
+            const btn_changeUsername = document.getElementById("btn_changeUsername") as HTMLButtonElement;
+            const usernameInput = document.getElementById("usernameInput") as HTMLInputElement;
+            btn_changeUsername.addEventListener('click', () =>
+            {
+                usernameInput.value = usernameInput.value.trim();
+                if (userSelect.value != "default"
+                    && usernameInput.value.length > 0)
+                {
+                    this.changeUsername(userSelect.value, usernameInput.value);
+                }
+            });
         }
     }
 
@@ -276,5 +288,12 @@ export default class AdminSocketService
     private stopUserAudio(userId: string)
     {
         this.socket.emit(SE.StopUserAudio, userId);
+    }
+
+    /** Изменить имя пользователя. */
+    private changeUsername(id: string, name: string)
+    {
+        const userInfo: UserInfo = { id, name };
+        this.socket.emit(SE.ChangeUsername, userInfo);
     }
 }

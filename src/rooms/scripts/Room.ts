@@ -476,6 +476,14 @@ export class Room
             }
         });
 
+        this.socket.on(SE.ChangeUsername, (name: string) =>
+        {
+            this.ui.usernameInput.value = name;
+
+            const btn = this.ui.buttons.get("setNewUsername")!;
+            btn.click();
+        });
+
         // ошибка при соединении нашего веб-сокета
         this.socket.on('connect_error', (err: Error) =>
         {
