@@ -1,5 +1,5 @@
 import * as mediasoup from 'mediasoup-client';
-import { NewConsumerInfo, NewWebRtcTransportInfo } from 'nostromo-shared/types/RoomTypes';
+import { PrefixConstants, NewConsumerInfo, NewWebRtcTransportInfo } from 'nostromo-shared/types/RoomTypes';
 import { handleCriticalError } from "./AppError";
 import MediasoupTypes = mediasoup.types;
 import Consumer = MediasoupTypes.Consumer;
@@ -49,6 +49,12 @@ export class Mediasoup
      * @value consumerId
      */
     private linkMapTrackConsumer = new Map<string, string>();
+
+    /** Максимальный битрейт для видеодорожек. */
+    public maxVideoBitrate = 10 * PrefixConstants.MEGA;
+
+    /** Максимальный битрейт для аудиодорожек. */
+    public maxAudioBitrate = 64 * PrefixConstants.KILO;
 
     constructor()
     {
@@ -112,22 +118,46 @@ export class Mediasoup
         return consumer;
     }
 
-    /** Создать изготовителя медиапотока. */
-    public async createProducer(track: MediaStreamTrack, maxBitrate: number): Promise<Producer>
+    /** Создать медиапотока-производителя. */
+    public async createProducer(track: MediaStreamTrack): Promise<Producer>
     {
-        const producer = await this.producerTransport!.produce({
+        const producerOptions: MediasoupTypes.ProducerOptions = {
             track,
-            zeroRtpOnPause: true,
-            codecOptions:
-            {
+            zeroRtpOnPause: true
+        };
+
+        const currentVideoBitrate = this.maxVideoBitrate;
+
+        if (track.kind == "video")
+        {
+            producerOptions.codecOptions = {
                 videoGoogleStartBitrate: 1000
-            },
-            encodings: [
+            };
+
+            producerOptions.encodings = [
                 {
-                    maxBitrate
+                    maxBitrate: currentVideoBitrate
                 }
-            ]
-        });
+            ];
+        }
+        else
+        {
+            producerOptions.encodings = [
+                {
+                    maxBitrate: this.maxAudioBitrate
+                }
+            ];
+        }
+
+        const producer = await this.producerTransport!.produce(producerOptions);
+
+        // Если пока создавали producer,
+        // сервер прислал новое значение максимального битрейта для видео
+        // и соответственно это значение не применилось.
+        if (producer.kind == "video" && (currentVideoBitrate != this.maxVideoBitrate))
+        {
+            await this.setBitrateForProducerVideoTracks(producer, this.maxVideoBitrate);
+        }
 
         this.producers.set(producer.id, producer);
 
@@ -170,5 +200,38 @@ export class Mediasoup
     public deleteProducer(producer: Producer): boolean
     {
         return this.producers.delete(producer.id);
+    }
+
+    /** Обновить значение максимального битрейта для исходящих видеопотоков. */
+    public async updateMaxBitrate(bitrate: number): Promise<void>
+    {
+        // Если битрейт изменился.
+        if (this.maxVideoBitrate != bitrate)
+        {
+            this.maxVideoBitrate = bitrate;
+            console.debug('[Mediasoup] > Update new maxVideoBitrate in Mbit', bitrate / PrefixConstants.MEGA);
+
+            await this.setBitrateForAllProducersVideoTracks(bitrate);
+        }
+    }
+
+    /** Применить новое значение максимального битрейта для исходящих видеопотоков. */
+    private async setBitrateForAllProducersVideoTracks(bitrate: number)
+    {
+        for (const producer of this.getProducers())
+        {
+            await this.setBitrateForProducerVideoTracks(producer, bitrate);
+        }
+    }
+
+    /** Применить новое значение максимального битрейта для исходящего видеопотока. */
+    private async setBitrateForProducerVideoTracks(producer: MediasoupTypes.Producer, bitrate: number)
+    {
+        if (producer.kind == 'video')
+        {
+            const params = producer.rtpSender!.getParameters();
+            params.encodings[0].maxBitrate = bitrate;
+            await producer.rtpSender!.setParameters(params);
+        }
     }
 }

@@ -1,4 +1,5 @@
 import { FileServiceConstants } from "nostromo-shared/types/FileServiceTypes";
+import { PrefixConstants } from "nostromo-shared/types/RoomTypes";
 import { handleCriticalError } from "./AppError";
 import { TusHeadRequest, TusOptionsRequest, TusPatchRequest, TusPostCreationRequest } from "./FileServiceTusProtocol";
 
@@ -7,8 +8,6 @@ type FileHasBeenUploadedCallback = (fileId: string, file: File, progressComponen
 /** Класс - обработчик файлов. */
 export class FileService
 {
-    private readonly MEGA = 1024 * 1024;
-
     /** Максимальный размер файла. */
     private maxSize = 0;
 
@@ -180,7 +179,7 @@ export class FileService
 
         return new Promise((resolve, reject) =>
         {
-            console.log(`[FileHandler] > Отправляем файл: ${file.name}, ${(file.size / this.MEGA).toFixed(3)} Mb (${file.size} bytes).`);
+            console.log(`[FileHandler] > Отправляем файл: ${file.name}, ${(file.size / PrefixConstants.MEGA).toFixed(3)} Mb (${file.size} bytes).`);
             console.log(`[FileHandler] Upload-Offset: ${uploadOffset}`);
 
             // Если мы уже загрузили этот файл на сервер,

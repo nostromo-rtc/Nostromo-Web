@@ -16,14 +16,15 @@ import
 import
 {
     UserInfo,
-    JoinInfo,
+    UserReadyInfo,
     NewConsumerInfo,
     NewWebRtcTransportInfo,
     ConnectWebRtcTransportInfo,
     NewProducerInfo,
     CloseConsumerInfo,
     ChatMsgInfo,
-    ChatFileInfo
+    ChatFileInfo,
+    PrefixConstants
 } from "nostromo-shared/types/RoomTypes";
 
 /** Callback при transport.on("connect"). */
@@ -67,18 +68,6 @@ export class Room
 
     /** Объект для загрузки файлов. */
     private readonly fileService: FileService;
-
-    /** Кило. */
-    private readonly KILO = 1024;
-
-    /** Мега. */
-    private readonly MEGA = 1024 * 1024;
-
-    /** Максимальный битрейт для видеодорожек. */
-    private maxVideoBitrate = 10 * this.MEGA;
-
-    /** Максимальный битрейт для аудиодорожек. */
-    private maxAudioBitrate = 64 * this.KILO;
 
     /** Задержка после входа на воспроизведение звуковых оповещений. */
     private soundDelayAfterJoin = true;
@@ -343,10 +332,18 @@ export class Room
             document.title += ` "${roomName}"`;
         });
 
-        // получаем макс. битрейт для аудио
+        // Получаем максимальный битрейт для аудио.
         this.socket.on(SE.MaxAudioBitrate, (bitrate: number) =>
         {
-            this.maxAudioBitrate = bitrate;
+            console.debug('[Room] > maxAudioBitrate in Kbit', bitrate / PrefixConstants.KILO);
+            this.mediasoup.maxAudioBitrate = bitrate;
+        });
+
+        // Получаем максимальный битрейт для видео.
+        this.socket.on(SE.MaxVideoBitrate, (bitrate: number) =>
+        {
+            console.debug('[Room] > maxVideoBitrate in Mbit', bitrate / PrefixConstants.MEGA);
+            this.mediasoup.maxVideoBitrate = bitrate;
         });
 
         // новый пользователь (т.е другой)
@@ -417,25 +414,10 @@ export class Room
             }
         });
 
-        // новое значение макс. битрейта видео
+        // Новое значение максимального битрейта видео.
         this.socket.on(SE.NewMaxVideoBitrate, async (bitrate: number) =>
         {
-            // если битрейт изменился
-            if (this.maxVideoBitrate != bitrate)
-            {
-                this.maxVideoBitrate = bitrate;
-                console.debug('[Room] > New maxVideoBitrate in Mbit', bitrate / this.MEGA);
-
-                for (const producer of this.mediasoup.getProducers())
-                {
-                    if (producer.kind == 'video')
-                    {
-                        const params = producer.rtpSender!.getParameters();
-                        params.encodings[0].maxBitrate = bitrate;
-                        await producer.rtpSender!.setParameters(params);
-                    }
-                }
-            }
+            await this.mediasoup.updateMaxBitrate(bitrate);
         });
 
         // другой пользователь отключился
@@ -655,7 +637,7 @@ export class Room
 
         // теперь, когда транспортный канал для приема потоков создан
         // войдем в комнату - т.е сообщим имя и наши rtpCapabilities
-        const info: JoinInfo = {
+        const info: UserReadyInfo = {
             name: this.ui.usernameInput.value,
             rtpCapabilities: this.mediasoup.device.rtpCapabilities
         };
@@ -765,10 +747,8 @@ export class Room
     /** Добавить медиапоток (одну дорожку) в подключение. */
     public async addMediaStreamTrack(track: MediaStreamTrack): Promise<void>
     {
-        const maxBitrate = (track.kind == 'video') ? this.maxVideoBitrate : this.maxAudioBitrate;
-
-        // создаем producer
-        await this.mediasoup.createProducer(track, maxBitrate);
+        // Создаем producer.
+        await this.mediasoup.createProducer(track);
     }
 
     /** Обновить существующую медиадорожку. */
