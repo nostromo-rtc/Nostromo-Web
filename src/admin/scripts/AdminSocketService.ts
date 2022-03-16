@@ -59,6 +59,16 @@ export default class AdminSocketService
                 this.setUserList(userList);
             });
 
+            this.generalSocket.on(SE.RoomDeleted, (roomId: string) =>
+            {
+                this.roomDeleted(roomId);
+            });
+
+            this.generalSocket.on(SE.RoomCreated, (info: RoomLinkInfo) =>
+            {
+                this.roomCreated(info);
+            });
+
             // Если комната какая-то выбрана, то сообщаем серверу,
             // что хотим получать список юзеров этой комнаты.
             const roomSelect = document.getElementById('roomSelect') as HTMLSelectElement;
@@ -170,23 +180,24 @@ export default class AdminSocketService
         };
 
         this.socket.emit(SE.CreateRoom, newRoomInfo);
-
-        this.socket.once(SE.RoomCreated, (info: RoomLinkInfo) =>
-        {
-            this.roomCreated(info, pass);
-        });
     }
 
-    private roomCreated(info: RoomLinkInfo, pass: string): void
+    private roomCreated(info: RoomLinkInfo): void
     {
         this.addRoomListItem(info);
+    }
 
-        const roomLink = document.getElementById('roomLink') as HTMLInputElement;
-        if (roomLink.hidden)
+    private roomDeleted(roomId: string): void
+    {
+        const roomSelect = document.getElementById('roomSelect') as HTMLSelectElement;
+        const selectedRoomId = roomSelect.item(roomSelect.selectedIndex)?.value;
+        if (selectedRoomId && selectedRoomId == roomId)
         {
-            roomLink.hidden = false;
+            const userSelect = document.getElementById('userSelect') as HTMLSelectElement;
+            userSelect.length = 0;
         }
-        roomLink.value = `${window.location.origin}/rooms/${info.id}?p=${pass}`;
+
+        this.removeRoomListItem(roomId);
     }
 
     private deleteRoom(): void
@@ -196,11 +207,6 @@ export default class AdminSocketService
         if (roomId && roomId != "default")
         {
             this.socket.emit(SE.DeleteRoom, roomId);
-            const option = document.querySelector(`option[value='${roomId}']`);
-            if (option)
-            {
-                option.remove();
-            }
         }
     }
 
@@ -263,6 +269,7 @@ export default class AdminSocketService
         }
     }
 
+    /** Добавить комнату в список комнат. */
     private addRoomListItem(info: RoomLinkInfo): void
     {
         const roomSelect = document.getElementById('roomSelect') as HTMLSelectElement;
@@ -270,6 +277,19 @@ export default class AdminSocketService
         newOption.value = info.id;
         newOption.innerText = `[${info.id}] ${info.name}`;
         roomSelect.add(newOption);
+    }
+
+    /** Удалить комнату из списка комнат. */
+    private removeRoomListItem(roomId: string): void
+    {
+        if (roomId && roomId != "default")
+        {
+            const option = document.querySelector(`option[value='${roomId}']`);
+            if (option)
+            {
+                option.remove();
+            }
+        }
     }
 
     /** Выгнать выбранного пользователя из комнаты. */
