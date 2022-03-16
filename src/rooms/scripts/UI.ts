@@ -29,7 +29,10 @@ export class UI
     }
 
     /** Текстовая метка локального видео. */
-    private localVideoLabel: HTMLSpanElement = this.prepareLocalVideoLabel();
+    public localVideoLabel: HTMLSpanElement = this.prepareVideoLabel();
+
+    /** Центральная текстовая метка локального видео. */
+    public centerLocalVideoLabel: HTMLSpanElement = this.prepareCenterVideoLabel();
 
     /** Контейнер с видеоэлементами. */
     private _allVideos = new Map<string, HTMLVideoElement>();
@@ -185,6 +188,7 @@ export class UI
         if (localStorage['username'] == undefined) localStorage['username'] = 'Гость';
         this.usernameInput.value = localStorage['username'] as string;
         this.localVideoLabel.innerText = localStorage['username'] as string;
+        this.centerLocalVideoLabel.innerText = localStorage['username'] as string;
     }
 
     /** Включить звук для всех видео. */
@@ -213,12 +217,16 @@ export class UI
         newVideoItem.id = `remoteVideoItem-${remoteVideoId}`;
         newVideoItem.classList.add('videoItem');
 
-        const videoLabel = document.createElement('span');
-        videoLabel.classList.add('videoLabel');
+        const videoLabel = this.prepareVideoLabel();
         videoLabel.innerText = name;
-        videoLabel.id = `remoteVideoLabel-${remoteVideoId}`;
+        videoLabel.id = `video-label-${remoteVideoId}`;
+        videoLabel.hidden = true;
         newVideoItem.appendChild(videoLabel);
 
+        const centerVideoLabel = this.prepareCenterVideoLabel();
+        centerVideoLabel.innerText = name;
+        centerVideoLabel.id = `center-video-label-${remoteVideoId}`;
+        newVideoItem.appendChild(centerVideoLabel);
 
         const newVideo = document.createElement('video');
         newVideo.id = `remoteVideo-${remoteVideoId}`;
@@ -240,9 +248,10 @@ export class UI
     }
 
     /** Обновления текстовой метки видеоэлемента собеседника. */
-    public updateVideoLabel(remoteVideoId: string, newName: string): void
+    public updateVideoLabels(remoteVideoId: string, newName: string): void
     {
-        document.getElementById(`remoteVideoLabel-${remoteVideoId}`)!.innerText = newName;
+        this.getVideoLabel(remoteVideoId)!.innerText = newName;
+        this.getCenterVideoLabel(remoteVideoId)!.innerText = newName;
     }
 
     /** Удалить видео собеседника (и обновить раскладку). */
@@ -329,6 +338,7 @@ export class UI
         localVideoItem.classList.add('videoItem');
 
         localVideoItem.appendChild(this.localVideoLabel);
+        localVideoItem.appendChild(this.centerLocalVideoLabel);
 
         const localVideo = document.createElement('video');
         localVideo.id = 'localVideo';
@@ -394,7 +404,7 @@ export class UI
     }
 
     /** Подготовить текстовую метку для локального видеоэлемента. */
-    private prepareLocalVideoLabel(): HTMLSpanElement
+    private prepareVideoLabel(): HTMLSpanElement
     {
         const label = document.createElement('span');
         label.classList.add('videoLabel');
@@ -426,5 +436,22 @@ export class UI
         this.filesProgress.append(progressComponent);
 
         return progressComponent;
+    }
+
+    public prepareCenterVideoLabel(): HTMLSpanElement
+    {
+        const centerVideoLabel = document.createElement('span');
+        centerVideoLabel.classList.add('center-video-label');
+        return centerVideoLabel;
+    }
+
+    public getCenterVideoLabel(userId: string) : HTMLSpanElement | null
+    {
+        return document.getElementById(`center-video-label-${userId}`);
+    }
+
+    public getVideoLabel(userId: string) : HTMLSpanElement | null
+    {
+        return document.getElementById(`video-label-${userId}`);
     }
 }

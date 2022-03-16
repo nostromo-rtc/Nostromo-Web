@@ -304,7 +304,23 @@ export class Room
                 // перезагружаем видеоэлемент,
                 // чтобы не висел последний кадр удаленной видеодорожки
                 if (consumer.track.kind == 'video')
+                {
                     remoteVideo.load();
+
+
+                    // Скрываем надпись на видеоэлементе, которая находится в правом верхнем углу.
+                    const videoLabel = this.ui.getVideoLabel(producerUserId);
+                    if (videoLabel)
+                    {
+                        videoLabel.hidden = true;
+                    }
+                    // Показываем центральную надпись на видео.
+                    const centerLabel = this.ui.getCenterVideoLabel(producerUserId);
+                    if (centerLabel)
+                    {
+                        centerLabel.hidden = false;
+                    }
+                }
 
                 const hasAudio: boolean = stream.getAudioTracks().length > 0;
                 // если дорожек не осталось, выключаем элементы управления плеера
@@ -362,7 +378,7 @@ export class Room
         // другой пользователь поменял имя
         this.socket.on(SE.NewUsername, ({ id, name }: UserInfo) =>
         {
-            this.ui.updateVideoLabel(id, name);
+            this.ui.updateVideoLabels(id, name);
         });
 
         // сообщение в чат
@@ -699,8 +715,11 @@ export class Room
     {
         const consumer = await this.mediasoup.createConsumer(newConsumerInfo);
 
-        // если consumer не удалось создать
-        if (!consumer) return;
+        // Если consumer не удалось создать.
+        if (!consumer)
+        {
+            return;
+        }
 
         const remoteVideo: HTMLVideoElement = this.ui.allVideos.get(newConsumerInfo.producerUserId)!;
 
@@ -723,7 +742,27 @@ export class Room
             // чтобы убрать зависнувший последний кадр.
             // Иначе баг на Chrome: если в стриме только аудиодорожка,
             // то play/pause на видеоэлементе не будут работать, а звук будет все равно идти.
-            if (!streamWasActive) remoteVideo.load();
+            if (!streamWasActive)
+            {
+                remoteVideo.load();
+            }
+        }
+
+        if (newConsumerInfo.kind == "video")
+        {
+            // Скрываем центральную надпись на видеоэлементе.
+            const centerLabel = this.ui.getCenterVideoLabel(newConsumerInfo.producerUserId);
+            if (centerLabel)
+            {
+                centerLabel.hidden = true;
+            }
+
+            // Показываем надпись на видеоэлементе, которая находится в правом верхнем углу.
+            const videoLabel = this.ui.getVideoLabel(newConsumerInfo.producerUserId);
+            if (videoLabel)
+            {
+                videoLabel.hidden = false;
+            }
         }
 
         // включаем отображение элементов управления

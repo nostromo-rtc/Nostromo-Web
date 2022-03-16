@@ -59,6 +59,19 @@
     z-index: 1;
 }
 
+.center-video-label {
+    position: absolute;
+    margin: 0;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.2vw;
+    z-index: 1;
+    color: white;
+    text-shadow: 0 0 2px #000;
+}
+
 .videoItem {
     flex-grow: 1;
     flex-shrink: 1;

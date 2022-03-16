@@ -87,6 +87,8 @@ export class UserMedia
         {
             this.toggleMic();
         });
+
+        this.ui.localVideoLabel.hidden = true;
     }
 
     /** Получение видео (веб-камера) или аудио (микрофон) потока. */
@@ -191,6 +193,10 @@ export class UserMedia
                 if (newTrack.kind == "video")
                 {
                     this.ui.buttons.get("stopMediaVideo")!.hidden = false;
+                    // Скрываем центральную надпись на видео.
+                    this.ui.centerLocalVideoLabel.hidden = true;
+                    // Показываем надпись на видео, находящуюся в правом верхнем углу.
+                    this.ui.localVideoLabel.hidden = false;
                 }
                 else
                 {
@@ -257,8 +263,13 @@ export class UserMedia
         this.stream.removeTrack(track);
         if (track.kind == 'video')
         {
-            // сбрасываем видео объект
+            // Сбрасываем видео объект.
             this.ui.localVideo!.load();
+
+            // Скрываем надпись, находящуюся в правом верхнем углу.
+            this.ui.localVideoLabel.hidden = true;
+            // Снова показываем центральную надпись на видео.
+            this.ui.centerLocalVideoLabel.hidden = false;
         }
 
         const hasAudio: boolean = this.stream.getAudioTracks().length > 0;
