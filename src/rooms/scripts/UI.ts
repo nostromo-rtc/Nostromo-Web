@@ -364,7 +364,7 @@ export class UI
             keyboard: { focused: false, global: false },
             clickToPlay: false,
             muted: (video.id == 'localVideo') ? true : this.mutePolicy,
-            controls: ['play-large', 'play', 'mute', 'volume', 'pip', 'fullscreen'],
+            controls: ['play-large', 'play', 'mute', 'volume', 'fullscreen'],
             loadSprite: false
         });
 
