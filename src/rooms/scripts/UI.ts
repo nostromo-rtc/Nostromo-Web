@@ -445,13 +445,25 @@ export class UI
         return centerVideoLabel;
     }
 
-    public getCenterVideoLabel(userId: string) : HTMLSpanElement | null
+    public getCenterVideoLabel(userId: string): HTMLSpanElement | null
     {
         return document.getElementById(`center-video-label-${userId}`);
     }
 
-    public getVideoLabel(userId: string) : HTMLSpanElement | null
+    public getVideoLabel(userId: string): HTMLSpanElement | null
     {
         return document.getElementById(`video-label-${userId}`);
+    }
+
+    /**
+     * Переключить видимость для меток на видео.
+     * Если было видно центральную метку, то скрыть её и показать метку в правом верхнем углу.
+     * И наоборот.
+     */
+    public toogleVideoLabels(first: HTMLSpanElement, second: HTMLSpanElement): void
+    {
+        const tempValue = first.hidden;
+        first.hidden = second.hidden;
+        second.hidden = tempValue;
     }
 }

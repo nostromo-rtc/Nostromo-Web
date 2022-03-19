@@ -193,10 +193,7 @@ export class UserMedia
                 if (newTrack.kind == "video")
                 {
                     this.ui.buttons.get("stopMediaVideo")!.hidden = false;
-                    // Скрываем центральную надпись на видео.
-                    this.ui.centerLocalVideoLabel.hidden = true;
-                    // Показываем надпись на видео, находящуюся в правом верхнем углу.
-                    this.ui.localVideoLabel.hidden = false;
+                    this.ui.toogleVideoLabels(this.ui.centerLocalVideoLabel, this.ui.localVideoLabel);
                 }
                 else
                 {
@@ -252,6 +249,9 @@ export class UserMedia
             // Скрываем кнопку ручного выключения видеодорожки.
             const stopVideoBtn = this.ui.buttons.get("stopMediaVideo")!;
             stopVideoBtn.hidden = true;
+
+            // Переключаем видимость текстовых меток.
+            this.ui.toogleVideoLabels(this.ui.centerLocalVideoLabel, this.ui.localVideoLabel);
         }
     }
 
@@ -265,11 +265,6 @@ export class UserMedia
         {
             // Сбрасываем видео объект.
             this.ui.localVideo!.load();
-
-            // Скрываем надпись, находящуюся в правом верхнем углу.
-            this.ui.localVideoLabel.hidden = true;
-            // Снова показываем центральную надпись на видео.
-            this.ui.centerLocalVideoLabel.hidden = false;
         }
 
         const hasAudio: boolean = this.stream.getAudioTracks().length > 0;

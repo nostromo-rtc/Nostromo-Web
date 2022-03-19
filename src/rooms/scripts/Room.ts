@@ -307,19 +307,10 @@ export class Room
                 {
                     remoteVideo.load();
 
-
-                    // Скрываем надпись на видеоэлементе, которая находится в правом верхнем углу.
-                    const videoLabel = this.ui.getVideoLabel(producerUserId);
-                    if (videoLabel)
-                    {
-                        videoLabel.hidden = true;
-                    }
-                    // Показываем центральную надпись на видео.
-                    const centerLabel = this.ui.getCenterVideoLabel(producerUserId);
-                    if (centerLabel)
-                    {
-                        centerLabel.hidden = false;
-                    }
+                    // Переключаем видимость текстовых меток.
+                    const videoLabel = this.ui.getVideoLabel(producerUserId)!;
+                    const centerLabel = this.ui.getCenterVideoLabel(producerUserId)!;
+                    this.ui.toogleVideoLabels(videoLabel, centerLabel);
                 }
 
                 const hasAudio: boolean = stream.getAudioTracks().length > 0;
@@ -750,19 +741,10 @@ export class Room
 
         if (newConsumerInfo.kind == "video")
         {
-            // Скрываем центральную надпись на видеоэлементе.
-            const centerLabel = this.ui.getCenterVideoLabel(newConsumerInfo.producerUserId);
-            if (centerLabel)
-            {
-                centerLabel.hidden = true;
-            }
-
-            // Показываем надпись на видеоэлементе, которая находится в правом верхнем углу.
-            const videoLabel = this.ui.getVideoLabel(newConsumerInfo.producerUserId);
-            if (videoLabel)
-            {
-                videoLabel.hidden = false;
-            }
+            // Переключаем видимость текстовых меток.
+            const videoLabel = this.ui.getVideoLabel(newConsumerInfo.producerUserId)!;
+            const centerLabel = this.ui.getCenterVideoLabel(newConsumerInfo.producerUserId)!;
+            this.ui.toogleVideoLabels(videoLabel, centerLabel);
         }
 
         // включаем отображение элементов управления
