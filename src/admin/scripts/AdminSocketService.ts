@@ -124,6 +124,38 @@ export default class AdminSocketService
                     this.changeUsername(userSelect.value, usernameInput.value);
                 }
             });
+
+            const btn_banUser = document.getElementById("btn_banUser") as HTMLButtonElement;
+            btn_banUser.addEventListener("click", () =>
+            {
+                if (userSelect.value != "default")
+                {
+                    if (confirm("Вы уверены что хотите заблокировать выбранного пользователя?"))
+                    {
+                        this.banUser(userSelect.value);
+                    }
+                }
+            });
+
+            const ipInput = document.getElementById("ip-input") as HTMLInputElement;
+            const btn_banUserByIp = document.getElementById("btn_banUserByIp") as HTMLButtonElement;
+            btn_banUserByIp.addEventListener('click', () =>
+            {
+                ipInput.value = ipInput.value.trim();
+                if (ipInput.value.length > 0)
+                {
+                    this.banUserByIp(ipInput.value);
+                }
+            });
+            const btn_unbanUserByIp = document.getElementById("btn_unbanUserByIp") as HTMLButtonElement;
+            btn_unbanUserByIp.addEventListener('click', () =>
+            {
+                ipInput.value = ipInput.value.trim();
+                if (ipInput.value.length > 0)
+                {
+                    this.unbanUserByIp(ipInput.value);
+                }
+            });
         }
     }
 
@@ -315,5 +347,23 @@ export default class AdminSocketService
     {
         const userInfo: UserInfo = { id, name };
         this.socket.emit(SE.ChangeUsername, userInfo);
+    }
+
+    /** Заблокировать пользователя комнаты userId на всём сервере. */
+    private banUser(userId: string)
+    {
+        this.socket.emit(SE.BanUser, userId);
+    }
+
+    /** Заблокировать пользователя по IP. */
+    private banUserByIp(userIp: string)
+    {
+        this.socket.emit(SE.BanUserByIp, userIp);
+    }
+
+    /** Разблокировать пользователя по IP. */
+    private unbanUserByIp(userIp: string)
+    {
+        this.socket.emit(SE.UnbanUserByIp, userIp);
     }
 }
