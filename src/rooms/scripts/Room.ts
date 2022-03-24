@@ -203,7 +203,8 @@ export class Room
     /** Обработка событий интерфейса связанных с чатом. */
     private handleChat(): void
     {
-        this.ui.buttons.get('sendMessage')!.addEventListener('click', () =>
+        const sendMsgBtn = this.ui.buttons.get('sendMessage')!;
+        sendMsgBtn.addEventListener('click', () =>
         {
             const message: string = this.ui.messageText.value.toString().trim();
 
@@ -211,6 +212,8 @@ export class Room
             {
                 this.addNewChatMsg(localStorage['username'] as string, message);
                 this.socket.emit(SE.ChatMsg, message);
+
+                this.ui.messageText.value = "";
             }
         });
     }
