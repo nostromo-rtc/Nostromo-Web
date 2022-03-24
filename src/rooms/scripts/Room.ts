@@ -234,8 +234,11 @@ export class Room
         {
             console.info("[Room] > Создано веб-сокет подключение:", this.socket.id);
 
-            // включим звук, что зашли в комнату
-            this.ui.joinedSound.play();
+            // Включим звук, что зашли в комнату.
+            if (this.ui.checkboxNotifications.checked)
+            {
+                this.ui.joinedSound.play();
+            }
         });
 
         // получаем RTP возможности сервера
@@ -360,7 +363,7 @@ export class Room
 
             this.pauseAndPlayEventsPlayerHandler(id);
 
-            if (!this.soundDelayAfterJoin)
+            if (!this.soundDelayAfterJoin && this.ui.checkboxNotifications.checked)
             {
                 this.ui.joinedSound.play();
             }
@@ -433,7 +436,11 @@ export class Room
             console.info("[Room] > remoteUser disconnected:", `[${remoteUserId}]`);
 
             this.ui.removeVideo(remoteUserId);
-            this.ui.leftSound.play();
+
+            if (this.ui.checkboxNotifications.checked)
+            {
+                this.ui.leftSound.play();
+            }
         });
 
         // Необходимо перейти на другую страницу.

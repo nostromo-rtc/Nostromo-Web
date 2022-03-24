@@ -1,9 +1,10 @@
 /* стили для комнат */
-#inroomMenu {
+.d-flex {
     display: flex;
+}
+.flex-start {
     justify-content: flex-start;
 }
-
 #videos {
     display: flex;
     flex-wrap: wrap;
@@ -103,4 +104,9 @@ video {
     height: 100%;
     position: absolute;
     top: 0;
+}
+
+.p-2
+{
+    padding: 2px;
 }

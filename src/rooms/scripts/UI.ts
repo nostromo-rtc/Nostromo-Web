@@ -80,6 +80,9 @@ export class UI
     /** Поле для ввода имени пользователя. */
     public readonly usernameInput = document.getElementById('usernameInput') as HTMLInputElement;
 
+    /** Чекбокс для включения/выключения звуковых оповещений. */
+    public readonly checkboxNotifications = document.getElementById("checkbox-notifications") as HTMLInputElement;
+
     /** Количество строк в раскладке. */
     private videoRows = 2;
 
@@ -111,9 +114,14 @@ export class UI
 
         const spritePlyr = document.createElement("div");
         spritePlyr.id = "sprite-plyr";
-        //spritePlyr.innerHTML = atob(svgSprite.replace(/data:image\/svg\+xml;base64,/, ''));
         spritePlyr.innerHTML = svgSprite;
         document.body.append(spritePlyr);
+
+        this.setupCheckboxNotificationsFromLocalStorage();
+        this.checkboxNotifications.addEventListener("click", () =>
+        {
+            this.changeCheckboxNotificationsState();
+        });
     }
 
     /** Обработчик toogle-кнопки включения/выключения звуков собеседника. */
@@ -465,5 +473,21 @@ export class UI
         const tempValue = first.hidden;
         first.hidden = second.hidden;
         second.hidden = tempValue;
+    }
+
+    /** Прочитать из локального хранилище настройку воспроизведения звуковых оповещений. */
+    private setupCheckboxNotificationsFromLocalStorage(): void
+    {
+        if (localStorage["enable-notifications"] == undefined)
+        {
+            localStorage["enable-notifications"] = "true";
+        }
+        this.checkboxNotifications.checked = (localStorage["enable-notifications"] == "true");
+    }
+
+    /** Установить новое состояние для чекбокса notifications. */
+    private changeCheckboxNotificationsState(): void
+    {
+        localStorage["enable-notifications"] = this.checkboxNotifications.checked;
     }
 }

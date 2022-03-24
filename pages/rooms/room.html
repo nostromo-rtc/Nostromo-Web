@@ -19,12 +19,16 @@
     </div>
 
     <div class="main">
-        <div id="usernameDiv">
+        <div class="d-flex flex-start p-2">
             <span>Ваше имя:</span>
             <input type="text" id="usernameInput">
             <button id="btn_setNewUsername">Сохранить имя</button>
+            <span class="vl">|</span>
+            <input type="checkbox" id="checkbox-notifications">
+            <label for="checkbox-notifications"> Вкл. оповещения</label><br>
+            <span class="vl">|</span>
         </div>
-        <div id="inroomMenu">
+        <div class="d-flex flex-start p-2">
             <span id="attention" class="vl">&#9888;</span>
             <button id="btn_toggleSounds" class="bold background-green">Включить звуки собеседников</button>
             <span class="vl">|</span>
