@@ -48,7 +48,7 @@ export default class IndexSocketService
         const roomListItem = document.createElement('a');
         roomListItem.classList.add('roomListItem');
         roomListItem.id = room.id;
-        roomListItem.href = `/rooms/${room['id']}`;
+        roomListItem.href = `/r/${room['id']}`;
         roomListItem.innerText = room['name'];
 
         this.roomList.appendChild(roomListItem);

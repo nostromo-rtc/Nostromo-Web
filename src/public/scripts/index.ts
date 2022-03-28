@@ -3,7 +3,9 @@ import AuthSocketService from './AuthSocketService';
 
 // создаем обработчики интерфейса и обработчики сокетов
 
-if (window.location.pathname.search('rooms') == -1)
+const roomList = document.getElementById('roomList') as HTMLDivElement;
+
+if (roomList)
 {
     const indexSocketHandlerInstance = new IndexSocketService();
 }
