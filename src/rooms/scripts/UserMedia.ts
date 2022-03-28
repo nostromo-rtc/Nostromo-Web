@@ -1,4 +1,4 @@
-import { UI } from "./UI";
+import { UI, UiSound } from "./UI";
 import { Room } from "./Room";
 
 declare global
@@ -194,6 +194,8 @@ export class UserMedia
                 {
                     this.ui.buttons.get("stopMediaVideo")!.hidden = false;
                     this.ui.toogleVideoLabels(this.ui.centerLocalVideoLabel, this.ui.localVideoLabel);
+
+                    this.ui.playSound(UiSound.videoOn);
                 }
                 else
                 {
@@ -252,6 +254,9 @@ export class UserMedia
 
             // Переключаем видимость текстовых меток.
             this.ui.toogleVideoLabels(this.ui.centerLocalVideoLabel, this.ui.localVideoLabel);
+
+            // Воспроизводим звук.
+            this.ui.playSound(UiSound.videoOff);
         }
     }
 
@@ -295,6 +300,8 @@ export class UserMedia
             btn_toggleMic!.innerText = 'Включить микрофон';
             btn_toggleMic!.classList.replace('background-red', 'background-green');
             this.micPaused = true;
+
+            this.ui.playSound(UiSound.micOff);
         }
         else
         {
@@ -302,6 +309,8 @@ export class UserMedia
             btn_toggleMic!.innerText = 'Выключить микрофон';
             btn_toggleMic!.classList.replace('background-green', 'background-red');
             this.micPaused = false;
+
+            this.ui.playSound(UiSound.micOn);
         }
     }
 

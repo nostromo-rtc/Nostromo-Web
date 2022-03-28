@@ -1,4 +1,4 @@
-import { UI } from "./UI";
+import { UI, UiSound } from "./UI";
 import { FileService } from "./FileService";
 
 import { io, Socket } from "socket.io-client";
@@ -238,10 +238,7 @@ export class Room
             console.info("[Room] > Создано веб-сокет подключение:", this.socket.id);
 
             // Включим звук, что зашли в комнату.
-            if (this.ui.checkboxNotifications.checked)
-            {
-                this.ui.joinedSound.play();
-            }
+            this.ui.playSound(UiSound.joined);
         });
 
         // получаем RTP возможности сервера
@@ -293,49 +290,9 @@ export class Room
 
         // на сервере закрылся consumer (так как закрылся транспорт или producer на сервере),
         // поэтому надо закрыть его и здесь
-        this.socket.on(SE.CloseConsumer, ({ consumerId, producerUserId }: CloseConsumerInfo) =>
+        this.socket.on(SE.CloseConsumer, (info: CloseConsumerInfo) =>
         {
-            const consumer = this.mediasoup.getConsumer(consumerId);
-
-            if (!consumer) return;
-
-            const remoteVideo = this.ui.allVideos.get(producerUserId);
-
-            if (remoteVideo)
-            {
-                const stream = remoteVideo.srcObject as MediaStream;
-                consumer.track.stop();
-                stream.removeTrack(consumer.track);
-
-                // перезагружаем видеоэлемент,
-                // чтобы не висел последний кадр удаленной видеодорожки
-                if (consumer.track.kind == 'video')
-                {
-                    remoteVideo.load();
-
-                    // Переключаем видимость текстовых меток.
-                    const videoLabel = this.ui.getVideoLabel(producerUserId)!;
-                    const centerLabel = this.ui.getCenterVideoLabel(producerUserId)!;
-                    this.ui.toogleVideoLabels(videoLabel, centerLabel);
-                }
-
-                const hasAudio: boolean = stream.getAudioTracks().length > 0;
-                // если дорожек не осталось, выключаем элементы управления плеера
-                if (stream.getTracks().length == 0)
-                {
-                    this.ui.hideControls(remoteVideo.plyr);
-                }
-
-                // предусматриваем случай, когда звуковых дорожек не осталось
-                // и убираем кнопку регулирования звука
-                else if (!hasAudio)
-                {
-                    this.ui.hideVolumeControl(remoteVideo.plyr);
-                }
-            }
-
-            consumer.close();
-            this.mediasoup.deleteConsumer(consumer);
+            this.closeConsumer(info);
         });
 
         // получаем название комнаты
@@ -366,9 +323,9 @@ export class Room
 
             this.pauseAndPlayEventsPlayerHandler(id);
 
-            if (!this.soundDelayAfterJoin && this.ui.checkboxNotifications.checked)
+            if (!this.soundDelayAfterJoin)
             {
-                this.ui.joinedSound.play();
+                this.ui.playSound(UiSound.joined);
             }
         });
 
@@ -378,19 +335,21 @@ export class Room
             this.ui.updateVideoLabels(id, name);
         });
 
-        // сообщение в чат
+        // Сообщение в чате.
         this.socket.on(SE.ChatMsg, ({ name, msg }: ChatMsgInfo) =>
         {
             this.addNewChatMsg(name, msg);
+            this.ui.playSoundWithCooldown(UiSound.msg);
         });
 
-        // файл в чате
+        // Файл в чате.
         this.socket.on(SE.ChatFile, (chatFileInfo: ChatFileInfo) =>
         {
             this.addNewFileLink(chatFileInfo);
+            this.ui.playSound(UiSound.msg);
         });
 
-        // новый consumer (новый входящий медиапоток)
+        // Новый consumer (новый входящий медиапоток).
         this.socket.on(SE.NewConsumer, async (newConsumerInfo: NewConsumerInfo) =>
         {
             await this.newConsumer(newConsumerInfo);
@@ -440,10 +399,7 @@ export class Room
 
             this.ui.removeVideo(remoteUserId);
 
-            if (this.ui.checkboxNotifications.checked)
-            {
-                this.ui.leftSound.play();
-            }
+            this.ui.playSound(UiSound.left);
         });
 
         // Необходимо перейти на другую страницу.
@@ -755,6 +711,8 @@ export class Room
             const videoLabel = this.ui.getVideoLabel(newConsumerInfo.producerUserId)!;
             const centerLabel = this.ui.getCenterVideoLabel(newConsumerInfo.producerUserId)!;
             this.ui.toogleVideoLabels(videoLabel, centerLabel);
+
+            this.ui.playSound(UiSound.videoOn);
         }
 
         // включаем отображение элементов управления
@@ -773,6 +731,56 @@ export class Room
         {
             this.socket.emit(SE.ResumeConsumer, consumer.id);
         }
+    }
+
+    /** Обработка события - входящий медиапоток закрывается. */
+    private closeConsumer(info: CloseConsumerInfo)
+    {
+        const { consumerId, producerUserId } = info;
+
+        const consumer = this.mediasoup.getConsumer(consumerId);
+
+        if (!consumer) return;
+
+        const remoteVideo = this.ui.allVideos.get(producerUserId);
+
+        if (remoteVideo)
+        {
+            const stream = remoteVideo.srcObject as MediaStream;
+            consumer.track.stop();
+            stream.removeTrack(consumer.track);
+
+            // перезагружаем видеоэлемент,
+            // чтобы не висел последний кадр удаленной видеодорожки
+            if (consumer.track.kind == 'video')
+            {
+                remoteVideo.load();
+
+                // Переключаем видимость текстовых меток.
+                const videoLabel = this.ui.getVideoLabel(producerUserId)!;
+                const centerLabel = this.ui.getCenterVideoLabel(producerUserId)!;
+                this.ui.toogleVideoLabels(videoLabel, centerLabel);
+
+                this.ui.playSound(UiSound.videoOff);
+            }
+
+            const hasAudio: boolean = stream.getAudioTracks().length > 0;
+            // если дорожек не осталось, выключаем элементы управления плеера
+            if (stream.getTracks().length == 0)
+            {
+                this.ui.hideControls(remoteVideo.plyr);
+            }
+
+            // предусматриваем случай, когда звуковых дорожек не осталось
+            // и убираем кнопку регулирования звука
+            else if (!hasAudio)
+            {
+                this.ui.hideVolumeControl(remoteVideo.plyr);
+            }
+        }
+
+        consumer.close();
+        this.mediasoup.deleteConsumer(consumer);
     }
 
     /** Добавить медиапоток (одну дорожку) в подключение. */

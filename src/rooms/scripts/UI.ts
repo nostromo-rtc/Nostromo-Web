@@ -11,6 +11,28 @@ declare global
     }
 }
 
+export const enum UiSound
+{
+    /** Звук-оповещение о входе нового пользователя. */
+    joined,
+    /** Звук-оповещение об уходе пользователя. */
+    left,
+    /** Звук-оповещение о выключенном микрофоне (то есть постановка на паузу). */
+    micOff,
+    /** Звук-оповещение о включенном микрофоне (если он был на паузе.) */
+    micOn,
+    /** Звук-оповещение о сообщении. */
+    msg,
+    /** Звук-оповещение о выключении звука. */
+    soundOff,
+    /** Звук-оповещение о включении звука. */
+    soundOn,
+    /** Звук-оповещение о прекращении работы видеопотока. */
+    videoOff,
+    /** Звук-оповещение о появлении видеопотока. */
+    videoOn
+}
+
 /** Класс для работы с интерфейсом (веб-страница). */
 export class UI
 {
@@ -92,15 +114,14 @@ export class UI
     /** Текущая политика Mute для видео (свойство muted). */
     private mutePolicy = true;
 
-    /** Звук-оповещение о входе нового пользователя. */
-    public joinedSound = new Howl({ src: '/rooms/sounds/joined.mp3' });
+    private uiSounds = new Map<UiSound, Howl>();
 
-    /** Звук-оповещение об уходе пользователя. */
-    public leftSound = new Howl({ src: '/rooms/sounds/left.mp3' });
+    private uiSoundCooldown = false;
 
     constructor()
     {
         console.debug('[UI] > ctor');
+        this.initUiSounds();
         this.prepareMessageText();
         this.prepareLocalVideo();
         this.resizeVideos();
@@ -122,6 +143,19 @@ export class UI
         {
             this.changeCheckboxNotificationsState();
         });
+    }
+
+    private initUiSounds(): void
+    {
+        this.uiSounds.set(UiSound.joined, new Howl({ src: "/rooms/sounds/joined.mp3" }));
+        this.uiSounds.set(UiSound.left, new Howl({ src: "/rooms/sounds/left.mp3" }));
+        this.uiSounds.set(UiSound.micOn, new Howl({ src: "/rooms/sounds/mic-on.mp3" }));
+        this.uiSounds.set(UiSound.micOff, new Howl({ src: "/rooms/sounds/mic-off.mp3" }));
+        this.uiSounds.set(UiSound.msg, new Howl({ src: "/rooms/sounds/msg.mp3" }));
+        this.uiSounds.set(UiSound.soundOff, new Howl({ src: "/rooms/sounds/sound-off.mp3" }));
+        this.uiSounds.set(UiSound.soundOn, new Howl({ src: "/rooms/sounds/sound-on.mp3" }));
+        this.uiSounds.set(UiSound.videoOff, new Howl({ src: "/rooms/sounds/video-off.mp3" }));
+        this.uiSounds.set(UiSound.videoOn, new Howl({ src: "/rooms/sounds/video-on.mp3" }));
     }
 
     /** Обработчик toogle-кнопки включения/выключения звуков собеседника. */
@@ -216,6 +250,15 @@ export class UI
             }
         }
         this.mutePolicy = disable;
+
+        if (disable)
+        {
+            this.playSound(UiSound.soundOff);
+        }
+        else
+        {
+            this.playSound(UiSound.soundOn);
+        }
     }
 
     /** Добавить новый видеоэлемент для нового собеседника. */
@@ -489,5 +532,24 @@ export class UI
     private changeCheckboxNotificationsState(): void
     {
         localStorage["enable-notifications"] = this.checkboxNotifications.checked;
+    }
+
+    public playSound(sound: UiSound)
+    {
+        if (this.checkboxNotifications.checked)
+        {
+            this.uiSounds.get(sound)?.play();
+        }
+    }
+
+    public playSoundWithCooldown(sound: UiSound)
+    {
+        if (!this.uiSoundCooldown)
+        {
+            this.playSound(sound);
+
+            this.uiSoundCooldown = true;
+            setTimeout(() => this.uiSoundCooldown = false, 3000);
+        }
     }
 }
