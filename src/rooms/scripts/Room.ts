@@ -712,7 +712,10 @@ export class Room
             const centerLabel = this.ui.getCenterVideoLabel(newConsumerInfo.producerUserId)!;
             this.ui.toogleVideoLabels(videoLabel, centerLabel);
 
-            this.ui.playSound(UiSound.videoOn);
+            if (!this.soundDelayAfterJoin)
+            {
+                this.ui.playSound(UiSound.videoOn);
+            }
         }
 
         // включаем отображение элементов управления
