@@ -20,42 +20,48 @@
 
     <div class="main">
         <p style="margin: auto">Менеджер комнат</p>
-        <div id="adminPanel">
-            <div id="createRoomDiv">
-                <span style="margin: auto">Создание комнат</span>
+        <div id="admin-panel">
+            <div>
+                <span class="m-a">Создание комнат</span>
                 <span>Название комнаты</span>
-                <input id="roomNameInput" type="text">
+                <input id="room-name-input" type="text">
                 <span>Пароль комнаты</span>
-                <input id="roomPassInput" type="password" pattern="[0-9a-fA-F]{4,8}" autocomplete="new-password">
+                <input id="room-pass-input" type="password" pattern="[0-9a-fA-F]{4,8}">
                 <span>Видеокодек для комнаты</span>
-                <select id="videoCodec"></select>
-                <button id="btn_createRoom">Создать комнату</button>
+                <select id="video-codec"></select>
+                <button id="btn-create-room">Создать комнату</button>
             </div>
-            <div id="selectRoomDiv">
-                <span style="margin: auto">Выбор комнаты</span>
+            <div>
+                <span class="m-a">Выбор комнаты</span>
                 <span>Список комнат</span>
-                <select id="roomSelect">
+                <select id="room-select">
                     <option disabled selected value="default">не выбрано...</option>
                 </select>
-                <button id="btn_deleteRoom">Удалить комнату</button>
+                <button id="btn-delete-room">Удалить комнату</button>
+                <span>Новое название комнаты</span>
+                <input id="change-room-name-input" type="text">
+                <button id="btn-change-room-name">Изменить название</button>
+                <span>Новое пароль комнаты</span>
+                <input id="change-room-pass-input" type="password" pattern="[0-9a-fA-F]{4,8}">
+                <button id="btn-change-room-pass">Изменить пароль</button>
             </div>
-            <div id="selectUserDiv">
-                <span style="margin: auto">Выбор пользователя</span>
+            <div>
+                <span class="m-a">Выбор пользователя</span>
                 <span>Список пользователей</span>
-                <select id="userSelect">
+                <select id="user-select">
                     <option disabled selected value="default">не выбрано...</option>
                 </select>
-                <button id="btn_kickUser">Кикнуть пользователя</button>
-                <button id="btn_banUser">Заблокировать пользователя</button>
-                <button id="btn_stopUserVideo">Отключить видео пользователя</button>
-                <button id="btn_stopUserAudio">Отключить аудио пользователя</button>
+                <button id="btn-kick-user">Кикнуть пользователя</button>
+                <button id="btn-ban-user">Заблокировать пользователя</button>
+                <button id="btn-stop-user-video">Отключить видео пользователя</button>
+                <button id="btn-stop-user-audio">Отключить аудио пользователя</button>
                 <span>Новое имя пользователя</span>
-                <input id="usernameInput" type="text">
-                <button id="btn_changeUsername">Изменить ник пользователя</button>
+                <input id="user-name-input" type="text">
+                <button id="btn-change-user-name">Изменить ник пользователя</button>
                 <span>IP-адрес</span>
                 <input id="ip-input" type="text">
-                <button id="btn_banUserByIp">Заблокировать по IP</button>
-                <button id="btn_unbanUserByIp">Разблокировать по IP</button>
+                <button id="btn-ban-user-by-ip">Заблокировать по IP</button>
+                <button id="btn-unban-user-by-ip">Разблокировать по IP</button>
             </div>
         </div>
     </div>

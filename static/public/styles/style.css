@@ -107,7 +107,7 @@ body {
     margin-bottom: 16px;
 }
 
-#btn_join {
+#btn-join {
     font-size: 48px;
 }
 
@@ -130,4 +130,8 @@ body {
 
 .bold {
     font-weight: bold;
+}
+
+.m-a {
+    margin: auto;
 }

@@ -1,6 +1,7 @@
 import { io, Socket } from "socket.io-client";
 import { SocketEvents as SE } from "nostromo-shared/types/SocketEvents";
-import { RoomLinkInfo } from "nostromo-shared/types/AdminTypes";
+import { PublicRoomInfo } from "nostromo-shared/types/RoomTypes";
+import { NewRoomNameInfo } from "nostromo-shared/types/AdminTypes";
 
 // Класс для работы с сокетами на главной странице
 export default class IndexSocketService
@@ -28,14 +29,15 @@ export default class IndexSocketService
             console.log(err.message);
         });
 
-        this.socket.on(SE.RoomList, (rooms: RoomLinkInfo[]) => this.createRoomList(rooms));
-        this.socket.on(SE.RoomCreated, (room: RoomLinkInfo) => this.addRoomToList(room));
+        this.socket.on(SE.RoomList, (rooms: PublicRoomInfo[]) => this.createRoomList(rooms));
+        this.socket.on(SE.RoomCreated, (room: PublicRoomInfo) => this.addRoomToList(room));
         this.socket.on(SE.RoomDeleted, (id: string) => this.removeRoomFromList(id));
+        this.socket.on(SE.RoomNameChanged, (info: NewRoomNameInfo) => this.updateRoomInList(info));
 
         this.socket.on(SE.Disconnect, () => this.onDisconnect());
     }
 
-    private createRoomList(rooms: RoomLinkInfo[]): void
+    private createRoomList(rooms: PublicRoomInfo[]): void
     {
         for (const room of rooms)
         {
@@ -43,7 +45,7 @@ export default class IndexSocketService
         }
     }
 
-    private addRoomToList(room: RoomLinkInfo): void
+    private addRoomToList(room: PublicRoomInfo): void
     {
         const roomListItem = document.createElement('a');
         roomListItem.classList.add('roomListItem');
@@ -56,8 +58,20 @@ export default class IndexSocketService
 
     private removeRoomFromList(id: string): void
     {
-        const room = document.getElementById(id);
-        if (room) room.remove();
+        const roomListItem = document.getElementById(id);
+        if (roomListItem)
+        {
+            roomListItem.remove();
+        }
+    }
+
+    private updateRoomInList(info: NewRoomNameInfo): void
+    {
+        const roomListItem = document.getElementById(info.id) as HTMLAnchorElement | undefined;
+        if (roomListItem)
+        {
+            roomListItem.innerText = info.name;
+        }
     }
 
     private onDisconnect(): void

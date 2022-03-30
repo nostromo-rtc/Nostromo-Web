@@ -10,7 +10,7 @@ export default class AuthSocketService
     });
 
     private passInput = document.getElementById('pass')! as HTMLInputElement;
-    private btn_join = document.getElementById('btn_join')! as HTMLButtonElement;
+    private btn_join = document.getElementById('btn-join')! as HTMLButtonElement;
 
     constructor()
     {
