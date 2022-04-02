@@ -72,6 +72,9 @@ export class Room
     /** Задержка после входа на воспроизведение звуковых оповещений. */
     private soundDelayAfterJoin = true;
 
+    /** Идентификатор пользователя. */
+    private userId?: string;
+
     /** Id комнаты. */
     private roomId: string;
 
@@ -117,7 +120,7 @@ export class Room
 
             // Локально добавляем ссылку на файл в чат.
             const chatFileInfo: ChatFileInfo = {
-                username: localStorage['username'] as string,
+                userId: "me",
                 fileId,
                 filename: file.name,
                 size: file.size
@@ -178,16 +181,15 @@ export class Room
         });
     }
 
-    /** Добавить ссылку на файл filename в чат. */
-    private addNewFileLink({ username,
-        fileId,
-        filename,
-        size }: ChatFileInfo): void
+    /** Добавить ссылку на файл в чат. */
+    private addNewFileLink(info: ChatFileInfo): void
     {
+        const { userId, fileId, filename, size } = info;
+
         const timestamp = this.getTimestamp();
 
         const msgParagraph: HTMLParagraphElement = document.createElement("p");
-        msgParagraph.innerHTML = `[${timestamp}] ${username}: `;
+        msgParagraph.innerHTML = `[${timestamp}] ${this.ui.usernames.get(userId) ?? "Неизвестно"}: `;
 
         const link: HTMLAnchorElement = document.createElement("a");
         link.href = `${window.location.origin}/files/${fileId}`;
@@ -210,7 +212,7 @@ export class Room
 
             if (message)
             {
-                this.addNewChatMsg(localStorage['username'] as string, message);
+                this.addNewChatMsg("me", message);
                 this.socket.emit(SE.ChatMsg, message);
 
                 this.ui.messageText.value = "";
@@ -219,12 +221,12 @@ export class Room
     }
 
     /** Вывести новое сообщение в чате. */
-    private addNewChatMsg(username: string, message: string): void
+    private addNewChatMsg(userId: string, message: string): void 
     {
         const timestamp = this.getTimestamp();
 
         const msgParagraph = document.createElement('p');
-        msgParagraph.innerHTML = `[${timestamp}] ${username}: ${message}`;
+        msgParagraph.innerHTML = `[${timestamp}] ${this.ui.usernames.get(userId)!}: ${message}`;
 
         this.ui.chat.append(msgParagraph);
         this.ui.chat.scrollTop = this.ui.chat.scrollHeight;
@@ -241,8 +243,29 @@ export class Room
             this.ui.playSound(UiSound.joined);
         });
 
+        // Получаем свой идентификатор.
+        this.socket.once(SE.UserId, (id: string) =>
+        {
+            console.info("[Room] > Ваш userId:", id);
+            this.userId = id;
+        });
+
+        // Получаем свое имя, сохраненное на сервере.
+        this.socket.once(SE.Username, (name: string) =>
+        {
+            this.ui.usernames.set("me", name);
+            this.ui.displayUserName();
+        });
+
+        // Получаем название комнаты.
+        this.socket.once(SE.RoomName, (roomName: string) =>
+        {
+            this.ui.roomName = roomName;
+            document.title += ` "${roomName}"`;
+        });
+
         // получаем RTP возможности сервера
-        this.socket.on(SE.RouterRtpCapabilities, async (
+        this.socket.once(SE.RouterRtpCapabilities, async (
             routerRtpCapabilities: MediasoupTypes.RtpCapabilities
         ) =>
         {
@@ -295,13 +318,6 @@ export class Room
             this.closeConsumer(info);
         });
 
-        // получаем название комнаты
-        this.socket.on(SE.RoomName, (roomName: string) =>
-        {
-            this.ui.roomName = roomName;
-            document.title += ` "${roomName}"`;
-        });
-
         // Получаем максимальный битрейт для аудио.
         this.socket.on(SE.MaxAudioBitrate, (bitrate: number) =>
         {
@@ -316,9 +332,11 @@ export class Room
             this.mediasoup.maxVideoBitrate = bitrate;
         });
 
-        // новый пользователь (т.е другой)
+        // Новый другой пользователь зашел в комнату.
         this.socket.on(SE.NewUser, ({ id, name }: UserInfo) =>
         {
+            this.ui.usernames.set(id, name);
+
             this.ui.addVideo(id, name);
 
             this.pauseAndPlayEventsPlayerHandler(id);
@@ -329,16 +347,17 @@ export class Room
             }
         });
 
-        // другой пользователь поменял имя
+        // Другой пользователь поменял имя.
         this.socket.on(SE.NewUsername, ({ id, name }: UserInfo) =>
         {
+            this.ui.usernames.set(id, name);
             this.ui.updateVideoLabels(id, name);
         });
 
         // Сообщение в чате.
-        this.socket.on(SE.ChatMsg, ({ name, msg }: ChatMsgInfo) =>
+        this.socket.on(SE.ChatMsg, ({ userId, msg }: ChatMsgInfo) =>
         {
-            this.addNewChatMsg(name, msg);
+            this.addNewChatMsg(userId, msg);
             this.ui.playSoundWithCooldown(UiSound.msg);
         });
 
@@ -538,11 +557,11 @@ export class Room
     {
         this.ui.buttons.get('setNewUsername')!.addEventListener('click', () =>
         {
-            this.ui.setNewUsername();
+            const newName = this.ui.setNewUsernameFromInput();
 
-            console.debug('[Room] > Ник был изменен на', this.ui.usernameInput.value);
+            console.debug('[Room] > Ник был изменен на', newName);
 
-            this.socket.emit(SE.NewUsername, this.ui.usernameInput.value);
+            this.socket.emit(SE.NewUsername, newName);
         });
     }
 
@@ -574,12 +593,15 @@ export class Room
                 };
                 this.socket.emit(SE.ConnectWebRtcTransport, info);
 
-                // сообщаем транспорту, что параметры были переданы на сервер
-                callback();
+                this.socket.once(SE.ConnectWebRtcTransport, () =>
+                {
+                    // Сообщаем транспорту, что параметры были приняты и обработаны сервером.
+                    callback();
+                });
             }
             catch (error)
             {
-                // сообщаем транспорту, что что-то пошло не так
+                // Сообщаем транспорту, что что-то пошло не так.
                 errback(error);
             }
         });
@@ -609,9 +631,8 @@ export class Room
         this.handleCommonTransportEvents(this.mediasoup.consumerTransport);
 
         // теперь, когда транспортный канал для приема потоков создан
-        // войдем в комнату - т.е сообщим имя и наши rtpCapabilities
+        // войдем в комнату - т.е сообщим наши rtpCapabilities
         const info: UserReadyInfo = {
-            name: this.ui.usernameInput.value,
             rtpCapabilities: this.mediasoup.device.rtpCapabilities
         };
 

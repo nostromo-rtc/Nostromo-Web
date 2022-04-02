@@ -114,9 +114,14 @@ export class UI
     /** Текущая политика Mute для видео (свойство muted). */
     private mutePolicy = true;
 
+    /** Звуки интерфейса. */
     private uiSounds = new Map<UiSound, Howl>();
 
+    /** Кулдаун (пауза между действиями) для воспроизведения звуков. */
     private uiSoundCooldown = false;
+
+    /** Связка userId - username. */
+    public usernames = new Map<string, string>();
 
     constructor()
     {
@@ -131,7 +136,7 @@ export class UI
         btn_toggleSounds!.addEventListener('click', () =>
         { this.handleBtnToggleSounds(btn_toggleSounds!); });
 
-        this.showUserName();
+        this.displayUserName();
 
         const spritePlyr = document.createElement("div");
         spritePlyr.id = "sprite-plyr";
@@ -218,19 +223,24 @@ export class UI
     }
 
     /** Установить новое имя для пользователя. */
-    public setNewUsername(): void
+    public setNewUsernameFromInput(): string
     {
-        localStorage['username'] = this.usernameInput.value;
-        this.showUserName();
+        const username = this.usernameInput.value;
+
+        this.usernames.set("me", username);
+
+        this.displayUserName();
+
+        return username;
     }
 
     /** Показать имя пользователя. */
-    private showUserName(): void
+    public displayUserName(): void
     {
-        if (localStorage['username'] == undefined) localStorage['username'] = 'Гость';
-        this.usernameInput.value = localStorage['username'] as string;
-        this.localVideoLabel.innerText = localStorage['username'] as string;
-        this.centerLocalVideoLabel.innerText = localStorage['username'] as string;
+        const username = this.usernames.get("me") ?? "Гость";
+        this.usernameInput.value = username;
+        this.localVideoLabel.innerText = username;
+        this.centerLocalVideoLabel.innerText = username;
     }
 
     /** Включить звук для всех видео. */
