@@ -1,7 +1,7 @@
 import { io, Socket } from "socket.io-client";
 import { SocketEvents as SE } from "nostromo-shared/types/SocketEvents";
 
-import { NewRoomInfo, NewRoomNameInfo, NewRoomPassInfo } from "nostromo-shared/types/AdminTypes";
+import { ActionOnUserInfo, ChangeUserNameInfo, NewRoomInfo, NewRoomNameInfo, NewRoomPassInfo } from "nostromo-shared/types/AdminTypes";
 import { VideoCodec, UserInfo, PublicRoomInfo } from "nostromo-shared/types/RoomTypes";
 
 // Класс для работы с сокетами при авторизации в панель администратора
@@ -106,7 +106,12 @@ export default class AdminSocketService
         btn_changeRoomName.addEventListener('click', () =>
         {
             const newName = changeRoomNameInput.value.trim();
-            this.changeRoomName(this.getSelectedRoom(), newName);
+            const info: NewRoomNameInfo = {
+                id: this.getSelectedRoom(),
+                name: newName
+            };
+
+            this.changeRoomName(info);
         });
 
         // Обработка кнопки изменения пароля комнаты.
@@ -115,7 +120,12 @@ export default class AdminSocketService
         btn_changeRoomPass.addEventListener('click', () =>
         {
             const newPass = changeRoomPassInput.value.trim();
-            this.changeRoomPass(this.getSelectedRoom(), newPass);
+            const info: NewRoomPassInfo = {
+                id: this.getSelectedRoom(),
+                password: newPass
+            };
+
+            this.changeRoomPass(info);
         });
     }
 
@@ -125,19 +135,34 @@ export default class AdminSocketService
         const btn_kickUser = document.getElementById("btn-kick-user") as HTMLButtonElement;
         btn_kickUser.addEventListener('click', () =>
         {
-            this.kickUser(this.getSelectedUser());
+            const info: ActionOnUserInfo = {
+                roomId: this.getSelectedRoom(),
+                userId: this.getSelectedUser()
+            };
+
+            this.kickUser(info);
         });
 
         const btn_stopUserVideo = document.getElementById("btn-stop-user-video") as HTMLButtonElement;
         btn_stopUserVideo.addEventListener("click", () =>
         {
-            this.stopUserVideo(this.getSelectedUser());
+            const info: ActionOnUserInfo = {
+                roomId: this.getSelectedRoom(),
+                userId: this.getSelectedUser()
+            };
+
+            this.stopUserVideo(info);
         });
 
         const btn_stopUserAudio = document.getElementById("btn-stop-user-audio") as HTMLButtonElement;
         btn_stopUserAudio.addEventListener("click", () =>
         {
-            this.stopUserAudio(this.getSelectedUser());
+            const info: ActionOnUserInfo = {
+                roomId: this.getSelectedRoom(),
+                userId: this.getSelectedUser()
+            };
+
+            this.stopUserAudio(info);
         });
 
         const usernameInput = document.getElementById("user-name-input") as HTMLInputElement;
@@ -146,16 +171,25 @@ export default class AdminSocketService
         btn_changeUsername.addEventListener('click', () =>
         {
             usernameInput.value = usernameInput.value.trim();
-            this.changeUsername(this.getSelectedUser(), usernameInput.value);
+
+            const info: ChangeUserNameInfo = {
+                roomId: this.getSelectedRoom(),
+                userId: this.getSelectedUser(),
+                username: usernameInput.value
+            };
+
+            this.changeUsername(info);
         });
 
         const btn_banUser = document.getElementById("btn-ban-user") as HTMLButtonElement;
         btn_banUser.addEventListener("click", () =>
         {
-            if (this.getSelectedUser() != "default")
-            {
-                this.banUser(this.getSelectedUser());
-            }
+            const info: ActionOnUserInfo = {
+                roomId: this.getSelectedRoom(),
+                userId: this.getSelectedUser()
+            };
+
+            this.banUser(info);
         });
 
         const ipInput = document.getElementById("ip-input") as HTMLInputElement;
@@ -422,48 +456,49 @@ export default class AdminSocketService
     }
 
     /** Выгнать выбранного пользователя из комнаты. */
-    private kickUser(userId: string)
+    private kickUser(info: ActionOnUserInfo)
     {
-        if (userId != "default")
+        if (info.userId != "default" && info.roomId != "default")
         {
-            this.socket.emit(SE.KickUser, userId);
+            this.socket.emit(SE.KickUser, info);
         }
     }
 
     /** Прекратить захват видео у пользователя. */
-    private stopUserVideo(userId: string)
+    private stopUserVideo(info: ActionOnUserInfo)
     {
-        if (userId != "default")
+        if (info.userId != "default" && info.roomId != "default")
         {
-            this.socket.emit(SE.StopUserVideo, userId);
+            this.socket.emit(SE.StopUserVideo, info);
         }
     }
 
     /** Прекратить захват аудио у пользователя. */
-    private stopUserAudio(userId: string)
+    private stopUserAudio(info: ActionOnUserInfo)
     {
-        if (userId != "default")
+        if (info.userId != "default" && info.roomId != "default")
         {
-            this.socket.emit(SE.StopUserAudio, userId);
+            this.socket.emit(SE.StopUserAudio, info);
         }
     }
 
     /** Изменить имя пользователя. */
-    private changeUsername(id: string, name: string)
+    private changeUsername(info: ChangeUserNameInfo)
     {
-        if (id != "default" && name.length > 0)
+        if (info.userId != "default" && info.roomId != "default" && info.username.length > 0)
         {
-            const userInfo: UserInfo = { id, name };
-            this.socket.emit(SE.ChangeUsername, userInfo);
+            this.socket.emit(SE.ChangeUsername, info);
         }
     }
 
     /** Заблокировать пользователя комнаты userId на всём сервере. */
-    private banUser(userId: string)
+    private banUser(info: ActionOnUserInfo)
     {
-        if (confirm("Вы уверены что хотите заблокировать выбранного пользователя?"))
+        if (info.roomId != "default"
+            && info.userId != "default"
+            && confirm("Вы уверены что хотите заблокировать выбранного пользователя?"))
         {
-            this.socket.emit(SE.BanUser, userId);
+            this.socket.emit(SE.BanUser, info);
         }
     }
 
@@ -486,21 +521,19 @@ export default class AdminSocketService
     }
 
     /** Изменить название комнаты. */
-    private changeRoomName(id: string, name: string)
+    private changeRoomName(info: NewRoomNameInfo)
     {
-        if (id != "default" && name.length > 0)
+        if (info.id != "default" && info.name.length > 0)
         {
-            const info: NewRoomNameInfo = { id, name };
             this.socket.emit(SE.ChangeRoomName, info);
         }
     }
 
     /** Изменить пароль комнаты. */
-    private changeRoomPass(id: string, password: string)
+    private changeRoomPass(info: NewRoomPassInfo)
     {
-        if (id != "default")
+        if (info.id != "default")
         {
-            const info: NewRoomPassInfo = { id, password };
             this.socket.emit(SE.ChangeRoomPass, info);
         }
     }
