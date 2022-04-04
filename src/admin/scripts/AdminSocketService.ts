@@ -352,7 +352,7 @@ export default class AdminSocketService
 
     private deleteRoom(roomId: string): void
     {
-        if (roomId != "default")
+        if (this.checkIsSelectOptionCorrect(roomId))
         {
             this.socket.emit(SE.DeleteRoom, roomId);
         }
@@ -393,7 +393,7 @@ export default class AdminSocketService
     /** Сообщаем серверу, что хотим получать список юзеров этой комнаты. */
     private subscribeUserList(roomId: string): void
     {
-        if (roomId != "default")
+        if (this.checkIsSelectOptionCorrect(roomId))
         {
             this.generalSocket.emit(SE.SubscribeUserList, roomId);
         }
@@ -435,7 +435,7 @@ export default class AdminSocketService
     /** Удалить комнату из списка комнат. */
     private removeRoomListItem(roomId: string): void
     {
-        if (roomId != "default")
+        if (this.checkIsSelectOptionCorrect(roomId))
         {
             const option = document.querySelector(`option[value='${roomId}']`);
             if (option)
@@ -458,7 +458,8 @@ export default class AdminSocketService
     /** Выгнать выбранного пользователя из комнаты. */
     private kickUser(info: ActionOnUserInfo)
     {
-        if (info.userId != "default" && info.roomId != "default")
+        if (this.checkIsSelectOptionCorrect(info.roomId)
+            && this.checkIsSelectOptionCorrect(info.userId))
         {
             this.socket.emit(SE.KickUser, info);
         }
@@ -467,7 +468,8 @@ export default class AdminSocketService
     /** Прекратить захват видео у пользователя. */
     private stopUserVideo(info: ActionOnUserInfo)
     {
-        if (info.userId != "default" && info.roomId != "default")
+        if (this.checkIsSelectOptionCorrect(info.roomId)
+            && this.checkIsSelectOptionCorrect(info.userId))
         {
             this.socket.emit(SE.StopUserVideo, info);
         }
@@ -476,7 +478,8 @@ export default class AdminSocketService
     /** Прекратить захват аудио у пользователя. */
     private stopUserAudio(info: ActionOnUserInfo)
     {
-        if (info.userId != "default" && info.roomId != "default")
+        if (this.checkIsSelectOptionCorrect(info.roomId)
+            && this.checkIsSelectOptionCorrect(info.userId))
         {
             this.socket.emit(SE.StopUserAudio, info);
         }
@@ -485,7 +488,9 @@ export default class AdminSocketService
     /** Изменить имя пользователя. */
     private changeUsername(info: ChangeUserNameInfo)
     {
-        if (info.userId != "default" && info.roomId != "default" && info.username.length > 0)
+        if (this.checkIsSelectOptionCorrect(info.roomId)
+            && this.checkIsSelectOptionCorrect(info.userId)
+            && info.username.length > 0)
         {
             this.socket.emit(SE.ChangeUsername, info);
         }
@@ -494,8 +499,8 @@ export default class AdminSocketService
     /** Заблокировать пользователя комнаты userId на всём сервере. */
     private banUser(info: ActionOnUserInfo)
     {
-        if (info.roomId != "default"
-            && info.userId != "default"
+        if (this.checkIsSelectOptionCorrect(info.roomId)
+            && this.checkIsSelectOptionCorrect(info.userId)
             && confirm("Вы уверены что хотите заблокировать выбранного пользователя?"))
         {
             this.socket.emit(SE.BanUser, info);
@@ -523,7 +528,7 @@ export default class AdminSocketService
     /** Изменить название комнаты. */
     private changeRoomName(info: NewRoomNameInfo)
     {
-        if (info.id != "default" && info.name.length > 0)
+        if (this.checkIsSelectOptionCorrect(info.id) && info.name.length > 0)
         {
             this.socket.emit(SE.ChangeRoomName, info);
         }
@@ -532,9 +537,18 @@ export default class AdminSocketService
     /** Изменить пароль комнаты. */
     private changeRoomPass(info: NewRoomPassInfo)
     {
-        if (info.id != "default")
+        if (this.checkIsSelectOptionCorrect(info.id))
         {
             this.socket.emit(SE.ChangeRoomPass, info);
         }
+    }
+
+    private checkIsSelectOptionCorrect(id: string): boolean
+    {
+        if (id == "default" || id == "")
+        {
+            return false;
+        }
+        return true;
     }
 }
