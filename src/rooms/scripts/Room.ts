@@ -243,6 +243,20 @@ export class Room
             this.ui.playSound(UiSound.joined);
         });
 
+        this.socket.once(SE.UserAlreadyJoined, () =>
+        {
+            const confirmMsg = `Вы уже находитесь в этой комнате с другого устройства/вкладки в рамках одной сессии.\nЕсли вы продолжите вход, вы будете выброшены из комнаты на другом устройстве.\nВы точно хотите продолжить?`;
+            console.log(confirmMsg);
+            if (confirm(confirmMsg))
+            {
+                this.socket.emit(SE.ForceJoinRoom);
+            }
+            else
+            {
+                document.location.replace("/");
+            }
+        });
+
         // Получаем свой идентификатор.
         this.socket.once(SE.UserId, (id: string) =>
         {
@@ -465,11 +479,21 @@ export class Room
         });
 
         // наше веб-сокет соединение разорвано
-        this.socket.on(SE.Disconnect, (reason) =>
+        this.socket.on(SE.Disconnect, (reason: string) =>
         {
-            console.warn("[Room] > Вы были отсоединены от веб-сервера (websocket disconnect)", reason);
+            console.warn("[Room] > Вы были отсоединены от сервера (websocket disconnect)", reason);
 
-            location.reload();
+            // Если нас отсоединил сервер, то не будем пробовать подключиться еще раз,
+            // а перейдем на главную страницу.
+            if (reason == "io server disconnect")
+            {
+                document.location.replace("/");
+            }
+            else
+            {
+                location.reload();
+            }
+
         });
 
         this.socket.io.on("error", (error) =>
