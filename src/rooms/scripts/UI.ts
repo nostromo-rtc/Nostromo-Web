@@ -592,7 +592,7 @@ export class UI
         }
 
         const messageSenderDiv = document.createElement('div');
-        messageSenderDiv.classList.add("message-sender");
+        messageSenderDiv.className = "message-sender color-dodgerblue bold";
         messageSenderDiv.innerText = this.usernames.get(userId)!;
 
         const messageTextDiv = document.createElement('div');
@@ -629,22 +629,41 @@ export class UI
         }
 
         const messageSenderDiv = document.createElement('div');
-        messageSenderDiv.classList.add("message-sender");
+        messageSenderDiv.className = "message-sender color-dodgerblue bold";
         messageSenderDiv.innerText = this.usernames.get(userId)!;
 
-        const messageLink = document.createElement('a');
-        messageLink.classList.add("message-text");
-        messageLink.href = `${window.location.origin}/files/${fileId}`;
-        messageLink.text = `${filename} (${(size / (1024 * 1024)).toFixed(3)} MB)`;
-        messageLink.target = "_blank";
+        const messageTextDiv = document.createElement('div');
+        messageTextDiv.classList.add("message-text");
+
+        const messageFileLabelSpan = document.createElement('span');
+        messageFileLabelSpan.classList.add("color-customgray");
+        messageFileLabelSpan.innerText = "Файл: ";
+
+        const messageFileNameSpan = document.createElement('span');
+        messageFileNameSpan.className = "color-darkviolet bold";
+        messageFileNameSpan.innerText = filename;
+
+        const messageFileSizeDiv = document.createElement('div');
+        messageFileSizeDiv.classList.add("message-file-size");
+        messageFileSizeDiv.innerText = `${(size / (1024 * 1024)).toFixed(3)} MB`;
+
+        messageTextDiv.appendChild(messageFileLabelSpan);
+        messageTextDiv.appendChild(messageFileNameSpan);
+        messageTextDiv.appendChild(messageFileSizeDiv);
 
         const messageDateDiv = document.createElement('div');
         messageDateDiv.classList.add("message-date");
         messageDateDiv.innerText = this.getTimestamp();
 
+        const messageLink = document.createElement('a');
+        messageLink.classList.add("message-link");
+        messageLink.href = `${window.location.origin}/files/${fileId}`;
+        messageLink.target = "_blank";
+
         messageDiv.appendChild(messageSenderDiv);
-        messageDiv.appendChild(messageLink);
+        messageDiv.appendChild(messageTextDiv);
         messageDiv.appendChild(messageDateDiv);
+        messageDiv.appendChild(messageLink);
 
         this.chat.append(messageDiv);
         this.chat.scrollTop = this.chat.scrollHeight;
