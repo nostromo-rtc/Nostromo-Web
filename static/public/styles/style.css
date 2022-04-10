@@ -120,6 +120,14 @@ body {
     background-color: lightgreen;
 }
 
+.background-white {
+    background-color: white;
+}
+
+.background-lightgreen {
+    background-color: rgb(163, 233, 163);
+}
+
 .background-orange {
     background-color: rgb(248, 178, 152);
 }

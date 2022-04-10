@@ -125,7 +125,7 @@ export class Room
                 filename: file.name,
                 size: file.size
             };
-            this.addNewFileLink(chatFileInfo);
+            this.ui.displayChatLink(chatFileInfo);
 
             // Сообщаем серверу, чтобы разослал всем ссылку в чате.
             this.socket.emit(SE.ChatFile, fileId);
@@ -181,27 +181,6 @@ export class Room
         });
     }
 
-    /** Добавить ссылку на файл в чат. */
-    private addNewFileLink(info: ChatFileInfo): void
-    {
-        const { userId, fileId, filename, size } = info;
-
-        const timestamp = this.getTimestamp();
-
-        const msgParagraph: HTMLParagraphElement = document.createElement("p");
-        msgParagraph.innerHTML = `[${timestamp}] ${this.ui.usernames.get(userId) ?? "Неизвестно"}: `;
-
-        const link: HTMLAnchorElement = document.createElement("a");
-        link.href = `${window.location.origin}/files/${fileId}`;
-        link.text = `${filename} (${(size / (1024 * 1024)).toFixed(3)} MB)`;
-        link.target = "_blank";
-
-        msgParagraph.append(link);
-
-        this.ui.chat.append(msgParagraph);
-        this.ui.chat.scrollTop = this.ui.chat.scrollHeight;
-    }
-
     /** Обработка событий интерфейса связанных с чатом. */
     private handleChat(): void
     {
@@ -212,24 +191,12 @@ export class Room
 
             if (message)
             {
-                this.addNewChatMsg("me", message);
+                this.ui.displayChatMsg("me", message);
                 this.socket.emit(SE.ChatMsg, message);
 
                 this.ui.messageText.value = "";
             }
         });
-    }
-
-    /** Вывести новое сообщение в чате. */
-    private addNewChatMsg(userId: string, message: string): void 
-    {
-        const timestamp = this.getTimestamp();
-
-        const msgParagraph = document.createElement('p');
-        msgParagraph.innerHTML = `[${timestamp}] ${this.ui.usernames.get(userId)!}: ${message}`;
-
-        this.ui.chat.append(msgParagraph);
-        this.ui.chat.scrollTop = this.ui.chat.scrollHeight;
     }
 
     /** Обработка событий Socket. */
@@ -366,19 +333,20 @@ export class Room
         {
             this.ui.usernames.set(id, name);
             this.ui.updateVideoLabels(id, name);
+            this.ui.updateNicknameInChat(id);
         });
 
         // Сообщение в чате.
         this.socket.on(SE.ChatMsg, ({ userId, msg }: ChatMsgInfo) =>
         {
-            this.addNewChatMsg(userId, msg);
+            this.ui.displayChatMsg(userId, msg);
             this.ui.playSoundWithCooldown(UiSound.msg);
         });
 
         // Файл в чате.
         this.socket.on(SE.ChatFile, (chatFileInfo: ChatFileInfo) =>
         {
-            this.addNewFileLink(chatFileInfo);
+            this.ui.displayChatLink(chatFileInfo);
             this.ui.playSound(UiSound.msg);
         });
 
@@ -564,18 +532,6 @@ export class Room
         remoteVideo.addEventListener('play', () => listenerFunc(false));
     }
 
-    /** Получить время в формате 00:00:00 (24 часа). */
-    private getTimestamp(): string
-    {
-        const timestamp = (new Date).toLocaleString("en-us", {
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-            hour12: false
-        });
-        return timestamp;
-    }
-
     /** Обработка нажатий на кнопки. */
     private handleButtons(): void
     {
@@ -586,6 +542,8 @@ export class Room
             console.debug('[Room] > Ник был изменен на', newName);
 
             this.socket.emit(SE.NewUsername, newName);
+
+            this.ui.updateNicknameInChat("me");
         });
     }
 

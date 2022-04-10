@@ -1,6 +1,7 @@
 import Plyr from 'plyr';
 import { Howl } from 'howler';
 import svgSprite from "plyr/dist/plyr.svg";
+import { ChatFileInfo } from "nostromo-shared/types/RoomTypes";
 
 // Plyr добавляет поле с плеером в класс HTMLVideoElement.
 declare global
@@ -560,6 +561,105 @@ export class UI
 
             this.uiSoundCooldown = true;
             setTimeout(() => this.uiSoundCooldown = false, 3000);
+        }
+    }
+
+    /** Получить время в формате 00:00:00 (24 часа). */
+    public getTimestamp(): string
+    {
+        const timestamp = (new Date).toLocaleString("en-us", {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: false
+        });
+        return timestamp;
+    }
+
+    public displayChatMsg(userId: string, message: string)
+    {
+        const messageDiv = document.createElement('div');
+        messageDiv.setAttribute("data-userid", userId);
+        messageDiv.classList.add("message");
+
+        if (userId == "me")
+        {
+            messageDiv.classList.add("background-lightgreen");
+        }
+        else
+        {
+            messageDiv.classList.add("background-white");
+        }
+
+        const messageSenderDiv = document.createElement('div');
+        messageSenderDiv.classList.add("message-sender");
+        messageSenderDiv.innerText = this.usernames.get(userId)!;
+
+        const messageTextDiv = document.createElement('div');
+        messageTextDiv.classList.add("message-text");
+        messageTextDiv.innerText = message;
+
+        const messageDateDiv = document.createElement('div');
+        messageDateDiv.classList.add("message-date");
+        messageDateDiv.innerText = this.getTimestamp();
+
+        messageDiv.appendChild(messageSenderDiv);
+        messageDiv.appendChild(messageTextDiv);
+        messageDiv.appendChild(messageDateDiv);
+
+        this.chat.append(messageDiv);
+        this.chat.scrollTop = this.chat.scrollHeight;
+    }
+
+    public displayChatLink(info: ChatFileInfo)
+    {
+        const { userId, fileId, filename, size } = info;
+
+        const messageDiv = document.createElement('div');
+        messageDiv.setAttribute("data-userid", userId);
+        messageDiv.classList.add("message");
+
+        if (userId == "me")
+        {
+            messageDiv.classList.add("background-lightgreen");
+        }
+        else
+        {
+            messageDiv.classList.add("background-white");
+        }
+
+        const messageSenderDiv = document.createElement('div');
+        messageSenderDiv.classList.add("message-sender");
+        messageSenderDiv.innerText = this.usernames.get(userId)!;
+
+        const messageLink = document.createElement('a');
+        messageLink.classList.add("message-text");
+        messageLink.href = `${window.location.origin}/files/${fileId}`;
+        messageLink.text = `${filename} (${(size / (1024 * 1024)).toFixed(3)} MB)`;
+        messageLink.target = "_blank";
+
+        const messageDateDiv = document.createElement('div');
+        messageDateDiv.classList.add("message-date");
+        messageDateDiv.innerText = this.getTimestamp();
+
+        messageDiv.appendChild(messageSenderDiv);
+        messageDiv.appendChild(messageLink);
+        messageDiv.appendChild(messageDateDiv);
+
+        this.chat.append(messageDiv);
+        this.chat.scrollTop = this.chat.scrollHeight;
+    }
+
+    public updateNicknameInChat(userId: string)
+    {
+        for (const msg of this.chat.childNodes)
+        {
+            const msgDiv = msg as HTMLDivElement;
+            if (msgDiv.getAttribute("data-userid") == userId)
+            {
+                const messageSenderDiv = msgDiv.getElementsByClassName("message-sender")[0] as HTMLDivElement;
+                messageSenderDiv.innerText = this.usernames.get(userId)!;
+            }
         }
     }
 }
