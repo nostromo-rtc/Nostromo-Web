@@ -644,7 +644,7 @@ export class UI
         messageFileNameSpan.innerText = filename;
 
         const messageFileSizeDiv = document.createElement('div');
-        messageFileSizeDiv.classList.add("message-file-size");
+        messageFileSizeDiv.className= "message-file-size bold";
         messageFileSizeDiv.innerText = `${(size / (1024 * 1024)).toFixed(3)} MB`;
 
         messageTextDiv.appendChild(messageFileLabelSpan);

@@ -16,7 +16,7 @@ export default class IndexSocketService
     {
         console.debug("indexSocketHandler ctor");
 
-        this.roomList = document.getElementById('roomList') as HTMLDivElement;
+        this.roomList = document.getElementById('room-list') as HTMLDivElement;
 
         this.socket.on('connect', () =>
         {
@@ -47,11 +47,21 @@ export default class IndexSocketService
 
     private addRoomToList(room: PublicRoomInfo): void
     {
-        const roomListItem = document.createElement('a');
-        roomListItem.classList.add('roomListItem');
+        const roomListItem = document.createElement("a");
+        roomListItem.classList.add("room-list-item");
         roomListItem.id = room.id;
-        roomListItem.href = `/r/${room['id']}`;
-        roomListItem.innerText = room['name'];
+        roomListItem.href = `/r/${room.id}`;
+
+        const roomLabel = document.createElement("span");
+        roomLabel.innerText = room.name;
+        roomLabel.classList.add("room-list-item-label");
+
+        const roomItemJoinLabel = document.createElement("span");
+        roomItemJoinLabel.innerText = "Войти";
+        roomItemJoinLabel.classList.add("room-list-item-join");
+
+        roomListItem.appendChild(roomLabel);
+        roomListItem.appendChild(roomItemJoinLabel);
 
         this.roomList.appendChild(roomListItem);
     }
@@ -77,12 +87,5 @@ export default class IndexSocketService
     private onDisconnect(): void
     {
         console.warn("Вы были отсоединены от веб-сервера (websocket disconnect)");
-        const roomList: NodeListOf<HTMLAnchorElement> = document.querySelectorAll(".roomListItem");
-        console.log(roomList);
-        for (const room of roomList)
-        {
-            console.log(room);
-            room.remove();
-        }
     }
 }
