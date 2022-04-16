@@ -14,22 +14,27 @@
 
 body {
     font-family: Rubik, Arial, Helvetica, sans-serif;
+    font-weight: 400;
 }
 
 input {
     font-family: Rubik, Arial, Helvetica, sans-serif;
+    font-weight: 400;
 }
 
 button {
     font-family: Rubik, Arial, Helvetica, sans-serif;
+    font-weight: 400;
 }
 
 textarea {
     font-family: Rubik, Arial, Helvetica, sans-serif;
+    font-weight: 400;
 }
 
 select {
     font-family: Rubik, Arial, Helvetica, sans-serif;
+    font-weight: 400;
 }
 
 .flex {
