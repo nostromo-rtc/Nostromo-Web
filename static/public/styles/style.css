@@ -116,7 +116,7 @@ select {
     text-decoration: none;
     margin-top: 5px;
     min-height: 50px;
-    border-radius: 0.85rem;
+    border-radius: 0.5rem;
 }
 
 .room-list-item-label
@@ -160,6 +160,10 @@ select {
 .vl {
     margin-left: 5px;
     margin-right: 5px;
+}
+
+.max-w-150 {
+    max-width: 150px;
 }
 
 .background-green {
