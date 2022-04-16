@@ -88,6 +88,12 @@ export class UI
     /** Список разрешений захвата веб-камеры. */
     public readonly captureSettingsCam = document.getElementById('captureSettingsCam') as HTMLSelectElement;
 
+    /** Список устройств-микрофонов. */
+    public readonly micDevices = document.getElementById("mic-devices") as HTMLSelectElement;
+
+    /** Список устройств-вебкамер. */
+    public readonly camDevices = document.getElementById("cam-devices") as HTMLSelectElement;
+
     /** Получить выбранное пользователем разрешение для захвата видеоизображения. */
     public get currentCaptureSettingDisplay(): string
     {
@@ -98,6 +104,18 @@ export class UI
     public get currentCaptureSettingCam(): string
     {
         return this.captureSettingsCam.value;
+    }
+
+    /** Получить выбранное пользователем устройство-микрофон. */
+    public get currentMicDevice(): string
+    {
+        return this.micDevices.value;
+    }
+
+    /** Получить выбранное пользователем устройство-вебкамеру. */
+    public get currentCamDevice(): string
+    {
+        return this.camDevices.value;
     }
 
     /** Поле для ввода имени пользователя. */
@@ -183,11 +201,11 @@ export class UI
         }
     }
 
-    /** Добавить новое разрешение захватываемого видеоизображения. */
-    public addCaptureSetting(settings: HTMLSelectElement, label: string, value: string): void
+    /** Добавить новый выбор в виджет Select. */
+    public addOptionToSelect(select: HTMLSelectElement, label: string, value: string): void
     {
-        const newSetting = new Option(label, value);
-        settings.add(newSetting);
+        const newOption = new Option(label, value);
+        select.add(newOption);
     }
 
     /** Подготовить контейнер map с кнопками. */
@@ -644,7 +662,7 @@ export class UI
         messageFileNameSpan.innerText = filename;
 
         const messageFileSizeDiv = document.createElement('div');
-        messageFileSizeDiv.className= "message-file-size bold";
+        messageFileSizeDiv.className = "message-file-size bold";
         messageFileSizeDiv.innerText = `${(size / (1024 * 1024)).toFixed(3)} MB`;
 
         messageTextDiv.appendChild(messageFileLabelSpan);

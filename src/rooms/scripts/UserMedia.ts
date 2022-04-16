@@ -48,15 +48,29 @@ export class UserMedia
         this.captureConstraintsDisplay = this.prepareCaptureDisplayConstraints();
         this.captureConstraintsCam = this.prepareCaptureCamConstraints();
 
+        this.prepareDevices(true);
+        this.prepareDevices(false);
+
+        navigator.mediaDevices.addEventListener("devicechange", async (event) =>
+        {
+            await this.prepareDevices(true);
+            await this.prepareDevices(false);
+        });
+
         this.ui.buttons.get('getUserMediaMic')!.addEventListener('click', async () =>
         {
+            const constraints = this.streamConstraintsMic;
+            constraints.audio = { deviceId: {ideal: this.ui.currentMicDevice} };
+
             await this.getUserMedia(this.streamConstraintsMic);
         });
 
         this.ui.buttons.get('getUserMediaCam')!.addEventListener('click', async () =>
         {
-            await this.getUserMedia(this.captureConstraintsCam
-                .get(this.ui.currentCaptureSettingCam)!);
+            const constraints = this.captureConstraintsCam.get(this.ui.currentCaptureSettingCam)!;
+            (constraints.video as MediaTrackConstraints).deviceId = { ideal: this.ui.currentCamDevice };
+
+            await this.getUserMedia(constraints);
         });
 
         const stopAudioBtn = this.ui.buttons.get("stopMediaAudio")!;
@@ -100,6 +114,12 @@ export class UserMedia
         {
             console.debug("[UserMedia] > getUserMedia", streamConstraints);
             const mediaStream: MediaStream = await navigator.mediaDevices.getUserMedia(streamConstraints);
+
+            // Для Firefox вручную обновим списки устройств,
+            // поскольку теперь у нас есть права на получение названий устройств
+            // так как мы только что их запросили при захвате устройства.
+            await this.refreshDevicesLabels(true);
+            await this.refreshDevicesLabels(false);
 
             console.debug("[UserMedia] > getUserMedia success:", mediaStream);
 
@@ -386,28 +406,28 @@ export class UserMedia
         const settingsDisplay = this.ui.captureSettingsDisplay;
 
         _constraints.set('1440p', constraints1440p);
-        this.ui.addCaptureSetting(settingsDisplay, '2560x1440', '1440p');
+        this.ui.addOptionToSelect(settingsDisplay, '2560x1440', '1440p');
 
         _constraints.set('1080p', constraints1080p);
-        this.ui.addCaptureSetting(settingsDisplay, '1920x1080', '1080p');
+        this.ui.addOptionToSelect(settingsDisplay, '1920x1080', '1080p');
 
         _constraints.set('1080p@60', constraints1080p60);
-        this.ui.addCaptureSetting(settingsDisplay, '1920x1080@60', '1080p@60');
+        this.ui.addOptionToSelect(settingsDisplay, '1920x1080@60', '1080p@60');
 
         _constraints.set('720p', constraints720p);
-        this.ui.addCaptureSetting(settingsDisplay, '1280x720', '720p');
+        this.ui.addOptionToSelect(settingsDisplay, '1280x720', '720p');
 
         _constraints.set('720p@60', constraints720p60);
-        this.ui.addCaptureSetting(settingsDisplay, '1280x720@60', '720p@60');
+        this.ui.addOptionToSelect(settingsDisplay, '1280x720@60', '720p@60');
 
         _constraints.set('480p', constraints480p);
-        this.ui.addCaptureSetting(settingsDisplay, '854x480', '480p');
+        this.ui.addOptionToSelect(settingsDisplay, '854x480', '480p');
 
         _constraints.set('360p', constraints360p);
-        this.ui.addCaptureSetting(settingsDisplay, '640x360', '360p');
+        this.ui.addOptionToSelect(settingsDisplay, '640x360', '360p');
 
         _constraints.set('240p', constraints240p);
-        this.ui.addCaptureSetting(settingsDisplay, '426x240', '240p');
+        this.ui.addOptionToSelect(settingsDisplay, '426x240', '240p');
 
         _constraints.set('default', constraints720p);
 
@@ -464,25 +484,77 @@ export class UserMedia
         const settingsCam = this.ui.captureSettingsCam;
 
         _constraints.set('1440p', constraints1440p);
-        this.ui.addCaptureSetting(settingsCam, '2560x1440', '1440p');
+        this.ui.addOptionToSelect(settingsCam, '2560x1440', '1440p');
 
         _constraints.set('1080p', constraints1080p);
-        this.ui.addCaptureSetting(settingsCam, '1920x1080', '1080p');
+        this.ui.addOptionToSelect(settingsCam, '1920x1080', '1080p');
 
         _constraints.set('720p', constraints720p);
-        this.ui.addCaptureSetting(settingsCam, '1280x720', '720p');
+        this.ui.addOptionToSelect(settingsCam, '1280x720', '720p');
 
         _constraints.set('480p', constraints480p);
-        this.ui.addCaptureSetting(settingsCam, '640x480', '480p');
+        this.ui.addOptionToSelect(settingsCam, '640x480', '480p');
 
         _constraints.set('360p', constraints360p);
-        this.ui.addCaptureSetting(settingsCam, '480x360', '360p');
+        this.ui.addOptionToSelect(settingsCam, '480x360', '360p');
 
         _constraints.set('240p', constraints240p);
-        this.ui.addCaptureSetting(settingsCam, '320x240', '240p');
+        this.ui.addOptionToSelect(settingsCam, '320x240', '240p');
 
         _constraints.set('default', constraints720p);
 
         return _constraints;
+    }
+
+    /** Подготовить опции с устройствами-микрофонами. */
+    private async prepareDevices(isMicDevices: boolean): Promise<void>
+    {
+        const mediaDevices = await navigator.mediaDevices.enumerateDevices();
+
+        const devicesSelect = isMicDevices ? this.ui.micDevices : this.ui.camDevices;
+        devicesSelect.length = 0;
+
+        const kind = isMicDevices ? "audioinput" : "videoinput";
+
+        for (const device of mediaDevices)
+        {
+            if (device.kind == kind
+                && device.deviceId != "default"
+                && device.deviceId != "communications")
+            {
+                console.log("Обнаружено устройство: ", device);
+                const kindDeviceLabel = isMicDevices ? "Микрофон" : "Веб-камера";
+                const label = (device.label.length != 0) ? device.label : `${kindDeviceLabel} #${devicesSelect.length + 1}`;
+                this.ui.addOptionToSelect(devicesSelect, label, device.deviceId);
+            }
+        }
+    }
+
+    /** Обновить названия с устройствами. */
+    private async refreshDevicesLabels(isMicDevices: boolean): Promise<void>
+    {
+        const mediaDevices = await navigator.mediaDevices.enumerateDevices();
+
+        const devicesSelect = isMicDevices ? this.ui.micDevices : this.ui.camDevices;
+
+        for (const deviceOption of devicesSelect)
+        {
+            const device = mediaDevices.find((val) =>
+            {
+                if (val.deviceId == deviceOption.value)
+                {
+                    return val;
+                }
+            });
+
+            if (!device)
+            {
+                return;
+            }
+
+            const kindDeviceLabel = isMicDevices ? "Микрофон" : "Веб-камера";
+            const label = (device.label.length != 0) ? device.label : `${kindDeviceLabel} #${devicesSelect.length + 1}`;
+            deviceOption.innerText = label;
+        }
     }
 }
