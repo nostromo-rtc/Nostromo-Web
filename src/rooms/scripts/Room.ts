@@ -242,7 +242,7 @@ export class Room
         this.socket.once(SE.RoomName, (roomName: string) =>
         {
             this.ui.roomName = roomName;
-            document.title += ` "${roomName}"`;
+            document.title += ` - Комната "${roomName}"`;
         });
 
         // получаем RTP возможности сервера

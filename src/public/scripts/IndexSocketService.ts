@@ -52,15 +52,20 @@ export default class IndexSocketService
         roomListItem.id = room.id;
         roomListItem.href = `/r/${room.id}`;
 
-        const roomLabel = document.createElement("span");
-        roomLabel.innerText = room.name;
-        roomLabel.classList.add("room-list-item-label");
+        const roomItemLabel = document.createElement("span");
+        roomItemLabel.innerText = room.name;
+        roomItemLabel.classList.add("room-list-item-label");
+
+        const roomItemId = document.createElement("span");
+        roomItemId.innerText = `#${room.id}`;
+        roomItemId.classList.add("room-list-item-id");
 
         const roomItemJoinLabel = document.createElement("span");
         roomItemJoinLabel.innerText = "Войти";
         roomItemJoinLabel.classList.add("room-list-item-join");
 
-        roomListItem.appendChild(roomLabel);
+        roomListItem.appendChild(roomItemLabel);
+        roomListItem.appendChild(roomItemId);
         roomListItem.appendChild(roomItemJoinLabel);
 
         this.roomList.appendChild(roomListItem);

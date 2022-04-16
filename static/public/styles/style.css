@@ -44,7 +44,7 @@ select {
 /* оформление для меню навигации */
 .nav {
     height: 100%;
-    width: 140px;
+    width: 60px;
     position: fixed;
     top: 0;
     left: 0;
@@ -54,7 +54,7 @@ select {
 }
 
 .nav a {
-    padding: 18px 8px 18px 14px;
+    padding: 18px 8px 18px 10px;
     border-right: 8px solid #d4d4d4;
     text-decoration: none;
     font-size: 28px;
@@ -75,7 +75,7 @@ select {
 .header {
     position: fixed;
     top: 0;
-    left: 140px;
+    left: 60px;
     width: 100%;
     z-index: 2;
     height: 32px;
@@ -91,7 +91,7 @@ select {
 
 /* оформление для главной части страницы */
 .main {
-    margin-left: 140px;
+    margin-left: 60px;
     display: flex;
     flex-direction: column;
     /* отступ от меню */
@@ -122,6 +122,15 @@ select {
 .room-list-item-label
 {
     margin-left: 10px;
+}
+
+.room-list-item-id
+{
+    margin-left: 5px;
+    color: #d4d4d4;
+    font-weight: 300;
+    font-size: 14px;
+    margin-top: 6px;
 }
 
 .room-list-item-join
@@ -196,6 +205,10 @@ select {
 
 .color-customgray {
     color: rgb(84, 110, 122);
+}
+
+.color-custom-lightgray {
+    color: #d4d4d4;
 }
 
 .color-darkviolet {
