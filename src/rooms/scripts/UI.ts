@@ -80,7 +80,7 @@ export class UI
     public readonly filesProgress = document.getElementById('files-progress') as HTMLDivElement;
 
     /** Сообщение пользователя, отправляемое в чат. */
-    public readonly messageText = document.getElementById('messageText') as HTMLTextAreaElement;
+    public readonly messageText = document.getElementById('message-textarea') as HTMLTextAreaElement;
 
     /** Список разрешений захвата видеоизображения. */
     public readonly captureSettingsDisplay = document.getElementById('captureSettingsDisplay') as HTMLSelectElement;
@@ -119,7 +119,7 @@ export class UI
     }
 
     /** Поле для ввода имени пользователя. */
-    public readonly usernameInput = document.getElementById('usernameInput') as HTMLInputElement;
+    public readonly usernameInput = document.getElementById('username-input') as HTMLInputElement;
 
     /** Чекбокс для включения/выключения звуковых оповещений. */
     public readonly checkboxNotifications = document.getElementById("checkbox-notifications") as HTMLInputElement;
@@ -258,7 +258,9 @@ export class UI
     {
         const username = this.usernames.get("me") ?? "Гость";
         this.usernameInput.value = username;
+        this.localVideoLabel.title = username;
         this.localVideoLabel.innerText = username;
+        this.centerLocalVideoLabel.title = username;
         this.centerLocalVideoLabel.innerText = username;
     }
 
@@ -299,18 +301,19 @@ export class UI
 
         const videoLabel = this.prepareVideoLabel();
         videoLabel.innerText = name;
+        videoLabel.title = name;
         videoLabel.id = `video-label-${remoteVideoId}`;
         videoLabel.hidden = true;
         newVideoItem.appendChild(videoLabel);
 
         const centerVideoLabel = this.prepareCenterVideoLabel();
         centerVideoLabel.innerText = name;
+        centerVideoLabel.title = name;
         centerVideoLabel.id = `center-video-label-${remoteVideoId}`;
         newVideoItem.appendChild(centerVideoLabel);
 
         const newVideo = document.createElement('video');
         newVideo.id = `remoteVideo-${remoteVideoId}`;
-        newVideo.classList.add('video-js');
         newVideo.autoplay = true;
         newVideo.muted = this.mutePolicy;
         newVideo.poster = './images/novideodata.jpg';
@@ -487,7 +490,7 @@ export class UI
     private prepareVideoLabel(): HTMLSpanElement
     {
         const label = document.createElement('span');
-        label.classList.add('videoLabel');
+        label.classList.add('video-label');
         return label;
     }
 

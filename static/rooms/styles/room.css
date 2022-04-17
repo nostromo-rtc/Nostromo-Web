@@ -18,7 +18,7 @@
 }
 
 /* чат */
-#chatSection {
+#chat-section {
     display: flex;
     flex-direction: column;
 }
@@ -89,7 +89,7 @@
     z-index: 1;
 }
 
-#messageText {
+#message-textarea {
     flex: 1 1 95%;
     resize: vertical;
 }
@@ -98,7 +98,7 @@
     flex-grow: 1;
 }
 
-.videoLabel {
+.video-label {
     position: absolute;
     right: 0;
     border-left: 1px solid black;
