@@ -594,9 +594,10 @@ export class UI
         return timestamp;
     }
 
+    /** Отобразить сообщение в чате. */
     public displayChatMsg(userId: string, message: string)
     {
-        const messageDiv = document.createElement('div');
+        const messageDiv = document.createElement("div");
         messageDiv.setAttribute("data-userid", userId);
         messageDiv.classList.add("message");
 
@@ -609,15 +610,28 @@ export class UI
             messageDiv.classList.add("background-white");
         }
 
-        const messageSenderDiv = document.createElement('div');
-        messageSenderDiv.className = "message-sender color-dodgerblue bold";
-        messageSenderDiv.innerText = this.usernames.get(userId)!;
+        const messageSenderDiv = document.createElement("div");
+        messageSenderDiv.classList.add("d-flex");
 
-        const messageTextDiv = document.createElement('div');
+        const messageSenderName = document.createElement("span");
+        messageSenderName.className = "message-sender-name color-dodgerblue bold";
+        messageSenderName.innerText = this.usernames.get(userId)!;
+        messageSenderName.title = this.usernames.get(userId)!;
+        messageSenderDiv.appendChild(messageSenderName);
+
+        if (userId != "me")
+        {
+            const messageSenderId = document.createElement("span");
+            messageSenderId.className = "message-sender-id";
+            messageSenderId.innerText = `#${userId.substring(0, 4)}`;
+            messageSenderDiv.appendChild(messageSenderId);
+        }
+
+        const messageTextDiv = document.createElement("div");
         messageTextDiv.classList.add("message-text");
         messageTextDiv.innerText = message;
 
-        const messageDateDiv = document.createElement('div');
+        const messageDateDiv = document.createElement("div");
         messageDateDiv.classList.add("message-date");
         messageDateDiv.innerText = this.getTimestamp();
 
@@ -646,9 +660,22 @@ export class UI
             messageDiv.classList.add("background-white");
         }
 
-        const messageSenderDiv = document.createElement('div');
-        messageSenderDiv.className = "message-sender color-dodgerblue bold";
-        messageSenderDiv.innerText = this.usernames.get(userId)!;
+        const messageSenderDiv = document.createElement("div");
+        messageSenderDiv.classList.add("d-flex");
+
+        const messageSenderName = document.createElement("span");
+        messageSenderName.className = "message-sender-name color-dodgerblue bold";
+        messageSenderName.innerText = this.usernames.get(userId)!;
+        messageSenderName.title = this.usernames.get(userId)!;
+        messageSenderDiv.appendChild(messageSenderName);
+
+        if (userId != "me")
+        {
+            const messageSenderId = document.createElement("span");
+            messageSenderId.className = "message-sender-id";
+            messageSenderId.innerText = `#${userId.substring(0, 4)}`;
+            messageSenderDiv.appendChild(messageSenderId);
+        }
 
         const messageTextDiv = document.createElement('div');
         messageTextDiv.classList.add("message-text");
@@ -694,7 +721,7 @@ export class UI
             const msgDiv = msg as HTMLDivElement;
             if (msgDiv.getAttribute("data-userid") == userId)
             {
-                const messageSenderDiv = msgDiv.getElementsByClassName("message-sender")[0] as HTMLDivElement;
+                const messageSenderDiv = msgDiv.getElementsByClassName("message-sender-name")[0] as HTMLDivElement;
                 messageSenderDiv.innerText = this.usernames.get(userId)!;
             }
         }

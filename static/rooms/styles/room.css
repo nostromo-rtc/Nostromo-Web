@@ -49,10 +49,18 @@
     width: fit-content;
 }
 
-#chat .message-sender {
+#chat .message-sender-name {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+}
+
+#chat .message-sender-id {
+    font-size: 0.75rem;
+    margin-top: 0.0625rem;
+    margin-left: 5px;
+    font-weight: 300;
+    color: rgba(84, 110, 122, 1.0);
 }
 
 #chat .message-text {
