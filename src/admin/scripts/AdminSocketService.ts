@@ -167,6 +167,9 @@ export default class AdminSocketService
 
         const usernameInput = document.getElementById("user-name-input") as HTMLInputElement;
 
+        // Ограничение по длине имени пользователя.
+        usernameInput.maxLength = 32;
+
         const btn_changeUsername = document.getElementById("btn-change-user-name") as HTMLButtonElement;
         btn_changeUsername.addEventListener('click', () =>
         {

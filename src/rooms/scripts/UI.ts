@@ -167,6 +167,9 @@ export class UI
         {
             this.changeCheckboxNotificationsState();
         });
+
+        // Ограничение по длине имени пользователя.
+        this.usernameInput.maxLength = 32;
     }
 
     private initUiSounds(): void
@@ -244,7 +247,12 @@ export class UI
     /** Установить новое имя для пользователя. */
     public setNewUsernameFromInput(): string
     {
-        const username = this.usernameInput.value;
+        let username = this.usernameInput.value;
+
+        if (username.length > 32)
+        {
+            username = username.slice(0, 32);
+        }
 
         this.usernames.set("me", username);
 
