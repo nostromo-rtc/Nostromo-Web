@@ -141,11 +141,11 @@ export class FileService
     {
         /// TODO: на телефоне lastModified выдает текущую дату.
         /// Нужно придумать другой способ - через хэш или уточнять у юзера.
-        const fileMetadata = `${file.name},${file.size},${file.lastModified}`;
+        const fileMetadata = `${roomId},${file.name},${file.size},${file.lastModified}`;
 
         // Ищем fileId в локальном хранилище.
         const fileId = localStorage.getItem(fileMetadata) ?? await this.createFileOnServer(roomId, file);
-        localStorage.setItem(`${file.name},${file.size},${file.lastModified}`, fileId);
+        localStorage.setItem(fileMetadata, fileId);
 
         // Присваиваем id для компонента с прогрессом.
         progressComponent.id = `progress-file-${fileId}`;
