@@ -309,14 +309,14 @@ export class UI
 
         const videoLabel = this.prepareVideoLabel();
         videoLabel.innerText = name;
-        videoLabel.title = name;
+        videoLabel.title = `${name} #${remoteVideoId.slice(0,4)}`;
         videoLabel.id = `video-label-${remoteVideoId}`;
         videoLabel.hidden = true;
         newVideoItem.appendChild(videoLabel);
 
         const centerVideoLabel = this.prepareCenterVideoLabel();
         centerVideoLabel.innerText = name;
-        centerVideoLabel.title = name;
+        centerVideoLabel.title = `${name} #${remoteVideoId.slice(0,4)}`;
         centerVideoLabel.id = `center-video-label-${remoteVideoId}`;
         newVideoItem.appendChild(centerVideoLabel);
 
@@ -342,9 +342,9 @@ export class UI
     public updateVideoLabels(remoteVideoId: string, newName: string): void
     {
         this.getVideoLabel(remoteVideoId)!.innerText = newName;
-        this.getVideoLabel(remoteVideoId)!.title = newName;
+        this.getVideoLabel(remoteVideoId)!.title = `${newName} #${remoteVideoId.slice(0,4)}`;
         this.getCenterVideoLabel(remoteVideoId)!.innerText = newName;
-        this.getCenterVideoLabel(remoteVideoId)!.title = newName;
+        this.getCenterVideoLabel(remoteVideoId)!.title = `${newName} #${remoteVideoId.slice(0,4)}`;
     }
 
     /** Удалить видео собеседника (и обновить раскладку). */
@@ -637,6 +637,7 @@ export class UI
             const messageSenderId = document.createElement("span");
             messageSenderId.className = "message-sender-id";
             messageSenderId.innerText = `#${userId.substring(0, 4)}`;
+            messageSenderId.title = `#${userId}`;
             messageSenderDiv.appendChild(messageSenderId);
         }
 
@@ -687,6 +688,7 @@ export class UI
             const messageSenderId = document.createElement("span");
             messageSenderId.className = "message-sender-id";
             messageSenderId.innerText = `#${userId.substring(0, 4)}`;
+            messageSenderId.title = `#${userId}`;
             messageSenderDiv.appendChild(messageSenderId);
         }
 
