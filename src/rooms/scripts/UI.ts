@@ -342,7 +342,9 @@ export class UI
     public updateVideoLabels(remoteVideoId: string, newName: string): void
     {
         this.getVideoLabel(remoteVideoId)!.innerText = newName;
+        this.getVideoLabel(remoteVideoId)!.title = newName;
         this.getCenterVideoLabel(remoteVideoId)!.innerText = newName;
+        this.getCenterVideoLabel(remoteVideoId)!.title = newName;
     }
 
     /** Удалить видео собеседника (и обновить раскладку). */
@@ -734,6 +736,7 @@ export class UI
             {
                 const messageSenderDiv = msgDiv.getElementsByClassName("message-sender-name")[0] as HTMLDivElement;
                 messageSenderDiv.innerText = this.usernames.get(userId)!;
+                messageSenderDiv.title = this.usernames.get(userId)!;
             }
         }
     }
