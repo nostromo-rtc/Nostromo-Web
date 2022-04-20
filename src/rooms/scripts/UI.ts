@@ -51,12 +51,6 @@ export class UI
         this._roomName.innerText = name;
     }
 
-    /** Текстовая метка локального видео. */
-    public localVideoLabel: HTMLSpanElement = this.prepareVideoLabel();
-
-    /** Центральная текстовая метка локального видео. */
-    public centerLocalVideoLabel: HTMLSpanElement = this.prepareCenterVideoLabel();
-
     /** Контейнер с видеоэлементами. */
     private _allVideos = new Map<string, HTMLVideoElement>();
     public get allVideos(): Map<string, HTMLVideoElement>
@@ -67,7 +61,7 @@ export class UI
     /** Видеоэлемент локального видео. */
     public get localVideo(): HTMLVideoElement | undefined
     {
-        return this._allVideos.get('localVideo');
+        return this._allVideos.get("local-main");
     }
 
     /** Чат. */
@@ -147,7 +141,7 @@ export class UI
         console.debug('[UI] > ctor');
         this.initUiSounds();
         this.prepareMessageText();
-        this.prepareLocalVideo();
+        this.addVideo("local", "main", "local");
         this.resizeVideos();
         window.addEventListener('resize', () => this.resizeVideos());
 
@@ -254,7 +248,7 @@ export class UI
             username = username.slice(0, 32);
         }
 
-        this.usernames.set("me", username);
+        this.usernames.set("local", username);
 
         this.displayUserName();
 
@@ -264,12 +258,9 @@ export class UI
     /** Показать имя пользователя. */
     public displayUserName(): void
     {
-        const username = this.usernames.get("me") ?? "Гость";
+        const username = this.usernames.get("local") ?? "Гость";
         this.usernameInput.value = username;
-        this.localVideoLabel.title = username;
-        this.localVideoLabel.innerText = username;
-        this.centerLocalVideoLabel.title = username;
-        this.centerLocalVideoLabel.innerText = username;
+        this.updateVideoLabels("local", username);
     }
 
     /** Включить звук для всех видео. */
@@ -300,28 +291,29 @@ export class UI
         }
     }
 
-    /** Добавить новый видеоэлемент для нового собеседника. */
-    public addVideo(remoteVideoId: string, name: string): void
+    /** Добавить новый видеоэлемент. */
+    public addVideo(userId: string, videoId: string, name: string): void
     {
+        const id = `${userId}-${videoId}`;
+
         const newVideoItem = document.createElement('div');
-        newVideoItem.id = `remoteVideoItem-${remoteVideoId}`;
-        newVideoItem.classList.add('videoItem');
+        newVideoItem.id = `video-item-${id}`;
+        newVideoItem.setAttribute("data-userid", userId);
+        newVideoItem.classList.add('video-item');
 
         const videoLabel = this.prepareVideoLabel();
-        videoLabel.innerText = name;
-        videoLabel.title = `${name} #${remoteVideoId.slice(0,4)}`;
-        videoLabel.id = `video-label-${remoteVideoId}`;
+        this.setTextIntoVideoLabel(videoLabel, name, userId);
+        videoLabel.id = `video-label-${id}`;
         videoLabel.hidden = true;
         newVideoItem.appendChild(videoLabel);
 
         const centerVideoLabel = this.prepareCenterVideoLabel();
-        centerVideoLabel.innerText = name;
-        centerVideoLabel.title = `${name} #${remoteVideoId.slice(0,4)}`;
-        centerVideoLabel.id = `center-video-label-${remoteVideoId}`;
+        this.setTextIntoVideoLabel(centerVideoLabel, name, userId);
+        centerVideoLabel.id = `center-video-label-${id}`;
         newVideoItem.appendChild(centerVideoLabel);
 
         const newVideo = document.createElement('video');
-        newVideo.id = `remoteVideo-${remoteVideoId}`;
+        newVideo.id = `video-${id}`;
         newVideo.autoplay = true;
         newVideo.muted = this.mutePolicy;
         newVideo.poster = './images/novideodata.jpg';
@@ -329,35 +321,66 @@ export class UI
         newVideoItem.appendChild(newVideo);
 
         document.getElementById('videos')!.appendChild(newVideoItem);
-        this._allVideos.set(remoteVideoId, newVideo);
+        this._allVideos.set(id, newVideo);
 
-        this.prepareVideoPlayer(newVideo);
+        this.prepareVideoPlayer(newVideo, userId == "local");
 
         // перестроим раскладку
         this.calculateLayout();
         this.resizeVideos();
     }
 
-    /** Обновления текстовой метки видеоэлемента собеседника. */
-    public updateVideoLabels(remoteVideoId: string, newName: string): void
+    /** Обновления текстовой метки видеоэлемента. */
+    public updateVideoLabels(userId: string, newName: string): void
     {
-        this.getVideoLabel(remoteVideoId)!.innerText = newName;
-        this.getVideoLabel(remoteVideoId)!.title = `${newName} #${remoteVideoId.slice(0,4)}`;
-        this.getCenterVideoLabel(remoteVideoId)!.innerText = newName;
-        this.getCenterVideoLabel(remoteVideoId)!.title = `${newName} #${remoteVideoId.slice(0,4)}`;
+        const videoLabels = this.getVideoLabels(userId);
+        for (const label of videoLabels)
+        {
+            this.setTextIntoVideoLabel(label, newName, userId);
+        }
+
+        const centerVideoLabels = this.getCenterVideoLabels(userId);
+        for (const centerLabel of centerVideoLabels)
+        {
+            this.setTextIntoVideoLabel(centerLabel, newName, userId);
+        }
     }
 
     /** Удалить видео собеседника (и обновить раскладку). */
-    public removeVideo(id: string): void
+    public removeVideo(userId: string, videoId: string): void
     {
-        const videoItem = document.getElementById(`remoteVideoItem-${id}`);
+        const id = `${userId}-${videoId}`;
+
+        const videoItem = document.getElementById(`video-item-${id}`);
         if (videoItem)
         {
+            // Отвязываем стрим от UI видеоэлемента.
+            const videoElement = this._allVideos.get(id)!;
+            videoElement.srcObject = null;
+            // Удаляем videoItem.
+            videoItem.remove();
+            // Удаляем видеоэлемент из контейнера всех видеоэлементов.
+            this._allVideos.delete(id);
+            // Обновляем раскладку.
+            this.calculateLayout();
+            this.resizeVideos();
+        }
+    }
+
+    /** Удалить все видео от собеседника (и обновить раскладку). */
+    public removeVideos(userId: string): void
+    {
+        const videoItems = document.querySelectorAll(`.video-item[data-userid='${userId}']`);
+        for (const item of videoItems)
+        {
+            const idx = "video-item-".length;
+            const id = item.id.slice(idx);
+
             // отвязываем стрим от UI видеоэлемента
             const videoElement = this._allVideos.get(id)!;
             videoElement.srcObject = null;
             // удаляем videoItem с этим id
-            videoItem.remove();
+            item.remove();
             // удаляем видеоэлемент контейнера всех видеоэлементов
             this._allVideos.delete(id);
             // обновляем раскладку
@@ -417,38 +440,15 @@ export class UI
         // max_h для регулирования размеров видео, чтобы оно вмещалось в videoRows (количество) строк
         const max_h = ((document.documentElement.clientHeight - header_offset) / this.videoRows) - offset;
         const flexBasis = ((document.documentElement.clientWidth - nav_offset) / this.videoColumns) - offset;
-        for (const videoItem of document.getElementsByClassName('videoItem'))
+        for (const videoItem of document.getElementsByClassName('video-item'))
         {
             (videoItem as HTMLDivElement).style.maxWidth = String(max_h * aspect_ratio) + 'px';
             (videoItem as HTMLDivElement).style.flexBasis = String(flexBasis) + 'px';
         }
     }
 
-    /** Подготовить локальный видеоэлемент. */
-    private prepareLocalVideo(): void
-    {
-        const localVideoItem = document.createElement('div');
-        localVideoItem.classList.add('videoItem');
-
-        localVideoItem.appendChild(this.localVideoLabel);
-        localVideoItem.appendChild(this.centerLocalVideoLabel);
-
-        const localVideo = document.createElement('video');
-        localVideo.id = 'localVideo';
-        localVideo.autoplay = true;
-        localVideo.muted = true;
-        localVideo.poster = './images/novideodata.jpg';
-
-        localVideoItem.appendChild(localVideo);
-
-        document.getElementById('videos')!.appendChild(localVideoItem);
-        this._allVideos.set('localVideo', localVideo);
-
-        this.prepareVideoPlayer(localVideo);
-    }
-
-    /** Подготовить плеер для локального видеоэлемента. */
-    private prepareVideoPlayer(video: HTMLVideoElement)
+    /** Подготовить плеер для видеоэлемента. */
+    private prepareVideoPlayer(video: HTMLVideoElement, isLocal: boolean)
     {
         const player = new Plyr(video, {
             ratio: '16:9',
@@ -456,13 +456,13 @@ export class UI
             storage: { enabled: false },
             keyboard: { focused: false, global: false },
             clickToPlay: false,
-            muted: (video.id == 'localVideo') ? true : this.mutePolicy,
+            muted: isLocal ? true : this.mutePolicy,
             controls: ['play-large', 'play', 'mute', 'volume', 'fullscreen'],
             loadSprite: false
         });
 
         // добавляем стиль (чтобы было как fluid у videojs)
-        player.elements.container!.classList.add('videoContainer');
+        player.elements.container!.classList.add('video-container');
         // убираем ненужный div с постером
         player.elements.wrapper!.children[1].remove();
         // скрываем элементы управления
@@ -496,12 +496,26 @@ export class UI
         this.hideVolumeControl(player, !hasAudio);
     }
 
-    /** Подготовить текстовую метку для локального видеоэлемента. */
+    /** Подготовить новую текстовую метку для локального видеоэлемента. */
     private prepareVideoLabel(): HTMLSpanElement
     {
         const label = document.createElement('span');
         label.classList.add('video-label');
         return label;
+    }
+
+    /** Подготовить текстовую метку для локального видеоэлемента. */
+    private setTextIntoVideoLabel(label: HTMLSpanElement, name: string, userId: string): void
+    {
+        label.innerText = name;
+        if (userId == "local")
+        {
+            label.title = `${name}`;
+        }
+        else
+        {
+            label.title = `${name} #${userId.slice(0, 4)}`;
+        }
     }
 
     public createProgressComponent(file: File): HTMLDivElement
@@ -538,14 +552,24 @@ export class UI
         return centerVideoLabel;
     }
 
-    public getCenterVideoLabel(userId: string): HTMLSpanElement | null
+    public getCenterVideoLabels(userId: string): NodeListOf<HTMLSpanElement>
     {
-        return document.getElementById(`center-video-label-${userId}`);
+        return document.querySelectorAll(`.video-item[data-userid='${userId}'] > .center-video-label`);
     }
 
-    public getVideoLabel(userId: string): HTMLSpanElement | null
+    public getCenterVideoLabel(userId: string, videoId: string): HTMLSpanElement | null
     {
-        return document.getElementById(`video-label-${userId}`);
+        return document.getElementById(`center-video-label-${userId}-${videoId}`);
+    }
+
+    public getVideoLabels(userId: string): NodeListOf<HTMLSpanElement>
+    {
+        return document.querySelectorAll(`.video-item[data-userid='${userId}'] > .video-label`);
+    }
+
+    public getVideoLabel(userId: string, videoId: string): HTMLSpanElement | null
+    {
+        return document.getElementById(`video-label-${userId}-${videoId}`);
     }
 
     /**
@@ -614,7 +638,7 @@ export class UI
         messageDiv.setAttribute("data-userid", userId);
         messageDiv.classList.add("message");
 
-        if (userId == "me")
+        if (userId == "local")
         {
             messageDiv.classList.add("background-lightgreen");
         }
@@ -632,7 +656,7 @@ export class UI
         messageSenderName.title = this.usernames.get(userId)!;
         messageSenderDiv.appendChild(messageSenderName);
 
-        if (userId != "me")
+        if (userId != "local")
         {
             const messageSenderId = document.createElement("span");
             messageSenderId.className = "message-sender-id";
@@ -665,7 +689,7 @@ export class UI
         messageDiv.setAttribute("data-userid", userId);
         messageDiv.classList.add("message");
 
-        if (userId == "me")
+        if (userId == "local")
         {
             messageDiv.classList.add("background-lightgreen");
         }
@@ -683,7 +707,7 @@ export class UI
         messageSenderName.title = this.usernames.get(userId)!;
         messageSenderDiv.appendChild(messageSenderName);
 
-        if (userId != "me")
+        if (userId != "local")
         {
             const messageSenderId = document.createElement("span");
             messageSenderId.className = "message-sender-id";

@@ -134,7 +134,7 @@
     max-width: 60%;
 }
 
-.videoItem {
+.video-item {
     flex-grow: 1;
     flex-shrink: 1;
     position: relative;
@@ -144,7 +144,7 @@
     border: 1px solid grey;
 }
 
-.videoContainer {
+.video-container {
     width: 100%;
     position: relative;
 }

@@ -120,7 +120,7 @@ export class Room
 
             // Локально добавляем ссылку на файл в чат.
             const chatFileInfo: ChatFileInfo = {
-                userId: "me",
+                userId: "local",
                 fileId,
                 filename: file.name,
                 size: file.size
@@ -191,7 +191,7 @@ export class Room
 
             if (message)
             {
-                this.ui.displayChatMsg("me", message);
+                this.ui.displayChatMsg("local", message);
                 this.socket.emit(SE.ChatMsg, message);
 
                 this.ui.messageText.value = "";
@@ -234,7 +234,7 @@ export class Room
         // Получаем свое имя, сохраненное на сервере.
         this.socket.once(SE.Username, (name: string) =>
         {
-            this.ui.usernames.set("me", name);
+            this.ui.usernames.set("local", name);
             this.ui.displayUserName();
         });
 
@@ -318,7 +318,7 @@ export class Room
         {
             this.ui.usernames.set(id, name);
 
-            this.ui.addVideo(id, name);
+            this.ui.addVideo(id, "main", name);
 
             this.pauseAndPlayEventsPlayerHandler(id);
 
@@ -398,7 +398,7 @@ export class Room
         {
             console.info("[Room] > remoteUser disconnected:", `[${remoteUserId}]`);
 
-            this.ui.removeVideo(remoteUserId);
+            this.ui.removeVideos(remoteUserId);
 
             this.ui.playSound(UiSound.left);
         });
@@ -473,8 +473,11 @@ export class Room
     /** Обработка паузы и снятие паузы на плеере. */
     private pauseAndPlayEventsPlayerHandler(id: string): void
     {
-        const remoteVideo = this.ui.allVideos.get(id);
-        if (!remoteVideo) return;
+        const remoteVideo = this.ui.allVideos.get(`${id}-main`);
+        if (!remoteVideo)
+        {
+            return;
+        }
 
         const listenerFunc = (playerPause: boolean) =>
         {
@@ -543,7 +546,7 @@ export class Room
 
             this.socket.emit(SE.NewUsername, newName);
 
-            this.ui.updateNicknameInChat("me");
+            this.ui.updateNicknameInChat("local");
         });
     }
 
@@ -673,6 +676,9 @@ export class Room
     /** Обработка события - новый входящий медиапоток. */
     private async newConsumer(newConsumerInfo: NewConsumerInfo): Promise<void>
     {
+        //TODO: доделать
+        const videoId = "main";
+
         const consumer = await this.mediasoup.createConsumer(newConsumerInfo);
 
         // Если consumer не удалось создать.
@@ -681,7 +687,9 @@ export class Room
             return;
         }
 
-        const remoteVideo: HTMLVideoElement = this.ui.allVideos.get(newConsumerInfo.producerUserId)!;
+        const remoteVideo: HTMLVideoElement = this.ui.allVideos.get(`${newConsumerInfo.producerUserId}-${videoId}`)!;
+
+        console.log(remoteVideo);
 
         let stream = remoteVideo.srcObject as MediaStream | null;
 
@@ -711,8 +719,8 @@ export class Room
         if (newConsumerInfo.kind == "video")
         {
             // Переключаем видимость текстовых меток.
-            const videoLabel = this.ui.getVideoLabel(newConsumerInfo.producerUserId)!;
-            const centerLabel = this.ui.getCenterVideoLabel(newConsumerInfo.producerUserId)!;
+            const videoLabel = this.ui.getVideoLabel(newConsumerInfo.producerUserId, videoId)!;
+            const centerLabel = this.ui.getCenterVideoLabel(newConsumerInfo.producerUserId, videoId)!;
             this.ui.toogleVideoLabels(videoLabel, centerLabel);
 
             if (!this.soundDelayAfterJoin)
@@ -746,9 +754,15 @@ export class Room
 
         const consumer = this.mediasoup.getConsumer(consumerId);
 
-        if (!consumer) return;
+        if (!consumer)
+        {
+            return;
+        }
 
-        const remoteVideo = this.ui.allVideos.get(producerUserId);
+        //TODO: доделать
+        const videoId = "main";
+
+        const remoteVideo = this.ui.allVideos.get(`${producerUserId}-${videoId}`);
 
         if (remoteVideo)
         {
@@ -763,8 +777,8 @@ export class Room
                 remoteVideo.load();
 
                 // Переключаем видимость текстовых меток.
-                const videoLabel = this.ui.getVideoLabel(producerUserId)!;
-                const centerLabel = this.ui.getCenterVideoLabel(producerUserId)!;
+                const videoLabel = this.ui.getVideoLabel(producerUserId, videoId)!;
+                const centerLabel = this.ui.getCenterVideoLabel(producerUserId, videoId)!;
                 this.ui.toogleVideoLabels(videoLabel, centerLabel);
 
                 this.ui.playSound(UiSound.videoOff);

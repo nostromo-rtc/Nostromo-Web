@@ -101,8 +101,6 @@ export class UserMedia
         {
             this.toggleMic();
         });
-
-        this.ui.localVideoLabel.hidden = true;
     }
 
     /** Получение видео (веб-камера) или аудио (микрофон) потока. */
@@ -213,7 +211,10 @@ export class UserMedia
                 if (newTrack.kind == "video")
                 {
                     this.ui.buttons.get("stopMediaVideo")!.hidden = false;
-                    this.ui.toogleVideoLabels(this.ui.centerLocalVideoLabel, this.ui.localVideoLabel);
+                    this.ui.toogleVideoLabels(
+                        this.ui.getCenterVideoLabel("local", "main")!,
+                        this.ui.getVideoLabel("local", "main")!
+                    );
 
                     this.ui.playSound(UiSound.videoOn);
                 }
@@ -273,7 +274,10 @@ export class UserMedia
             stopVideoBtn.hidden = true;
 
             // Переключаем видимость текстовых меток.
-            this.ui.toogleVideoLabels(this.ui.centerLocalVideoLabel, this.ui.localVideoLabel);
+            this.ui.toogleVideoLabels(
+                this.ui.getCenterVideoLabel("local", "main")!,
+                this.ui.getVideoLabel("local", "main")!
+            );
 
             // Воспроизводим звук.
             this.ui.playSound(UiSound.videoOff);
