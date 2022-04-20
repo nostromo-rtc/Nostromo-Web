@@ -804,7 +804,7 @@ export class Room
     }
 
     /** Добавить медиапоток (одну дорожку) в подключение. */
-    public async addMediaStreamTrack(track: MediaStreamTrack): Promise<void>
+    public async addMediaStreamTrack(videoId:string, track: MediaStreamTrack): Promise<void>
     {
         // Создаем producer.
         await this.mediasoup.createProducer(track);

@@ -22,8 +22,8 @@ export class UserMedia
     // TODO: попробовать сделать явную инициализацию первым треком
     // а то вроде бы Chrome не любит пустые MediaStream
 
-    /** Медиапоток. */
-    private stream = new MediaStream();
+    /** Медиапотоки. */
+    private streams = new Map<string, MediaStream>();
 
     /** Настройки медиапотока при захвате микрофона. */
     private readonly streamConstraintsMic: MediaStreamConstraints = {
@@ -48,8 +48,8 @@ export class UserMedia
         this.captureConstraintsDisplay = this.prepareCaptureDisplayConstraints();
         this.captureConstraintsCam = this.prepareCaptureCamConstraints();
 
-        this.prepareDevices(true);
-        this.prepareDevices(false);
+        void this.prepareDevices(true);
+        void this.prepareDevices(false);
 
         navigator.mediaDevices.addEventListener("devicechange", async (event) =>
         {
@@ -60,7 +60,7 @@ export class UserMedia
         this.ui.buttons.get('getUserMediaMic')!.addEventListener('click', async () =>
         {
             const constraints = this.streamConstraintsMic;
-            constraints.audio = { deviceId: {ideal: this.ui.currentMicDevice} };
+            constraints.audio = { deviceId: { ideal: this.ui.currentMicDevice } };
 
             await this.getUserMedia(this.streamConstraintsMic);
         });
@@ -78,18 +78,18 @@ export class UserMedia
 
         stopAudioBtn.addEventListener("click", () =>
         {
-            const track = this.stream.getAudioTracks()[0];
+            const track = this.streams.get("main")!.getAudioTracks()[0];
 
             track.stop();
-            this.removeEndedTrack(track);
+            this.removeEndedTrack("main", track);
         });
 
         stopVideoBtn.addEventListener("click", () =>
         {
-            const track = this.stream.getVideoTracks()[0];
+            const track = this.streams.get("main")!.getVideoTracks()[0];
 
             track.stop();
-            this.removeEndedTrack(track);
+            this.removeEndedTrack("main", track);
         });
 
         this.ui.buttons.get('getDisplayMedia')!.addEventListener('click', async () =>
@@ -121,7 +121,7 @@ export class UserMedia
 
             console.debug("[UserMedia] > getUserMedia success:", mediaStream);
 
-            await this.handleMediaStream(mediaStream);
+            await this.handleMediaStream("main", mediaStream);
 
             if (streamConstraints.audio)
             {
@@ -148,7 +148,12 @@ export class UserMedia
 
             console.debug("[UserMedia] > getDisplayMedia success:", mediaStream);
 
-            await this.handleMediaStream(mediaStream);
+            if (!this.ui.allVideos.has("local-display"))
+            {
+                this.ui.addUserSecondaryVideo("local", "display", "display");
+            }
+
+            await this.handleMediaStream("display", mediaStream);
         }
         catch (error)
         {
@@ -157,63 +162,76 @@ export class UserMedia
     }
 
     /** Обработка медиапотока. */
-    private async handleMediaStream(mediaStream: MediaStream): Promise<void>
+    private async handleMediaStream(videoId: string, mediaStream: MediaStream): Promise<void>
     {
+        let stream = this.streams.get(videoId);
+        const video = this.ui.allVideos.get(`local-${videoId}`)!;
+
         for (const newTrack of mediaStream.getTracks())
         {
-            this.handleEndedTrack(newTrack);
+            // Подключаем обработчик закончившейся дорожки.
+            this.handleEndedTrack(videoId, newTrack);
 
-            // проверяем, было ли от нас что-то до этого такого же типа (аудио или видео)
+            // Проверяем, было ли от нас что-то до этого такого же типа (аудио или видео).
             let presentSameKindMedia = false;
-            for (const oldTrack of this.stream.getTracks())
+
+            if (stream)
             {
-                if (oldTrack.kind == newTrack.kind)
+                for (const oldTrack of stream.getTracks())
                 {
-                    presentSameKindMedia = true;
-                    this.stopTrackBeforeReplace(oldTrack);
-                    await this.room.updateMediaStreamTrack(oldTrack.id, newTrack);
+                    if (oldTrack.kind == newTrack.kind)
+                    {
+                        presentSameKindMedia = true;
+                        this.stopTrackBeforeReplace(videoId, oldTrack);
+                        await this.room.updateMediaStreamTrack(oldTrack.id, newTrack);
+                    }
+                }
+
+                const streamWasActive = stream.active;
+                stream.addTrack(newTrack);
+
+                // Перезагружаем видеоэлемент. Это необходимо, на тот случай,
+                // если до этого из стрима удалили все дорожки и стрим стал неактивным,
+                // а при удалении видеодорожки (и она была последней при удалении) вызывали load(),
+                // чтобы убрать зависнувший последний кадр.
+                // Иначе баг на Chrome: если в стриме только аудиодорожка,
+                // то play/pause на видеоэлементе не будут работать, а звук будет все равно идти.
+                if (!streamWasActive)
+                {
+                    video.load();
                 }
             }
-
-            const streamWasActive = this.stream.active;
-            this.stream.addTrack(newTrack);
-
-            // Перезагружаем видеоэлемент. Это необходимо, на тот случай,
-            // если до этого из стрима удалили все дорожки и стрим стал неактивным,
-            // а при удалении видеодорожки (и она была последней при удалении) вызывали load(),
-            // чтобы убрать зависнувший последний кадр.
-            // Иначе баг на Chrome: если в стриме только аудиодорожка,
-            // то play/pause на видеоэлементе не будут работать, а звук будет все равно идти.
-            if (!streamWasActive)
+            else
             {
-                this.ui.localVideo!.load();
+                stream = new MediaStream([newTrack]);
+                this.streams.set(videoId, stream);
             }
-
-            // Так как добавили новую дорожку, включаем отображение элементов управления
-            // регулятор громкости не показываем.
 
             /* TODO: перенести регулятор громкости локального видео куда-нибудь в настройки
                 чтобы было возможно проверять микрофон */
 
-            this.ui.showControls(this.ui.localVideo!.plyr, false);
+            // Так как добавили новую дорожку, включаем отображение элементов управления.
+            // Но регулятор громкости не показываем.
+            this.ui.showControls(video.plyr, false);
 
-            // Подключаем медиапоток к HTML-элементу <video> (localVideo).
-            if (!this.ui.localVideo!.srcObject)
+            // Подключаем медиапоток к HTML-видеоэлементу.
+            if (!video.srcObject)
             {
-                this.ui.localVideo!.srcObject = this.stream;
+                video.srcObject = stream;
             }
 
-            // Если не было, то есть добавляем новую медиадорожку.
+            // Если не было дорожек такого же типа, то отправляем всем новую медиадорожку.
             if (!presentSameKindMedia)
             {
-                await this.room.addMediaStreamTrack(newTrack);
+                await this.room.addMediaStreamTrack(videoId, newTrack);
 
                 if (newTrack.kind == "video")
                 {
                     this.ui.buttons.get("stopMediaVideo")!.hidden = false;
+
                     this.ui.toogleVideoLabels(
-                        this.ui.getCenterVideoLabel("local", "main")!,
-                        this.ui.getVideoLabel("local", "main")!
+                        this.ui.getCenterVideoLabel("local", videoId)!,
+                        this.ui.getVideoLabel("local", videoId)!
                     );
 
                     this.ui.playSound(UiSound.videoOn);
@@ -227,33 +245,41 @@ export class UserMedia
     }
 
     /** Остановить медиадорожку. */
-    private stopTrackBeforeReplace(oldVideoTrack: MediaStreamTrack): void
+    private stopTrackBeforeReplace(videoId: string, oldVideoTrack: MediaStreamTrack): void
     {
         // Stop не вызывает событие ended,
         // поэтому удаляем трек из стрима сами.
         oldVideoTrack.stop();
         console.debug("[UserMedia] > stopTrackBeforeReplace", oldVideoTrack);
 
-        this.removeTrackFromLocalStream(oldVideoTrack);
+        this.removeTrackFromLocalStream(videoId, oldVideoTrack);
     }
 
     /** Обработка закончившейся (ended) дорожки. */
-    private handleEndedTrack(track: MediaStreamTrack): void
+    private handleEndedTrack(videoId: string, track: MediaStreamTrack): void
     {
         track.addEventListener('ended', () =>
         {
-            this.removeEndedTrack(track);
+            this.removeEndedTrack(videoId, track);
         });
     }
 
     /** Удалить закончившуюся (ended) дорожку. */
-    private removeEndedTrack(track: MediaStreamTrack)
+    private removeEndedTrack(videoId: string, track: MediaStreamTrack)
     {
         console.debug("[UserMedia] > removeEndedTrack", track);
 
-        this.removeTrackFromLocalStream(track);
+        this.removeTrackFromLocalStream(videoId, track);
         this.room.removeMediaStreamTrack(track.id);
-        if (track.kind == "audio")
+
+        // Если дорожек не осталось у неосновного видеоэлемента, то удаляем его.
+        if (this.streams.get(videoId)!.getTracks().length == 0 && videoId != "main")
+        {
+            this.ui.removeVideo("local", videoId);
+            this.streams.delete(videoId);
+        }
+
+        if (track.kind == "audio" && videoId == "main")
         {
             // поскольку аудиодорожка была удалена, значит новая точно
             // должна быть не на паузе
@@ -269,15 +295,22 @@ export class UserMedia
         }
         if (track.kind == "video")
         {
-            // Скрываем кнопку ручного выключения видеодорожки.
-            const stopVideoBtn = this.ui.buttons.get("stopMediaVideo")!;
-            stopVideoBtn.hidden = true;
+            if (videoId == "main")
+            {
+                // Скрываем кнопку ручного выключения видеодорожки.
+                const stopVideoBtn = this.ui.buttons.get("stopMediaVideo")!;
+                stopVideoBtn.hidden = true;
+            }
 
-            // Переключаем видимость текстовых меток.
-            this.ui.toogleVideoLabels(
-                this.ui.getCenterVideoLabel("local", "main")!,
-                this.ui.getVideoLabel("local", "main")!
-            );
+            // Если видеоэлемент не удалён
+            if (this.ui.allVideos.has(`local-${videoId}`))
+            {
+                // Переключаем видимость текстовых меток.
+                this.ui.toogleVideoLabels(
+                    this.ui.getCenterVideoLabel("local", videoId)!,
+                    this.ui.getVideoLabel("local", videoId)!
+                );
+            }
 
             // Воспроизводим звук.
             this.ui.playSound(UiSound.videoOff);
@@ -285,28 +318,31 @@ export class UserMedia
     }
 
     /** Удалить медиадорожку из локального стрима. */
-    private removeTrackFromLocalStream(track: MediaStreamTrack): void
+    private removeTrackFromLocalStream(videoId: string, track: MediaStreamTrack): void
     {
+        const stream = this.streams.get(videoId)!;
+        const video = this.ui.allVideos.get(`local-${videoId}`)!;
+
         console.debug("[UserMedia] > removeTrackFromLocalStream", track);
 
-        this.stream.removeTrack(track);
+        stream.removeTrack(track);
         if (track.kind == 'video')
         {
             // Сбрасываем видео объект.
-            this.ui.localVideo!.load();
+            video.load();
         }
 
-        const hasAudio: boolean = this.stream.getAudioTracks().length > 0;
-        // если дорожек не осталось, выключаем элементы управления плеера
-        if (this.stream.getTracks().length == 0)
+        const hasAudio: boolean = stream.getAudioTracks().length > 0;
+        // Если дорожек не осталось, выключаем элементы управления плеера
+        if (stream.getTracks().length == 0 && videoId == "main")
         {
-            this.ui.hideControls(this.ui.localVideo!.plyr);
+            this.ui.hideControls(video.plyr);
         }
-        // предусматриваем случай, когда звуковых дорожек не осталось
-        // и убираем кнопку регулирования звука
-        else if (!hasAudio)
+        // Предусматриваем случай, когда звуковых дорожек не осталось
+        // и убираем кнопку регулирования звука у основого видеоэлемента.
+        else if (!hasAudio && videoId == "main")
         {
-            this.ui.hideVolumeControl(this.ui.localVideo!.plyr);
+            this.ui.hideVolumeControl(video.plyr);
         }
     }
 
@@ -315,7 +351,7 @@ export class UserMedia
     {
         console.debug("[UserMedia] > toogleMic");
 
-        const audioTrack: MediaStreamTrack = this.stream.getAudioTracks()[0];
+        const audioTrack: MediaStreamTrack = this.streams.get("main")!.getAudioTracks()[0];
 
         const btn_toggleMic = this.ui.buttons.get('toggleMic');
         if (!this.micPaused)

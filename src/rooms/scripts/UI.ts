@@ -58,12 +58,6 @@ export class UI
         return this._allVideos;
     }
 
-    /** Видеоэлемент локального видео. */
-    public get localVideo(): HTMLVideoElement | undefined
-    {
-        return this._allVideos.get("local-main");
-    }
-
     /** Чат. */
     public readonly chat = document.getElementById('chat') as HTMLDivElement;
 
@@ -291,8 +285,8 @@ export class UI
         }
     }
 
-    /** Добавить новый видеоэлемент. */
-    public addVideo(userId: string, videoId: string, name: string): void
+    /** Создать видеоэлемент. */
+    private createVideoItem(userId: string, videoId: string, name: string): HTMLDivElement
     {
         const id = `${userId}-${videoId}`;
 
@@ -320,10 +314,30 @@ export class UI
 
         newVideoItem.appendChild(newVideo);
 
-        document.getElementById('videos')!.appendChild(newVideoItem);
         this._allVideos.set(id, newVideo);
 
         this.prepareVideoPlayer(newVideo, userId == "local");
+
+        return newVideoItem;
+    }
+
+    /** Добавить новый видеоэлемент. */
+    public addVideo(userId: string, videoId: string, name: string): void
+    {
+        const videoItem = this.createVideoItem(userId, videoId, name);
+        document.getElementById('videos')!.appendChild(videoItem);
+
+        // перестроим раскладку
+        this.calculateLayout();
+        this.resizeVideos();
+    }
+
+    /** Добавить новый неосновной-видеоэлемент пользователя userId. */
+    public addUserSecondaryVideo(userId: string, videoId: string, name: string): void
+    {
+        const newVideoItem = this.createVideoItem(userId, videoId, name);
+        const videoItemsOfUser = document.querySelectorAll(`.video-item[data-userid='${userId}']`);
+        videoItemsOfUser.item(videoItemsOfUser.length - 1).after(newVideoItem);
 
         // перестроим раскладку
         this.calculateLayout();
