@@ -41,7 +41,7 @@ export class UI
     public readonly buttons: Map<string, HTMLButtonElement> = this.prepareButtons();
 
     /** Название комнаты. */
-    private _roomName = document.getElementById('roomName') as HTMLSpanElement;
+    private _roomName = document.getElementById('room-name') as HTMLSpanElement;
     public get roomName(): string
     {
         return this._roomName.innerText;
@@ -62,7 +62,7 @@ export class UI
     public readonly chat = document.getElementById('chat') as HTMLDivElement;
 
     /** Поле для выбора файла. */
-    public readonly fileInput = document.getElementById('fileInput') as HTMLInputElement;
+    public readonly fileInput = document.getElementById('file-input') as HTMLInputElement;
 
     /** Контейнер с прогрессами отправки файлов. */
     public readonly filesProgress = document.getElementById('files-progress') as HTMLDivElement;
@@ -71,10 +71,10 @@ export class UI
     public readonly messageText = document.getElementById('message-textarea') as HTMLTextAreaElement;
 
     /** Список разрешений захвата видеоизображения. */
-    public readonly captureSettingsDisplay = document.getElementById('captureSettingsDisplay') as HTMLSelectElement;
+    public readonly captureSettingsDisplay = document.getElementById('capture-settings-display') as HTMLSelectElement;
 
     /** Список разрешений захвата веб-камеры. */
-    public readonly captureSettingsCam = document.getElementById('captureSettingsCam') as HTMLSelectElement;
+    public readonly captureSettingsCam = document.getElementById('capture-settings-cam') as HTMLSelectElement;
 
     /** Список устройств-микрофонов. */
     public readonly micDevices = document.getElementById("mic-devices") as HTMLSelectElement;
@@ -139,7 +139,7 @@ export class UI
         this.resizeVideos();
         window.addEventListener('resize', () => this.resizeVideos());
 
-        const btn_toggleSounds = this.buttons.get('toggleSounds');
+        const btn_toggleSounds = this.buttons.get('toggle-sounds');
         btn_toggleSounds!.addEventListener('click', () =>
         { this.handleBtnToggleSounds(btn_toggleSounds!); });
 
@@ -204,16 +204,16 @@ export class UI
     {
         const buttons = new Map<string, HTMLButtonElement>();
 
-        buttons.set('getUserMediaMic', document.getElementById('btn_getUserMediaMic') as HTMLButtonElement);
-        buttons.set('toggleMic', document.getElementById('btn_toggleMic') as HTMLButtonElement);
-        buttons.set('getUserMediaCam', document.getElementById('btn_getUserMediaCam') as HTMLButtonElement);
-        buttons.set('getDisplayMedia', document.getElementById('btn_getDisplayMedia') as HTMLButtonElement);
-        buttons.set('sendMessage', document.getElementById('btn_sendMessage') as HTMLButtonElement);
-        buttons.set('sendFile', document.getElementById('btn_sendFile') as HTMLButtonElement);
-        buttons.set('toggleSounds', document.getElementById('btn_toggleSounds') as HTMLButtonElement);
-        buttons.set('setNewUsername', document.getElementById('btn_setNewUsername') as HTMLButtonElement);
-        buttons.set('stopMediaAudio', document.getElementById('btn_stopMediaAudio') as HTMLButtonElement);
-        buttons.set('stopMediaVideo', document.getElementById('btn_stopMediaVideo') as HTMLButtonElement);
+        buttons.set('get-mic', document.getElementById('btn-get-mic') as HTMLButtonElement);
+        buttons.set('toggle-mic', document.getElementById('btn-toggle-mic') as HTMLButtonElement);
+        buttons.set('get-cam', document.getElementById('btn-get-cam') as HTMLButtonElement);
+        buttons.set('get-display', document.getElementById('btn-get-display') as HTMLButtonElement);
+        buttons.set('send-message', document.getElementById('btn-send-message') as HTMLButtonElement);
+        buttons.set('send-file', document.getElementById('btn-send-file') as HTMLButtonElement);
+        buttons.set('toggle-sounds', document.getElementById('btn-toggle-sounds') as HTMLButtonElement);
+        buttons.set('set-new-username', document.getElementById('btn-set-new-username') as HTMLButtonElement);
+        buttons.set('stop-media-audio', document.getElementById('btn-stop-media-audio') as HTMLButtonElement);
+        buttons.set('stop-media-video', document.getElementById('btn-stop-media-video') as HTMLButtonElement);
 
         return buttons;
     }
@@ -226,7 +226,7 @@ export class UI
             if (e.key == 'Enter' && !e.shiftKey)
             {
                 e.preventDefault();
-                this.buttons.get('sendMessage')!.click();
+                this.buttons.get('send-message')!.click();
                 this.messageText.value = '';
             }
         });

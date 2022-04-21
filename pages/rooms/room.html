@@ -15,14 +15,14 @@
     </div>
 
     <div class="header">
-        <div>Комната - <span id="roomName"></span></div>
+        <div>Комната - <span id="room-name"></span></div>
     </div>
 
     <div class="main">
         <div class="d-flex flex-start p-2">
             <span>Ваше имя:</span>
             <input type="text" id="username-input">
-            <button id="btn_setNewUsername">Сохранить имя</button>
+            <button id="btn-set-new-username">Сохранить имя</button>
             <span class="vl">|</span>
             <input type="checkbox" id="checkbox-notifications">
             <label for="checkbox-notifications"> Вкл. оповещения</label><br>
@@ -33,25 +33,25 @@
         </div>
         <div class="d-flex flex-start p-2">
             <span id="attention" class="vl">&#9888;</span>
-            <button id="btn_toggleSounds" class="bold background-green">Включить звуки собеседников</button>
+            <button id="btn-toggle-sounds" class="bold background-green">Включить звуки собеседников</button>
             <span class="vl">|</span>
-            <button id="btn_getUserMediaMic">Захватить микрофон</button>
-            <button hidden id="btn_toggleMic" class="bold background-orange">Выключить микрофон</button>
+            <button id="btn-get-mic">Захватить микрофон</button>
+            <button hidden id="btn-toggle-mic" class="bold background-orange">Выключить микрофон</button>
             <span class="vl">|</span>
-            <button id="btn_getUserMediaCam">Захватить веб-камеру</button>
+            <button id="btn-get-cam">Захватить веб-камеру</button>
             <span class="vl">&larr;</span>
-            <select id="captureSettingsCam">
+            <select id="capture-settings-cam">
                 <option disabled selected value="default">Выберите разрешение</option>
             </select>
             <span class="vl">|</span>
-            <button id="btn_getDisplayMedia">Демонстрация экрана компьютера</button>
+            <button id="btn-get-display">Демонстрация экрана компьютера</button>
             <span class="vl">&larr;</span>
-            <select id="captureSettingsDisplay">
+            <select id="capture-settings-display">
                 <option disabled selected value="default">Выберите разрешение</option>
             </select>
             <span class="vl">|</span>
-            <button id="btn_stopMediaAudio" class="bold background-red" hidden>Прекратить захват аудиодорожки</button>
-            <button id="btn_stopMediaVideo" class="bold background-red" hidden>Прекратить захват видеодорожки</button>
+            <button id="btn-stop-media-audio" class="bold background-red" hidden>Прекратить захват аудиодорожки</button>
+            <button id="btn-stop-media-video" class="bold background-red" hidden>Прекратить захват видеодорожки</button>
         </div>
         <div id="videos"></div>
         <section id="chat-section">
@@ -59,13 +59,13 @@
             <div id="chat" readonly></div>
             <div class="flex">
                 <textarea id="message-textarea" placeholder="Введите ваше сообщение"></textarea>
-                <button id="btn_sendMessage" accesskey="enter" autofocus>Отправить</button>
+                <button id="btn-send-message" accesskey="enter" autofocus>Отправить</button>
             </div>
         </section>
-        <section id="fileSection">
+        <section id="file-section">
             <span>Отправка файлов:</span><br>
-            <input type="file" id="fileInput" name="file" multiple="true" /><br>
-            <button id="btn_sendFile">Отправить</button><br>
+            <input type="file" id="file-input" name="file" multiple="true" /><br>
+            <button id="btn-send-file">Отправить</button><br>
             <div id="files-progress"></div>
         </section>
     </div>

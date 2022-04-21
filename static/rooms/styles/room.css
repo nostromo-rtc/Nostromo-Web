@@ -94,7 +94,7 @@
     resize: vertical;
 }
 
-#btn_sendMessage {
+#btn-send-message {
     flex-grow: 1;
 }
 

@@ -131,7 +131,7 @@ export class Room
             this.socket.emit(SE.ChatFile, fileId);
         };
 
-        this.ui.buttons.get('sendFile')!.addEventListener('click', async () =>
+        this.ui.buttons.get('send-file')!.addEventListener('click', async () =>
         {
             const fileInput = this.ui.fileInput;
 
@@ -184,7 +184,7 @@ export class Room
     /** Обработка событий интерфейса связанных с чатом. */
     private handleChat(): void
     {
-        const sendMsgBtn = this.ui.buttons.get('sendMessage')!;
+        const sendMsgBtn = this.ui.buttons.get('send-message')!;
         sendMsgBtn.addEventListener('click', () =>
         {
             const message: string = this.ui.messageText.value.toString().trim();
@@ -414,7 +414,7 @@ export class Room
 
         this.socket.on(SE.StopUserVideo, () =>
         {
-            const btn = this.ui.buttons.get("stopMediaVideo")!;
+            const btn = this.ui.buttons.get("stop-media-video")!;
 
             if (!btn.hidden)
             {
@@ -424,7 +424,7 @@ export class Room
 
         this.socket.on(SE.StopUserAudio, () =>
         {
-            const btn = this.ui.buttons.get("stopMediaAudio")!;
+            const btn = this.ui.buttons.get("stop-media-audio")!;
 
             if (!btn.hidden)
             {
@@ -436,7 +436,7 @@ export class Room
         {
             this.ui.usernameInput.value = name;
 
-            const btn = this.ui.buttons.get("setNewUsername")!;
+            const btn = this.ui.buttons.get("set-new-username")!;
             btn.click();
         });
 
@@ -538,7 +538,7 @@ export class Room
     /** Обработка нажатий на кнопки. */
     private handleButtons(): void
     {
-        this.ui.buttons.get('setNewUsername')!.addEventListener('click', () =>
+        this.ui.buttons.get('set-new-username')!.addEventListener('click', () =>
         {
             const newName = this.ui.setNewUsernameFromInput();
 

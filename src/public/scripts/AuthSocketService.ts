@@ -28,7 +28,7 @@ export default class AuthSocketService
 
         this.socket.on(SE.RoomName, (roomName: string) =>
         {
-            (document.getElementById('roomName') as HTMLSpanElement).innerText = roomName;
+            (document.getElementById('room-name') as HTMLSpanElement).innerText = roomName;
             (document.getElementById('auth') as HTMLDivElement).hidden = false;
         });
 

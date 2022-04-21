@@ -57,7 +57,7 @@ export class UserMedia
             await this.prepareDevices(false);
         });
 
-        this.ui.buttons.get('getUserMediaMic')!.addEventListener('click', async () =>
+        this.ui.buttons.get('get-mic')!.addEventListener('click', async () =>
         {
             const constraints = this.streamConstraintsMic;
             constraints.audio = { deviceId: { ideal: this.ui.currentMicDevice } };
@@ -65,7 +65,7 @@ export class UserMedia
             await this.getUserMedia(this.streamConstraintsMic);
         });
 
-        this.ui.buttons.get('getUserMediaCam')!.addEventListener('click', async () =>
+        this.ui.buttons.get('get-cam')!.addEventListener('click', async () =>
         {
             const constraints = this.captureConstraintsCam.get(this.ui.currentCaptureSettingCam)!;
             (constraints.video as MediaTrackConstraints).deviceId = { ideal: this.ui.currentCamDevice };
@@ -73,8 +73,8 @@ export class UserMedia
             await this.getUserMedia(constraints);
         });
 
-        const stopAudioBtn = this.ui.buttons.get("stopMediaAudio")!;
-        const stopVideoBtn = this.ui.buttons.get("stopMediaVideo")!;
+        const stopAudioBtn = this.ui.buttons.get("stop-media-audio")!;
+        const stopVideoBtn = this.ui.buttons.get("stop-media-video")!;
 
         stopAudioBtn.addEventListener("click", () =>
         {
@@ -92,12 +92,12 @@ export class UserMedia
             this.removeEndedTrack("main", track);
         });
 
-        this.ui.buttons.get('getDisplayMedia')!.addEventListener('click', async () =>
+        this.ui.buttons.get('get-display')!.addEventListener('click', async () =>
         {
             await this.getDisplayMedia();
         });
 
-        this.ui.buttons.get('toggleMic')!.addEventListener('click', () =>
+        this.ui.buttons.get('toggle-mic')!.addEventListener('click', () =>
         {
             this.toggleMic();
         });
@@ -125,7 +125,7 @@ export class UserMedia
 
             if (streamConstraints.audio)
             {
-                this.ui.buttons.get('toggleMic')!.hidden = false;
+                this.ui.buttons.get('toggle-mic')!.hidden = false;
             }
         }
         catch (error) // В случае ошибки.
@@ -227,7 +227,7 @@ export class UserMedia
 
                 if (newTrack.kind == "video")
                 {
-                    this.ui.buttons.get("stopMediaVideo")!.hidden = false;
+                    this.ui.buttons.get("stop-media-video")!.hidden = false;
 
                     this.ui.toogleVideoLabels(
                         this.ui.getCenterVideoLabel("local", videoId)!,
@@ -238,7 +238,7 @@ export class UserMedia
                 }
                 else
                 {
-                    this.ui.buttons.get("stopMediaAudio")!.hidden = false;
+                    this.ui.buttons.get("stop-media-audio")!.hidden = false;
                 }
             }
         }
@@ -283,14 +283,14 @@ export class UserMedia
         {
             // поскольку аудиодорожка была удалена, значит новая точно
             // должна быть не на паузе
-            const toggleMicButton = this.ui.buttons.get('toggleMic')!;
+            const toggleMicButton = this.ui.buttons.get('toggle-mic')!;
             toggleMicButton.innerText = 'Выключить микрофон';
             toggleMicButton.classList.replace('background-green', 'background-red');
             toggleMicButton.hidden = true;
             this.micPaused = false;
 
             // Скрываем кнопку ручного выключения аудиодорожки.
-            const stopAudioBtn = this.ui.buttons.get("stopMediaAudio")!;
+            const stopAudioBtn = this.ui.buttons.get("stop-media-audio")!;
             stopAudioBtn.hidden = true;
         }
         if (track.kind == "video")
@@ -298,7 +298,7 @@ export class UserMedia
             if (videoId == "main")
             {
                 // Скрываем кнопку ручного выключения видеодорожки.
-                const stopVideoBtn = this.ui.buttons.get("stopMediaVideo")!;
+                const stopVideoBtn = this.ui.buttons.get("stop-media-video")!;
                 stopVideoBtn.hidden = true;
             }
 
@@ -353,7 +353,7 @@ export class UserMedia
 
         const audioTrack: MediaStreamTrack = this.streams.get("main")!.getAudioTracks()[0];
 
-        const btn_toggleMic = this.ui.buttons.get('toggleMic');
+        const btn_toggleMic = this.ui.buttons.get('toggle-mic');
         if (!this.micPaused)
         {
             this.room.pauseMediaStreamTrack(audioTrack.id);
