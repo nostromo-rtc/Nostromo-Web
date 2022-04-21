@@ -478,6 +478,14 @@ export class UserMedia
             audio: { echoCancellation: false, noiseSuppression: false }
         };
 
+        const constraints1080p5: MediaStreamConstraints = {
+            video: {
+                frameRate: 5,
+                width: 1920, height: 1080
+            },
+            audio: { echoCancellation: false, noiseSuppression: false }
+        };
+
         const constraints720p: MediaStreamConstraints = {
             video: {
                 frameRate: 30,
@@ -489,6 +497,14 @@ export class UserMedia
         const constraints720p60: MediaStreamConstraints = {
             video: {
                 frameRate: 60,
+                width: 1280, height: 720
+            },
+            audio: { echoCancellation: false, noiseSuppression: false }
+        };
+
+        const constraints720p5: MediaStreamConstraints = {
+            video: {
+                frameRate: 5,
                 width: 1280, height: 720
             },
             audio: { echoCancellation: false, noiseSuppression: false }
@@ -529,11 +545,17 @@ export class UserMedia
         _constraints.set('1080p@60', constraints1080p60);
         this.ui.addOptionToSelect(settingsDisplay, '1920x1080@60', '1080p@60');
 
+        _constraints.set('1080p@5', constraints1080p5);
+        this.ui.addOptionToSelect(settingsDisplay, '1920x1080@5', '1080p@5');
+
         _constraints.set('720p', constraints720p);
         this.ui.addOptionToSelect(settingsDisplay, '1280x720', '720p');
 
         _constraints.set('720p@60', constraints720p60);
         this.ui.addOptionToSelect(settingsDisplay, '1280x720@60', '720p@60');
+
+        _constraints.set('720p@5', constraints720p5);
+        this.ui.addOptionToSelect(settingsDisplay, '1280x720@5', '720p@5');
 
         _constraints.set('480p', constraints480p);
         this.ui.addOptionToSelect(settingsDisplay, '854x480', '480p');
