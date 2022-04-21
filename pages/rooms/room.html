@@ -37,6 +37,7 @@
             <button id="btn-disable-sounds" class="bold background-red" hidden>Выключить звуки собеседников</button>
             <span class="vl">|</span>
             <button id="btn-get-mic">Захватить микрофон</button>
+            <button id="btn-stop-mic" class="bold background-red" hidden>Прекратить захват микрофона</button>
             <button id="btn-pause-mic" class="bold background-orange" hidden>Выключить микрофон</button>
             <button id="btn-unpause-mic" class="bold background-green" hidden>Включить микрофон</button>
             <span class="vl">|</span>
@@ -46,14 +47,14 @@
                 <option disabled selected value="default">Выберите разрешение</option>
             </select>
             <span class="vl">|</span>
-            <button id="btn-get-display">Демонстрация экрана компьютера</button>
-            <span class="vl">&larr;</span>
-            <select id="capture-settings-display">
-                <option disabled selected value="default">Выберите разрешение</option>
-            </select>
-            <span class="vl">|</span>
-            <button id="btn-stop-media-audio" class="bold background-red" hidden>Прекратить захват аудиодорожки</button>
-            <button id="btn-stop-media-video" class="bold background-red" hidden>Прекратить захват видеодорожки</button>
+            <div class="d-flex" id="div-get-display">
+                <button id="btn-get-display">Демонстрация экрана компьютера</button>
+                <span class="vl">&larr;</span>
+                <select id="capture-settings-display">
+                    <option disabled selected value="default">Выберите разрешение</option>
+                </select>
+            </div>
+            <button id="btn-stop-display" class="bold background-red" hidden>Прекратить захват экрана</button>
         </div>
         <div id="videos"></div>
         <section id="chat-section">

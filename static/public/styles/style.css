@@ -218,3 +218,7 @@ select {
 .m-a {
     margin: auto;
 }
+
+[hidden] {
+    display: none !important;
+}

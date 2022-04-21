@@ -74,6 +74,19 @@ export class UserMedia
             constraints.audio = { deviceId: { ideal: this.ui.currentMicDevice } };
 
             await this.getUserMedia(this.streamConstraintsMic);
+
+            this.ui.buttons.get('pause-mic')!.hidden = false;
+            this.ui.toggleMicButtons();
+        });
+
+        // Кнопка остановки захвата микрофона.
+        const stopMicBtn = this.ui.buttons.get("stop-mic")!;
+        stopMicBtn.addEventListener("click", () =>
+        {
+            const track = this.streams.get("main")!.getAudioTracks()[0];
+
+            track.stop();
+            this.removeEndedTrack("main", track);
         });
 
         // Кнопка выключения микрофона (пауза).
@@ -106,26 +119,21 @@ export class UserMedia
         btn_getDisplay.addEventListener('click', async () =>
         {
             await this.getDisplayMedia();
+            this.ui.toggleDisplayButtons();
         });
 
-        // Кнопка остановки захвата аудио.
-        const stopAudioBtn = this.ui.buttons.get("stop-media-audio")!;
-        stopAudioBtn.addEventListener("click", () =>
+        // Кнопка остановки захвата изображения экрана.
+        const stopDisplayBtn = this.ui.buttons.get("stop-display")!;
+        stopDisplayBtn.addEventListener("click", () =>
         {
-            const track = this.streams.get("main")!.getAudioTracks()[0];
+            const stream = this.streams.get("display")!;
 
-            track.stop();
-            this.removeEndedTrack("main", track);
-        });
+            for (const track of stream.getTracks())
+            {
+                track.stop();
+            }
 
-        // Кнопка остановки захвата видео.
-        const stopVideoBtn = this.ui.buttons.get("stop-media-video")!;
-        stopVideoBtn.addEventListener("click", () =>
-        {
-            const track = this.streams.get("main")!.getVideoTracks()[0];
-
-            track.stop();
-            this.removeEndedTrack("main", track);
+            this.removeEndedDisplayStream();
         });
     }
 
@@ -148,11 +156,6 @@ export class UserMedia
             console.debug("[UserMedia] > getUserMedia success:", mediaStream);
 
             await this.handleMediaStream("main", mediaStream);
-
-            if (streamConstraints.audio)
-            {
-                this.ui.buttons.get('pause-mic')!.hidden = false;
-            }
         }
         catch (error) // В случае ошибки.
         {
@@ -253,18 +256,12 @@ export class UserMedia
 
                 if (newTrack.kind == "video")
                 {
-                    this.ui.buttons.get("stop-media-video")!.hidden = false;
-
                     this.ui.toggleVideoLabels(
                         this.ui.getCenterVideoLabel("local", videoId)!,
                         this.ui.getVideoLabel("local", videoId)!
                     );
 
                     this.ui.playSound(UiSound.videoOn);
-                }
-                else
-                {
-                    this.ui.buttons.get("stop-media-audio")!.hidden = false;
                 }
             }
         }
@@ -286,7 +283,14 @@ export class UserMedia
     {
         track.addEventListener('ended', () =>
         {
-            this.removeEndedTrack(videoId, track);
+            if (videoId == "display")
+            {
+                this.removeEndedDisplayStream();
+            }
+            else
+            {
+                this.removeEndedTrack(videoId, track);
+            }
         });
     }
 
@@ -312,19 +316,12 @@ export class UserMedia
             // то скрываем кнопки включения/выключения микрофона.
             this.ui.hideMicPauseButtons();
 
-            // Скрываем кнопку ручного выключения аудиодорожки.
-            const stopAudioBtn = this.ui.buttons.get("stop-media-audio")!;
-            stopAudioBtn.hidden = true;
+            // И переключаем кнопку захвата микрофона.
+            this.ui.toggleMicButtons();
         }
+
         if (track.kind == "video")
         {
-            if (videoId == "main")
-            {
-                // Скрываем кнопку ручного выключения видеодорожки.
-                const stopVideoBtn = this.ui.buttons.get("stop-media-video")!;
-                stopVideoBtn.hidden = true;
-            }
-
             // Если видеоэлемент не удалён
             if (this.ui.allVideos.has(`local-${videoId}`))
             {
@@ -338,6 +335,27 @@ export class UserMedia
             // Воспроизводим звук.
             this.ui.playSound(UiSound.videoOff);
         }
+    }
+
+    /** Удалить закончившийся поток display - экран компьютера: видео и аудио (если есть). */
+    private removeEndedDisplayStream()
+    {
+        console.debug("[UserMedia] > removeEndedDisplayStream");
+
+        const stream = this.streams.get("display")!;
+        for (const track of stream.getTracks())
+        {
+            this.room.removeMediaStreamTrack(track.id);
+        }
+
+        this.ui.removeVideo("local", "display");
+        this.streams.delete("display");
+
+        // Переключаем кнопку захвата микрофона.
+        this.ui.toggleDisplayButtons();
+
+        // Воспроизводим звук.
+        this.ui.playSound(UiSound.videoOff);
     }
 
     /** Удалить медиадорожку из локального стрима. */

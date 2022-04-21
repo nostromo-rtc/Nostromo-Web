@@ -414,7 +414,7 @@ export class Room
 
         this.socket.on(SE.StopUserVideo, () =>
         {
-            const btn = this.ui.buttons.get("stop-media-video")!;
+            const btn = this.ui.buttons.get("stop-display")!;
 
             if (!btn.hidden)
             {
@@ -424,7 +424,7 @@ export class Room
 
         this.socket.on(SE.StopUserAudio, () =>
         {
-            const btn = this.ui.buttons.get("stop-media-audio")!;
+            const btn = this.ui.buttons.get("stop-mic")!;
 
             if (!btn.hidden)
             {

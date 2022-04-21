@@ -213,6 +213,26 @@ export class UI
         btn_unpauseMic.hidden = !btn_unpauseMic.hidden;
     }
 
+    /** Переключить видимость кнопок захвата/прекращения захвата микрофона. */
+    public toggleMicButtons(): void
+    {
+        const btn_getMic = this.buttons.get('get-mic')!;
+        const btn_stopMic = this.buttons.get('stop-mic')!;
+
+        btn_getMic.hidden = !btn_getMic.hidden;
+        btn_stopMic.hidden = !btn_stopMic.hidden;
+    }
+
+    /** Переключить видимость кнопок захвата/прекращения захвата экрана компьютера. */
+    public toggleDisplayButtons(): void
+    {
+        const div_getDisplay = document.getElementById('div-get-display')!;
+        const btn_stopDisplay = this.buttons.get('stop-display')!;
+
+        div_getDisplay.hidden = !div_getDisplay.hidden;
+        btn_stopDisplay.hidden = !btn_stopDisplay.hidden;
+    }
+
     /** Скрыть видимость кнопок включения/выключения (пауза) микрофона. */
     public hideMicPauseButtons(): void
     {
@@ -236,17 +256,17 @@ export class UI
         const buttons = new Map<string, HTMLButtonElement>();
 
         buttons.set('get-mic', document.getElementById('btn-get-mic') as HTMLButtonElement);
+        buttons.set('stop-mic', document.getElementById('btn-stop-mic') as HTMLButtonElement);
         buttons.set('pause-mic', document.getElementById('btn-pause-mic') as HTMLButtonElement);
         buttons.set('unpause-mic', document.getElementById('btn-unpause-mic') as HTMLButtonElement);
         buttons.set('get-cam', document.getElementById('btn-get-cam') as HTMLButtonElement);
         buttons.set('get-display', document.getElementById('btn-get-display') as HTMLButtonElement);
+        buttons.set('stop-display', document.getElementById('btn-stop-display') as HTMLButtonElement);
         buttons.set('send-message', document.getElementById('btn-send-message') as HTMLButtonElement);
         buttons.set('send-file', document.getElementById('btn-send-file') as HTMLButtonElement);
         buttons.set('enable-sounds', document.getElementById('btn-enable-sounds') as HTMLButtonElement);
         buttons.set('disable-sounds', document.getElementById('btn-disable-sounds') as HTMLButtonElement);
         buttons.set('set-new-username', document.getElementById('btn-set-new-username') as HTMLButtonElement);
-        buttons.set('stop-media-audio', document.getElementById('btn-stop-media-audio') as HTMLButtonElement);
-        buttons.set('stop-media-video', document.getElementById('btn-stop-media-video') as HTMLButtonElement);
 
         return buttons;
     }
