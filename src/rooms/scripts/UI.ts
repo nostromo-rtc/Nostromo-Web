@@ -135,13 +135,11 @@ export class UI
         console.debug('[UI] > ctor');
         this.initUiSounds();
         this.prepareMessageText();
+        this.handleButtons();
+
         this.addVideo("local", "main", "local");
         this.resizeVideos();
         window.addEventListener('resize', () => this.resizeVideos());
-
-        const btn_toggleSounds = this.buttons.get('toggle-sounds');
-        btn_toggleSounds!.addEventListener('click', () =>
-        { this.handleBtnToggleSounds(btn_toggleSounds!); });
 
         this.displayUserName();
 
@@ -173,23 +171,56 @@ export class UI
         this.uiSounds.set(UiSound.videoOn, new Howl({ src: "/rooms/sounds/video-on.mp3" }));
     }
 
-    /** Обработчик toogle-кнопки включения/выключения звуков собеседника. */
-    private handleBtnToggleSounds(btn_toggleSounds: HTMLButtonElement): void
+    /** Подключить обработчики к кнопкам. */
+    private handleButtons(): void
     {
-        if (this.mutePolicy)
+        // Кнопка включения звука собеседников.
+        const btn_enableSounds = this.buttons.get('enable-sounds')!;
+        btn_enableSounds.addEventListener('click', () =>
         {
             this.enableSounds();
-            btn_toggleSounds.innerText = 'Выключить звуки собеседников';
-            btn_toggleSounds.classList.replace('background-green', 'background-red');
-            document.getElementById('attention')!.hidden = true;
-        }
-        else
+            this.toggleSoundsButtons();
+        });
+
+        // Кнопка выключения звука собеседников.
+        const btn_disableSounds = this.buttons.get('disable-sounds')!;
+        btn_disableSounds.addEventListener('click', () =>
         {
             this.disableSounds();
-            btn_toggleSounds.innerText = 'Включить звуки собеседников';
-            btn_toggleSounds.classList.replace('background-red', 'background-green');
-            document.getElementById('attention')!.hidden = false;
-        }
+            this.toggleSoundsButtons();
+        });
+    }
+
+    /** Переключить видимость кнопок включения/выключения звуков собеседника. */
+    private toggleSoundsButtons(): void
+    {
+        const btn_enableSounds = this.buttons.get('enable-sounds')!;
+        const btn_disableSounds = this.buttons.get('disable-sounds')!;
+        const attention = document.getElementById('attention')!;
+
+        btn_enableSounds.hidden = !btn_enableSounds.hidden;
+        btn_disableSounds.hidden = !btn_disableSounds.hidden;
+        attention.hidden = !attention.hidden;
+    }
+
+    /** Переключить видимость кнопок включения/выключения (пауза) микрофона. */
+    public toggleMicPauseButtons(): void
+    {
+        const btn_pauseMic = this.buttons.get('pause-mic')!;
+        const btn_unpauseMic = this.buttons.get('unpause-mic')!;
+
+        btn_pauseMic.hidden = !btn_pauseMic.hidden;
+        btn_unpauseMic.hidden = !btn_unpauseMic.hidden;
+    }
+
+    /** Скрыть видимость кнопок включения/выключения (пауза) микрофона. */
+    public hideMicPauseButtons(): void
+    {
+        const btn_pauseMic = this.buttons.get('pause-mic')!;
+        const btn_unpauseMic = this.buttons.get('unpause-mic')!;
+
+        btn_pauseMic.hidden = true;
+        btn_unpauseMic.hidden = true;
     }
 
     /** Добавить новый выбор в виджет Select. */
@@ -205,12 +236,14 @@ export class UI
         const buttons = new Map<string, HTMLButtonElement>();
 
         buttons.set('get-mic', document.getElementById('btn-get-mic') as HTMLButtonElement);
-        buttons.set('toggle-mic', document.getElementById('btn-toggle-mic') as HTMLButtonElement);
+        buttons.set('pause-mic', document.getElementById('btn-pause-mic') as HTMLButtonElement);
+        buttons.set('unpause-mic', document.getElementById('btn-unpause-mic') as HTMLButtonElement);
         buttons.set('get-cam', document.getElementById('btn-get-cam') as HTMLButtonElement);
         buttons.set('get-display', document.getElementById('btn-get-display') as HTMLButtonElement);
         buttons.set('send-message', document.getElementById('btn-send-message') as HTMLButtonElement);
         buttons.set('send-file', document.getElementById('btn-send-file') as HTMLButtonElement);
-        buttons.set('toggle-sounds', document.getElementById('btn-toggle-sounds') as HTMLButtonElement);
+        buttons.set('enable-sounds', document.getElementById('btn-enable-sounds') as HTMLButtonElement);
+        buttons.set('disable-sounds', document.getElementById('btn-disable-sounds') as HTMLButtonElement);
         buttons.set('set-new-username', document.getElementById('btn-set-new-username') as HTMLButtonElement);
         buttons.set('stop-media-audio', document.getElementById('btn-stop-media-audio') as HTMLButtonElement);
         buttons.set('stop-media-video', document.getElementById('btn-stop-media-video') as HTMLButtonElement);
@@ -591,7 +624,7 @@ export class UI
      * Если было видно центральную метку, то скрыть её и показать метку в правом верхнем углу.
      * И наоборот.
      */
-    public toogleVideoLabels(first: HTMLSpanElement, second: HTMLSpanElement): void
+    public toggleVideoLabels(first: HTMLSpanElement, second: HTMLSpanElement): void
     {
         const tempValue = first.hidden;
         first.hidden = second.hidden;

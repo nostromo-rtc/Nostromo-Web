@@ -30,9 +30,6 @@ export class UserMedia
         audio: true, video: false
     };
 
-    /** Микрофон на паузе? */
-    private micPaused = false;
-
     /** Настройки медиапотока при захвате видеоизображения экрана. */
     private captureConstraintsDisplay: Map<string, MediaStreamConstraints>;
 
@@ -48,6 +45,14 @@ export class UserMedia
         this.captureConstraintsDisplay = this.prepareCaptureDisplayConstraints();
         this.captureConstraintsCam = this.prepareCaptureCamConstraints();
 
+        this.handleDevicesList();
+
+        this.handleButtons();
+    }
+
+    /** Подготовить список устройств и подключение обработчика событий изменения устройств. */
+    private handleDevicesList()
+    {
         void this.prepareDevices(true);
         void this.prepareDevices(false);
 
@@ -56,8 +61,14 @@ export class UserMedia
             await this.prepareDevices(true);
             await this.prepareDevices(false);
         });
+    }
 
-        this.ui.buttons.get('get-mic')!.addEventListener('click', async () =>
+    /** Подключить обработчики к кнопкам. */
+    private handleButtons(): void
+    {
+        // Кнопка захвата микрофона.
+        const btn_getMic = this.ui.buttons.get('get-mic')!;
+        btn_getMic.addEventListener('click', async () =>
         {
             const constraints = this.streamConstraintsMic;
             constraints.audio = { deviceId: { ideal: this.ui.currentMicDevice } };
@@ -65,7 +76,24 @@ export class UserMedia
             await this.getUserMedia(this.streamConstraintsMic);
         });
 
-        this.ui.buttons.get('get-cam')!.addEventListener('click', async () =>
+        // Кнопка выключения микрофона (пауза).
+        const btn_pauseMic = this.ui.buttons.get('pause-mic')!;
+        btn_pauseMic.addEventListener('click', () =>
+        {
+            this.pauseMic();
+        });
+
+        // Кнопка включения микрофона (снятие с паузы).
+        const btn_unpauseMic = this.ui.buttons.get('unpause-mic')!;
+        btn_unpauseMic.addEventListener('click', () =>
+        {
+            this.unpauseMic();
+        });
+
+        // Кнопка захвата веб-камеры.
+        const btn_getCam = this.ui.buttons.get('get-cam')!;
+
+        btn_getCam.addEventListener('click', async () =>
         {
             const constraints = this.captureConstraintsCam.get(this.ui.currentCaptureSettingCam)!;
             (constraints.video as MediaTrackConstraints).deviceId = { ideal: this.ui.currentCamDevice };
@@ -73,9 +101,15 @@ export class UserMedia
             await this.getUserMedia(constraints);
         });
 
-        const stopAudioBtn = this.ui.buttons.get("stop-media-audio")!;
-        const stopVideoBtn = this.ui.buttons.get("stop-media-video")!;
+        // Кнопка захвата изображения экрана компьютера.
+        const btn_getDisplay = this.ui.buttons.get('get-display')!;
+        btn_getDisplay.addEventListener('click', async () =>
+        {
+            await this.getDisplayMedia();
+        });
 
+        // Кнопка остановки захвата аудио.
+        const stopAudioBtn = this.ui.buttons.get("stop-media-audio")!;
         stopAudioBtn.addEventListener("click", () =>
         {
             const track = this.streams.get("main")!.getAudioTracks()[0];
@@ -84,22 +118,14 @@ export class UserMedia
             this.removeEndedTrack("main", track);
         });
 
+        // Кнопка остановки захвата видео.
+        const stopVideoBtn = this.ui.buttons.get("stop-media-video")!;
         stopVideoBtn.addEventListener("click", () =>
         {
             const track = this.streams.get("main")!.getVideoTracks()[0];
 
             track.stop();
             this.removeEndedTrack("main", track);
-        });
-
-        this.ui.buttons.get('get-display')!.addEventListener('click', async () =>
-        {
-            await this.getDisplayMedia();
-        });
-
-        this.ui.buttons.get('toggle-mic')!.addEventListener('click', () =>
-        {
-            this.toggleMic();
         });
     }
 
@@ -125,7 +151,7 @@ export class UserMedia
 
             if (streamConstraints.audio)
             {
-                this.ui.buttons.get('toggle-mic')!.hidden = false;
+                this.ui.buttons.get('pause-mic')!.hidden = false;
             }
         }
         catch (error) // В случае ошибки.
@@ -229,7 +255,7 @@ export class UserMedia
                 {
                     this.ui.buttons.get("stop-media-video")!.hidden = false;
 
-                    this.ui.toogleVideoLabels(
+                    this.ui.toggleVideoLabels(
                         this.ui.getCenterVideoLabel("local", videoId)!,
                         this.ui.getVideoLabel("local", videoId)!
                     );
@@ -279,15 +305,12 @@ export class UserMedia
             this.streams.delete(videoId);
         }
 
+        // Если это аудиодорожка у "main" - значит это была дорожка микрофона.
         if (track.kind == "audio" && videoId == "main")
         {
-            // поскольку аудиодорожка была удалена, значит новая точно
-            // должна быть не на паузе
-            const toggleMicButton = this.ui.buttons.get('toggle-mic')!;
-            toggleMicButton.innerText = 'Выключить микрофон';
-            toggleMicButton.classList.replace('background-green', 'background-red');
-            toggleMicButton.hidden = true;
-            this.micPaused = false;
+            // Поскольку дорожка микрофона была удалена,
+            // то скрываем кнопки включения/выключения микрофона.
+            this.ui.hideMicPauseButtons();
 
             // Скрываем кнопку ручного выключения аудиодорожки.
             const stopAudioBtn = this.ui.buttons.get("stop-media-audio")!;
@@ -306,7 +329,7 @@ export class UserMedia
             if (this.ui.allVideos.has(`local-${videoId}`))
             {
                 // Переключаем видимость текстовых меток.
-                this.ui.toogleVideoLabels(
+                this.ui.toggleVideoLabels(
                     this.ui.getCenterVideoLabel("local", videoId)!,
                     this.ui.getVideoLabel("local", videoId)!
                 );
@@ -346,32 +369,32 @@ export class UserMedia
         }
     }
 
-    /** Включить/выключить микрофон. */
-    private toggleMic(): void
+    /** Выключить микрофон (поставить на паузу). */
+    private pauseMic(): void
     {
-        console.debug("[UserMedia] > toogleMic");
+        console.debug("[UserMedia] > pauseMic");
 
-        const audioTrack: MediaStreamTrack = this.streams.get("main")!.getAudioTracks()[0];
+        const micTrack: MediaStreamTrack = this.streams.get("main")!.getAudioTracks()[0];
 
-        const btn_toggleMic = this.ui.buttons.get('toggle-mic');
-        if (!this.micPaused)
-        {
-            this.room.pauseMediaStreamTrack(audioTrack.id);
-            btn_toggleMic!.innerText = 'Включить микрофон';
-            btn_toggleMic!.classList.replace('background-red', 'background-green');
-            this.micPaused = true;
+        this.room.pauseMediaStreamTrack(micTrack.id);
 
-            this.ui.playSound(UiSound.micOff);
-        }
-        else
-        {
-            this.room.resumeMediaStreamTrack(audioTrack.id);
-            btn_toggleMic!.innerText = 'Выключить микрофон';
-            btn_toggleMic!.classList.replace('background-green', 'background-red');
-            this.micPaused = false;
+        this.ui.toggleMicPauseButtons();
 
-            this.ui.playSound(UiSound.micOn);
-        }
+        this.ui.playSound(UiSound.micOff);
+    }
+
+    /** Включить микрофон (снять с паузы). */
+    private unpauseMic(): void
+    {
+        console.debug("[UserMedia] > unpauseMic");
+
+        const micTrack: MediaStreamTrack = this.streams.get("main")!.getAudioTracks()[0];
+
+        this.room.resumeMediaStreamTrack(micTrack.id);
+
+        this.ui.toggleMicPauseButtons();
+
+        this.ui.playSound(UiSound.micOn);
     }
 
     /** Подготовить опции с разрешениями захватываемого видеоизображения. */

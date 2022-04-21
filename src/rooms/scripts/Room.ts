@@ -721,7 +721,7 @@ export class Room
             // Переключаем видимость текстовых меток.
             const videoLabel = this.ui.getVideoLabel(newConsumerInfo.producerUserId, videoId)!;
             const centerLabel = this.ui.getCenterVideoLabel(newConsumerInfo.producerUserId, videoId)!;
-            this.ui.toogleVideoLabels(videoLabel, centerLabel);
+            this.ui.toggleVideoLabels(videoLabel, centerLabel);
 
             if (!this.soundDelayAfterJoin)
             {
@@ -779,7 +779,7 @@ export class Room
                 // Переключаем видимость текстовых меток.
                 const videoLabel = this.ui.getVideoLabel(producerUserId, videoId)!;
                 const centerLabel = this.ui.getCenterVideoLabel(producerUserId, videoId)!;
-                this.ui.toogleVideoLabels(videoLabel, centerLabel);
+                this.ui.toggleVideoLabels(videoLabel, centerLabel);
 
                 this.ui.playSound(UiSound.videoOff);
             }
