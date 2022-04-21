@@ -19,9 +19,6 @@ export class UserMedia
     /** Объект - комната. */
     private readonly room: Room;
 
-    // TODO: попробовать сделать явную инициализацию первым треком
-    // а то вроде бы Chrome не любит пустые MediaStream
-
     /** Медиапотоки. */
     private streams = new Map<string, MediaStream>();
 
@@ -182,7 +179,7 @@ export class UserMedia
                 this.ui.addUserSecondaryVideo("local", "display", "display");
             }
 
-            await this.handleMediaStream("display", mediaStream);
+            await this.handleMediaDisplayStream(mediaStream);
         }
         catch (error)
         {
@@ -265,6 +262,43 @@ export class UserMedia
                 }
             }
         }
+    }
+
+    /** Обработка медиапотока (захват экрана). */
+    private async handleMediaDisplayStream(stream: MediaStream): Promise<void>
+    {
+        const video = this.ui.allVideos.get(`local-display`)!;
+
+        // Запоминаем поток.
+        this.streams.set("display", stream);
+
+        // Подключаем медиапоток к HTML-видеоэлементу.
+        if (!video.srcObject)
+        {
+            video.srcObject = stream;
+        }
+
+        // Так как добавили новую дорожку, включаем отображение элементов управления.
+        // Но регулятор громкости не показываем.
+        this.ui.showControls(video.plyr, false);
+
+        // Переключаем метку на видео.
+        this.ui.toggleVideoLabels(
+            this.ui.getCenterVideoLabel("local", "display")!,
+            this.ui.getVideoLabel("local", "display")!
+        );
+
+        for (const newTrack of stream.getTracks())
+        {
+            // Подключаем обработчик закончившейся дорожки.
+            this.handleEndedTrack("display", newTrack);
+
+            // Отправим всем новую медиадорожку.
+            await this.room.addMediaStreamTrack("display", newTrack);
+        }
+
+        // Воспроизведем звук захвата видеодорожки.
+        this.ui.playSound(UiSound.videoOn);
     }
 
     /** Остановить медиадорожку. */
