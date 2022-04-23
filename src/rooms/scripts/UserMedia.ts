@@ -529,12 +529,28 @@ export class UserMedia
             audio: { echoCancellation: false, noiseSuppression: false }
         };
 
+        const constraints900p: MediaStreamConstraints = {
+            video: {
+                frameRate: 30,
+                width: 1600, height: 900
+            },
+            audio: { echoCancellation: false, noiseSuppression: false }
+        };
+
+        const constraints900p60: MediaStreamConstraints = {
+            video: {
+                frameRate: 60,
+                width: 1600, height: 900
+            },
+            audio: { echoCancellation: false, noiseSuppression: false }
+        };
+
         const constraints720p: MediaStreamConstraints = {
             video: {
                 frameRate: 30,
                 width: 1280, height: 720
             },
-            audio: { echoCancellation: false, noiseSuppression: false, suppressLocalAudioPlayback: true }
+            audio: { echoCancellation: false, noiseSuppression: false }
         };
 
         const constraints720p60: MediaStreamConstraints = {
@@ -577,11 +593,21 @@ export class UserMedia
             audio: { echoCancellation: false, noiseSuppression: false }
         };
 
+        const constraints144p: MediaStreamConstraints = {
+            video: {
+                frameRate: 30,
+                width: 256, height: 144
+            },
+            audio: { echoCancellation: false, noiseSuppression: false }
+        };
+
         const settingsDisplay = this.ui.captureSettingsDisplay;
 
+        // 1440
         _constraints.set('1440p', constraints1440p);
         this.ui.addOptionToSelect(settingsDisplay, '2560x1440', '1440p');
 
+        // 1080
         _constraints.set('1080p', constraints1080p);
         this.ui.addOptionToSelect(settingsDisplay, '1920x1080', '1080p');
 
@@ -591,6 +617,14 @@ export class UserMedia
         _constraints.set('1080p@5', constraints1080p5);
         this.ui.addOptionToSelect(settingsDisplay, '1920x1080@5', '1080p@5');
 
+        // 900
+        _constraints.set('900p', constraints900p);
+        this.ui.addOptionToSelect(settingsDisplay, '1600x900', '900p');
+
+        _constraints.set('900p@60', constraints900p60);
+        this.ui.addOptionToSelect(settingsDisplay, '1600x900@60', '900p@60');
+
+        // 720
         _constraints.set('720p', constraints720p);
         this.ui.addOptionToSelect(settingsDisplay, '1280x720', '720p');
 
@@ -600,14 +634,21 @@ export class UserMedia
         _constraints.set('720p@5', constraints720p5);
         this.ui.addOptionToSelect(settingsDisplay, '1280x720@5', '720p@5');
 
+        // 480
         _constraints.set('480p', constraints480p);
         this.ui.addOptionToSelect(settingsDisplay, '854x480', '480p');
 
+        // 360
         _constraints.set('360p', constraints360p);
         this.ui.addOptionToSelect(settingsDisplay, '640x360', '360p');
 
+        // 240
         _constraints.set('240p', constraints240p);
         this.ui.addOptionToSelect(settingsDisplay, '426x240', '240p');
+
+        // 144
+        _constraints.set('144p', constraints144p);
+        this.ui.addOptionToSelect(settingsDisplay, '256x144', '144p');
 
         _constraints.set('default', constraints720p);
 
