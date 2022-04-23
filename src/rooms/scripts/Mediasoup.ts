@@ -51,7 +51,10 @@ export class Mediasoup
     private linkMapTrackConsumer = new Map<string, string>();
 
     /** Максимальный битрейт для видеодорожек. */
-    public maxVideoBitrate = 10 * PrefixConstants.MEGA;
+    public maxVideoBitrate = 100 * PrefixConstants.MEGA;
+
+    /** Максимальный разумный битрейт для видеодорожки. */
+    public maxReasonableVideoBitrate = 100 * PrefixConstants.MEGA;
 
     /** Максимальный битрейт для аудиодорожек. */
     public maxAudioBitrate = 64 * PrefixConstants.KILO;
@@ -127,16 +130,18 @@ export class Mediasoup
         };
 
         const currentVideoBitrate = this.maxVideoBitrate;
+        const videoBitrate = this.getReasonableVideoBitrate(currentVideoBitrate);
 
         if (track.kind == "video")
         {
             producerOptions.codecOptions = {
-                videoGoogleStartBitrate: 1000
+                videoGoogleStartBitrate: 1000,
+                videoGoogleMaxBitrate: videoBitrate / PrefixConstants.KILO
             };
 
             producerOptions.encodings = [
                 {
-                    maxBitrate: currentVideoBitrate
+                    maxBitrate: videoBitrate
                 }
             ];
         }
@@ -148,6 +153,8 @@ export class Mediasoup
                 }
             ];
         }
+
+        console.debug("[Mediasoup] > createProducer", producerOptions);
 
         const producer = await this.producerTransport!.produce(producerOptions);
 
@@ -230,8 +237,14 @@ export class Mediasoup
         if (producer.kind == 'video')
         {
             const params = producer.rtpSender!.getParameters();
-            params.encodings[0].maxBitrate = bitrate;
+            params.encodings[0].maxBitrate = this.getReasonableVideoBitrate(bitrate);
             await producer.rtpSender!.setParameters(params);
         }
+    }
+
+    /** Вернуть максимальный разумный битрейт для видеодорожки. */
+    private getReasonableVideoBitrate(bitrate: number): number
+    {
+        return (bitrate <= this.maxReasonableVideoBitrate) ? bitrate : this.maxReasonableVideoBitrate;
     }
 }
