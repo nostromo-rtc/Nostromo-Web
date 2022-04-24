@@ -216,7 +216,7 @@ export class UserMedia
             await this.refreshDevicesLabels(true);
             await this.refreshDevicesLabels(false);
         }
-        // Chrome не сообщает количество устройств, а также не сообщает их Id (возвращает пустой Id).
+        // Chrome изначально не сообщает количество устройств, а также не сообщает их Id (возвращает пустой Id).
         // Поэтому если это Chrome, то в эту функцию был передан пустой deviceId.
         // Поэтому для Chrome вручную обновим списки устройств только определенного типа (video или audio),
         // поскольку права выдаются только на тот тип, что был захвачен.
@@ -806,6 +806,13 @@ export class UserMedia
 
         for (const deviceOption of devicesSelect)
         {
+            // Если нет Id устройства, то и название не обновить.
+            if (deviceOption.value == "")
+            {
+                return;
+            }
+
+            // Ищем в mediaDevices устройство с таким же Id, как и в deviceOption
             const device = mediaDevices.find((val) =>
             {
                 if (val.deviceId == deviceOption.value)
