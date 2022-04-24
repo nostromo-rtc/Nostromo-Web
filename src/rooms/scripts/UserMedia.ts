@@ -75,6 +75,20 @@ export class UserMedia
             const constraints = this.streamConstraintsMic;
             constraints.audio = { deviceId: { ideal: deviceId } };
 
+            if (deviceId == "")
+            {
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const device = devices.find((val) =>
+                {
+                    if (val.kind == "audioinput")
+                    {
+                        return val;
+                    }
+                });
+                const groupId = device!.groupId;
+                constraints.audio.groupId = { ideal: groupId };
+            }
+
             try
             {
                 // Захват микрофона.
@@ -122,12 +136,26 @@ export class UserMedia
 
             if (this.capturedVideoDevices.has(deviceId))
             {
-                alert("Это видеоустройство уже захвачено.")
+                alert("Это видеоустройство уже захвачено.");
                 return;
             }
 
             const constraints = this.captureConstraintsCam.get(this.ui.currentCaptureSettingCam)!;
             (constraints.video as MediaTrackConstraints).deviceId = { ideal: deviceId };
+
+            if (deviceId == "")
+            {
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const device = devices.find((val) =>
+                {
+                    if (val.kind == "videoinput")
+                    {
+                        return val;
+                    }
+                });
+                const groupId = device!.groupId;
+                (constraints.video as MediaTrackConstraints).groupId = { ideal: groupId };
+            }
 
             try
             {
@@ -181,13 +209,31 @@ export class UserMedia
         console.debug("[UserMedia] > getUserMedia", streamConstraints);
         const mediaStream: MediaStream = await navigator.mediaDevices.getUserMedia(streamConstraints);
 
-        // Для Firefox вручную обновим списки устройств,
-        // поскольку теперь у нас есть права на получение названий устройств
-        // так как мы только что их запросили при захвате устройства.
-        await this.refreshDevicesLabels(true);
-        await this.refreshDevicesLabels(false);
+        // Обновим списки устройств, после того как мы получили права после запроса getUserMedia.
+        // У Firefox у нас уже были Id устройств, осталось обновить список с полученными названиями устройств обоих видов.
+        if (deviceId != "")
+        {
+            await this.refreshDevicesLabels(true);
+            await this.refreshDevicesLabels(false);
+        }
+        // Chrome не сообщает количество устройств, а также не сообщает их Id (возвращает пустой Id).
+        // Поэтому если это Chrome, то в эту функцию был передан пустой deviceId.
+        // Поэтому для Chrome вручную обновим списки устройств только определенного типа (video или audio),
+        // поскольку права выдаются только на тот тип, что был захвачен.
+        else if (deviceId == "" && streamConstraints.audio)
+        {
+            await this.prepareDevices(true);
+            // Получаем настоящий Id захваченного аудиоустройства.
+            deviceId = mediaStream.getAudioTracks()[0].getSettings().deviceId!;
+        }
+        else if (deviceId == "" && streamConstraints.video)
+        {
+            await this.prepareDevices(false);
+            // Получаем настоящий Id захваченного видеоустройства.
+            deviceId = mediaStream.getVideoTracks()[0].getSettings().deviceId!;
+        }
 
-        console.debug("[UserMedia] > getUserMedia success:", mediaStream);
+        console.debug("[UserMedia] > getUserMedia success:", deviceId, mediaStream);
 
         // Если это микрофон.
         if (streamConstraints.audio)
