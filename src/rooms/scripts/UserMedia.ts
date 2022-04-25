@@ -385,15 +385,14 @@ export class UserMedia
         else if (deviceId == "" && isAudioDevice)
         {
             await this.prepareDevices(true);
-            // Получаем настоящий Id захваченного аудиоустройства.
-            deviceId = mediaStream.getAudioTracks()[0].getSettings().deviceId!;
         }
         else if (deviceId == "" && !isAudioDevice)
         {
             await this.prepareDevices(false);
-            // Получаем настоящий Id захваченного видеоустройства.
-            deviceId = mediaStream.getVideoTracks()[0].getSettings().deviceId!;
         }
+
+        // Получаем настоящий Id захваченного устройства.
+        deviceId = mediaStream.getTracks()[0].getSettings().deviceId!;
 
         return deviceId;
     }
