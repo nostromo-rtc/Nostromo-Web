@@ -128,7 +128,8 @@ export class UserMedia
         const btn_stopCam = this.ui.buttons.get("stop-cam")!;
         btn_stopCam.addEventListener("click", () =>
         {
-            this.handleStopCam();
+            const deviceId = this.ui.currentCamDevice;
+            this.handleStopCam(deviceId);
         });
 
         // Кнопка захвата изображения экрана компьютера.
@@ -246,10 +247,8 @@ export class UserMedia
     }
 
     /** Обработка нажатия на кнопку "Прекратить захват веб-камеры". */
-    private handleStopCam(): void
+    private handleStopCam(deviceId: string): void
     {
-        const deviceId = this.ui.currentCamDevice;
-
         console.debug("[UserMedia] > handleStopCam", deviceId);
 
         let streamId = deviceId;
