@@ -25,6 +25,9 @@ export class UserMedia
     /** Список захваченных видеоустройств. */
     private capturedVideoDevices = new Set<string>();
 
+    /** Идентификатор видеоустройства, захваченного в главном медиапотоке (main). */
+    private mainStreamVideoDeviceId = "";
+
     /** Настройки медиапотока при захвате микрофона. */
     private readonly streamConstraintsMic: MediaStreamConstraints = {
         audio: true, video: false
@@ -70,48 +73,14 @@ export class UserMedia
         const btn_getMic = this.ui.buttons.get('get-mic')!;
         btn_getMic.addEventListener('click', async () =>
         {
-            const deviceId = this.ui.currentMicDevice;
-
-            const constraints = this.streamConstraintsMic;
-            constraints.audio = { deviceId: { ideal: deviceId } };
-
-            if (deviceId == "")
-            {
-                const devices = await navigator.mediaDevices.enumerateDevices();
-                const device = devices.find((val) =>
-                {
-                    if (val.kind == "audioinput")
-                    {
-                        return val;
-                    }
-                });
-                const groupId = device!.groupId;
-                constraints.audio.groupId = { ideal: groupId };
-            }
-
-            try
-            {
-                // Захват микрофона.
-                await this.getUserMedia(this.streamConstraintsMic, deviceId);
-
-                // Переключим кнопки для захвата микрофона.
-                this.ui.buttons.get('pause-mic')!.hidden = false;
-                this.ui.toggleMicButtons();
-            }
-            catch (error) // В случае ошибки.
-            {
-                console.error("[UserMedia] > getUserMedia (mic) error:", error as DOMException);
-            }
+            await this.handleGetMic();
         });
 
         // Кнопка остановки захвата микрофона.
-        const stopMicBtn = this.ui.buttons.get("stop-mic")!;
-        stopMicBtn.addEventListener("click", () =>
+        const btn_stopMic = this.ui.buttons.get("stop-mic")!;
+        btn_stopMic.addEventListener("click", () =>
         {
-            const track = this.streams.get("main")!.getAudioTracks()[0];
-
-            track.stop();
-            this.removeEndedTrack("main", track);
+            this.handleStopMic();
         });
 
         // Кнопка выключения микрофона (пауза).
@@ -132,106 +101,211 @@ export class UserMedia
         const btn_getCam = this.ui.buttons.get('get-cam')!;
         btn_getCam.addEventListener('click', async () =>
         {
-            const deviceId = this.ui.currentCamDevice;
+            await this.handleGetCam();
+        });
 
-            if (this.capturedVideoDevices.has(deviceId))
-            {
-                alert("Это видеоустройство уже захвачено.");
-                return;
-            }
-
-            const constraints = this.captureConstraintsCam.get(this.ui.currentCaptureSettingCam)!;
-            (constraints.video as MediaTrackConstraints).deviceId = { ideal: deviceId };
-
-            if (deviceId == "")
-            {
-                const devices = await navigator.mediaDevices.enumerateDevices();
-                const device = devices.find((val) =>
-                {
-                    if (val.kind == "videoinput")
-                    {
-                        return val;
-                    }
-                });
-                const groupId = device!.groupId;
-                (constraints.video as MediaTrackConstraints).groupId = { ideal: groupId };
-            }
-
-            try
-            {
-                await this.getUserMedia(constraints, deviceId);
-            }
-            catch (error)
-            {
-                console.error("[UserMedia] > getUserMedia (cam) error:", error as DOMException);
-            }
+        // Кнопка остановки захвата веб-камеры.
+        const btn_stopCam = this.ui.buttons.get("stop-cam")!;
+        btn_stopCam.addEventListener("click", () =>
+        {
+            this.handleStopCam();
         });
 
         // Кнопка захвата изображения экрана компьютера.
         const btn_getDisplay = this.ui.buttons.get('get-display')!;
         btn_getDisplay.addEventListener('click', async () =>
         {
-            try
-            {
-                // Захват изображения с экрана компьютера.
-                await this.getDisplayMedia();
-
-                // Переключаем кнопки захвата экрана.
-                this.ui.toggleDisplayButtons();
-            }
-            catch (error)
-            {
-                console.error("[UserMedia] > getDisplayMedia error:", error as DOMException);
-            }
+            await this.handleGetDisplay();
         });
 
         // Кнопка остановки захвата изображения экрана.
-        const stopDisplayBtn = this.ui.buttons.get("stop-display")!;
-        stopDisplayBtn.addEventListener("click", () =>
+        const btn_stopDisplay = this.ui.buttons.get("stop-display")!;
+        btn_stopDisplay.addEventListener("click", () =>
         {
-            const stream = this.streams.get("display")!;
-
-            for (const track of stream.getTracks())
-            {
-                track.stop();
-            }
-
-            this.removeEndedDisplayStream();
+            this.handleStopDisplay();
         });
     }
 
-    /** Получение потока видео (веб-камера) или аудио (микрофон). */
+    /** Обработка нажатия на кнопку "Захватить микрофон". */
+    private async handleGetMic(): Promise<void>
+    {
+        const deviceId = this.ui.currentMicDevice;
+
+        const constraints = this.streamConstraintsMic;
+        constraints.audio = { deviceId: { ideal: deviceId } };
+
+        // Это происходит на Chrome, при первом заходе на страницу
+        // когда нет прав на получение Id устройства.
+        if (deviceId == "")
+        {
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            const device = devices.find((val) =>
+            {
+                if (val.kind == "audioinput")
+                {
+                    return val;
+                }
+            });
+            const groupId = device!.groupId;
+            constraints.audio.groupId = { ideal: groupId };
+        }
+
+        try
+        {
+            // Захват микрофона.
+            await this.getUserMedia(this.streamConstraintsMic, deviceId);
+
+            // Выберем в списке устройств захваченный микрофон.
+            this.ui.micDevices.value = deviceId;
+
+            // Переключим кнопки для захвата микрофона.
+            this.ui.buttons.get('pause-mic')!.hidden = false;
+            this.ui.toggleMicButtons();
+        }
+        catch (error) // В случае ошибки.
+        {
+            console.error("[UserMedia] > getUserMedia (mic) error:", error as DOMException);
+        }
+    }
+
+    /** Обработка нажатия на кнопку "Прекратить захват микрофона". */
+    private handleStopMic(): void
+    {
+        const track = this.streams.get("main")!.getAudioTracks()[0];
+
+        track.stop();
+        this.removeEndedTrack("main", track);
+    }
+
+    /** Обработка нажатия на кнопку "Захватить веб-камеру". */
+    private async handleGetCam(): Promise<void>
+    {
+        let deviceId = this.ui.currentCamDevice;
+
+        console.debug("[UserMedia] > handleGetCam", deviceId);
+
+        if (this.capturedVideoDevices.has(deviceId))
+        {
+            alert("Это видеоустройство уже захвачено.");
+            return;
+        }
+
+        const constraints = this.captureConstraintsCam.get(this.ui.currentCaptureSettingCam)!;
+        (constraints.video as MediaTrackConstraints).deviceId = { ideal: deviceId };
+
+        // Это происходит на Chrome, при первом заходе на страницу
+        // когда нет прав на получение Id устройства.
+        if (deviceId == "")
+        {
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            const device = devices.find((val) =>
+            {
+                if (val.kind == "videoinput")
+                {
+                    return val;
+                }
+            });
+            const groupId = device!.groupId;
+            (constraints.video as MediaTrackConstraints).groupId = { ideal: groupId };
+        }
+
+        try
+        {
+            deviceId = await this.getUserMedia(constraints, deviceId);
+
+            // Выберем в списке устройств захваченную вебку.
+            this.ui.camDevices.value = deviceId;
+
+            // Переключаем кнопки захвата вебки.
+            this.ui.toggleCamButtons();
+        }
+        catch (error)
+        {
+            console.error("[UserMedia] > getUserMedia (cam) error:", error as DOMException);
+        }
+    }
+
+    /** Обработка нажатия на кнопку "Прекратить захват веб-камеры". */
+    private handleStopCam(): void
+    {
+        const deviceId = this.ui.currentCamDevice;
+
+        console.debug("[UserMedia] > handleStopCam", deviceId);
+
+        let streamId = deviceId;
+        if (streamId == this.mainStreamVideoDeviceId)
+        {
+            streamId = "main";
+        }
+
+        const stream = this.streams.get(streamId);
+
+        if (!stream)
+        {
+            return;
+        }
+
+        const track = stream.getVideoTracks()[0];
+
+        // Останавливаем видеодорожку.
+        track.stop();
+
+        // Удаляем дорожку.
+        this.removeEndedTrack(streamId, track);
+
+        // Отметим, что устройство deviceId больше не занято.
+        this.capturedVideoDevices.delete(deviceId);
+    }
+
+    /** Обработка нажатия на кнопку "Демонстрация экрана". */
+    private async handleGetDisplay(): Promise<void>
+    {
+        try
+        {
+            // Захват изображения с экрана компьютера.
+            await this.getDisplayMedia();
+
+            // Переключаем кнопки захвата экрана.
+            this.ui.toggleDisplayButtons();
+        }
+        catch (error)
+        {
+            console.error("[UserMedia] > getDisplayMedia error:", error as DOMException);
+        }
+    }
+
+    /** Обработка нажатия на кнопку "Прекратить захват экрана". */
+    private handleStopDisplay(): void
+    {
+        const stream = this.streams.get("display")!;
+
+        for (const track of stream.getTracks())
+        {
+            track.stop();
+        }
+
+        this.removeEndedDisplayStream();
+    }
+
+    /**
+     * Получение потока видео (веб-камера) или аудио (микрофон).
+     * @returns deviceId - Id захваченного устройства.
+    */
     private async getUserMedia(
         streamConstraints: MediaStreamConstraints,
         deviceId: string
-    ): Promise<void>
+    ): Promise<string>
     {
         console.debug("[UserMedia] > getUserMedia", streamConstraints);
         const mediaStream: MediaStream = await navigator.mediaDevices.getUserMedia(streamConstraints);
 
-        // Обновим списки устройств, после того как мы получили права после запроса getUserMedia.
-        // У Firefox у нас уже были Id устройств, осталось обновить список с полученными названиями устройств обоих видов.
-        if (deviceId != "")
-        {
-            await this.refreshDevicesLabels(true);
-            await this.refreshDevicesLabels(false);
-        }
-        // Chrome изначально не сообщает количество устройств, а также не сообщает их Id (возвращает пустой Id).
-        // Поэтому если это Chrome, то в эту функцию был передан пустой deviceId.
-        // Поэтому для Chrome вручную обновим списки устройств только определенного типа (video или audio),
-        // поскольку права выдаются только на тот тип, что был захвачен.
-        else if (deviceId == "" && streamConstraints.audio)
-        {
-            await this.prepareDevices(true);
-            // Получаем настоящий Id захваченного аудиоустройства.
-            deviceId = mediaStream.getAudioTracks()[0].getSettings().deviceId!;
-        }
-        else if (deviceId == "" && streamConstraints.video)
-        {
-            await this.prepareDevices(false);
-            // Получаем настоящий Id захваченного видеоустройства.
-            deviceId = mediaStream.getVideoTracks()[0].getSettings().deviceId!;
-        }
+        // Обновим список устройств после получения прав
+        // и получим настоящий Id захваченного устройства.
+        deviceId = await this.updateDevicesAfterGettingPermissions(
+            mediaStream,
+            deviceId,
+            streamConstraints.audio ? true : false
+        );
 
         console.debug("[UserMedia] > getUserMedia success:", deviceId, mediaStream);
 
@@ -239,11 +313,12 @@ export class UserMedia
         if (streamConstraints.audio)
         {
             await this.handleMediaStream("main", mediaStream);
-
-            return;
+            return deviceId;
         }
 
-        // Иначе это веб-камера.
+        // ---------------------------------------
+        // Иначе это веб-камера (видеоустройство).
+        // ---------------------------------------
 
         // Запишем, что устройство deviceId занято, для исключения дубликатов.
         this.capturedVideoDevices.add(deviceId);
@@ -258,9 +333,52 @@ export class UserMedia
         else
         {
             await this.handleMediaStream("main", mediaStream, deviceId);
+
+            // Запишем идентификатор видеоустройства.
+            this.mainStreamVideoDeviceId = deviceId;
         }
+
+        return deviceId;
     }
 
+    /**
+     * Обновление списка устройств после получения прав в соответствии с браузером (Firefox или Chrome).
+     * @returns deviceId - настоящий Id захваченного устройства.
+     */
+    private async updateDevicesAfterGettingPermissions(
+        mediaStream: MediaStream,
+        deviceId: string,
+        isAudioDevice: boolean
+    ): Promise<string>
+    {
+        // Обновим списки устройств, после того как мы получили права после запроса getUserMedia.
+        // У Firefox у нас уже были Id устройств, осталось обновить список с полученными названиями устройств обоих видов.
+        if (deviceId != "")
+        {
+            await this.refreshDevicesLabels(true);
+            await this.refreshDevicesLabels(false);
+        }
+        // Chrome изначально не сообщает количество устройств, а также не сообщает их Id (возвращает пустой Id).
+        // Поэтому если это Chrome, то в эту функцию был передан пустой deviceId.
+        // Поэтому для Chrome вручную обновим списки устройств только определенного типа (video или audio),
+        // поскольку права выдаются только на тот тип, что был захвачен.
+        else if (deviceId == "" && isAudioDevice)
+        {
+            await this.prepareDevices(true);
+            // Получаем настоящий Id захваченного аудиоустройства.
+            deviceId = mediaStream.getAudioTracks()[0].getSettings().deviceId!;
+        }
+        else if (deviceId == "" && !isAudioDevice)
+        {
+            await this.prepareDevices(false);
+            // Получаем настоящий Id захваченного видеоустройства.
+            deviceId = mediaStream.getVideoTracks()[0].getSettings().deviceId!;
+        }
+
+        return deviceId;
+    }
+
+    /** Нужен ли дополнительный видеоэлемент под веб-камеру. */
     private isNeededSecondaryVideoStream(): boolean
     {
         const mainStream = this.streams.get("main");
@@ -432,37 +550,14 @@ export class UserMedia
 
         this.room.removeMediaStreamTrack(track.id);
 
-        // Если это дорожка неосновного потока.
-        if (streamId != "main")
+        // Если это дорожка основного потока (main).
+        if (streamId == "main")
         {
-            this.ui.removeVideo("local", streamId);
-            this.streams.delete(streamId);
-
-            return;
+            this.removeTrackFromMainStream(streamId, track);
         }
-
-        // Иначе необходимо удалить дорожку из основного медиапотока (main).
-        this.removeTrackFromMainStream(track);
-
-        if (track.kind == "audio")
+        else // Иначе необходимо удалить дорожку неосновного медиапотока.
         {
-            // Поскольку дорожка микрофона была удалена,
-            // то скрываем кнопки включения/выключения микрофона.
-            this.ui.hideMicPauseButtons();
-
-            // И переключаем кнопку захвата микрофона.
-            this.ui.toggleMicButtons();
-        }
-        else
-        {
-            // Переключаем видимость текстовых меток.
-            this.ui.toggleVideoLabels(
-                this.ui.getCenterVideoLabel("local", streamId)!,
-                this.ui.getVideoLabel("local", streamId)!
-            );
-
-            // Воспроизводим звук.
-            this.ui.playSound(UiSound.videoOff);
+            this.removeTrackFromSecondaryStream(streamId);
         }
     }
 
@@ -487,8 +582,8 @@ export class UserMedia
         this.ui.playSound(UiSound.videoOff);
     }
 
-    /** Удалить медиадорожку из локального стрима. */
-    private removeTrackFromMainStream(track: MediaStreamTrack): void
+    /** Удалить медиадорожку из локального основного стрима. */
+    private removeTrackFromMainStream(streamId: string, track: MediaStreamTrack): void
     {
         console.debug("[UserMedia] > removeTrackFromMainStream", track);
 
@@ -501,13 +596,53 @@ export class UserMedia
         {
             // Сбрасываем видео объект.
             video.load();
+
+            // Переключаем видимость текстовых меток.
+            this.ui.toggleVideoLabels(
+                this.ui.getCenterVideoLabel("local", streamId)!,
+                this.ui.getVideoLabel("local", streamId)!
+            );
+
+            // Воспроизводим звук.
+            this.ui.playSound(UiSound.videoOff);
+
+            // Очищаем идентификатор видеоустройства, захваченного в главном медиапотоке.
+            this.mainStreamVideoDeviceId = "";
+
+            // И переключаем кнопку захвата веб-камеры.
+            this.ui.toggleCamButtons();
+        }
+        else
+        {
+            // Поскольку дорожка микрофона была удалена,
+            // то скрываем кнопки включения/выключения микрофона.
+            this.ui.hideMicPauseButtons();
+
+            // И переключаем кнопку захвата микрофона.
+            this.ui.toggleMicButtons();
         }
 
-        // Если дорожек не осталось, выключаем элементы управления плеера
+        // Если дорожек не осталось, выключаем элементы управления плеера.
         if (stream.getTracks().length == 0)
         {
             this.ui.hideControls(video.plyr);
         }
+    }
+
+    /** Удалить медиадорожку из локального неосновного стрима. */
+    private removeTrackFromSecondaryStream(streamId: string): void
+    {
+        // Удаляем видеоэлемент.
+        this.ui.removeVideo("local", streamId);
+
+        // Удаляем из списка потоков.
+        this.streams.delete(streamId);
+
+        // Воспроизводим звук.
+        this.ui.playSound(UiSound.videoOff);
+
+        // И переключаем кнопку захвата веб-камеры.
+        this.ui.toggleCamButtons();
     }
 
     /** Выключить микрофон (поставить на паузу). */

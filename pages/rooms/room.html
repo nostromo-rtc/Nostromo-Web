@@ -41,11 +41,14 @@
             <button id="btn-pause-mic" class="bold background-orange" hidden>Выключить микрофон</button>
             <button id="btn-unpause-mic" class="bold background-green" hidden>Включить микрофон</button>
             <span class="vl">|</span>
-            <button id="btn-get-cam">Захватить веб-камеру</button>
-            <span class="vl">&larr;</span>
-            <select id="capture-settings-cam">
-                <option disabled selected value="default">Выберите разрешение</option>
-            </select>
+            <div class="d-flex" id="div-get-cam">
+                <button id="btn-get-cam">Захватить веб-камеру</button>
+                <span class="vl">&larr;</span>
+                <select id="capture-settings-cam">
+                    <option disabled selected value="default">Выберите разрешение</option>
+                </select>
+            </div>
+            <button id="btn-stop-cam" class="bold background-red" hidden>Прекратить захват веб-камеры</button>
             <span class="vl">|</span>
             <div class="d-flex" id="div-get-display">
                 <button id="btn-get-display">Демонстрация экрана компьютера</button>
