@@ -49,12 +49,12 @@ export class UserMedia
         this.captureConstraintsCam = this.prepareCaptureCamConstraints();
 
         this.handleDevicesList();
-
+        this.handleChoosingCamDevices();
         this.handleButtons();
     }
 
     /** Подготовить список устройств и подключение обработчика событий изменения устройств. */
-    private handleDevicesList()
+    private handleDevicesList(): void
     {
         void this.prepareDevices(true);
         void this.prepareDevices(false);
@@ -63,6 +63,26 @@ export class UserMedia
         {
             await this.prepareDevices(true);
             await this.prepareDevices(false);
+        });
+    }
+
+    /** Подключение обработчика изменения выбора видеоустройства. */
+    private handleChoosingCamDevices(): void
+    {
+        const devices = this.ui.camDevices;
+
+        devices.addEventListener("change", () =>
+        {
+            const deviceId = devices.value;
+            const stopBtnHidden = this.ui.buttons.get('stop-cam')!.hidden;
+
+            // Необходимо отображать кнопку прекращения захвата, если устройство захвачено
+            // и соотвественно отображать кнопку захвата, если выбранное устройство не захвачено.
+            if ((this.capturedVideoDevices.has(deviceId) && stopBtnHidden)
+                || (!this.capturedVideoDevices.has(deviceId) && !stopBtnHidden))
+            {
+                this.ui.toggleCamButtons();
+            }
         });
     }
 
