@@ -332,7 +332,7 @@ export class UI
     {
         for (const video of this._allVideos)
         {
-            if (video[0] != 'localVideo')
+            if (video[0] != "local-main")
             {
                 video[1].muted = disable;
             }
