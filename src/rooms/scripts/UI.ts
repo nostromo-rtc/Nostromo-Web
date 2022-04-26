@@ -385,7 +385,7 @@ export class UI
         return newVideoItem;
     }
 
-    /** Добавить новый видеоэлемент. */
+    /** Добавить новый видеоэлемент пользователя userId. */
     public addVideo(userId: string, videoId: string, name: string): void
     {
         const videoItem = this.createVideoItem(userId, videoId, name);
@@ -397,7 +397,7 @@ export class UI
     }
 
     /** Добавить новый неосновной-видеоэлемент пользователя userId. */
-    public addUserSecondaryVideo(userId: string, videoId: string, name: string): void
+    public addSecondaryVideo(userId: string, videoId: string, name: string): void
     {
         const newVideoItem = this.createVideoItem(userId, videoId, name);
         const videoItemsOfUser = document.querySelectorAll(`.video-item[data-userid='${userId}']`);
@@ -457,9 +457,9 @@ export class UI
             // отвязываем стрим от UI видеоэлемента
             const videoElement = this._allVideos.get(id)!;
             videoElement.srcObject = null;
-            // удаляем videoItem с этим id
+            // Удаляем videoItem с этим id
             item.remove();
-            // удаляем видеоэлемент контейнера всех видеоэлементов
+            // Удаляем видеоэлемент из контейнера всех видеоэлементов
             this._allVideos.delete(id);
             // обновляем раскладку
             this.calculateLayout();

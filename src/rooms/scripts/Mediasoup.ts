@@ -6,11 +6,34 @@ import Consumer = MediasoupTypes.Consumer;
 import Producer = MediasoupTypes.Producer;
 export { MediasoupTypes };
 
+export interface ClientProducerAppData
+{
+    streamId: string;
+}
+
+/** Дополнительные данные для Consumer. */
+export interface ClientConsumerAppData
+{
+    /** Consumer был поставлен на паузу со стороны клиента (плеер на паузе) */
+    localPaused: boolean;
+
+    /**
+     * Consumer был поставлен на паузу со стороны сервера
+     * (соответствующий producer на сервере был поставлен на паузу)
+     */
+    serverPaused: boolean;
+
+    /** Идентификатор пользователя, который производит эту медиадорожку. */
+    producerUserId: string;
+
+    /** Идентификатор видеоэлемента, где дорожка выводится. */
+    streamId: string;
+}
 
 export type TransportProduceParameters = {
-    kind: MediasoupTypes.MediaKind,
-    rtpParameters: MediasoupTypes.RtpParameters,
-    appData: unknown;
+    kind: MediasoupTypes.MediaKind;
+    rtpParameters: MediasoupTypes.RtpParameters;
+    appData: ClientProducerAppData;
 };
 
 /** Класс, обрабатывающий медиапотоки пользователя. */
@@ -50,11 +73,12 @@ export class Mediasoup
      */
     private linkMapTrackConsumer = new Map<string, string>();
 
-    /** Максимальный битрейт для видеодорожек. */
-    public maxVideoBitrate = 100 * PrefixConstants.MEGA;
-
     /** Максимальный разумный битрейт для видеодорожки. */
     public maxReasonableVideoBitrate = 100 * PrefixConstants.MEGA;
+
+    /** Максимальный битрейт для видеодорожек. */
+    public maxVideoBitrate = this.maxReasonableVideoBitrate;
+
 
     /** Максимальный битрейт для аудиодорожек. */
     public maxAudioBitrate = 64 * PrefixConstants.KILO;
@@ -106,13 +130,21 @@ export class Mediasoup
     /** Создать потребителя медиапотока. */
     public async createConsumer(newConsumerInfo: NewConsumerInfo): Promise<Consumer>
     {
-        const { id, producerId, kind, rtpParameters } = newConsumerInfo;
+        const { id, producerId, kind, rtpParameters, producerUserId, streamId } = newConsumerInfo;
+
+        const appData: ClientConsumerAppData = {
+            localPaused: false,
+            serverPaused: false,
+            producerUserId,
+            streamId
+        };
 
         const consumer = await this.consumerTransport!.consume({
             id,
             producerId,
             kind,
-            rtpParameters
+            rtpParameters,
+            appData
         });
 
         this.consumers.set(consumer.id, consumer);
@@ -122,11 +154,15 @@ export class Mediasoup
     }
 
     /** Создать медиапотока-производителя. */
-    public async createProducer(track: MediaStreamTrack): Promise<Producer>
+    public async createProducer(streamId: string, track: MediaStreamTrack): Promise<Producer>
     {
+        const producerAppData: ClientProducerAppData = {
+            streamId
+        };
+
         const producerOptions: MediasoupTypes.ProducerOptions = {
             track,
-            zeroRtpOnPause: true
+            appData: producerAppData
         };
 
         const currentVideoBitrate = this.maxVideoBitrate;
@@ -136,7 +172,7 @@ export class Mediasoup
         {
             producerOptions.codecOptions = {
                 videoGoogleStartBitrate: 1000,
-                videoGoogleMaxBitrate: videoBitrate / PrefixConstants.KILO
+                videoGoogleMaxBitrate: this.maxReasonableVideoBitrate / PrefixConstants.KILO
             };
 
             producerOptions.encodings = [
@@ -237,8 +273,14 @@ export class Mediasoup
         if (producer.kind == 'video')
         {
             const params = producer.rtpSender!.getParameters();
-            params.encodings[0].maxBitrate = this.getReasonableVideoBitrate(bitrate);
-            await producer.rtpSender!.setParameters(params);
+            const newBitrate = this.getReasonableVideoBitrate(bitrate);
+
+            if (params.encodings[0].maxBitrate != newBitrate)
+            {
+                console.debug("[Mediasoup] setBitrateForProducerVideoTracks", producer.id, newBitrate);
+                params.encodings[0].maxBitrate = newBitrate;
+                await producer.rtpSender!.setParameters(params);
+            }
         }
     }
 

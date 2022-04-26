@@ -93,7 +93,9 @@ export class UserMedia
         const btn_getMic = this.ui.buttons.get('get-mic')!;
         btn_getMic.addEventListener('click', async () =>
         {
+            btn_getMic.disabled = true;
             await this.handleGetMic();
+            btn_getMic.disabled = false;
         });
 
         // Кнопка остановки захвата микрофона.
@@ -121,7 +123,9 @@ export class UserMedia
         const btn_getCam = this.ui.buttons.get('get-cam')!;
         btn_getCam.addEventListener('click', async () =>
         {
+            btn_getCam.disabled = true;
             await this.handleGetCam();
+            btn_getCam.disabled = false;
         });
 
         // Кнопка остановки захвата веб-камеры.
@@ -136,7 +140,9 @@ export class UserMedia
         const btn_getDisplay = this.ui.buttons.get('get-display')!;
         btn_getDisplay.addEventListener('click', async () =>
         {
+            btn_getDisplay.disabled = true;
             await this.handleGetDisplay();
+            btn_getDisplay.disabled = false;
         });
 
         // Кнопка остановки захвата изображения экрана.
@@ -346,7 +352,7 @@ export class UserMedia
         if (this.isNeededSecondaryVideoStream())
         {
             const videoItemName = `${this.ui.usernames.get("local")!} [${deviceId.slice(0, 4)}]`;
-            this.ui.addUserSecondaryVideo("local", deviceId, videoItemName);
+            this.ui.addSecondaryVideo("local", deviceId, videoItemName);
             await this.handleMediaStream(deviceId, mediaStream, deviceId);
         }
         else
@@ -420,7 +426,7 @@ export class UserMedia
         console.debug("[UserMedia] > getDisplayMedia success:", mediaStream);
 
         const videoItemName = `${this.ui.usernames.get("local")!} [Экран]`;
-        this.ui.addUserSecondaryVideo("local", "display", videoItemName);
+        this.ui.addSecondaryVideo("local", "display", videoItemName);
 
         await this.handleMediaDisplayStream(mediaStream);
     }

@@ -6,26 +6,9 @@ import { SocketEvents as SE } from "nostromo-shared/types/SocketEvents";
 
 import { handleCriticalError, TransportFailedError } from "./AppError";
 
-import
-{
-    Mediasoup,
-    MediasoupTypes,
-    TransportProduceParameters
-} from "./Mediasoup.js";
+import { ClientConsumerAppData, Mediasoup, MediasoupTypes, TransportProduceParameters } from "./Mediasoup";
 
-import
-{
-    UserInfo,
-    UserReadyInfo,
-    NewConsumerInfo,
-    NewWebRtcTransportInfo,
-    ConnectWebRtcTransportInfo,
-    NewProducerInfo,
-    CloseConsumerInfo,
-    ChatMsgInfo,
-    ChatFileInfo,
-    PrefixConstants
-} from "nostromo-shared/types/RoomTypes";
+import { UserInfo, UserReadyInfo, NewConsumerInfo, NewWebRtcTransportInfo, ConnectWebRtcTransportInfo, NewProducerInfo, ChatMsgInfo, ChatFileInfo, PrefixConstants } from "nostromo-shared/types/RoomTypes";
 
 /** Callback при transport.on("connect"). */
 type CallbackOnConnect = {
@@ -40,19 +23,6 @@ type CallbackOnProduce = {
 type Errback = {
     (error?: unknown): void;
 };
-
-/** Дополнительные данные для Consumer. */
-interface ConsumerAppData
-{
-    /** Consumer был поставлен на паузу со стороны клиента (плеер на паузе) */
-    localPaused: boolean;
-
-    /**
-     * Consumer был поставлен на паузу со стороны сервера
-     * (соответствующий producer на сервере был поставлен на паузу)
-     */
-    serverPaused: boolean;
-}
 
 /** Класс - комната. */
 export class Room
@@ -292,11 +262,11 @@ export class Room
             }
         });
 
-        // на сервере закрылся consumer (так как закрылся транспорт или producer на сервере),
-        // поэтому надо закрыть его и здесь
-        this.socket.on(SE.CloseConsumer, (info: CloseConsumerInfo) =>
+        // На сервере закрылся consumer (так как закрылся транспорт или producer на сервере),
+        // поэтому надо закрыть его и здесь.
+        this.socket.on(SE.CloseConsumer, (consumerId: string) =>
         {
-            this.closeConsumer(info);
+            this.closeConsumer(consumerId);
         });
 
         // Получаем максимальный битрейт для аудио.
@@ -318,9 +288,10 @@ export class Room
         {
             this.ui.usernames.set(id, name);
 
-            this.ui.addVideo(id, "main", name);
+            const streamId = "main";
 
-            this.pauseAndPlayEventsPlayerHandler(id);
+            this.ui.addVideo(id, streamId, name);
+            this.pauseAndPlayEventsPlayerHandler(id, streamId);
 
             if (!this.soundDelayAfterJoin)
             {
@@ -363,7 +334,7 @@ export class Room
             if (!consumer) return;
 
             // запоминаем, что сервер поставил на паузу (по крайней мере хотел)
-            (consumer.appData as ConsumerAppData).serverPaused = true;
+            (consumer.appData as ClientConsumerAppData).serverPaused = true;
 
             if (!consumer.paused) consumer.pause();
         });
@@ -375,13 +346,13 @@ export class Room
             if (!consumer) return;
 
             // запоминаем, что сервер снял с паузы (по крайней мере хотел)
-            (consumer.appData as ConsumerAppData).serverPaused = false;
+            (consumer.appData as ClientConsumerAppData).serverPaused = false;
 
             // проверяем чтобы:
             // 1) consumer был на паузе,
             // 2) мы ГОТОВЫ к снятию паузы у этого consumer
             if (consumer.paused
-                && !(consumer.appData as ConsumerAppData).localPaused)
+                && !(consumer.appData as ClientConsumerAppData).localPaused)
             {
                 consumer.resume();
             }
@@ -471,9 +442,9 @@ export class Room
     }
 
     /** Обработка паузы и снятие паузы на плеере. */
-    private pauseAndPlayEventsPlayerHandler(id: string): void
+    private pauseAndPlayEventsPlayerHandler(userId: string, streamId: string): void
     {
-        const remoteVideo = this.ui.allVideos.get(`${id}-main`);
+        const remoteVideo = this.ui.allVideos.get(`${userId}-${streamId}`);
         if (!remoteVideo)
         {
             return;
@@ -482,7 +453,10 @@ export class Room
         const listenerFunc = (playerPause: boolean) =>
         {
             const stream = remoteVideo.srcObject as MediaStream | null;
-            if (!stream) return;
+            if (!stream)
+            {
+                return;
+            }
 
             if (playerPause)
             {
@@ -500,32 +474,32 @@ export class Room
 
                 if (playerPause)
                 {
-                    // запоминаем, что поставили / хотели поставить на паузу
-                    (consumer.appData as ConsumerAppData).localPaused = true;
+                    // Запоминаем, что поставили / хотели поставить на паузу.
+                    (consumer.appData as ClientConsumerAppData).localPaused = true;
 
-                    // ставим на паузу consumer у клиента
+                    // Ставим на паузу consumer у клиента.
                     if (!consumer.paused) consumer.pause();
 
-                    // просим поставить на паузу consumer на сервере
-                    // т.е сообщаем о нашем намерении поставить на паузу
+                    // Просим поставить на паузу consumer на сервере
+                    // т.е сообщаем о нашем намерении поставить на паузу.
                     this.socket.emit(SE.PauseConsumer, consumer.id);
                 }
                 else
                 {
-                    // запоминаем, что сняли / хотели снять с паузы
-                    (consumer.appData as ConsumerAppData).localPaused = false;
+                    // Запоминаем, что сняли / хотели снять с паузы.
+                    (consumer.appData as ClientConsumerAppData).localPaused = false;
 
-                    // снимаем с паузы consumer у клиента, если:
+                    // Снимаем с паузы consumer у клиента, если:
                     // 1) consumer на паузе
                     // 2) сервер готов
                     if (consumer.paused
-                        && !(consumer.appData as ConsumerAppData).serverPaused)
+                        && !(consumer.appData as ClientConsumerAppData).serverPaused)
                     {
                         consumer.resume();
                     }
 
-                    // просим снять с паузы consumer на сервере
-                    // т.е сообщаем о нашем намерении снять с паузы
+                    // Просим снять с паузы consumer на сервере
+                    // т.е сообщаем о нашем намерении снять с паузы.
                     this.socket.emit(SE.ResumeConsumer, consumer.id);
                 }
             }
@@ -644,7 +618,7 @@ export class Room
     /** Обработка событий исходящего транспортного канала. */
     private handleProducerTransportEvents(localTransport: MediasoupTypes.Transport): void
     {
-        localTransport.on('produce', (
+        localTransport.on("produce", (
             parameters: TransportProduceParameters, callback: CallbackOnProduce, errback: Errback
         ) =>
         {
@@ -653,13 +627,14 @@ export class Room
                 const info: NewProducerInfo = {
                     transportId: localTransport.id,
                     kind: parameters.kind,
-                    rtpParameters: parameters.rtpParameters
+                    rtpParameters: parameters.rtpParameters,
+                    streamId: parameters.appData.streamId
                 };
 
                 this.socket.emit(SE.NewProducer, info);
 
-                // сообщаем транспорту, что параметры были переданы на сервер
-                // и передаем транспорту id серверного producer
+                // Сообщаем транспорту, что параметры были переданы на сервер
+                // и передаем транспорту Id серверного producer.
                 this.socket.once(SE.NewProducer, (id: string) =>
                 {
                     callback({ id });
@@ -676,8 +651,9 @@ export class Room
     /** Обработка события - новый входящий медиапоток. */
     private async newConsumer(newConsumerInfo: NewConsumerInfo): Promise<void>
     {
-        //TODO: доделать
-        const videoId = "main";
+        console.debug("[Room] > newConsumer", newConsumerInfo);
+
+        const { streamId, producerUserId, kind } = newConsumerInfo;
 
         const consumer = await this.mediasoup.createConsumer(newConsumerInfo);
 
@@ -687,13 +663,23 @@ export class Room
             return;
         }
 
-        const remoteVideo: HTMLVideoElement = this.ui.allVideos.get(`${newConsumerInfo.producerUserId}-${videoId}`)!;
+        let remoteVideo = this.ui.allVideos.get(`${producerUserId}-${streamId}`);
 
-        console.log(remoteVideo);
+        // Если не нашли, скорее всего это неосновной видеоэлемент.
+        if (!remoteVideo)
+        {
+            // Создадим его.
+            const username = this.ui.usernames.get(producerUserId)!;
+            const videoItemName = (streamId == "display") ? `${username} [Экран]` : `${username} [${streamId.slice(0, 4)}]`;
+            this.ui.addSecondaryVideo(producerUserId, streamId, videoItemName);
+            this.pauseAndPlayEventsPlayerHandler(producerUserId, streamId);
+
+            remoteVideo = this.ui.allVideos.get(`${producerUserId}-${streamId}`)!;
+        }
 
         let stream = remoteVideo.srcObject as MediaStream | null;
 
-        // если MediaStream нет, то создадим его и инициализируем этим треком
+        // Если MediaStream нет, то создадим его и инициализируем этим треком.
         if (!stream)
         {
             stream = new MediaStream([consumer.track]);
@@ -716,12 +702,14 @@ export class Room
             }
         }
 
-        if (newConsumerInfo.kind == "video")
+        if (kind == "video")
         {
             // Переключаем видимость текстовых меток.
-            const videoLabel = this.ui.getVideoLabel(newConsumerInfo.producerUserId, videoId)!;
-            const centerLabel = this.ui.getCenterVideoLabel(newConsumerInfo.producerUserId, videoId)!;
-            this.ui.toggleVideoLabels(videoLabel, centerLabel);
+            // Переключаем метку на видео.
+            this.ui.toggleVideoLabels(
+                this.ui.getCenterVideoLabel(producerUserId, streamId)!,
+                this.ui.getVideoLabel(producerUserId, streamId)!
+            );
 
             if (!this.soundDelayAfterJoin)
             {
@@ -729,17 +717,18 @@ export class Room
             }
         }
 
-        // включаем отображение элементов управления
-        // также обрабатываем в плеере случаи когда в stream нет звуковых дорожек и когда они есть
+        // Включаем отображение элементов управления
+        // также обрабатываем в плеере случаи,
+        // когда в stream нет звуковых дорожек и когда они есть.
         const hasAudio: boolean = stream.getAudioTracks().length > 0;
         this.ui.showControls(remoteVideo.plyr, hasAudio);
 
-        // если видеоэлемент на паузе, ставим новый consumer на паузу
-        // на сервере он изначально на паузе
+        // Если видеоэлемент на паузе, ставим новый consumer на паузу
+        // на сервере он изначально на паузе.
         if (remoteVideo.paused)
         {
             consumer.pause();
-            (consumer.appData as ConsumerAppData).localPaused = true;
+            (consumer.appData as ClientConsumerAppData).localPaused = true;
         }
         else // иначе сообщаем серверу, чтобы он снял с паузы consumer
         {
@@ -748,9 +737,9 @@ export class Room
     }
 
     /** Обработка события - входящий медиапоток закрывается. */
-    private closeConsumer(info: CloseConsumerInfo)
+    private closeConsumer(consumerId: string)
     {
-        const { consumerId, producerUserId } = info;
+        console.debug("[Room] > closeConsumer", consumerId);
 
         const consumer = this.mediasoup.getConsumer(consumerId);
 
@@ -759,64 +748,77 @@ export class Room
             return;
         }
 
-        //TODO: доделать
-        const videoId = "main";
+        // Закроем consumer и удалим его из контейнера.
+        consumer.close();
+        this.mediasoup.deleteConsumer(consumer);
 
-        const remoteVideo = this.ui.allVideos.get(`${producerUserId}-${videoId}`);
+        // Теперь обработаем видеоэлемент.
+        const { producerUserId, streamId } = (consumer.appData as ClientConsumerAppData);
+        const remoteVideo = this.ui.allVideos.get(`${producerUserId}-${streamId}`);
 
-        if (remoteVideo)
+        if (!remoteVideo)
+        {
+            return;
+        }
+
+        // Если это неосновной видеоэлемент, то удалим видео.
+        if (streamId != "main")
+        {
+            this.removeRemoteSecondaryVideo(producerUserId, streamId);
+        }
+        else // Если основной
         {
             const stream = remoteVideo.srcObject as MediaStream;
-            consumer.track.stop();
+
+            // Удалим дорожку из потока.
             stream.removeTrack(consumer.track);
 
-            // перезагружаем видеоэлемент,
-            // чтобы не висел последний кадр удаленной видеодорожки
+            // Перезагружаем видеоэлемент,
+            // чтобы не висел последний кадр удаленной видеодорожки.
             if (consumer.track.kind == 'video')
             {
                 remoteVideo.load();
 
                 // Переключаем видимость текстовых меток.
-                const videoLabel = this.ui.getVideoLabel(producerUserId, videoId)!;
-                const centerLabel = this.ui.getCenterVideoLabel(producerUserId, videoId)!;
-                this.ui.toggleVideoLabels(videoLabel, centerLabel);
+                this.ui.toggleVideoLabels(
+                    this.ui.getCenterVideoLabel(producerUserId, streamId)!,
+                    this.ui.getVideoLabel(producerUserId, streamId)!
+                );
 
                 this.ui.playSound(UiSound.videoOff);
             }
 
             const hasAudio: boolean = stream.getAudioTracks().length > 0;
-            // если дорожек не осталось, выключаем элементы управления плеера
+            // Если дорожек не осталось, выключаем элементы управления плеера.
             if (stream.getTracks().length == 0)
             {
                 this.ui.hideControls(remoteVideo.plyr);
             }
 
-            // предусматриваем случай, когда звуковых дорожек не осталось
-            // и убираем кнопку регулирования звука
+            // Предусматриваем случай, когда звуковых дорожек не осталось
+            // и убираем кнопку регулирования звука.
             else if (!hasAudio)
             {
                 this.ui.hideVolumeControl(remoteVideo.plyr);
             }
         }
+    }
 
-        consumer.close();
-        this.mediasoup.deleteConsumer(consumer);
+    /** Удалить неосновной видеоэлемент другого пользователя. */
+    private removeRemoteSecondaryVideo(producerUserId: string, streamId: string)
+    {
+        // Удаляем видео.
+        this.ui.removeVideo(producerUserId, streamId);
+
+        // Воспроизводим звук.
+        this.ui.playSound(UiSound.videoOff);
     }
 
     /** Добавить медиапоток (одну дорожку) в подключение. */
-    public async addMediaStreamTrack(videoId:string, track: MediaStreamTrack): Promise<void>
+    public async addMediaStreamTrack(streamId: string, track: MediaStreamTrack): Promise<void>
     {
         // Создаем producer.
-        await this.mediasoup.createProducer(track);
-    }
-
-    /** Обновить существующую медиадорожку. */
-    public async updateMediaStreamTrack(oldTrackId: string, track: MediaStreamTrack): Promise<void>
-    {
-        const producer = Array.from(this.mediasoup.getProducers())
-            .find((producer) => producer.track!.id == oldTrackId);
-
-        if (producer) await producer.replaceTrack({ track });
+        await this.mediasoup.createProducer(streamId, track);
     }
 
     /** Удалить медиапоток (дорожку) из подключения. */
