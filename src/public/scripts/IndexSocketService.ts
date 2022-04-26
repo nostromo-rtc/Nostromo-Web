@@ -39,6 +39,9 @@ export default class IndexSocketService
 
     private createRoomList(rooms: PublicRoomInfo[]): void
     {
+        // Очищаем список, перед добавлением комнат.
+        this.roomList.innerHTML = "";
+
         for (const room of rooms)
         {
             this.addRoomToList(room);
