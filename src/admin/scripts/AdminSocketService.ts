@@ -143,15 +143,26 @@ export default class AdminSocketService
             this.kickUser(info);
         });
 
-        const btn_stopUserVideo = document.getElementById("btn-stop-user-video") as HTMLButtonElement;
-        btn_stopUserVideo.addEventListener("click", () =>
+        const btn_stopUserDisplay = document.getElementById("btn-stop-user-display") as HTMLButtonElement;
+        btn_stopUserDisplay.addEventListener("click", () =>
         {
             const info: ActionOnUserInfo = {
                 roomId: this.getSelectedRoom(),
                 userId: this.getSelectedUser()
             };
 
-            this.stopUserVideo(info);
+            this.stopUserDisplay(info);
+        });
+
+        const btn_stopUserCam = document.getElementById("btn-stop-user-cam") as HTMLButtonElement;
+        btn_stopUserCam.addEventListener("click", () =>
+        {
+            const info: ActionOnUserInfo = {
+                roomId: this.getSelectedRoom(),
+                userId: this.getSelectedUser()
+            };
+
+            this.stopUserCam(info);
         });
 
         const btn_stopUserAudio = document.getElementById("btn-stop-user-audio") as HTMLButtonElement;
@@ -468,13 +479,23 @@ export default class AdminSocketService
         }
     }
 
-    /** Прекратить захват видео у пользователя. */
-    private stopUserVideo(info: ActionOnUserInfo)
+    /** Прекратить захват экрана у пользователя. */
+    private stopUserDisplay(info: ActionOnUserInfo)
     {
         if (this.checkIsSelectOptionCorrect(info.roomId)
             && this.checkIsSelectOptionCorrect(info.userId))
         {
-            this.socket.emit(SE.StopUserVideo, info);
+            this.socket.emit(SE.StopUserDisplay, info);
+        }
+    }
+
+    /** Прекратить захват видеоустройств у пользователя. */
+    private stopUserCam(info: ActionOnUserInfo)
+    {
+        if (this.checkIsSelectOptionCorrect(info.roomId)
+            && this.checkIsSelectOptionCorrect(info.userId))
+        {
+            this.socket.emit(SE.StopUserCam, info);
         }
     }
 

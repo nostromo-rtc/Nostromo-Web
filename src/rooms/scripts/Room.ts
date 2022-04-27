@@ -383,7 +383,7 @@ export class Room
             }
         });
 
-        this.socket.on(SE.StopUserVideo, () =>
+        this.socket.on(SE.StopUserDisplay, () =>
         {
             const btn = this.ui.buttons.get("stop-display")!;
 
@@ -391,6 +391,13 @@ export class Room
             {
                 btn.click();
             }
+        });
+
+        this.socket.on(SE.StopUserCam, () =>
+        {
+            const btn = this.ui.buttons.get("stop-all-cams")!;
+
+            btn.click();
         });
 
         this.socket.on(SE.StopUserAudio, () =>

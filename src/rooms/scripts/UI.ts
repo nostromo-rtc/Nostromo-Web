@@ -271,6 +271,7 @@ export class UI
         buttons.set('unpause-mic', document.getElementById('btn-unpause-mic') as HTMLButtonElement);
         buttons.set('get-cam', document.getElementById('btn-get-cam') as HTMLButtonElement);
         buttons.set('stop-cam', document.getElementById('btn-stop-cam') as HTMLButtonElement);
+        buttons.set("stop-all-cams", document.getElementById('btn-stop-all-cams') as HTMLButtonElement)
         buttons.set('get-display', document.getElementById('btn-get-display') as HTMLButtonElement);
         buttons.set('stop-display', document.getElementById('btn-stop-display') as HTMLButtonElement);
         buttons.set('send-message', document.getElementById('btn-send-message') as HTMLButtonElement);

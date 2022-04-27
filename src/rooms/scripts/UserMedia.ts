@@ -136,6 +136,16 @@ export class UserMedia
             this.handleStopCam(deviceId);
         });
 
+        // Кнопка остановки захвата всех веб-камер.
+        const btn_stopAllCams = this.ui.buttons.get("stop-all-cams")!;
+        btn_stopAllCams.addEventListener("click", () =>
+        {
+            for (const deviceId of this.capturedVideoDevices)
+            {
+                this.handleStopCam(deviceId);
+            }
+        });
+
         // Кнопка захвата изображения экрана компьютера.
         const btn_getDisplay = this.ui.buttons.get('get-display')!;
         btn_getDisplay.addEventListener('click', async () =>
@@ -256,6 +266,12 @@ export class UserMedia
     private handleStopCam(deviceId: string): void
     {
         console.debug("[UserMedia] > handleStopCam", deviceId);
+
+        // Если это устройство не числится, как захваченное.
+        if (!this.capturedVideoDevices.has(deviceId))
+        {
+            return;
+        }
 
         let streamId = deviceId;
         if (streamId == this.mainStreamVideoDeviceId)
