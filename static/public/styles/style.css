@@ -3,18 +3,19 @@
     src: url('fonts/rubik/Rubik.ttf') format('truetype');
     font-weight: 300 900;
     font-style: normal;
-  }
+}
 
-  @font-face {
+@font-face {
     font-family: Rubik;
     src: url('fonts/rubik/Rubik-Italic.ttf') format('truetype');
     font-weight: 300 900;
     font-style: italic;
-  }
+}
 
 body {
     font-family: Rubik, Arial, Helvetica, sans-serif;
     font-weight: 400;
+    -webkit-text-size-adjust: none;
 }
 
 input {
@@ -119,13 +120,11 @@ select {
     border-radius: 0.5rem;
 }
 
-.room-list-item-label
-{
+.room-list-item-label {
     margin-left: 10px;
 }
 
-.room-list-item-id
-{
+.room-list-item-id {
     margin-left: 5px;
     color: #d4d4d4;
     font-weight: 300;
@@ -133,14 +132,12 @@ select {
     margin-top: 6px;
 }
 
-.room-list-item-join
-{
+.room-list-item-join {
     margin-left: auto;
     margin-right: 20px;
 }
 
-.room-list-item:hover
-{
+.room-list-item:hover {
     background-color: #957777;
     color: #00BFFF;
     font-size: 23px;
