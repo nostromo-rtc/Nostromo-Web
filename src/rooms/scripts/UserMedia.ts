@@ -367,8 +367,7 @@ export class UserMedia
         // Определим, нужен ли дополнительный видеоэлемент под вебку.
         if (this.isNeededSecondaryVideoStream())
         {
-            const videoItemName = `${this.ui.usernames.get("local")!} [${deviceId.slice(0, 4)}]`;
-            this.ui.addSecondaryVideo("local", deviceId, videoItemName);
+            this.ui.addSecondaryVideo("local", deviceId, this.ui.usernames.get("local")!);
             await this.handleMediaStream(deviceId, mediaStream, deviceId);
         }
         else
@@ -441,8 +440,7 @@ export class UserMedia
 
         console.debug("[UserMedia] > getDisplayMedia success:", mediaStream);
 
-        const videoItemName = `${this.ui.usernames.get("local")!} [Экран]`;
-        this.ui.addSecondaryVideo("local", "display", videoItemName);
+        this.ui.addSecondaryVideo("local", "display", this.ui.usernames.get("local")!);
 
         await this.handleMediaDisplayStream(mediaStream);
     }
@@ -464,7 +462,7 @@ export class UserMedia
         this.handleEndedTrack(streamId, newTrack, videoDeviceId);
 
         let stream = this.streams.get(streamId);
-        const video = this.ui.allVideos.get(`local-${streamId}`)!;
+        const video = this.ui.getVideo("local", streamId)!;
 
         // Если такой поток есть.
         if (stream)
@@ -522,7 +520,12 @@ export class UserMedia
     /** Обработка медиапотока (захват экрана). */
     private async handleMediaDisplayStream(stream: MediaStream): Promise<void>
     {
-        const video = this.ui.allVideos.get(`local-display`)!;
+        const video = this.ui.getVideo("local", "display");
+
+        if (!video)
+        {
+            return;
+        }
 
         // Запоминаем поток.
         this.streams.set("display", stream);
@@ -612,7 +615,8 @@ export class UserMedia
             this.room.removeMediaStreamTrack(track.id);
         }
 
-        this.ui.removeVideo("local", "display");
+
+        this.ui.removeVideoItem(this.ui.getVideoItem("local", "display")!);
         this.streams.delete("display");
 
         // Переключаем кнопку захвата экрана.
@@ -628,7 +632,7 @@ export class UserMedia
         console.debug("[UserMedia] > removeTrackFromMainStream", track);
 
         const stream = this.streams.get("main")!;
-        const video = this.ui.allVideos.get("local-main")!;
+        const video = this.ui.getVideo("local", "main")!;
 
         stream.removeTrack(track);
 
@@ -673,7 +677,7 @@ export class UserMedia
     private removeTrackFromSecondaryStream(streamId: string): void
     {
         // Удаляем видеоэлемент.
-        this.ui.removeVideo("local", streamId);
+        this.ui.removeVideoItem(this.ui.getVideoItem("local", streamId)!);
 
         // Удаляем из списка потоков.
         this.streams.delete(streamId);

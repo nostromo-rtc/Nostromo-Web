@@ -52,11 +52,7 @@ export class UI
     }
 
     /** Контейнер с видеоэлементами. */
-    private _allVideos = new Map<string, HTMLVideoElement>();
-    public get allVideos(): Map<string, HTMLVideoElement>
-    {
-        return this._allVideos;
-    }
+    private allVideos = new Map<string, HTMLVideoElement>();
 
     /** Чат. */
     public readonly chat = document.getElementById('chat') as HTMLDivElement;
@@ -271,7 +267,7 @@ export class UI
         buttons.set('unpause-mic', document.getElementById('btn-unpause-mic') as HTMLButtonElement);
         buttons.set('get-cam', document.getElementById('btn-get-cam') as HTMLButtonElement);
         buttons.set('stop-cam', document.getElementById('btn-stop-cam') as HTMLButtonElement);
-        buttons.set("stop-all-cams", document.getElementById('btn-stop-all-cams') as HTMLButtonElement)
+        buttons.set("stop-all-cams", document.getElementById('btn-stop-all-cams') as HTMLButtonElement);
         buttons.set('get-display', document.getElementById('btn-get-display') as HTMLButtonElement);
         buttons.set('stop-display', document.getElementById('btn-stop-display') as HTMLButtonElement);
         buttons.set('send-message', document.getElementById('btn-send-message') as HTMLButtonElement);
@@ -331,9 +327,9 @@ export class UI
     /** Выключить звук для всех видео. */
     private disableSounds(disable = true): void
     {
-        for (const video of this._allVideos)
+        for (const video of this.allVideos)
         {
-            if (video[0] != "local-main")
+            if (video[0] != "local@main")
             {
                 video[1].muted = disable;
             }
@@ -351,35 +347,31 @@ export class UI
     }
 
     /** Создать видеоэлемент. */
-    private createVideoItem(userId: string, videoId: string, name: string): HTMLDivElement
+    private createVideoItem(userId: string, streamId: string, name: string): HTMLDivElement
     {
-        const id = `${userId}-${videoId}`;
-
         const newVideoItem = document.createElement('div');
-        newVideoItem.id = `video-item-${id}`;
-        newVideoItem.setAttribute("data-userid", userId);
+        newVideoItem.dataset.userId = userId;
+        newVideoItem.dataset.streamId = streamId;
         newVideoItem.classList.add('video-item');
 
         const videoLabel = this.prepareVideoLabel();
-        this.setTextIntoVideoLabel(videoLabel, name, userId);
-        videoLabel.id = `video-label-${id}`;
+        this.setTextIntoVideoLabel(videoLabel, name, streamId, userId);
         videoLabel.hidden = true;
         newVideoItem.appendChild(videoLabel);
 
         const centerVideoLabel = this.prepareCenterVideoLabel();
-        this.setTextIntoVideoLabel(centerVideoLabel, name, userId);
-        centerVideoLabel.id = `center-video-label-${id}`;
+        this.setTextIntoVideoLabel(centerVideoLabel, name, streamId, userId);
         newVideoItem.appendChild(centerVideoLabel);
 
         const newVideo = document.createElement('video');
-        newVideo.id = `video-${id}`;
         newVideo.autoplay = true;
         newVideo.muted = this.mutePolicy;
         newVideo.poster = './images/novideodata.jpg';
 
         newVideoItem.appendChild(newVideo);
 
-        this._allVideos.set(id, newVideo);
+        const id = `${userId}@${streamId}`;
+        this.allVideos.set(id, newVideo);
 
         this.prepareVideoPlayer(newVideo, userId == "local");
 
@@ -398,10 +390,10 @@ export class UI
     }
 
     /** Добавить новый неосновной-видеоэлемент пользователя userId. */
-    public addSecondaryVideo(userId: string, videoId: string, name: string): void
+    public addSecondaryVideo(userId: string, streamId: string, name: string): void
     {
-        const newVideoItem = this.createVideoItem(userId, videoId, name);
-        const videoItemsOfUser = document.querySelectorAll(`.video-item[data-userid='${userId}']`);
+        const newVideoItem = this.createVideoItem(userId, streamId, name);
+        const videoItemsOfUser = this.getVideoItems(userId);
         videoItemsOfUser.item(videoItemsOfUser.length - 1).after(newVideoItem);
 
         // перестроим раскладку
@@ -415,56 +407,48 @@ export class UI
         const videoLabels = this.getVideoLabels(userId);
         for (const label of videoLabels)
         {
-            this.setTextIntoVideoLabel(label, newName, userId);
+            const streamId = label.parentElement!.dataset.streamId!;
+            this.setTextIntoVideoLabel(label, newName, streamId, userId);
         }
 
         const centerVideoLabels = this.getCenterVideoLabels(userId);
         for (const centerLabel of centerVideoLabels)
         {
-            this.setTextIntoVideoLabel(centerLabel, newName, userId);
+            const streamId = centerLabel.parentElement!.dataset.streamId!;
+            this.setTextIntoVideoLabel(centerLabel, newName, streamId, userId);
         }
     }
 
     /** Удалить видео собеседника (и обновить раскладку). */
-    public removeVideo(userId: string, videoId: string): void
+    public removeVideoItem(videoItem: HTMLDivElement): void
     {
-        const id = `${userId}-${videoId}`;
+        const userId = videoItem.dataset.userId!;
+        const streamId = videoItem.dataset.streamId!;
 
-        const videoItem = document.getElementById(`video-item-${id}`);
-        if (videoItem)
-        {
-            // Отвязываем стрим от UI видеоэлемента.
-            const videoElement = this._allVideos.get(id)!;
-            videoElement.srcObject = null;
-            // Удаляем videoItem.
-            videoItem.remove();
-            // Удаляем видеоэлемент из контейнера всех видеоэлементов.
-            this._allVideos.delete(id);
-            // Обновляем раскладку.
-            this.calculateLayout();
-            this.resizeVideos();
-        }
+        const id = `${userId}@${streamId}`;
+
+        // Отвязываем поток (стрим) от видеоэлемента.
+        const videoElement = this.getVideo(userId, streamId)!;
+        videoElement.srcObject = null;
+
+        // Удаляем videoItem.
+        videoItem.remove();
+
+        // Удаляем видеоэлемент из контейнера всех видеоэлементов.
+        this.allVideos.delete(id);
+
+        // Обновляем раскладку.
+        this.calculateLayout();
+        this.resizeVideos();
     }
 
     /** Удалить все видео от собеседника (и обновить раскладку). */
     public removeVideos(userId: string): void
     {
-        const videoItems = document.querySelectorAll(`.video-item[data-userid='${userId}']`);
+        const videoItems = this.getVideoItems(userId);
         for (const item of videoItems)
         {
-            const idx = "video-item-".length;
-            const id = item.id.slice(idx);
-
-            // отвязываем стрим от UI видеоэлемента
-            const videoElement = this._allVideos.get(id)!;
-            videoElement.srcObject = null;
-            // Удаляем videoItem с этим id
-            item.remove();
-            // Удаляем видеоэлемент из контейнера всех видеоэлементов
-            this._allVideos.delete(id);
-            // обновляем раскладку
-            this.calculateLayout();
-            this.resizeVideos();
+            this.removeVideoItem(item);
         }
     }
 
@@ -474,7 +458,7 @@ export class UI
      */
     private calculateLayout(): void
     {
-        const videoCount = this._allVideos.size;
+        const videoCount = this.allVideos.size;
         // если только 1 видео на экране
         if (videoCount == 1)
         {
@@ -583,10 +567,23 @@ export class UI
         return label;
     }
 
-    /** Подготовить текстовую метку для локального видеоэлемента. */
-    private setTextIntoVideoLabel(label: HTMLSpanElement, name: string, userId: string): void
+    /** Подготовить текстовую метку для видеоэлемента. */
+    private setTextIntoVideoLabel(
+        label: HTMLSpanElement,
+        name: string,
+        streamId: string,
+        userId: string
+    ): void
     {
-        label.innerText = name;
+        const streamIdPart = streamId == "display" ? "Экран" : streamId.slice(0, 4);
+
+        if (streamId != "main")
+        {
+            name = `${name} [${streamIdPart}]`;
+        }
+
+
+        label.innerText = `${name}`;
         if (userId == "local")
         {
             label.title = `${name}`;
@@ -631,24 +628,60 @@ export class UI
         return centerVideoLabel;
     }
 
+    /** Получить контейнер с видеоэлементом. */
+    public getVideoItem(userId: string, streamId: string): HTMLDivElement | null
+    {
+        return document.querySelector(`.video-item[data-user-id='${userId}'][data-stream-id='${streamId}']`);
+    }
+
+    /** Получить контейнеры с видеоэлементами пользователя userId. */
+    public getVideoItems(userId: string): NodeListOf<HTMLDivElement>
+    {
+        return document.querySelectorAll(`.video-item[data-user-id='${userId}']`);
+    }
+
+    /** Получить контейнер с видеоэлементом. */
+    public getVideo(userId: string, streamId: string): HTMLVideoElement | undefined
+    {
+        const id = `${userId}@${streamId}`;
+
+        return this.allVideos.get(id);
+    }
+
+    /** Получить все центральные метки пользователя userId. */
     public getCenterVideoLabels(userId: string): NodeListOf<HTMLSpanElement>
     {
-        return document.querySelectorAll(`.video-item[data-userid='${userId}'] > .center-video-label`);
+        return document.querySelectorAll(`.video-item[data-user-id='${userId}'] > .center-video-label`);
     }
 
-    public getCenterVideoLabel(userId: string, videoId: string): HTMLSpanElement | null
+    /** Получить центральную метку пользователя userId для потока streamId. */
+    public getCenterVideoLabel(userId: string, streamId: string): HTMLSpanElement | null
     {
-        return document.getElementById(`center-video-label-${userId}-${videoId}`);
+        const videoItem = this.getVideoItem(userId, streamId);
+        if (!videoItem)
+        {
+            return null;
+        }
+
+        return videoItem.querySelector(`.center-video-label`);
     }
 
+    /** Получить все боковые метки пользователя userId. */
     public getVideoLabels(userId: string): NodeListOf<HTMLSpanElement>
     {
-        return document.querySelectorAll(`.video-item[data-userid='${userId}'] > .video-label`);
+        return document.querySelectorAll(`.video-item[data-user-id='${userId}'] > .video-label`);
     }
 
-    public getVideoLabel(userId: string, videoId: string): HTMLSpanElement | null
+    /** Получить боковую метку пользователя userId для потока streamId. */
+    public getVideoLabel(userId: string, streamId: string): HTMLSpanElement | null
     {
-        return document.getElementById(`video-label-${userId}-${videoId}`);
+        const videoItem = this.getVideoItem(userId, streamId);
+        if (!videoItem)
+        {
+            return null;
+        }
+
+        return videoItem.querySelector(`.video-label`);
     }
 
     /**
@@ -714,7 +747,7 @@ export class UI
     public displayChatMsg(userId: string, message: string)
     {
         const messageDiv = document.createElement("div");
-        messageDiv.setAttribute("data-userid", userId);
+        messageDiv.dataset.userId = userId;
         messageDiv.classList.add("message");
 
         if (userId == "local")
@@ -765,7 +798,7 @@ export class UI
         const { userId, fileId, filename, size } = info;
 
         const messageDiv = document.createElement('div');
-        messageDiv.setAttribute("data-userid", userId);
+        messageDiv.dataset.userId = userId;
         messageDiv.classList.add("message");
 
         if (userId == "local")
@@ -837,7 +870,7 @@ export class UI
         for (const msg of this.chat.childNodes)
         {
             const msgDiv = msg as HTMLDivElement;
-            if (msgDiv.getAttribute("data-userid") == userId)
+            if (msgDiv.dataset.userId == userId)
             {
                 const messageSenderDiv = msgDiv.getElementsByClassName("message-sender-name")[0] as HTMLDivElement;
                 messageSenderDiv.innerText = this.usernames.get(userId)!;

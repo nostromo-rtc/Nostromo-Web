@@ -451,7 +451,7 @@ export class Room
     /** Обработка паузы и снятие паузы на плеере. */
     private pauseAndPlayEventsPlayerHandler(userId: string, streamId: string): void
     {
-        const remoteVideo = this.ui.allVideos.get(`${userId}-${streamId}`);
+        const remoteVideo = this.ui.getVideo(userId, streamId);
         if (!remoteVideo)
         {
             return;
@@ -670,18 +670,17 @@ export class Room
             return;
         }
 
-        let remoteVideo = this.ui.allVideos.get(`${producerUserId}-${streamId}`);
+        let remoteVideo = this.ui.getVideo(producerUserId, streamId);
 
         // Если не нашли, скорее всего это неосновной видеоэлемент.
         if (!remoteVideo)
         {
             // Создадим его.
             const username = this.ui.usernames.get(producerUserId)!;
-            const videoItemName = (streamId == "display") ? `${username} [Экран]` : `${username} [${streamId.slice(0, 4)}]`;
-            this.ui.addSecondaryVideo(producerUserId, streamId, videoItemName);
+            this.ui.addSecondaryVideo(producerUserId, streamId, username);
             this.pauseAndPlayEventsPlayerHandler(producerUserId, streamId);
 
-            remoteVideo = this.ui.allVideos.get(`${producerUserId}-${streamId}`)!;
+            remoteVideo = this.ui.getVideo(producerUserId, streamId)!;
         }
 
         let stream = remoteVideo.srcObject as MediaStream | null;
@@ -761,7 +760,7 @@ export class Room
 
         // Теперь обработаем видеоэлемент.
         const { producerUserId, streamId } = (consumer.appData as ClientConsumerAppData);
-        const remoteVideo = this.ui.allVideos.get(`${producerUserId}-${streamId}`);
+        const remoteVideo = this.ui.getVideo(producerUserId, streamId);
 
         if (!remoteVideo)
         {
@@ -814,8 +813,11 @@ export class Room
     /** Удалить неосновной видеоэлемент другого пользователя. */
     private removeRemoteSecondaryVideo(producerUserId: string, streamId: string)
     {
-        // Удаляем видео.
-        this.ui.removeVideo(producerUserId, streamId);
+        // Получим videoItem.
+        const videoItem = this.ui.getVideoItem(producerUserId, streamId)!;
+
+        // Удаляем videoItem.
+        this.ui.removeVideoItem(videoItem);
 
         // Воспроизводим звук.
         this.ui.playSound(UiSound.videoOff);
