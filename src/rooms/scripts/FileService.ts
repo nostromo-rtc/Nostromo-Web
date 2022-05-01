@@ -12,9 +12,9 @@ export class FileService
     private maxSize = 0;
 
     /** Узнаём настройки протокола TUS на сервере. */
-    private fileHandlerOptions(): void
+    private fileServiceOptions(): void
     {
-        console.log("[FileHandler] > Узнаем настройки протокола TUS на сервере...");
+        console.log("[FileService] > Узнаем настройки протокола TUS на сервере...");
 
         const optionsReq = new TusOptionsRequest();
 
@@ -38,7 +38,7 @@ export class FileService
 
                 this.maxSize = Number(xhr.getResponseHeader("Tus-Max-Size"));
 
-                console.debug(`[FileHandler] Max size for file: ${this.maxSize}`);
+                console.debug(`[FileService] Max size for file: ${this.maxSize}`);
             }
             else
             {
@@ -51,7 +51,7 @@ export class FileService
 
     constructor()
     {
-        this.fileHandlerOptions();
+        this.fileServiceOptions();
     }
 
     public async createFileOnServer(roomId: string, file: File): Promise<string>
@@ -179,8 +179,8 @@ export class FileService
 
         return new Promise((resolve, reject) =>
         {
-            console.log(`[FileHandler] > Отправляем файл: ${file.name}, ${(file.size / PrefixConstants.MEGA).toFixed(3)} Mb (${file.size} bytes).`);
-            console.log(`[FileHandler] Upload-Offset: ${uploadOffset}`);
+            console.log(`[FileService] > Отправляем файл: ${file.name}, ${(file.size / PrefixConstants.MEGA).toFixed(3)} Mb (${file.size} bytes).`);
+            console.log(`[FileService] Upload-Offset: ${uploadOffset}`);
 
             // Если мы уже загрузили этот файл на сервер,
             // то просто возвращаем Id файла.
@@ -205,7 +205,7 @@ export class FileService
 
             xhr.addEventListener("load", () =>
             {
-                console.log(`[FileHandler] > Отправка файла завершена!`);
+                console.log(`[FileService] > Отправка файла завершена!`);
 
                 if (xhr.status == req.successfulStatusCode)
                 {
@@ -240,14 +240,14 @@ export class FileService
 
             xhr.addEventListener("error", async (event) =>
             {
-                console.log(`[FileHandler] > Ошибка во время отправления файла!`, event);
+                console.log(`[FileService] > Ошибка во время отправления файла!`, event);
                 // Попробуем загрузить файл заново.
                 return await this.fileUpload(roomId, file, progressComponent, cb);
             });
 
             xhr.addEventListener("timeout", async (event) =>
             {
-                console.log(`[FileHandler] > Timeout во время отправления файла!`, event);
+                console.log(`[FileService] > Timeout во время отправления файла!`, event);
                 // Попробуем загрузить файл заново.
                 return await this.fileUpload(roomId, file, progressComponent, cb);
             });

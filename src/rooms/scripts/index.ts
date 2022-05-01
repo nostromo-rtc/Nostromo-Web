@@ -23,8 +23,8 @@ const ui = new UI();
 /** Для работы с медиапотоками на уровне Mediasoup (Consumers и Producers). */
 const mediasoup = new Mediasoup();
 /** Для работы с файлами. */
-const fileHandler = new FileService();
+const fileService = new FileService();
 /** Комната. */
-const room = new Room(ui, mediasoup, fileHandler);
+const room = new Room(ui, mediasoup, fileService);
 /** Для работы с локальными медиапотоками пользователя. */
 const userMedia = new UserMedia(ui, room);
