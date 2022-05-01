@@ -176,6 +176,8 @@ export class Room
         {
             console.info("[Room] > Создано веб-сокет подключение:", this.socket.id);
 
+            this.socket.emit(SE.JoinRoom, this.roomId);
+
             // Включим звук, что зашли в комнату.
             this.ui.playSound(UiSound.joined);
         });
