@@ -1,5 +1,5 @@
 import IndexSocketService from './IndexSocketService';
-import AuthSocketService from './AuthSocketService';
+import AuthService from './AuthService';
 
 // создаем обработчики интерфейса и обработчики сокетов
 
@@ -11,5 +11,5 @@ if (roomList)
 }
 else
 {
-    const authSocketHandlerInstance = new AuthSocketService();
+    const authSocketHandlerInstance = new AuthService();
 }
