@@ -14,7 +14,7 @@ export default class IndexSocketService
 
     constructor()
     {
-        console.debug("indexSocketHandler ctor");
+        console.debug("IndexSocketService ctor");
 
         this.roomList = document.getElementById('room-list') as HTMLDivElement;
 

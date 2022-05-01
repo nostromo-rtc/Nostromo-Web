@@ -1,27 +1,22 @@
 import { Buffer } from "buffer/";
 
-// Класс для авторизации в комнату
-export default class AuthService
+// Класс для авторизации в админку
+export default class AdminAuthService
 {
     private passInput = document.getElementById('pass')! as HTMLInputElement;
     private btn_join = document.getElementById('btn-join')! as HTMLButtonElement;
     private result = document.getElementById('result')! as HTMLParagraphElement;
-    private roomIdSpan = document.getElementById('room-name')! as HTMLSpanElement;
-    private roomId: string;
 
     constructor()
     {
-        console.debug("AuthService ctor");
-
-        this.roomId = document.location.pathname.split('/').slice(-1)[0];
-        this.roomIdSpan.innerText = this.roomId;
+        console.debug("AdminAuthService ctor");
 
         this.btn_join.addEventListener('click', async () =>
         {
             const pass: string = (document.getElementById('pass') as HTMLInputElement).value;
             const passBase64 = Buffer.from(pass, "utf-8").toString("base64");
 
-            const res = await fetch(`/r/${this.roomId}`, {
+            const res = await fetch("/admin", {
                 headers: {
                     "Authorization": passBase64
                 }

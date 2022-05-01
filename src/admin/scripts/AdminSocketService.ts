@@ -35,40 +35,14 @@ export default class AdminSocketService
             console.log(err.message);
         });
 
-        if (this.onAuthPage())
-        {
-            this.handleAuthResultEv();
-        }
-        else
-        {
-            this.handleEvents();
+        this.handleEvents();
 
-            // Если комната какая-то выбрана, то сообщаем серверу,
-            // что хотим получать список юзеров этой комнаты.
-            this.subscribeUserList(this.getSelectedRoom());
-            this.prepareVideoCodecSelect();
-            this.handleRoomButtons();
-            this.handleUserButtons();
-        }
-    }
-
-    private handleAuthResultEv()
-    {
-        this.socket.on(SE.Result, (success: boolean) =>
-        {
-            if (success)
-            {
-                location.reload();
-            }
-            else
-            {
-                const result = document.getElementById('result') as HTMLParagraphElement;
-                if (result)
-                {
-                    result.innerText = "Неправильный пароль!";
-                }
-            }
-        });
+        // Если комната какая-то выбрана, то сообщаем серверу,
+        // что хотим получать список юзеров этой комнаты.
+        this.subscribeUserList(this.getSelectedRoom());
+        this.prepareVideoCodecSelect();
+        this.handleRoomButtons();
+        this.handleUserButtons();
     }
 
     private getSelectedRoom(): string
@@ -289,32 +263,6 @@ export default class AdminSocketService
 
         const H264Option = new Option(VideoCodec.H264, VideoCodec.H264);
         this.videoCodecSelect.add(H264Option);
-    }
-
-    private onAuthPage(): boolean
-    {
-        const joinButton = document.getElementById('btn-join');
-        if (joinButton)
-        {
-            const passInput = document.getElementById('pass')! as HTMLInputElement;
-
-            joinButton.addEventListener('click', () =>
-            {
-                this.socket.emit(SE.AdminAuth, passInput.value);
-            });
-
-            passInput.addEventListener('keydown', (e) =>
-            {
-                if (e.key == 'Enter' && !e.shiftKey)
-                {
-                    e.preventDefault();
-                    joinButton.click();
-                }
-            });
-
-            return true;
-        }
-        return false;
     }
 
     private createRoom(): void
