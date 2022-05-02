@@ -1,7 +1,7 @@
 import Plyr from 'plyr';
 import { Howl } from 'howler';
 import svgSprite from "plyr/dist/plyr.svg";
-import { ChatFileInfo } from "nostromo-shared/types/RoomTypes";
+import { ChatFileInfo, ChatMessage } from "nostromo-shared/types/RoomTypes";
 
 // Plyr добавляет поле с плеером в класс HTMLVideoElement.
 declare global
@@ -732,20 +732,48 @@ export class UI
     }
 
     /** Получить время в формате 00:00:00 (24 часа). */
-    public getTimestamp(): string
+    public getTimestamp(datetime: number): string
     {
-        const timestamp = (new Date).toLocaleString("en-us", {
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-            hour12: false
-        });
+        const date = new Date(datetime);
+        const current_date = new Date();
+
+        let timestamp = "";
+
+        // Если это тот же день.
+        if (date.getDate() == current_date.getDate()
+            && date.getMonth() == current_date.getMonth()
+            && date.getFullYear() == current_date.getFullYear())
+        {
+            timestamp = date.toLocaleString("en-us", {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: false
+            });
+
+            return timestamp;
+        }
+        else
+        {
+            timestamp = date.toLocaleString("en-us", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: '2-digit',
+                minute: "2-digit",
+                second: "numeric",
+                hour12: false
+            });
+        }
+
         return timestamp;
     }
 
     /** Отобразить сообщение в чате. */
-    public displayChatMsg(userId: string, message: string)
+    public displayChatMessage(message: ChatMessage)
     {
+        const { userId, datetime, content } = message;
+
         const messageDiv = document.createElement("div");
         messageDiv.dataset.userId = userId;
         messageDiv.classList.add("message");
@@ -779,11 +807,11 @@ export class UI
 
         const messageTextDiv = document.createElement("div");
         messageTextDiv.classList.add("message-text");
-        messageTextDiv.innerText = message;
+        messageTextDiv.innerText = content as string;
 
         const messageDateDiv = document.createElement("div");
         messageDateDiv.classList.add("message-date");
-        messageDateDiv.innerText = this.getTimestamp();
+        messageDateDiv.innerText = this.getTimestamp(datetime);
 
         messageDiv.appendChild(messageSenderDiv);
         messageDiv.appendChild(messageTextDiv);
@@ -793,9 +821,11 @@ export class UI
         this.chat.scrollTop = this.chat.scrollHeight;
     }
 
-    public displayChatLink(info: ChatFileInfo)
+    public displayChatLink(message: ChatMessage)
     {
-        const { userId, fileId, filename, size } = info;
+        const { userId, datetime } = message;
+
+        const fileInfo = message.content as ChatFileInfo;
 
         const messageDiv = document.createElement('div');
         messageDiv.dataset.userId = userId;
@@ -837,11 +867,11 @@ export class UI
 
         const messageFileNameSpan = document.createElement('span');
         messageFileNameSpan.className = "color-darkviolet bold";
-        messageFileNameSpan.innerText = filename;
+        messageFileNameSpan.innerText = fileInfo.name;
 
         const messageFileSizeDiv = document.createElement('div');
         messageFileSizeDiv.className = "message-file-size bold";
-        messageFileSizeDiv.innerText = `${(size / (1024 * 1024)).toFixed(3)} MB`;
+        messageFileSizeDiv.innerText = `${(fileInfo.size / (1024 * 1024)).toFixed(3)} MB`;
 
         messageTextDiv.appendChild(messageFileLabelSpan);
         messageTextDiv.appendChild(messageFileNameSpan);
@@ -849,11 +879,11 @@ export class UI
 
         const messageDateDiv = document.createElement('div');
         messageDateDiv.classList.add("message-date");
-        messageDateDiv.innerText = this.getTimestamp();
+        messageDateDiv.innerText = this.getTimestamp(datetime);
 
         const messageLink = document.createElement('a');
         messageLink.classList.add("message-link");
-        messageLink.href = `${window.location.origin}/files/${fileId}`;
+        messageLink.href = `${window.location.origin}/files/${fileInfo.fileId}`;
         messageLink.target = "_blank";
 
         messageDiv.appendChild(messageSenderDiv);

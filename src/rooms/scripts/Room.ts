@@ -8,7 +8,7 @@ import { handleCriticalError, TransportFailedError } from "./AppError";
 
 import { ClientConsumerAppData, Mediasoup, MediasoupTypes, TransportProduceParameters } from "./Mediasoup";
 
-import { UserInfo, UserReadyInfo, NewConsumerInfo, NewWebRtcTransportInfo, ConnectWebRtcTransportInfo, NewProducerInfo, ChatMsgInfo, ChatFileInfo, PrefixConstants } from "nostromo-shared/types/RoomTypes";
+import { UserInfo, UserReadyInfo, NewConsumerInfo, NewWebRtcTransportInfo, ConnectWebRtcTransportInfo, NewProducerInfo, ChatMessage, PrefixConstants } from "nostromo-shared/types/RoomTypes";
 
 /** Callback при transport.on("connect"). */
 type CallbackOnConnect = {
@@ -88,15 +88,6 @@ export class Room
             // Удаляем компонент с прогрессом загрузки файла.
             progressComponent.remove();
 
-            // Локально добавляем ссылку на файл в чат.
-            const chatFileInfo: ChatFileInfo = {
-                userId: "local",
-                fileId,
-                filename: file.name,
-                size: file.size
-            };
-            this.ui.displayChatLink(chatFileInfo);
-
             // Сообщаем серверу, чтобы разослал всем ссылку в чате.
             this.socket.emit(SE.ChatFile, fileId);
         };
@@ -161,9 +152,7 @@ export class Room
 
             if (message)
             {
-                this.ui.displayChatMsg("local", message);
                 this.socket.emit(SE.ChatMsg, message);
-
                 this.ui.messageText.value = "";
             }
         });
@@ -310,16 +299,36 @@ export class Room
         });
 
         // Сообщение в чате.
-        this.socket.on(SE.ChatMsg, ({ userId, msg }: ChatMsgInfo) =>
+        this.socket.on(SE.ChatMsg, (message: ChatMessage, username?: string) =>
         {
-            this.ui.displayChatMsg(userId, msg);
+            if (message.userId == this.userId)
+            {
+                message.userId = "local";
+            }
+
+            if (username)
+            {
+                this.ui.usernames.set(message.userId, username);
+            }
+
+            this.ui.displayChatMessage(message);
             this.ui.playSoundWithCooldown(UiSound.msg);
         });
 
         // Файл в чате.
-        this.socket.on(SE.ChatFile, (chatFileInfo: ChatFileInfo) =>
+        this.socket.on(SE.ChatFile, (message: ChatMessage, username?: string) =>
         {
-            this.ui.displayChatLink(chatFileInfo);
+            if (message.userId == this.userId)
+            {
+                message.userId = "local";
+            }
+
+            if (username)
+            {
+                this.ui.usernames.set(message.userId, username);
+            }
+
+            this.ui.displayChatLink(message);
             this.ui.playSound(UiSound.msg);
         });
 
