@@ -312,7 +312,11 @@ export class Room
             }
 
             this.ui.displayChatMessage(message);
-            this.ui.playSoundWithCooldown(UiSound.msg);
+
+            if (!this.soundDelayAfterJoin)
+            {
+                this.ui.playSoundWithCooldown(UiSound.msg);
+            }
         });
 
         // Файл в чате.
@@ -329,7 +333,11 @@ export class Room
             }
 
             this.ui.displayChatLink(message);
-            this.ui.playSound(UiSound.msg);
+
+            if (!this.soundDelayAfterJoin)
+            {
+                this.ui.playSoundWithCooldown(UiSound.msg);
+            }
         });
 
         // Новый consumer (новый входящий медиапоток).
