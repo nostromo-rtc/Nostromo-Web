@@ -195,6 +195,18 @@ export default class AdminSocketService
             ipInput.value = ipInput.value.trim();
             this.unbanUserByIp(ipInput.value);
         });
+
+        const btn_clearRoomChat = document.getElementById("btn-clear-room-chat") as HTMLButtonElement;
+        btn_clearRoomChat.addEventListener("click", () =>
+        {
+            this.clearRoomChat(this.getSelectedRoom());
+        });
+
+        const btn_deleteRoomFiles = document.getElementById("btn-delete-room-files") as HTMLButtonElement;
+        btn_deleteRoomFiles.addEventListener("click", () =>
+        {
+            this.deleteRoomFiles(this.getSelectedRoom());
+        });
     }
 
     private handleEvents()
@@ -312,11 +324,30 @@ export default class AdminSocketService
         }
     }
 
+    /** Удалить комнату. */
     private deleteRoom(roomId: string): void
     {
         if (this.checkIsSelectOptionCorrect(roomId))
         {
             this.socket.emit(SE.DeleteRoom, roomId);
+        }
+    }
+
+    /** Очистить историю чата. */
+    private clearRoomChat(roomId: string): void
+    {
+        if (this.checkIsSelectOptionCorrect(roomId))
+        {
+            this.socket.emit(SE.ClearRoomChat, roomId);
+        }
+    }
+
+    /** Удалить все файлы комнаты. */
+    private deleteRoomFiles(roomId: string): void
+    {
+        if (this.checkIsSelectOptionCorrect(roomId))
+        {
+            this.socket.emit(SE.DeleteRoomFiles, roomId);
         }
     }
 
@@ -517,10 +548,6 @@ export default class AdminSocketService
 
     private checkIsSelectOptionCorrect(id: string): boolean
     {
-        if (id == "default" || id == "")
-        {
-            return false;
-        }
-        return true;
+        return (id != "default" && id != "");
     }
 }
