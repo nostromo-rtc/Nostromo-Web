@@ -28,6 +28,9 @@
                 <input id="room-pass-input" type="password" pattern="[0-9a-fA-F]{4,8}">
                 <span>Видеокодек для комнаты</span>
                 <select id="video-codec"></select>
+                <label for="checkbox-save-room-chat-policy">Сохранять историю чата? &rarr;
+                    <input type="checkbox" id="checkbox-save-room-chat-policy" name="save-room-chat-policy" checked="true">
+                </label>
                 <button id="btn-create-room">Создать комнату</button>
             </div>
             <div>
@@ -36,15 +39,20 @@
                 <select id="room-select">
                     <option disabled selected value="default">не выбрано...</option>
                 </select>
-                <button id="btn-delete-room">Удалить комнату</button>
-                <button id="btn-clear-room-chat">Очистить историю чата</button>
-                <button id="btn-delete-room-files">Удалить все файлы комнаты</button>
                 <span>Новое название комнаты</span>
                 <input id="change-room-name-input" type="text">
                 <button id="btn-change-room-name">Изменить название</button>
                 <span>Новое пароль комнаты</span>
                 <input id="change-room-pass-input" type="password" pattern="[0-9a-fA-F]{4,8}">
                 <button id="btn-change-room-pass">Изменить пароль</button>
+                <hr width="100%">
+                <button id="btn-save-room-chat-policy">Сохранять историю чата</button>
+                <button id="btn-dont-save-room-chat-policy">Не сохранять историю чата</button>
+                <hr width="100%">
+                <button id="btn-clear-room-chat">Очистить историю чата</button>
+                <button id="btn-delete-room-files">Удалить все файлы комнаты</button>
+                <button class="bold background-red" id="btn-delete-room">Удалить комнату</button>
+
             </div>
             <div>
                 <span class="m-a">Выбор пользователя</span>
@@ -53,7 +61,8 @@
                     <option disabled selected value="default">не выбрано...</option>
                 </select>
                 <button id="btn-kick-user">Кикнуть пользователя</button>
-                <button id="btn-ban-user">Заблокировать пользователя</button>
+                <button class="bold background-red" id="btn-ban-user">Заблокировать пользователя</button>
+                <hr width="100%">
                 <button id="btn-stop-user-display">Прекратить демонстрацию экрана пользователя</button>
                 <button id="btn-stop-user-cam">Отключить веб-камеры пользователя</button>
                 <button id="btn-stop-user-audio">Отключить аудио пользователя</button>

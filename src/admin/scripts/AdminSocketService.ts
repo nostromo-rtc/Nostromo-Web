@@ -1,7 +1,7 @@
 import { io, Socket } from "socket.io-client";
 import { SocketEvents as SE } from "nostromo-shared/types/SocketEvents";
 
-import { ActionOnUserInfo, ChangeUserNameInfo, NewRoomInfo, NewRoomNameInfo, NewRoomPassInfo } from "nostromo-shared/types/AdminTypes";
+import { ActionOnUserInfo, ChangeUserNameInfo, NewRoomInfo, NewRoomNameInfo, NewRoomPassInfo, NewRoomSaveChatPolicyInfo } from "nostromo-shared/types/AdminTypes";
 import { VideoCodec, UserInfo, PublicRoomInfo } from "nostromo-shared/types/RoomTypes";
 
 // Класс для работы с сокетами при авторизации в панель администратора
@@ -35,37 +35,52 @@ export default class AdminSocketService
             console.log(err.message);
         });
 
+        // Обработка событий.
         this.handleEvents();
 
         // Если комната какая-то выбрана, то сообщаем серверу,
         // что хотим получать список юзеров этой комнаты.
         this.subscribeUserList(this.getSelectedRoom());
+
+        // Подготовка опций выбора кодека.
         this.prepareVideoCodecSelect();
+
+        // Обработка кнопок.
         this.handleRoomButtons();
         this.handleUserButtons();
     }
 
+    /** Отдать Id выбранной комнаты. */
     private getSelectedRoom(): string
     {
         const roomSelect = document.getElementById('room-select') as HTMLSelectElement;
         return roomSelect.value;
     }
 
+    /** Отдать Id выбранного пользователя. */
     private getSelectedUser(): string
     {
         const userSelect = document.getElementById('user-select') as HTMLSelectElement;
         return userSelect.value;
     }
 
+    /** Отдать выбранные Id комнаты и пользователя. */
+    private getSelectedActionOnUserInfo(): ActionOnUserInfo
+    {
+        const info: ActionOnUserInfo = {
+            roomId: this.getSelectedRoom(),
+            userId: this.getSelectedUser()
+        };
+
+        return info;
+    }
+
     /** Обработка кнопок связанных с комнатами. */
-    private handleRoomButtons()
+    private handleRoomButtons(): void
     {
         // Обработка кнопки создания комнаты.
         const btn_createRoom = document.getElementById('btn-create-room')! as HTMLButtonElement;
-        btn_createRoom.addEventListener('click', () =>
-        {
-            this.createRoom();
-        });
+        btn_createRoom.addEventListener('click', this.createRoom);
 
         // Обработка кнопки удаления комнаты.
         const btn_deleteRoom = document.getElementById('btn-delete-room')! as HTMLButtonElement;
@@ -101,60 +116,82 @@ export default class AdminSocketService
 
             this.changeRoomPass(info);
         });
+
+        // Очистка истории чата комнаты.
+        const btn_clearRoomChat = document.getElementById("btn-clear-room-chat") as HTMLButtonElement;
+        btn_clearRoomChat.addEventListener("click", () =>
+        {
+            this.clearRoomChat(this.getSelectedRoom());
+        });
+
+        // Удалить все файлы, привязанные к комнате.
+        const btn_deleteRoomFiles = document.getElementById("btn-delete-room-files") as HTMLButtonElement;
+        btn_deleteRoomFiles.addEventListener("click", () =>
+        {
+            this.deleteRoomFiles(this.getSelectedRoom());
+        });
+
+        // Сохранять историю чата.
+        const btn_saveRoomChatPolicy = document.getElementById("btn-save-room-chat-policy") as HTMLButtonElement;
+        btn_saveRoomChatPolicy.addEventListener("click", () =>
+        {
+            const info: NewRoomSaveChatPolicyInfo = {
+                id: this.getSelectedRoom(),
+                saveChatPolicy: true
+            };
+
+            this.setSaveRoomChatPolicy(info);
+        });
+
+        // Не сохранять историю чата.
+        const btn_dontSaveRoomChatPolicy = document.getElementById("btn-dont-save-room-chat-policy") as HTMLButtonElement;
+        btn_dontSaveRoomChatPolicy.addEventListener("click", () =>
+        {
+            const info: NewRoomSaveChatPolicyInfo = {
+                id: this.getSelectedRoom(),
+                saveChatPolicy: false
+            };
+
+            this.setSaveRoomChatPolicy(info);
+        });
     }
 
-    private handleUserButtons()
+    /** Обработка кнопок, связанных с пользователем. */
+    private handleUserButtons(): void
     {
-        // Обработка кнопки кика юзера.
+        // Кик юзера.
         const btn_kickUser = document.getElementById("btn-kick-user") as HTMLButtonElement;
         btn_kickUser.addEventListener('click', () =>
         {
-            const info: ActionOnUserInfo = {
-                roomId: this.getSelectedRoom(),
-                userId: this.getSelectedUser()
-            };
-
-            this.kickUser(info);
+            this.kickUser(this.getSelectedActionOnUserInfo());
         });
 
+        // Остановить демонстрацию экрана.
         const btn_stopUserDisplay = document.getElementById("btn-stop-user-display") as HTMLButtonElement;
         btn_stopUserDisplay.addEventListener("click", () =>
         {
-            const info: ActionOnUserInfo = {
-                roomId: this.getSelectedRoom(),
-                userId: this.getSelectedUser()
-            };
-
-            this.stopUserDisplay(info);
+            this.stopUserDisplay(this.getSelectedActionOnUserInfo());
         });
 
+        // Выключить вебки пользователя (прекратить захват видеоустройств).
         const btn_stopUserCam = document.getElementById("btn-stop-user-cam") as HTMLButtonElement;
         btn_stopUserCam.addEventListener("click", () =>
         {
-            const info: ActionOnUserInfo = {
-                roomId: this.getSelectedRoom(),
-                userId: this.getSelectedUser()
-            };
-
-            this.stopUserCam(info);
+            this.stopUserCam(this.getSelectedActionOnUserInfo());
         });
 
+        // Прекратить захват микрофона.
         const btn_stopUserAudio = document.getElementById("btn-stop-user-audio") as HTMLButtonElement;
         btn_stopUserAudio.addEventListener("click", () =>
         {
-            const info: ActionOnUserInfo = {
-                roomId: this.getSelectedRoom(),
-                userId: this.getSelectedUser()
-            };
-
-            this.stopUserAudio(info);
+            this.stopUserAudio(this.getSelectedActionOnUserInfo());
         });
 
-        const usernameInput = document.getElementById("user-name-input") as HTMLInputElement;
-
         // Ограничение по длине имени пользователя.
+        const usernameInput = document.getElementById("user-name-input") as HTMLInputElement;
         usernameInput.maxLength = 32;
 
+        // Смена ника юзера.
         const btn_changeUsername = document.getElementById("btn-change-user-name") as HTMLButtonElement;
         btn_changeUsername.addEventListener('click', () =>
         {
@@ -169,19 +206,15 @@ export default class AdminSocketService
             this.changeUsername(info);
         });
 
+        // Бан юзера.
         const btn_banUser = document.getElementById("btn-ban-user") as HTMLButtonElement;
         btn_banUser.addEventListener("click", () =>
         {
-            const info: ActionOnUserInfo = {
-                roomId: this.getSelectedRoom(),
-                userId: this.getSelectedUser()
-            };
-
-            this.banUser(info);
+            this.banUser(this.getSelectedActionOnUserInfo());
         });
 
+        // Бан юзера по IP.
         const ipInput = document.getElementById("ip-input") as HTMLInputElement;
-
         const btn_banUserByIp = document.getElementById("btn-ban-user-by-ip") as HTMLButtonElement;
         btn_banUserByIp.addEventListener('click', () =>
         {
@@ -189,80 +222,26 @@ export default class AdminSocketService
             this.banUserByIp(ipInput.value);
         });
 
+        // Разбан юзера по IP.
         const btn_unbanUserByIp = document.getElementById("btn-unban-user-by-ip") as HTMLButtonElement;
         btn_unbanUserByIp.addEventListener('click', () =>
         {
             ipInput.value = ipInput.value.trim();
             this.unbanUserByIp(ipInput.value);
         });
-
-        const btn_clearRoomChat = document.getElementById("btn-clear-room-chat") as HTMLButtonElement;
-        btn_clearRoomChat.addEventListener("click", () =>
-        {
-            this.clearRoomChat(this.getSelectedRoom());
-        });
-
-        const btn_deleteRoomFiles = document.getElementById("btn-delete-room-files") as HTMLButtonElement;
-        btn_deleteRoomFiles.addEventListener("click", () =>
-        {
-            this.deleteRoomFiles(this.getSelectedRoom());
-        });
     }
 
+    /** Обработка сокет событий. */
     private handleEvents()
     {
-        this.handleRoomListEv();
-        this.handleUserListEv();
-        this.handleRoomDeletedEv();
-        this.handleRoomCreatedEv();
-        this.handleRoomNameChangedEv();
+        this.socket.on(SE.RoomList, this.setInitialRoomList);
+        this.generalSocket.on(SE.UserList, this.setUserList);
+        this.generalSocket.on(SE.RoomDeleted, this.roomDeleted);
+        this.generalSocket.on(SE.RoomCreated, this.roomCreated);
+        this.generalSocket.on(SE.RoomNameChanged, this.roomNameChanged);
     }
 
-    /** Обрабатываем событие получения начального списка комнат. */
-    private handleRoomListEv()
-    {
-        this.socket.on(SE.RoomList, (roomList: PublicRoomInfo[]) =>
-        {
-            this.setInitialRoomList(roomList);
-        });
-    }
-
-    /** Обрабатываем событие изменения списка юзеров в комнате. */
-    private handleUserListEv()
-    {
-        this.generalSocket.on(SE.UserList, (userList: UserInfo[]) =>
-        {
-            this.setUserList(userList);
-        });
-    }
-
-    /** Обрабатываем событие удаления комнаты. */
-    private handleRoomDeletedEv()
-    {
-        this.generalSocket.on(SE.RoomDeleted, (roomId: string) =>
-        {
-            this.roomDeleted(roomId);
-        });
-    }
-
-    /** Обрабатываем событие создания комнаты. */
-    private handleRoomCreatedEv()
-    {
-        this.generalSocket.on(SE.RoomCreated, (info: PublicRoomInfo) =>
-        {
-            this.roomCreated(info);
-        });
-    }
-
-    /** Обрабатываем событие изменения названия комнаты. */
-    private handleRoomNameChangedEv()
-    {
-        this.generalSocket.on(SE.RoomNameChanged, (info: NewRoomNameInfo) =>
-        {
-            this.roomNameChanged(info);
-        });
-    }
-
+    /** Подготовить опции выбора кодека. */
     private prepareVideoCodecSelect(): void
     {
         this.videoCodecSelect = document.getElementById('video-codec')! as HTMLSelectElement;
@@ -277,31 +256,36 @@ export default class AdminSocketService
         this.videoCodecSelect.add(H264Option);
     }
 
-    private createRoom(): void
+    /** Создать комнату. */
+    private createRoom = (): void =>
     {
         const name = (document.getElementById('room-name-input') as HTMLInputElement).value;
         const password = (document.getElementById('room-pass-input') as HTMLInputElement).value;
         const videoCodec = this.videoCodecSelect!.value as VideoCodec;
+        const saveChatPolicy = (document.getElementById('checkbox-save-room-chat-policy') as HTMLInputElement).checked;
 
         const newRoomInfo: NewRoomInfo = {
             name,
             password,
-            videoCodec
+            videoCodec,
+            saveChatPolicy
         };
 
         if (name.length > 0)
         {
             this.socket.emit(SE.CreateRoom, newRoomInfo);
         }
-    }
+    };
 
-    private roomCreated(info: PublicRoomInfo): void
+    /** Обрабатываем событие создания комнаты. */
+    private roomCreated = (info: PublicRoomInfo): void =>
     {
         this.addRoomListItem(info);
         this.roomInfoList.set(info.id, info);
-    }
+    };
 
-    private roomDeleted(roomId: string): void
+    /** Обрабатываем событие удаления комнаты. */
+    private roomDeleted = (roomId: string): void =>
     {
         if (this.getSelectedRoom() == roomId)
         {
@@ -311,9 +295,10 @@ export default class AdminSocketService
 
         this.removeRoomListItem(roomId);
         this.roomInfoList.delete(roomId);
-    }
+    };
 
-    private roomNameChanged(info: NewRoomNameInfo): void
+    /** Обрабатываем событие изменения названия комнаты. */
+    private roomNameChanged = (info: NewRoomNameInfo): void =>
     {
         const roomInfo = this.roomInfoList.get(info.id);
 
@@ -322,12 +307,13 @@ export default class AdminSocketService
             roomInfo.name = info.name;
             this.updateRoomListItem(roomInfo);
         }
-    }
+    };
 
     /** Удалить комнату. */
     private deleteRoom(roomId: string): void
     {
-        if (this.checkIsSelectOptionCorrect(roomId))
+        if (this.checkIsSelectOptionCorrect(roomId)
+            && confirm("Вы уверены что хотите удалить выбранную комнату?"))
         {
             this.socket.emit(SE.DeleteRoom, roomId);
         }
@@ -351,7 +337,8 @@ export default class AdminSocketService
         }
     }
 
-    private setInitialRoomList(roomList: PublicRoomInfo[]): void
+    /** Обрабатываем событие получения начального списка комнат. */
+    private setInitialRoomList = (roomList: PublicRoomInfo[]): void =>
     {
         const roomSelect = document.getElementById('room-select') as HTMLSelectElement;
         for (const room of roomList)
@@ -381,7 +368,7 @@ export default class AdminSocketService
                 this.latestSubscribedRoomId = roomId;
             }
         });
-    }
+    };
 
     /** Сообщаем серверу, что хотим получать список юзеров этой комнаты. */
     private subscribeUserList(roomId: string): void
@@ -399,7 +386,7 @@ export default class AdminSocketService
     }
 
     /** Присваиваем список юзеров. */
-    private setUserList(userList: UserInfo[]): void
+    private setUserList = (userList: UserInfo[]): void =>
     {
         const userSelect = document.getElementById('user-select') as HTMLSelectElement;
 
@@ -413,7 +400,7 @@ export default class AdminSocketService
 
             userSelect.add(newOption);
         }
-    }
+    };
 
     /** Добавить комнату в список комнат. */
     private addRoomListItem(info: PublicRoomInfo): void
@@ -546,8 +533,18 @@ export default class AdminSocketService
         }
     }
 
+    /** Проверка правильности выбранной опции. */
     private checkIsSelectOptionCorrect(id: string): boolean
     {
         return (id != "default" && id != "");
+    }
+
+    /** Установить параметр сохранения истории чата на сервере. */
+    private setSaveRoomChatPolicy(info: NewRoomSaveChatPolicyInfo)
+    {
+        if (this.checkIsSelectOptionCorrect(info.id))
+        {
+            this.socket.emit(SE.ChangeRoomSaveChatPolicy, info);
+        }
     }
 }
