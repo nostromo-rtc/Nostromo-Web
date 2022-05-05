@@ -416,6 +416,35 @@ export class UserMedia
         // Получаем настоящий Id захваченного устройства.
         deviceId = mediaStream.getTracks()[0].getSettings().deviceId!;
 
+        const isPoorDeviceId = (id: string) =>
+        {
+            return (id == "" || id == "default" || id == "communications");
+        };
+
+        // Если нас не устраивает Id захваченного устройства.
+        // Попробуем выяснить его через groupId.
+        if (isPoorDeviceId(deviceId))
+        {
+            const groupId = mediaStream.getTracks()[0].getSettings().groupId!;
+            const kind = isAudioDevice ? "audioinput" : "videoinput";
+
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            const device = devices.find((val) =>
+            {
+                if (val.kind == kind
+                    && val.groupId == groupId
+                    && !isPoorDeviceId(val.deviceId))
+                {
+                    return val;
+                }
+            });
+
+            if (device)
+            {
+                deviceId = device.deviceId;
+            }
+        }
+
         return deviceId;
     }
 
