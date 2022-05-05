@@ -185,8 +185,12 @@ export class UserMedia
                     return val;
                 }
             });
-            const groupId = device!.groupId;
-            constraints.audio.groupId = { ideal: groupId };
+
+            if (device)
+            {
+                const groupId = device.groupId;
+                constraints.audio.groupId = { ideal: groupId };
+            }
         }
 
         try
@@ -244,8 +248,12 @@ export class UserMedia
                     return val;
                 }
             });
-            const groupId = device!.groupId;
-            (constraints.video as MediaTrackConstraints).groupId = { ideal: groupId };
+
+            if (device)
+            {
+                const groupId = device.groupId;
+                (constraints.video as MediaTrackConstraints).groupId = { ideal: groupId };
+            }
         }
 
         try
