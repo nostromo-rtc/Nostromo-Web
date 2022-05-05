@@ -166,7 +166,9 @@ export class UserMedia
     /** Обработка нажатия на кнопку "Захватить микрофон". */
     private async handleGetMic(): Promise<void>
     {
-        const deviceId = this.ui.currentMicDevice;
+        let deviceId = this.ui.currentMicDevice;
+
+        console.debug("[UserMedia] > handleGetMic", deviceId);
 
         const constraints = this.streamConstraintsMic;
         constraints.audio = { deviceId: { ideal: deviceId } };
@@ -190,7 +192,7 @@ export class UserMedia
         try
         {
             // Захват микрофона.
-            await this.getUserMedia(this.streamConstraintsMic, deviceId);
+            deviceId = await this.getUserMedia(this.streamConstraintsMic, deviceId);
 
             // Выберем в списке устройств захваченный микрофон.
             this.ui.micDevices.value = deviceId;
