@@ -1,12 +1,12 @@
 {
   "name": "nostromo-web",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "lockfileVersion": 2,
   "requires": true,
   "packages": {
     "": {
       "name": "nostromo-web",
-      "version": "0.2.1",
+      "version": "0.3.0",
       "license": "BSD-3-Clause",
       "devDependencies": {
         "@types/howler": "2.2.7",
