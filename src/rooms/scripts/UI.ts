@@ -744,7 +744,7 @@ export class UI
             && date.getMonth() == current_date.getMonth()
             && date.getFullYear() == current_date.getFullYear())
         {
-            timestamp = date.toLocaleString("en-us", {
+            timestamp = date.toLocaleString("en-GB", {
                 hour: "2-digit",
                 minute: "2-digit",
                 second: "2-digit",
@@ -755,7 +755,7 @@ export class UI
         }
         else
         {
-            timestamp = date.toLocaleString("en-us", {
+            timestamp = date.toLocaleString("en-GB", {
                 day: "2-digit",
                 month: "2-digit",
                 year: "numeric",
