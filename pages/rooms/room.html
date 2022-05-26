@@ -14,8 +14,18 @@
         <div class="navbutton"><a href="/">🏠</a></div>
     </div>
 
-    <div class="header">
-        <div>Комната - <span id="room-name"></span></div>
+    <div class="header d-flex">
+        <div class="d-flex w-100-proc">
+            <span style="min-width: 120px;">Комната -</span>
+            <span id="room-name"></span>
+            <span class="vl">//</span>
+            <span id="users-count-label">
+                Количество участников (<span id="users-count">1</span>):
+                <select id="user-list" class="vl">
+                    <option value="none" selected disabled hidden>...</option>
+                </select>
+            </span>
+        </div>
     </div>
 
     <div class="main">

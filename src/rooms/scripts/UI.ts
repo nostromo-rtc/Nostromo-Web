@@ -120,6 +120,12 @@ export class UI
     /** Чекбокс для включения/выключения отображения локальных видеоэлементов. */
     public readonly checkboxDisplayLocalVideos = document.getElementById("checkbox-display-local-videos") as HTMLInputElement;
 
+    /** Текстовая метка - количество пользователей. */
+    public readonly spanUsersCount = document.getElementById("users-count") as HTMLSpanElement;
+
+    /** Список пользователей. */
+    public readonly userList = document.getElementById("user-list") as HTMLSelectElement;
+
     /** Количество строк в раскладке. */
     private videoRows = 2;
 
@@ -1099,5 +1105,42 @@ export class UI
         }
 
         return count;
+    }
+
+    /** Добавить пользователя в список пользователей. */
+    public addUserToUserList(id: string, name: string)
+    {
+        const usersCount = Number(this.spanUsersCount.innerText);
+        this.spanUsersCount.innerText = String(usersCount + 1);
+
+        const option = new Option(`${name} [#${id}]`, id);
+        option.disabled = true;
+
+        this.userList.add(option);
+    }
+
+    /** Удалить пользователя из списка пользователей. */
+    public removeUserToUserList(id: string)
+    {
+        const usersCount = Number(this.spanUsersCount.innerText);
+        this.spanUsersCount.innerText = String(usersCount - 1);
+
+        const option = this.userList.querySelector(`option[value="${id}"]`);
+
+        if (option)
+        {
+            this.userList.removeChild(option);
+        }
+    }
+
+    /** Обновления текстовой метки видеоэлемента. */
+    public updateUserInUserList(id: string, newName: string): void
+    {
+        const option = this.userList.querySelector(`option[value="${id}"]`);
+
+        if (option)
+        {
+            option.textContent = `${newName} [${id}]`;
+        }
     }
 }

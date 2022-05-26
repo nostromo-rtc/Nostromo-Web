@@ -169,3 +169,22 @@ video {
 .p-2 {
     padding: 2px;
 }
+
+#room-name
+{
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+#users-count-label
+{
+    min-width: 500px;
+}
+
+#user-list
+{
+    width: 40px;
+}
+
+#user-list option:disabled { color: #000; }

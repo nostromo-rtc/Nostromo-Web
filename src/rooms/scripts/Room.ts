@@ -190,6 +190,11 @@ export class Room
         {
             console.info("[Room] > Ваш userId:", id);
             this.userId = id;
+
+            const option = new Option(`Я [#${id}]`, id);
+            option.disabled = true;
+
+            this.ui.userList.add(option);
         });
 
         // Получаем свое имя, сохраненное на сервере.
@@ -288,6 +293,8 @@ export class Room
             {
                 this.ui.playSound(UiSound.joined);
             }
+
+            this.ui.addUserToUserList(id, name);
         });
 
         // Другой пользователь поменял имя.
@@ -296,6 +303,7 @@ export class Room
             this.ui.usernames.set(id, name);
             this.ui.updateVideoLabels(id, name);
             this.ui.updateNicknameInChat(id);
+            this.ui.updateUserInUserList(id, name);
         });
 
         // Сообщение в чате.
@@ -391,6 +399,8 @@ export class Room
             this.ui.removeVideos(remoteUserId);
 
             this.ui.playSound(UiSound.left);
+
+            this.ui.removeUserToUserList(remoteUserId);
         });
 
         // Необходимо перейти на другую страницу.

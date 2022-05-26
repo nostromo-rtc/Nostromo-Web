@@ -172,6 +172,11 @@ select {
     max-width: 150px;
 }
 
+.w-100-proc
+{
+    width: 100%;
+}
+
 .background-green {
     background-color: lightgreen;
 }
