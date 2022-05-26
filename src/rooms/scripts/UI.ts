@@ -111,6 +111,15 @@ export class UI
     /** Чекбокс для включения/выключения отображения неактивных видеоэлементов. */
     public readonly checkboxDisplayInactiveVideos = document.getElementById("checkbox-display-inactive-videos") as HTMLInputElement;
 
+    /** Чекбокс для включения/выключения отображения настроек. */
+    public readonly checkboxDisplaySettings = document.getElementById("checkbox-display-settings") as HTMLInputElement;
+
+    /** Контейнер с настройками. */
+    public readonly settings = document.getElementById("settings") as HTMLDivElement;
+
+    /** Чекбокс для включения/выключения отображения локальных видеоэлементов. */
+    public readonly checkboxDisplayLocalVideos = document.getElementById("checkbox-display-local-videos") as HTMLInputElement;
+
     /** Количество строк в раскладке. */
     private videoRows = 2;
 
@@ -135,6 +144,7 @@ export class UI
         this.initUiSounds();
         this.prepareMessageText();
         this.handleButtons();
+        this.handleCheckboxes();
 
         this.addVideo("local", "main", "local");
         this.resizeVideos();
@@ -146,30 +156,6 @@ export class UI
         spritePlyr.id = "sprite-plyr";
         spritePlyr.innerHTML = svgSprite;
         document.body.append(spritePlyr);
-
-        this.setupCheckboxNotificationsFromLocalStorage();
-        this.checkboxNotifications.addEventListener("click", () =>
-        {
-            this.changeCheckboxNotificationsState();
-        });
-
-        this.setupCheckboxDisplayInactiveVideosFromLocalStorage();
-        this.checkboxDisplayInactiveVideos.addEventListener("click", () =>
-        {
-            this.changeCheckboxDisplayInactiveVideosState();
-
-            // В соответствии с опцией, скроем или покажем видеоэлементы.
-            if (this.checkboxDisplayInactiveVideos.checked)
-            {
-                this.showHiddenVideoItems();
-            }
-            else
-            {
-                this.hideInactiveVideoItems();
-            }
-
-            this.refreshVideosLayout();
-        });
 
         // Ограничение по длине имени пользователя.
         this.usernameInput.maxLength = 32;
@@ -205,6 +191,59 @@ export class UI
         {
             this.disableSounds();
             this.toggleSoundsButtons();
+        });
+    }
+
+    /** Подключить обработчики к чекбоксам. */
+    private handleCheckboxes(): void
+    {
+        this.setupCheckboxNotificationsFromLS();
+        this.checkboxNotifications.addEventListener("click", () =>
+        {
+            this.setCheckboxNotificationsState();
+        });
+
+        this.setupCheckboxDisplayInactiveVideosFromLS();
+        this.checkboxDisplayInactiveVideos.addEventListener("click", () =>
+        {
+            this.setCheckboxDisplayInactiveVideosState();
+
+            // В соответствии с опцией, скроем или покажем видеоэлементы.
+            if (this.checkboxDisplayInactiveVideos.checked)
+            {
+                this.showHiddenVideoItems();
+            }
+            else
+            {
+                this.hideInactiveVideoItems();
+            }
+
+            this.refreshVideosLayout();
+        });
+
+        this.setupCheckboxDisplaySettingsFromLS();
+        this.checkboxDisplaySettings.addEventListener("click", () =>
+        {
+            this.setCheckboxDisplaySettingsState();
+
+            // В соответствии с опцией, скроем или покажем настройки.
+            this.settings.hidden = !this.checkboxDisplaySettings.checked;
+        });
+        this.settings.hidden = !this.checkboxDisplaySettings.checked;
+
+
+        this.setupCheckboxDisplayLocalVideoFromLS();
+        this.checkboxDisplayLocalVideos.addEventListener("click", () =>
+        {
+            this.setCheckboxDisplayLocalVideoState();
+
+            const items = this.getVideoItems("local");
+            for (const item of items)
+            {
+                item.hidden = !this.checkboxDisplayLocalVideos.checked;
+            }
+
+            this.refreshVideosLayout();
         });
     }
 
@@ -405,8 +444,8 @@ export class UI
         const videoItem = this.createVideoItem(userId, videoId, name);
         document.getElementById('videos')!.appendChild(videoItem);
 
-        if (userId != "local"
-            && !this.checkboxDisplayInactiveVideos.checked)
+        if ((userId != "local" && !this.checkboxDisplayInactiveVideos.checked)
+            || (userId == "local" && !this.checkboxDisplayLocalVideos.checked))
         {
             videoItem.hidden = true;
         }
@@ -483,8 +522,9 @@ export class UI
     private calculateLayout(): void
     {
         const videoCount = this.getDisplayedVideosCount();
+
         // если только 1 видео на экране
-        if (videoCount == 1)
+        if (videoCount <= 1)
         {
             this.videoRows = 2;
             this.videoColumns = 2;
@@ -689,7 +729,7 @@ export class UI
 
         for (const item of videoItems)
         {
-            if (item.hidden)
+            if (item.dataset.userId != "local" && item.hidden)
             {
                 item.hidden = false;
             }
@@ -785,7 +825,7 @@ export class UI
     }
 
     /** Прочитать из локального хранилище настройку воспроизведения звуковых оповещений. */
-    private setupCheckboxNotificationsFromLocalStorage(): void
+    private setupCheckboxNotificationsFromLS(): void
     {
         if (localStorage["enable-notifications"] == undefined)
         {
@@ -795,7 +835,7 @@ export class UI
     }
 
     /** Прочитать из локального хранилище настройку отображения неактивных видеоэлементов. */
-    private setupCheckboxDisplayInactiveVideosFromLocalStorage(): void
+    private setupCheckboxDisplayInactiveVideosFromLS(): void
     {
         if (localStorage["display-inactive-videos"] == undefined)
         {
@@ -804,16 +844,48 @@ export class UI
         this.checkboxDisplayInactiveVideos.checked = (localStorage["display-inactive-videos"] == "true");
     }
 
+    /** Прочитать из локального хранилище настройку отображения настроек. */
+    private setupCheckboxDisplaySettingsFromLS(): void
+    {
+        if (localStorage["display-settings"] == undefined)
+        {
+            localStorage["display-settings"] = "true";
+        }
+        this.checkboxDisplaySettings.checked = (localStorage["display-settings"] == "true");
+    }
+
+    /** Прочитать из локального хранилище настройку отображения локального видеоэлемента. */
+    private setupCheckboxDisplayLocalVideoFromLS(): void
+    {
+        if (localStorage["display-local-video"] == undefined)
+        {
+            localStorage["display-local-video"] = "true";
+        }
+        this.checkboxDisplayLocalVideos.checked = (localStorage["display-local-video"] == "true");
+    }
+
     /** Установить новое состояние для чекбокса notifications. */
-    private changeCheckboxNotificationsState(): void
+    private setCheckboxNotificationsState(): void
     {
         localStorage["enable-notifications"] = this.checkboxNotifications.checked;
     }
 
     /** Установить новое состояние для чекбокса display-inactive-videos. */
-    private changeCheckboxDisplayInactiveVideosState(): void
+    private setCheckboxDisplayInactiveVideosState(): void
     {
         localStorage["display-inactive-videos"] = this.checkboxDisplayInactiveVideos.checked;
+    }
+
+    /** Установить новое состояние для чекбокса display-settings. */
+    private setCheckboxDisplaySettingsState(): void
+    {
+        localStorage["display-settings"] = this.checkboxDisplaySettings.checked;
+    }
+
+    /** Установить новое состояние для чекбокса display-local-video. */
+    private setCheckboxDisplayLocalVideoState(): void
+    {
+        localStorage["display-local-video"] = this.checkboxDisplayLocalVideos.checked;
     }
 
     public playSound(sound: UiSound)
@@ -1025,6 +1097,7 @@ export class UI
                 ++count;
             }
         }
+
         return count;
     }
 }

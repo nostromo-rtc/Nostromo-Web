@@ -27,10 +27,16 @@
             <span>Выбор устройств:</span>
             <select id="mic-devices" class="vl max-w-150"></select>
             <select id="cam-devices" class="vl max-w-150"></select>
+            <span class="vl">|</span>
+            <input type="checkbox" id="checkbox-display-settings">
+            <label for="checkbox-display-settings"> Отображать настройки</label><br>
         </div>
-        <div class="d-flex flex-start p-2">
+        <div id="settings" class="d-flex flex-start p-2" hidden>
             <input type="checkbox" id="checkbox-notifications">
             <label for="checkbox-notifications"> Вкл. оповещения</label><br>
+            <span class="vl">|</span>
+            <input type="checkbox" id="checkbox-display-local-videos">
+            <label for="checkbox-display-local-videos"> Отображать локальные видео</label><br>
             <span class="vl">|</span>
             <input type="checkbox" id="checkbox-display-inactive-videos">
             <label for="checkbox-display-inactive-videos"> Отображать неактивных участников</label><br>
