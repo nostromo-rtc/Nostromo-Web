@@ -108,6 +108,9 @@ export class UI
     /** Чекбокс для включения/выключения звуковых оповещений. */
     public readonly checkboxNotifications = document.getElementById("checkbox-notifications") as HTMLInputElement;
 
+    /** Чекбокс для включения/выключения отображения неактивных видеоэлементов. */
+    public readonly checkboxDisplayInactiveVideos = document.getElementById("checkbox-display-inactive-videos") as HTMLInputElement;
+
     /** Количество строк в раскладке. */
     private videoRows = 2;
 
@@ -148,6 +151,24 @@ export class UI
         this.checkboxNotifications.addEventListener("click", () =>
         {
             this.changeCheckboxNotificationsState();
+        });
+
+        this.setupCheckboxDisplayInactiveVideosFromLocalStorage();
+        this.checkboxDisplayInactiveVideos.addEventListener("click", () =>
+        {
+            this.changeCheckboxDisplayInactiveVideosState();
+
+            // В соответствии с опцией, скроем или покажем видеоэлементы.
+            if (this.checkboxDisplayInactiveVideos.checked)
+            {
+                this.showHiddenVideoItems();
+            }
+            else
+            {
+                this.hideInactiveVideoItems();
+            }
+
+            this.refreshVideosLayout();
         });
 
         // Ограничение по длине имени пользователя.
@@ -384,9 +405,14 @@ export class UI
         const videoItem = this.createVideoItem(userId, videoId, name);
         document.getElementById('videos')!.appendChild(videoItem);
 
-        // перестроим раскладку
-        this.calculateLayout();
-        this.resizeVideos();
+        if (userId != "local"
+            && !this.checkboxDisplayInactiveVideos.checked)
+        {
+            videoItem.hidden = true;
+        }
+
+        // Обновим раскладку.
+        this.refreshVideosLayout();
     }
 
     /** Добавить новый неосновной-видеоэлемент пользователя userId. */
@@ -396,9 +422,8 @@ export class UI
         const videoItemsOfUser = this.getVideoItems(userId);
         videoItemsOfUser.item(videoItemsOfUser.length - 1).after(newVideoItem);
 
-        // перестроим раскладку
-        this.calculateLayout();
-        this.resizeVideos();
+        // Обновим раскладку.
+        this.refreshVideosLayout();
     }
 
     /** Обновления текстовой метки видеоэлемента. */
@@ -437,9 +462,8 @@ export class UI
         // Удаляем видеоэлемент из контейнера всех видеоэлементов.
         this.allVideos.delete(id);
 
-        // Обновляем раскладку.
-        this.calculateLayout();
-        this.resizeVideos();
+        // И обновляем раскладку.
+        this.refreshVideosLayout();
     }
 
     /** Удалить все видео от собеседника (и обновить раскладку). */
@@ -458,7 +482,7 @@ export class UI
      */
     private calculateLayout(): void
     {
-        const videoCount = this.allVideos.size;
+        const videoCount = this.getDisplayedVideosCount();
         // если только 1 видео на экране
         if (videoCount == 1)
         {
@@ -493,7 +517,7 @@ export class UI
         }
     }
 
-    /** Перестроить раскладку. */
+    /** Изменить размеры видеоэлементов на экране. */
     private resizeVideos(): void
     {
         const header_offset = 82.5;
@@ -508,6 +532,13 @@ export class UI
             (videoItem as HTMLDivElement).style.maxWidth = String(max_h * aspect_ratio) + 'px';
             (videoItem as HTMLDivElement).style.flexBasis = String(flexBasis) + 'px';
         }
+    }
+
+    /** Перестроим раскладку. */
+    public refreshVideosLayout()
+    {
+        this.calculateLayout();
+        this.resizeVideos();
     }
 
     /** Подготовить плеер для видеоэлемента. */
@@ -640,7 +671,64 @@ export class UI
         return document.querySelectorAll(`.video-item[data-user-id='${userId}']`);
     }
 
-    /** Получить контейнер с видеоэлементом. */
+    /** Показать контейнер с видеоэлементом. */
+    public showVideoItem(userId: string, streamId: string)
+    {
+        const videoItem = this.getVideoItem(userId, streamId);
+
+        if (videoItem)
+        {
+            videoItem.hidden = false;
+        }
+    }
+
+    /** Показать скрытые контейнеры с видеоэлементом. */
+    public showHiddenVideoItems()
+    {
+        const videoItems: NodeListOf<HTMLDivElement> = document.querySelectorAll(".video-item");
+
+        for (const item of videoItems)
+        {
+            if (item.hidden)
+            {
+                item.hidden = false;
+            }
+        }
+    }
+
+    /** Скрыть контейнеры с неактивными видеоэлементами. */
+    public hideInactiveVideoItems()
+    {
+        const videoItems: NodeListOf<HTMLDivElement> = document.querySelectorAll(".video-item");
+
+        for (const item of videoItems)
+        {
+            const video = item.querySelector("video")!;
+            const stream = video.srcObject as MediaStream | null;
+
+            // Локальный контейнер с видеоэлементом никогда не скрываем.
+            // Скрываем неактивный видеоэлемент, то есть в нем нет видеопотока.
+            if (item.dataset.userId != "local" &&
+                (!stream || stream.getVideoTracks().length == 0)
+            )
+            {
+                item.hidden = true;
+            }
+        }
+    }
+
+    /** Скрыть контейнер с видеоэлементом. */
+    public hideVideoItem(userId: string, streamId: string)
+    {
+        const videoItem = this.getVideoItem(userId, streamId);
+
+        if (videoItem)
+        {
+            videoItem.hidden = true;
+        }
+    }
+
+    /** Получить видеоэлемент. */
     public getVideo(userId: string, streamId: string): HTMLVideoElement | undefined
     {
         const id = `${userId}@${streamId}`;
@@ -706,10 +794,26 @@ export class UI
         this.checkboxNotifications.checked = (localStorage["enable-notifications"] == "true");
     }
 
+    /** Прочитать из локального хранилище настройку отображения неактивных видеоэлементов. */
+    private setupCheckboxDisplayInactiveVideosFromLocalStorage(): void
+    {
+        if (localStorage["display-inactive-videos"] == undefined)
+        {
+            localStorage["display-inactive-videos"] = "true";
+        }
+        this.checkboxDisplayInactiveVideos.checked = (localStorage["display-inactive-videos"] == "true");
+    }
+
     /** Установить новое состояние для чекбокса notifications. */
     private changeCheckboxNotificationsState(): void
     {
         localStorage["enable-notifications"] = this.checkboxNotifications.checked;
+    }
+
+    /** Установить новое состояние для чекбокса display-inactive-videos. */
+    private changeCheckboxDisplayInactiveVideosState(): void
+    {
+        localStorage["display-inactive-videos"] = this.checkboxDisplayInactiveVideos.checked;
     }
 
     public playSound(sound: UiSound)
@@ -907,5 +1011,20 @@ export class UI
                 messageSenderDiv.title = this.usernames.get(userId)!;
             }
         }
+    }
+
+    /** Получить количество отображаемых видеоэлементов на экране. */
+    private getDisplayedVideosCount(): number
+    {
+        let count = 0;
+
+        for (const videoItem of document.querySelectorAll(".video-item"))
+        {
+            if (!(videoItem as HTMLDivElement).hidden)
+            {
+                ++count;
+            }
+        }
+        return count;
     }
 }

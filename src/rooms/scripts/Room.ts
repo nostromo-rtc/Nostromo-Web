@@ -740,6 +740,13 @@ export class Room
             {
                 this.ui.playSound(UiSound.videoOn);
             }
+
+            // Отображаем видеоэлемент и перестроим раскладку.
+            if (!this.ui.checkboxDisplayInactiveVideos.checked)
+            {
+                this.ui.showVideoItem(producerUserId, streamId);
+                this.ui.refreshVideosLayout();
+            }
         }
 
         // Включаем отображение элементов управления
@@ -811,6 +818,14 @@ export class Room
                 );
 
                 this.ui.playSound(UiSound.videoOff);
+
+                // Скрываем видеоэлемент, если стоит такая настройка.
+                // И обновляем раскладку.
+                if (!this.ui.checkboxDisplayInactiveVideos.checked)
+                {
+                    this.ui.hideVideoItem(producerUserId, streamId);
+                    this.ui.refreshVideosLayout();
+                }
             }
 
             const hasAudio: boolean = stream.getAudioTracks().length > 0;
