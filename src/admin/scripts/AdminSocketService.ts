@@ -1,7 +1,7 @@
 import { io, Socket } from "socket.io-client";
 import { SocketEvents as SE } from "nostromo-shared/types/SocketEvents";
 
-import { ActionOnUserInfo, ChangeUserNameInfo, NewRoomInfo, NewRoomNameInfo, NewRoomPassInfo, NewRoomSaveChatPolicyInfo } from "nostromo-shared/types/AdminTypes";
+import { ActionOnUserInfo, ChangeUserNameInfo, NewRoomInfo, NewRoomModeInfo, NewRoomNameInfo, NewRoomPassInfo, NewRoomSaveChatPolicyInfo } from "nostromo-shared/types/AdminTypes";
 import { VideoCodec, UserInfo, PublicRoomInfo } from "nostromo-shared/types/RoomTypes";
 
 // Класс для работы с сокетами при авторизации в панель администратора
@@ -154,6 +154,30 @@ export default class AdminSocketService
 
             this.setSaveRoomChatPolicy(info);
         });
+
+        // Переключить в симметричный режим.
+        const btn_doSymmetricMode = document.getElementById("btn-do-symmetric-mode") as HTMLButtonElement;
+        btn_doSymmetricMode.addEventListener("click", () =>
+        {
+            const info: NewRoomModeInfo = {
+                id: this.getSelectedRoom(),
+                symmetricMode: true
+            };
+
+            this.setRoomMode(info);
+        });
+
+        // Переключить в асимметричный режим.
+        const btn_doNotSymmetricMode = document.getElementById("btn-do-not-symmetric-mode") as HTMLButtonElement;
+        btn_doNotSymmetricMode.addEventListener("click", () =>
+        {
+            const info: NewRoomModeInfo = {
+                id: this.getSelectedRoom(),
+                symmetricMode: false
+            };
+
+            this.setRoomMode(info);
+        });
     }
 
     /** Обработка кнопок, связанных с пользователем. */
@@ -229,6 +253,20 @@ export default class AdminSocketService
             ipInput.value = ipInput.value.trim();
             this.unbanUserByIp(ipInput.value);
         });
+
+        // Разрешить пользователю выступать.
+        const btn_allowUserToSpeak = document.getElementById("btn-allow-user-to-speak") as HTMLButtonElement;
+        btn_allowUserToSpeak.addEventListener("click", () =>
+        {
+            this.allowUserToSpeak(this.getSelectedActionOnUserInfo());
+        });
+
+        // Запретить пользователю выступать.
+        const btn_forbidUserToSpeak = document.getElementById("btn-forbid-user-to-speak") as HTMLButtonElement;
+        btn_forbidUserToSpeak.addEventListener("click", () =>
+        {
+            this.forbidUserToSpeak(this.getSelectedActionOnUserInfo());
+        });
     }
 
     /** Обработка сокет событий. */
@@ -263,12 +301,14 @@ export default class AdminSocketService
         const password = (document.getElementById('room-pass-input') as HTMLInputElement).value;
         const videoCodec = this.videoCodecSelect!.value as VideoCodec;
         const saveChatPolicy = (document.getElementById('checkbox-save-room-chat-policy') as HTMLInputElement).checked;
+        const symmetricMode = (document.getElementById('checkbox-symmetric-mode') as HTMLInputElement).checked;
 
         const newRoomInfo: NewRoomInfo = {
             name,
             password,
             videoCodec,
-            saveChatPolicy
+            saveChatPolicy,
+            symmetricMode
         };
 
         if (name.length > 0)
@@ -515,6 +555,26 @@ export default class AdminSocketService
         }
     }
 
+    /** Разрешить пользователю выступать. */
+    private allowUserToSpeak(info: ActionOnUserInfo)
+    {
+        if (this.checkIsSelectOptionCorrect(info.roomId)
+            && this.checkIsSelectOptionCorrect(info.userId))
+        {
+            this.socket.emit(SE.AllowUserToSpeak, info);
+        }
+    }
+
+    /** Запретить пользователю выступать. */
+    private forbidUserToSpeak(info: ActionOnUserInfo)
+    {
+        if (this.checkIsSelectOptionCorrect(info.roomId)
+            && this.checkIsSelectOptionCorrect(info.userId))
+        {
+            this.socket.emit(SE.ForbidUserToSpeak, info);
+        }
+    }
+
     /** Изменить название комнаты. */
     private changeRoomName(info: NewRoomNameInfo)
     {
@@ -545,6 +605,15 @@ export default class AdminSocketService
         if (this.checkIsSelectOptionCorrect(info.id))
         {
             this.socket.emit(SE.ChangeRoomSaveChatPolicy, info);
+        }
+    }
+
+    /** Установить режим конференции на сервере. */
+    private setRoomMode(info: NewRoomModeInfo)
+    {
+        if (this.checkIsSelectOptionCorrect(info.id))
+        {
+            this.socket.emit(SE.ChangeRoomMode, info);
         }
     }
 }

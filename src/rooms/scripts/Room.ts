@@ -48,6 +48,9 @@ export class Room
     /** Id комнаты. */
     private roomId: string;
 
+    /** Разрешено выступать? */
+    public isAllowedToSpeak = false;
+
     constructor(_ui: UI, _mediasoup: Mediasoup, _fileService: FileService)
     {
         console.debug("[Room] > ctor");
@@ -209,6 +212,20 @@ export class Room
         {
             this.ui.roomName = roomName;
             document.title += ` - Комната "${roomName}"`;
+        });
+
+        this.socket.on(SE.IsAllowedToSpeak, (value: boolean) =>
+        {
+            this.isAllowedToSpeak = value;
+
+            if (this.isAllowedToSpeak)
+            {
+                this.ui.showMediaControlsButtons();
+            }
+            else
+            {
+                this.ui.hideMediaControlsButtons();
+            }
         });
 
         // получаем RTP возможности сервера

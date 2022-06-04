@@ -166,6 +166,11 @@ export class UserMedia
     /** Обработка нажатия на кнопку "Захватить микрофон". */
     private async handleGetMic(): Promise<void>
     {
+        if (!this.room.isAllowedToSpeak)
+        {
+            return;
+        }
+
         let deviceId = this.ui.currentMicDevice;
 
         console.debug("[UserMedia] > handleGetMic", deviceId);
@@ -223,6 +228,11 @@ export class UserMedia
     /** Обработка нажатия на кнопку "Захватить веб-камеру". */
     private async handleGetCam(): Promise<void>
     {
+        if (!this.room.isAllowedToSpeak)
+        {
+            return;
+        }
+
         let deviceId = this.ui.currentCamDevice;
 
         console.debug("[UserMedia] > handleGetCam", deviceId);
@@ -311,6 +321,11 @@ export class UserMedia
     /** Обработка нажатия на кнопку "Демонстрация экрана". */
     private async handleGetDisplay(): Promise<void>
     {
+        if (!this.room.isAllowedToSpeak)
+        {
+            return;
+        }
+
         try
         {
             // Захват изображения с экрана компьютера.

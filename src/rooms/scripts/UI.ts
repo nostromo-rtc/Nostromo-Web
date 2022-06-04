@@ -1143,4 +1143,14 @@ export class UI
             option.textContent = `${newName} [${id}]`;
         }
     }
+
+    public showMediaControlsButtons(): void
+    {
+        const mediaControls = document.getElementById("media-controls")!.hidden = false;
+    }
+
+    public hideMediaControlsButtons(): void
+    {
+        const mediaControls = document.getElementById("media-controls")!.hidden = true;
+    }
 }
