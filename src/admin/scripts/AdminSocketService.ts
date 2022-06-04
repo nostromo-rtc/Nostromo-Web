@@ -178,6 +178,13 @@ export default class AdminSocketService
 
             this.setRoomMode(info);
         });
+
+        // Кик всех юзеров.
+        const btn_kickAllUsers = document.getElementById("btn-kick-all-users") as HTMLButtonElement;
+        btn_kickAllUsers.addEventListener('click', () =>
+        {
+            this.kickAllUsers(this.getSelectedRoom());
+        });
     }
 
     /** Обработка кнопок, связанных с пользователем. */
@@ -374,6 +381,15 @@ export default class AdminSocketService
         if (this.checkIsSelectOptionCorrect(roomId))
         {
             this.socket.emit(SE.DeleteRoomFiles, roomId);
+        }
+    }
+
+    /** Кикнуть всех пользователей в комнате. */
+    private kickAllUsers(roomId: string): void
+    {
+        if (this.checkIsSelectOptionCorrect(roomId))
+        {
+            this.socket.emit(SE.KickAllUsers, roomId);
         }
     }
 
