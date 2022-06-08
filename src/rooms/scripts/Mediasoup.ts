@@ -179,7 +179,6 @@ export class Mediasoup
 
             producerOptions.encodings = [
                 {
-                    maxBitrate: videoBitrate
                     maxBitrate: videoBitrate,
                     maxFramerate: track.getConstraints().frameRate as number
                 }
