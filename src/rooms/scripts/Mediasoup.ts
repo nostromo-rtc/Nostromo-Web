@@ -169,6 +169,9 @@ export class Mediasoup
 
         if (track.kind == "video")
         {
+            // Для фикса бага с 5 фпс для Chrome и кодека VP9.
+            track.contentHint = "motion";
+
             producerOptions.codecOptions = {
                 videoGoogleStartBitrate: 1000,
                 videoGoogleMaxBitrate: this.maxReasonableVideoBitrate / PrefixConstants.KILO
