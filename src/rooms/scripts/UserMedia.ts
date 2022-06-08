@@ -781,7 +781,7 @@ export class UserMedia
                 frameRate: 30,
                 width: 2560, height: 1440
             },
-            audio: { echoCancellation: false, noiseSuppression: false, }
+            audio: { echoCancellation: false, noiseSuppression: false }
         };
 
         const constraints1080p: MediaStreamConstraints = {
