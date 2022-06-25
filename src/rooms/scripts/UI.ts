@@ -120,6 +120,9 @@ export class UI
     /** Чекбокс для включения/выключения отображения локальных видеоэлементов. */
     public readonly checkboxDisplayLocalVideos = document.getElementById("checkbox-display-local-videos") as HTMLInputElement;
 
+    /** Чекбокс для включения/выключения шумоподавления микрофона. */
+    public readonly checkboxEnableNoiseSuppression = document.getElementById("checkbox-enable-noise-suppression") as HTMLInputElement;
+
     /** Текстовая метка - количество пользователей. */
     public readonly spanUsersCount = document.getElementById("users-count") as HTMLSpanElement;
 
@@ -250,6 +253,12 @@ export class UI
             }
 
             this.refreshVideosLayout();
+        });
+
+        this.setupCheckboxEnableNoiseSuppressionFromLS();
+        this.checkboxEnableNoiseSuppression.addEventListener("click", () =>
+        {
+            this.setCheckboxEnableNoiseSuppressionState();
         });
     }
 
@@ -870,6 +879,16 @@ export class UI
         this.checkboxDisplayLocalVideos.checked = (localStorage["display-local-video"] == "true");
     }
 
+    /** Прочитать из локального хранилище настройку включения/выключения шумоподавления микрофона. */
+    private setupCheckboxEnableNoiseSuppressionFromLS(): void
+    {
+        if (localStorage["enable-noise-suppression"] == undefined)
+        {
+            localStorage["enable-noise-suppression"] = "true";
+        }
+        this.checkboxEnableNoiseSuppression.checked = (localStorage["enable-noise-suppression"] == "true");
+    }
+
     /** Установить новое состояние для чекбокса notifications. */
     private setCheckboxNotificationsState(): void
     {
@@ -892,6 +911,12 @@ export class UI
     private setCheckboxDisplayLocalVideoState(): void
     {
         localStorage["display-local-video"] = this.checkboxDisplayLocalVideos.checked;
+    }
+
+    /** Установить новое состояние для чекбокса enable-noise-suppression. */
+    private setCheckboxEnableNoiseSuppressionState(): void
+    {
+        localStorage["enable-noise-suppression"] = this.checkboxEnableNoiseSuppression.checked;
     }
 
     public playSound(sound: UiSound)

@@ -186,11 +186,10 @@ export class Mediasoup
         }
         else
         {
-            producerOptions.encodings = [
-                {
-                    maxBitrate: this.maxAudioBitrate
-                }
-            ];
+            producerOptions.codecOptions = {
+                opusStereo: true,
+                opusMaxAverageBitrate: this.maxAudioBitrate
+            };
         }
 
         console.debug("[Mediasoup] > createProducer", producerOptions);

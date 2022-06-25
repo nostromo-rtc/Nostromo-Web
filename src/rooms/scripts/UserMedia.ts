@@ -30,7 +30,12 @@ export class UserMedia
 
     /** Настройки медиапотока при захвате микрофона. */
     private readonly streamConstraintsMic: MediaStreamConstraints = {
-        audio: true, video: false
+        audio: {noiseSuppression: true, echoCancellation: true}, video: false
+    };
+
+    /** Настройки медиапотока при захвате микрофона без шумоподавления. */
+    private readonly streamConstraintsMicWithoutNoiseSuppression: MediaStreamConstraints = {
+        audio: {noiseSuppression: false, echoCancellation: false}, video: false
     };
 
     /** Настройки медиапотока при захвате видеоизображения экрана. */
@@ -175,8 +180,9 @@ export class UserMedia
 
         console.debug("[UserMedia] > handleGetMic", deviceId);
 
-        const constraints = this.streamConstraintsMic;
-        constraints.audio = { deviceId: { ideal: deviceId } };
+        // Используем spread оператор для копирования объекта streamConstraintsMic.
+        const constraints = this.ui.checkboxEnableNoiseSuppression.checked ? {...this.streamConstraintsMic} : {...this.streamConstraintsMicWithoutNoiseSuppression};
+        (constraints.audio as MediaTrackConstraints).deviceId = { ideal: deviceId };
 
         // Это происходит на Chrome, при первом заходе на страницу
         // когда нет прав на получение Id устройства.
@@ -194,14 +200,14 @@ export class UserMedia
             if (device)
             {
                 const groupId = device.groupId;
-                constraints.audio.groupId = { ideal: groupId };
+                (constraints.audio as MediaTrackConstraints).groupId = { ideal: groupId };
             }
         }
 
         try
         {
             // Захват микрофона.
-            deviceId = await this.getUserMedia(this.streamConstraintsMic, deviceId);
+            deviceId = await this.getUserMedia(constraints, deviceId);
 
             // Выберем в списке устройств захваченный микрофон.
             this.ui.micDevices.value = deviceId;
@@ -243,7 +249,8 @@ export class UserMedia
             return;
         }
 
-        const constraints = this.captureConstraintsCam.get(this.ui.currentCaptureSettingCam)!;
+        // Используем spread оператор для копирования объекта constraints.
+        const constraints = {...this.captureConstraintsCam.get(this.ui.currentCaptureSettingCam)!};
         (constraints.video as MediaTrackConstraints).deviceId = { ideal: deviceId };
 
         // Это происходит на Chrome, при первом заходе на страницу
@@ -379,6 +386,7 @@ export class UserMedia
         if (streamConstraints.audio)
         {
             await this.handleMediaStream("main", mediaStream);
+            console.debug("[UserMedia] > Captured mic settings:", mediaStream.getAudioTracks()[0].getSettings());
             return deviceId;
         }
 
