@@ -103,7 +103,15 @@ export class Mediasoup
     /** Создать транспортный канал для приёма медиапотоков. */
     public createConsumerTransport(transport: NewWebRtcTransportInfo): void
     {
-        const { id, iceParameters, iceCandidates, dtlsParameters } = transport;
+        const { id, iceParameters, dtlsParameters } = transport;
+        let { iceCandidates } = transport;
+
+        if (localStorage["enable-ice-tcp-protocol"] == "true")
+        {
+            iceCandidates = iceCandidates.filter(
+                candidate => candidate.protocol == "tcp"
+            );
+        }
 
         this._consumerTransport = this.device.createRecvTransport({
             id,
@@ -116,7 +124,15 @@ export class Mediasoup
     /** Создать транспортный канал для отдачи медиапотоков. */
     public createProducerTransport(transport: NewWebRtcTransportInfo): void
     {
-        const { id, iceParameters, iceCandidates, dtlsParameters } = transport;
+        const { id, iceParameters, dtlsParameters } = transport;
+        let { iceCandidates } = transport;
+
+        if (localStorage["enable-ice-tcp-protocol"] == "true")
+        {
+            iceCandidates = iceCandidates.filter(
+                candidate => candidate.protocol == "tcp"
+            );
+        }
 
         this._producerTransport = this.device.createSendTransport({
             id,

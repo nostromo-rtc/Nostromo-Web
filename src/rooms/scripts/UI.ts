@@ -123,6 +123,9 @@ export class UI
     /** Чекбокс для включения/выключения шумоподавления микрофона. */
     public readonly checkboxEnableNoiseSuppression = document.getElementById("checkbox-enable-noise-suppression") as HTMLInputElement;
 
+    /** Чекбокс для включения/выключения TCP протокола для ICE-соединений. */
+    public readonly checkboxEnableIceTcpProtocol = document.getElementById("checkbox-enable-ice-tcp-protocol") as HTMLInputElement;
+
     /** Текстовая метка - количество пользователей. */
     public readonly spanUsersCount = document.getElementById("users-count") as HTMLSpanElement;
 
@@ -259,6 +262,20 @@ export class UI
         this.checkboxEnableNoiseSuppression.addEventListener("click", () =>
         {
             this.setCheckboxEnableNoiseSuppressionState();
+        });
+
+        this.setupCheckboxEnableIceTcpProtocolFromLS();
+        this.checkboxEnableIceTcpProtocol.addEventListener("click", (ev) =>
+        {
+            if (confirm("Вы точно хотите изменить протокол для соединения?"))
+            {
+                this.setCheckboxEnableIceTcpProtocolState();
+                location.reload();
+            }
+            else
+            {
+                ev.preventDefault();
+            }
         });
     }
 
@@ -889,6 +906,16 @@ export class UI
         this.checkboxEnableNoiseSuppression.checked = (localStorage["enable-noise-suppression"] == "true");
     }
 
+    /** Прочитать из локального хранилище настройку включения/выключения TCP-протокола для ICE-соединений. */
+    private setupCheckboxEnableIceTcpProtocolFromLS(): void
+    {
+        if (localStorage["enable-ice-tcp-protocol"] == undefined)
+        {
+            localStorage["enable-ice-tcp-protocol"] = "false";
+        }
+        this.checkboxEnableIceTcpProtocol.checked = (localStorage["enable-ice-tcp-protocol"] == "true");
+    }
+
     /** Установить новое состояние для чекбокса notifications. */
     private setCheckboxNotificationsState(): void
     {
@@ -917,6 +944,12 @@ export class UI
     private setCheckboxEnableNoiseSuppressionState(): void
     {
         localStorage["enable-noise-suppression"] = this.checkboxEnableNoiseSuppression.checked;
+    }
+
+    /** Установить новое состояние для чекбокса enable-ice-tcp-protocol. */
+    private setCheckboxEnableIceTcpProtocolState(): void
+    {
+        localStorage["enable-ice-tcp-protocol"] = this.checkboxEnableIceTcpProtocol.checked;
     }
 
     public playSound(sound: UiSound)

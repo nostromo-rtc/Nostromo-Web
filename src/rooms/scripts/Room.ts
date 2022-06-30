@@ -622,9 +622,12 @@ export class Room
         {
             console.debug("[Room] > connectionstatechange: ", state);
 
-            // так и не получилось подключиться
+            // Так и не получилось подключиться.
             if (state == "failed")
             {
+                // Попробуем по протоколу TCP.
+                localStorage["enable-ice-tcp-protocol"] = "true";
+
                 handleCriticalError(new TransportFailedError("ICE connection state change is failed."));
             }
         });
