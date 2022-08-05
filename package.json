@@ -1,6 +1,6 @@
 {
   "name": "nostromo-web",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Front-end component of Nostromo",
   "scripts": {
     "build": "webpack",
