@@ -24,7 +24,7 @@
     "howler": "2.2.3",
     "mediasoup-client": "3.6.82",
     "mini-css-extract-plugin": "2.6.0",
-    "nostromo-shared": "git+https://git@gitlab.com/sgakerru/nostromo-shared.git#dev",
+    "nostromo-shared": "git+https://git@gitlab.com/sgakerru/nostromo-shared.git#new-ui",
     "plyr": "3.6.12",
     "socket.io-client": "4.4.1",
     "ts-loader": "9.2.8",
