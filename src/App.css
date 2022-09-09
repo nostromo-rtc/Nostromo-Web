@@ -1,0 +1,94 @@
+#app {
+    display: flex;
+}
+
+.flex {
+    display: flex;
+}
+
+#base
+{
+    display: flex;
+    width: 100%;
+}
+
+#auth {
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    font-size: 24px;
+}
+
+#pass {
+    font-size: 48px;
+    margin-bottom: 5px;
+}
+
+#pass-label {
+    margin-bottom: 16px;
+}
+
+#btn-join {
+    font-size: 48px;
+}
+
+.vl {
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.max-w-150 {
+    max-width: 150px;
+}
+
+.w-100-proc {
+    width: 100%;
+}
+
+.background-green {
+    background-color: lightgreen;
+}
+
+.background-white {
+    background-color: white;
+}
+
+.background-lightgreen {
+    background-color: rgb(163, 233, 163);
+}
+
+.background-orange {
+    background-color: rgb(248, 178, 152);
+}
+
+.background-red {
+    background-color: lightcoral;
+}
+
+.bold {
+    font-weight: 600;
+}
+
+.color-dodgerblue {
+    color: dodgerblue;
+}
+
+.color-customgray {
+    color: rgb(84, 110, 122);
+}
+
+.color-custom-lightgray {
+    color: #d4d4d4;
+}
+
+.color-darkviolet {
+    color: darkviolet;
+}
+
+.m-a {
+    margin: auto;
+}
+
+[hidden] {
+    display: none !important;
+}

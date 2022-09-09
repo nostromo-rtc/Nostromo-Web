@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.1" viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<defs>
+<linearGradient id="b">
+<stop offset="0"/>
+</linearGradient>
+<filter id="d" x="-.1288" y="-.10217" width="1.2576" height="1.2043" color-interpolation-filters="sRGB">
+<feGaussianBlur stdDeviation="0.58812146"/>
+</filter>
+<filter id="c" x="-.46646" y="-.37003" width="1.9329" height="1.7401" color-interpolation-filters="sRGB">
+<feGaussianBlur stdDeviation="3.9167298"/>
+</filter>
+<linearGradient id="a" x1="40.535" x2="64.094" y1="67.998" y2="67.998" gradientUnits="userSpaceOnUse" xlink:href="#b"/>
+</defs>
+<g>
+<ellipse cx="90" cy="90.931" rx="89.265" ry="89.371" display="none" stroke="#000" stroke-width="1.234"/>
+<text transform="matrix(4.5907 0 0 4.0664 -150.14 -185.64)" fill="#00ff00" filter="url(#c)" font-family="Roboto" font-size="40px" font-weight="500" stroke="url(#a)" stroke-linecap="square" stroke-width="2.2449" style="font-variant-caps:normal;font-variant-east-asian:normal;font-variant-ligatures:normal;font-variant-numeric:normal;line-height:1.25;mix-blend-mode:normal;paint-order:stroke markers fill;shape-inside:url(#rect6796);white-space:pre" xml:space="preserve"><tspan x="38.144531" y="82.216797">N</tspan></text>
+<text transform="matrix(4.4061 0 0 4.4061 -140.44 -209.49)" fill="#000000" filter="url(#d)" font-family="Roboto" font-size="40px" font-weight="500" stroke="url(#a)" stroke-linecap="square" stroke-width="2.9879" style="font-variant-caps:normal;font-variant-east-asian:normal;font-variant-ligatures:normal;font-variant-numeric:normal;line-height:1.25;mix-blend-mode:normal;paint-order:stroke markers fill;shape-inside:url(#rect6796-3);white-space:pre" xml:space="preserve"><tspan x="38.144531" y="82.216797">N</tspan></text>
+<text transform="matrix(4.4061 0 0 4.4061 -140.43 -209.43)" fill="#00ff00" font-family="Roboto" font-size="40px" font-weight="500" stroke="url(#a)" stroke-linejoin="round" stroke-width="2.9879" style="font-variant-caps:normal;font-variant-east-asian:normal;font-variant-ligatures:normal;font-variant-numeric:normal;line-height:1.25;paint-order:stroke fill markers;shape-inside:url(#rect7151);white-space:pre" xml:space="preserve"><tspan x="38.144531" y="82.216797">N</tspan></text>
+</g>
+</svg>

@@ -1,0 +1,53 @@
+/* оформление для главной части страницы */
+.main {
+    margin-left: 72px;
+    display: flex;
+    flex-direction: column;
+    /* отступ от меню */
+    margin-top: 36px;
+    /* отступ от заголовка */
+    font-size: 18px;
+    padding: 5px 10px;
+    width: 100%;
+}
+
+#room-list {
+    display: flex;
+    flex-direction: column;
+    font-size: 22px;
+}
+
+.room-list-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background-color: #666262;
+    color: white;
+    text-decoration: none;
+    margin-top: 5px;
+    min-height: 50px;
+    border-radius: 0.5rem;
+}
+
+.room-list-item-label {
+    margin-left: 10px;
+}
+
+.room-list-item-id {
+    margin-left: 5px;
+    color: #d4d4d4;
+    font-weight: 300;
+    font-size: 14px;
+    margin-top: 6px;
+}
+
+.room-list-item-join {
+    margin-left: auto;
+    margin-right: 20px;
+}
+
+.room-list-item:hover {
+    background-color: #957777;
+    color: #00BFFF;
+    font-size: 23px;
+}

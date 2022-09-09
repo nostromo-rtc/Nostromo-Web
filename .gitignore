@@ -1,17 +1,12 @@
-# VSCode cfg
-.vscode/
-
 # NodeJS runtime
-node_modules/
+/node_modules
 
-# compiled .js files of frontend
-temp-build/**/*.js
+# production
+/build
 
-# bundled (webpack) and vendor .js files of frontend
-static/**/*.js
-static/**/vendor.css
+# misc
+.env.local
+.env.development.local
 
 # other
 *.bat
-*.exe
-log.txt
