@@ -1,13 +1,12 @@
 /* оформление для заголовка */
 .header {
-    position: fixed;
-    top: 0;
-    left: 72px;
-    width: 100%;
+    display: flex;
+    align-items: center;
     z-index: 2;
     height: 32px;
-    background-color: #4a4848;
-    border-bottom: 4px solid #d4d4d4;
+    background-color: #36393f;
+    border-bottom: 1px solid #2b2e33;
+    box-shadow: 0px 2px 4px -4px rgba(0, 0, 0, 0.85);
 }
 
 .header div {

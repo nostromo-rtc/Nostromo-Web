@@ -2,15 +2,15 @@ import { BrowserRouter } from "react-router-dom";
 import "./App.css";
 
 // Мои компоненты
-import { AppNavbar } from "./components/AppNavbar";
+import { Navbar } from "./components/Navbar";
 import { PageRouter } from "./components/PageRouter";
 
 function App()
 {
     return (
         <BrowserRouter>
-            <div id="app">
-                <AppNavbar />
+            <div id="app" className="container">
+                <Navbar />
                 <PageRouter />
             </div>
         </BrowserRouter>

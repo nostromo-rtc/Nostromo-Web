@@ -12,31 +12,28 @@
     font-style: italic;
 }
 
-body {
+html,
+body,
+#root {
+    height: 100%;
+    width: 100%;
     margin: 0;
+    padding: 0;
+}
+
+#root {
+    display: flex;
+}
+
+html,
+body,
+input,
+button,
+textarea,
+select {
     font-family: Rubik, Arial, Helvetica, sans-serif;
     font-weight: 400;
     -webkit-text-size-adjust: none;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-}
-
-input {
-    font-family: Rubik, Arial, Helvetica, sans-serif;
-    font-weight: 400;
-}
-
-button {
-    font-family: Rubik, Arial, Helvetica, sans-serif;
-    font-weight: 400;
-}
-
-textarea {
-    font-family: Rubik, Arial, Helvetica, sans-serif;
-    font-weight: 400;
-}
-
-select {
-    font-family: Rubik, Arial, Helvetica, sans-serif;
-    font-weight: 400;
 }

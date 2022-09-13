@@ -14,9 +14,9 @@ export const RoomAuthPage: React.FC = () =>
     }, []);
 
     return (
-        <div id="base">
+        <div className="container flex-column">
             <Header title="Авторизация в комнате" />
-            <div className="main">
+            <div className="base">
                 Авторизация в {id}
             </div>
         </div>
