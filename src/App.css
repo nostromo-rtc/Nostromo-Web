@@ -9,33 +9,21 @@
 .container {
     position: relative;
     display: flex;
-    width: 100%;
-    height: 100%;
-}
-
-#auth {
-    display: flex;
-    flex-direction: column;
-    margin: auto;
-    font-size: 24px;
-}
-
-#pass {
-    font-size: 48px;
-    margin-bottom: 5px;
-}
-
-#pass-label {
-    margin-bottom: 16px;
-}
-
-#btn-join {
-    font-size: 48px;
+    flex: auto;
 }
 
 .vl {
     margin-left: 5px;
     margin-right: 5px;
+}
+
+.base {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    font-size: 1.125rem;
+    padding: 5px 10px;
+    background-color: #36393f;
 }
 
 .max-w-150 {
@@ -92,4 +80,8 @@
 
 [hidden] {
     display: none !important;
+}
+
+p, span {
+    color: white;
 }
