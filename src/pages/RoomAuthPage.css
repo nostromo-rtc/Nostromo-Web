@@ -1,8 +1,11 @@
 #room-name {
     color: #d4d4d4;
-    font-size: 1.1em;
+    font-size: 0.8em;
     margin-top: 10px;
     margin-bottom: 20px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 90%;
 }
 
 #auth {
@@ -11,13 +14,10 @@
     margin: auto;
     background-color: #4f5461;
     font-size: 2rem;
-    padding-top: 25px;
-    padding-bottom: 25px;
-    padding-left: 25px;
-    padding-right: 25px;
+    padding: 1.5rem;
     border-radius: 0.5rem;
     box-shadow: 0px 2px 10px -1px rgba(0, 0, 0, 0.2);
-    width: 28rem;
+    width: 30rem;
 }
 
 #pass {
@@ -34,6 +34,12 @@
     #auth {
         font-size: 1.5rem;
         max-width: 14rem;
+    }
+}
+
+@media (height <= 400px) {
+    #auth {
+        font-size: 1.5rem;
     }
 }
 

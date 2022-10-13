@@ -16,13 +16,13 @@ export const RoomAuthPage: React.FC = () =>
     }, []);
 
     return (
-        <div className="container flex-column">
+        <div id="base">
             <Header title="Авторизация в комнате" />
-            <div className="base">
+            <div id="main">
                 <form id="auth" autoComplete="on" onSubmit={(ev) => {setStatus(false); ev.preventDefault()}}>
                     {status === false ? <span className="m-a" id="status">Неправильный пароль!</span> : <></>}
                     <span className="m-a">Вход в комнату</span>
-                    <span className="m-a" id="room-name">Тестовая</span>
+                    <span className="m-a" id="room-name" title="Тестовая">Тестовая</span>
                     <input type="text" name="username" defaultValue={id} hidden />
                     <input id="pass" type="password" name="password" placeholder="Введите пароль" />
                     { /* TODO: это пока заглушка, нужно привязать нормальное действие */ }

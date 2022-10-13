@@ -13,9 +13,9 @@ export const RoomListPage: React.FC = () =>
     }, []);
 
     return (
-        <div className="container flex-column">
+        <div id="base">
             <Header title="Список комнат" />
-            <div className="base">
+            <div id="main">
                 <div id="room-list">
                     <NavLink to="/r/testId" id="testId" className="room-list-item">
                         <span className="room-list-item-label">Тестовая</span>

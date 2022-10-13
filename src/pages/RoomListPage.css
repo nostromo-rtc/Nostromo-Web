@@ -3,6 +3,7 @@
     display: flex;
     flex-direction: column;
     font-size: 1.375rem;
+    margin: 5px;
 }
 
 .room-list-item {
@@ -20,6 +21,9 @@
 
 .room-list-item-label {
     margin-left: 10px;
+    overflow: hidden;
+    max-width: 90%;
+    text-overflow: ellipsis;
 }
 
 .room-list-item-id {
