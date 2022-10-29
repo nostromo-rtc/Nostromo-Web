@@ -1,0 +1,34 @@
+.vertical-layout {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: #36393f;
+}
+
+.vl-resizer-bar {
+    cursor: ns-resize;
+    min-height: 4px;
+    width: 100%;
+}
+
+.vl-upper-elem {
+    position: relative;
+    display: flex;
+    flex: auto;
+    background-color: #303338;
+    border-radius: 7px;
+    border-bottom: 1px rgb(34, 33, 33) solid;
+}
+
+.vl-lower-elem {
+    position: relative;
+    display: flex;
+    min-height: 20%;
+    max-height: 80%;
+    background-color: #3d4248;
+    border-radius: 7px;
+    border-top: 1px rgb(34, 33, 33, 0.6) solid;
+}
