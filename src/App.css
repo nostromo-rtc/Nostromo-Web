@@ -95,6 +95,7 @@
     display: none !important;
 }
 
-p, span {
+p,
+span {
     color: white;
 }

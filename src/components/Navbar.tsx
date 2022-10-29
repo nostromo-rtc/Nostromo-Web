@@ -7,7 +7,7 @@ import "./Navbar.css";
 export const Navbar: React.FC = () =>
 (
     <div className="nav">
-        <NavLink to="/" className={({isActive}) => isActive ? "navbutton-active" : "navbutton-inactive"}><img src={logo} alt="Home" className="navbutton-icon"></img></NavLink>
+        <NavLink to="/" className={({ isActive }) => isActive ? "navbutton-active" : "navbutton-inactive"}><img src={logo} alt="Home" className="navbutton-icon"></img></NavLink>
         <span className="navbutton-underline"></span>
     </div>
 );
