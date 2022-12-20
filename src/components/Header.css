@@ -3,14 +3,22 @@
     display: flex;
     align-items: center;
     z-index: 2;
-    height: 32px;
+    height: 48px;
     background-color: #414652;
     border-bottom: 1px solid #2b2e33;
     box-shadow: 0px 2px 4px -4px rgba(0, 0, 0, 0.85);
 }
 
-.header div {
+#header-title {
     margin-left: 10px;
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     color: #d4d4d4;
+    flex: auto;
+}
+
+#toggle-user-list
+{
+    font-size: 0.8rem;
+    color: #d4d4d4;
+    margin-right: 15px;
 }

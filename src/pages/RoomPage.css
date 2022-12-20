@@ -1,7 +1,40 @@
 #call-container {
     color: white;
+    background-color: #303338;
+    border-radius: 7px;
+    border-bottom: 1px rgb(34, 33, 33) solid;
+    flex: auto;
 }
 
 #chat-container {
     color: white;
+    background-color: #3d4248;
+    border-radius: 7px;
+    border-top: 1px rgb(34, 33, 33, 0.6) solid;
+    flex: auto;
+}
+
+#upper-container
+{
+    display: flex;
+    flex-direction: column;
+    flex: auto;
+}
+
+#user-list-container
+{
+    color: white;
+    background-color: #2e3133;
+    border-radius: 7px;
+    margin-left: 5px;
+    flex: auto;
+    min-width: 240px;
+}
+
+#action-panel-container
+{
+    color: white;
+    background-color: #252e34;
+    border-radius: 7px;
+    margin-bottom: 4px;
 }

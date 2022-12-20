@@ -48,7 +48,12 @@ export const VerticalLayout: React.FC<Params> = ({ upperContainer, lowerContaine
     };
 
     return (
-        <div className="vertical-layout" style={{ cursor: cursorStyle }} onMouseMove={onMouseMove} onMouseUp={onMouseUp} onMouseLeave={onMouseUp}>
+        <div className={resizing ? "vertical-layout non-selectable" : "vertical-layout"}
+            style={{ cursor: cursorStyle }}
+            onMouseMove={onMouseMove}
+            onMouseUp={onMouseUp}
+            onMouseLeave={onMouseUp}
+        >
             <div className="vl-upper-elem">{upperContainer}</div>
             <div className={resizing ? "vl-resizer-bar vl-resizer-bar-activated" : "vl-resizer-bar"} onMouseDown={onMouseDown}></div>
             <div className="vl-lower-elem" ref={lowerContainerRef} style={({ height: heightForLower })}>{lowerContainer}</div>
