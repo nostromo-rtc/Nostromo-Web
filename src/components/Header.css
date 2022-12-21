@@ -16,7 +16,7 @@
     flex: auto;
 }
 
-#toggle-user-list
+.toolbar-btn
 {
     font-size: 0.8rem;
     color: #d4d4d4;

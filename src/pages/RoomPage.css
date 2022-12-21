@@ -1,4 +1,4 @@
-#call-container {
+#video-container {
     color: white;
     background-color: #303338;
     border-radius: 7px;
@@ -14,7 +14,7 @@
     flex: auto;
 }
 
-#upper-container
+#call-container
 {
     display: flex;
     flex-direction: column;
@@ -27,7 +27,6 @@
     background-color: #2e3133;
     border-radius: 7px;
     margin-left: 5px;
-    flex: auto;
     min-width: 240px;
 }
 

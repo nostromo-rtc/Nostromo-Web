@@ -5,11 +5,6 @@ import "../App.css";
 import { VerticalLayout } from "../components/VerticalLayout";
 import "./RoomPage.css";
 
-export type ToggleUserListBtnInfo = {
-    isUserListHidden: boolean,
-    setIsUserListHidden: (state: boolean) => void
-}
-
 export const RoomPage: React.FC = () =>
 {
     useEffect(() =>
@@ -18,18 +13,22 @@ export const RoomPage: React.FC = () =>
     }, []);
 
     const actionPanelContainer = <div id="action-panel-container">action-panel-container</div>;
-    const callContainer = <div id="call-container">call-container</div>;
+    const videoContainer = <div id="video-container">video-container</div>;
     const chatContainer = <div id="chat-container">chat-container</div>;
-    const upperContainer = <div id="upper-container">{actionPanelContainer}{callContainer}</div>;
-    const userListContainer = <div id="user-list-container">user-list-container</div>
+    const callContainer = <div id="call-container">{actionPanelContainer}{videoContainer}</div>;
+    const userListContainer = <div id="user-list-container">user-list-container</div>;
 
     const [isUserListHidden, setIsUserListHidden] = useState(false);
+    const [isChatHidden, setIsChatHidden] = useState(false);
 
     return (
         <div id="base">
-            <Header title="Комната - Тестовая" toggleUserListBtnInfo={{isUserListHidden, setIsUserListHidden}} />
+            <Header title="Комната - Тестовая"
+                toggleUserListBtnInfo={{ isUserListHidden, setIsUserListHidden }}
+                toggleChatBtnInfo={{ isChatHidden, setIsChatHidden }}
+            />
             <div id="main" className="flex-row">
-                <VerticalLayout upperContainer={upperContainer} lowerContainer={chatContainer} />
+                {isChatHidden ? callContainer : <VerticalLayout upperContainer={callContainer} lowerContainer={chatContainer} />}
                 {isUserListHidden ? <></> : userListContainer}
             </div>
         </div>
