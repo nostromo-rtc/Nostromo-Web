@@ -188,3 +188,40 @@ video {
 }
 
 #user-list option:disabled { color: #000; }
+
+#mic-options
+{
+    border-radius: 7px;
+    padding: 10px 15px;
+    background-color: #f6d3c6;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    align-self: center;
+}
+
+#volume-indicator-label
+{
+    font-weight: 300;
+    display: inline-block;
+}
+
+#volume-indicator
+{
+    min-width: 500px;
+}
+
+#btn-toggle-mic-filter
+{
+    margin-top: 5px;
+    cursor: pointer;
+    user-select: none;
+    font-size: 14px;
+    width: fit-content;
+    padding: 5px;
+    margin-left: auto;
+}
+
+.background-darkgreen
+{
+    background-color: rgb(30, 185, 30)
+}

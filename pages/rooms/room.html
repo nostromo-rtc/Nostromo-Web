@@ -86,7 +86,14 @@
                     </select>
                 </div>
                 <button id="btn-stop-display" class="bold background-red" hidden>Прекратить захват экрана</button>
+                <span class="vl">|</span>
+                <button id="btn-show-mic-options">Доп. настройки микрофона</button>
             </div>
+        </div>
+        <div id="mic-options" hidden>
+            <div id="volume-indicator-label">Индикатор громкости:</div>
+            <meter id="volume-indicator" high="0.25" max="1" value="0.7"></meter>
+            <div id="btn-toggle-mic-filter" class="background-darkgreen" role="button">Включить интеллектуальное шумоподавление</div>
         </div>
         <div id="videos"></div>
         <section id="chat-section">

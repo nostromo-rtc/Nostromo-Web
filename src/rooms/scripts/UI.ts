@@ -204,6 +204,21 @@ export class UI
             this.disableSounds();
             this.toggleSoundsButtons();
         });
+
+        const btn_showMicOptions = this.buttons.get('show-mic-options')!;
+        btn_showMicOptions.addEventListener('click', () =>
+        {
+            const micOptions = document.getElementById("mic-options")!;
+            micOptions.hidden = !micOptions.hidden;
+        });
+
+        const btn_toggleMicFilter = document.getElementById("btn-toggle-mic-filter")!;
+        btn_toggleMicFilter.addEventListener("click", () =>
+        {
+            const isFilterEnabled = (btn_toggleMicFilter.innerText === "Включить интеллектуальное шумоподавление");
+            btn_toggleMicFilter.innerText = isFilterEnabled ? "Выключить интеллектуальное шумоподавление" : "Включить интеллектуальное шумоподавление";
+            btn_toggleMicFilter.className = isFilterEnabled ? "background-red" : "background-darkgreen";
+        });
     }
 
     /** Подключить обработчики к чекбоксам. */
@@ -367,6 +382,7 @@ export class UI
         buttons.set('enable-sounds', document.getElementById('btn-enable-sounds') as HTMLButtonElement);
         buttons.set('disable-sounds', document.getElementById('btn-disable-sounds') as HTMLButtonElement);
         buttons.set('set-new-username', document.getElementById('btn-set-new-username') as HTMLButtonElement);
+        buttons.set("show-mic-options", document.getElementById("btn-show-mic-options") as HTMLButtonElement);
 
         return buttons;
     }
