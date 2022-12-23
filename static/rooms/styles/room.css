@@ -197,6 +197,10 @@ video {
     margin-top: 10px;
     margin-bottom: 10px;
     align-self: center;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    min-width: 650px;
 }
 
 #volume-indicator-label
@@ -224,4 +228,37 @@ video {
 .background-darkgreen
 {
     background-color: rgb(30, 185, 30)
+}
+
+#mic-is-not-captured
+{
+    background-color: #48423f;
+    opacity: 98%;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    border-radius: 7px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#mic-is-not-captured div
+{
+    margin: auto;
+    color: white;
+    font-size: 16px;
+    display: flex;
+    flex-direction: column;
+    user-select: none;
+}
+
+#mic-is-not-captured div div
+{
+    margin-top: 5px;
+    font-size: 15px;
+    font-weight: 300;
 }
