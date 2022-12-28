@@ -1,8 +1,10 @@
 const path = require('path');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const WorkerUrlPlugin = require("worker-url/plugin");
 
 const BUILD_DIR = path.join('src/');
 const OUT_DIR = path.join('static/');
+const PUBLIC_DIR = path.join('static/public');
 
 const ADMIN_PATHNAME = path.join('admin/scripts/index');
 const INDEX_PATHNAME = path.join('public/scripts/index');
@@ -45,6 +47,7 @@ module.exports = {
             filename: "[name].css",
             ignoreOrder: false,
         }),
+        new WorkerUrlPlugin(),
     ],
     module: {
         rules: [

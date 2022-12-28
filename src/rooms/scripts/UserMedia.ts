@@ -1,6 +1,8 @@
 import { UI, UiSound } from "./UI";
 import { Room } from "./Room";
 
+import { WorkerUrl } from "worker-url";
+
 declare global
 {
     interface MediaTrackConstraintSet
@@ -30,12 +32,12 @@ export class UserMedia
 
     /** Настройки медиапотока при захвате микрофона. */
     private readonly streamConstraintsMic: MediaStreamConstraints = {
-        audio: {noiseSuppression: true, echoCancellation: true}, video: false
+        audio: { noiseSuppression: true, echoCancellation: true }, video: false
     };
 
     /** Настройки медиапотока при захвате микрофона без шумоподавления. */
     private readonly streamConstraintsMicWithoutNoiseSuppression: MediaStreamConstraints = {
-        audio: {noiseSuppression: false, echoCancellation: false}, video: false
+        audio: { noiseSuppression: false, echoCancellation: false }, video: false
     };
 
     /** Настройки медиапотока при захвате видеоизображения экрана. */
@@ -43,6 +45,10 @@ export class UserMedia
 
     /** Настройки медиапотока при захвате изображения веб-камеры. */
     private captureConstraintsCam: Map<string, MediaStreamConstraints>;
+
+    private audioContext: AudioContext = new AudioContext();
+
+    private stopVolumeMeter?: () => void;
 
     constructor(_ui: UI, _room: Room)
     {
@@ -181,7 +187,7 @@ export class UserMedia
         console.debug("[UserMedia] > handleGetMic", deviceId);
 
         // Используем spread оператор для копирования объекта streamConstraintsMic.
-        const constraints = this.ui.checkboxEnableNoiseSuppression.checked ? {...this.streamConstraintsMic} : {...this.streamConstraintsMicWithoutNoiseSuppression};
+        const constraints = this.ui.checkboxEnableNoiseSuppression.checked ? { ...this.streamConstraintsMic } : { ...this.streamConstraintsMicWithoutNoiseSuppression };
         (constraints.audio as MediaTrackConstraints).deviceId = { ideal: deviceId };
 
         // Это происходит на Chrome, при первом заходе на страницу
@@ -215,6 +221,8 @@ export class UserMedia
             // Переключим кнопки для захвата микрофона.
             this.ui.buttons.get('pause-mic')!.hidden = false;
             this.ui.toggleMicButtons();
+
+            await this.handleVolumeMeter();
         }
         catch (error) // В случае ошибки.
         {
@@ -250,7 +258,7 @@ export class UserMedia
         }
 
         // Используем spread оператор для копирования объекта constraints.
-        const constraints = {...this.captureConstraintsCam.get(this.ui.currentCaptureSettingCam)!};
+        const constraints = { ...this.captureConstraintsCam.get(this.ui.currentCaptureSettingCam)! };
         (constraints.video as MediaTrackConstraints).deviceId = { ideal: deviceId };
 
         // Это происходит на Chrome, при первом заходе на страницу
@@ -726,6 +734,13 @@ export class UserMedia
 
             // И переключаем кнопку захвата микрофона.
             this.ui.toggleMicButtons();
+
+            if (this.stopVolumeMeter)
+            {
+                this.stopVolumeMeter();
+
+                this.stopVolumeMeter = undefined;
+            }
         }
 
         // Если дорожек не осталось, выключаем элементы управления плеера.
@@ -1071,5 +1086,38 @@ export class UserMedia
             const label = (device.label.length != 0) ? device.label : `${kindDeviceLabel} #${devicesSelect.length + 1}`;
             deviceOption.innerText = label;
         }
+    }
+
+    private async handleVolumeMeter(): Promise<void>
+    {
+        const workletUrl = new WorkerUrl(new URL("./VolumeMeter.ts", import.meta.url), {
+            name: "public/VolumeMeterWorklet", customPath: () =>
+            {
+                return new URL("VolumeMeterWorklet.js", window.location.origin);
+            }
+        });
+
+        await this.audioContext.audioWorklet.addModule(workletUrl);
+
+        const meter = this.ui.volumeMeterElem;
+        const stream = this.streams.get("main")!;
+        const micNode = this.audioContext.createMediaStreamSource(stream);
+
+        const volumeMeterNode = new AudioWorkletNode(this.audioContext, "volume-meter");
+
+        volumeMeterNode.port.onmessage = ({ data }) =>
+        {
+            meter.value = data * 500;
+        };
+
+        micNode.connect(volumeMeterNode).connect(this.audioContext.destination);
+
+        this.stopVolumeMeter = () =>
+        {
+            micNode.disconnect();
+
+            volumeMeterNode.port.close();
+            volumeMeterNode.disconnect();
+        };
     }
 }

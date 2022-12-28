@@ -132,6 +132,8 @@ export class UI
     /** Список пользователей. */
     public readonly userList = document.getElementById("user-list") as HTMLSelectElement;
 
+    public readonly volumeMeterElem = document.getElementById("volume-meter") as HTMLMeterElement;
+
     /** Количество строк в раскладке. */
     private videoRows = 2;
 

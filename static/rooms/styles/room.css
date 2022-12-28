@@ -203,15 +203,16 @@ video {
     min-width: 650px;
 }
 
-#volume-indicator-label
+#volume-meter-label
 {
     font-weight: 300;
     display: inline-block;
 }
 
-#volume-indicator
+#volume-meter
 {
     min-width: 500px;
+    width: auto;
 }
 
 #btn-toggle-mic-filter
