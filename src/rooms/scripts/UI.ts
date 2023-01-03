@@ -998,7 +998,8 @@ export class UI
 
     public playSound(sound: UiSound)
     {
-        if (this.checkboxNotifications.checked)
+        if (this.checkboxNotifications.checked
+            && Howler.ctx.state === "running")
         {
             this.uiSounds.get(sound)?.play();
         }
