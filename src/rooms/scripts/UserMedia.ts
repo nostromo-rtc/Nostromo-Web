@@ -35,11 +35,6 @@ export class UserMedia
         audio: { noiseSuppression: true, echoCancellation: true }, video: false
     };
 
-    /** Настройки медиапотока при захвате микрофона без шумоподавления. */
-    private readonly streamConstraintsMicWithoutNoiseSuppression: MediaStreamConstraints = {
-        audio: { noiseSuppression: false, echoCancellation: false }, video: false
-    };
-
     /** Настройки медиапотока при захвате видеоизображения экрана. */
     private captureConstraintsDisplay: Map<string, MediaStreamConstraints>;
 
@@ -187,8 +182,12 @@ export class UserMedia
         console.debug("[UserMedia] > handleGetMic", deviceId);
 
         // Используем spread оператор для копирования объекта streamConstraintsMic.
-        const constraints = this.ui.checkboxEnableNoiseSuppression.checked ? { ...this.streamConstraintsMic } : { ...this.streamConstraintsMicWithoutNoiseSuppression };
+        const constraints = { ...this.streamConstraintsMic };
         (constraints.audio as MediaTrackConstraints).deviceId = { ideal: deviceId };
+
+        // Применяем настройки шумоподавления и эхоподавления.
+        (constraints.audio as MediaTrackConstraints).noiseSuppression = this.ui.checkboxEnableNoiseSuppression.checked;
+        (constraints.audio as MediaTrackConstraints).echoCancellation = this.ui.checkboxEnableEchoCancellation.checked;
 
         // Это происходит на Chrome, при первом заходе на страницу
         // когда нет прав на получение Id устройства.

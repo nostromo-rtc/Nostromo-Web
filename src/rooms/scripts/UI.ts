@@ -123,6 +123,9 @@ export class UI
     /** Чекбокс для включения/выключения шумоподавления микрофона. */
     public readonly checkboxEnableNoiseSuppression = document.getElementById("checkbox-enable-noise-suppression") as HTMLInputElement;
 
+    /** Чекбокс для включения/выключения эхоподавления микрофона. */
+    public readonly checkboxEnableEchoCancellation = document.getElementById("checkbox-enable-echo-cancellation") as HTMLInputElement;
+
     /** Чекбокс для включения/выключения TCP протокола для ICE-соединений. */
     public readonly checkboxEnableIceTcpProtocol = document.getElementById("checkbox-enable-ice-tcp-protocol") as HTMLInputElement;
 
@@ -279,6 +282,12 @@ export class UI
         this.checkboxEnableNoiseSuppression.addEventListener("click", () =>
         {
             this.setCheckboxEnableNoiseSuppressionState();
+        });
+
+        this.setupCheckboxEnableEchoCancellationFromLS();
+        this.checkboxEnableEchoCancellation.addEventListener("click", () =>
+        {
+            this.setCheckboxEnableEchoCancellationState();
         });
 
         this.setupCheckboxEnableIceTcpProtocolFromLS();
@@ -927,6 +936,15 @@ export class UI
         this.checkboxEnableNoiseSuppression.checked = (localStorage["enable-noise-suppression"] == "true");
     }
 
+    private setupCheckboxEnableEchoCancellationFromLS(): void
+    {
+        if (localStorage["enable-echo-cancellation"] == undefined)
+        {
+            localStorage["enable-echo-cancellation"] = "true";
+        }
+        this.checkboxEnableEchoCancellation.checked = (localStorage["enable-echo-cancellation"] == "true");
+    }
+
     /** Прочитать из локального хранилище настройку включения/выключения TCP-протокола для ICE-соединений. */
     private setupCheckboxEnableIceTcpProtocolFromLS(): void
     {
@@ -965,6 +983,11 @@ export class UI
     private setCheckboxEnableNoiseSuppressionState(): void
     {
         localStorage["enable-noise-suppression"] = this.checkboxEnableNoiseSuppression.checked;
+    }
+
+    private setCheckboxEnableEchoCancellationState(): void
+    {
+        localStorage["enable-echo-cancellation"] = this.checkboxEnableEchoCancellation.checked;
     }
 
     /** Установить новое состояние для чекбокса enable-ice-tcp-protocol. */
