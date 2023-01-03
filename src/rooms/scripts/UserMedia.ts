@@ -1111,6 +1111,9 @@ export class UserMedia
 
         micNode.connect(volumeMeterNode).connect(this.audioContext.destination);
 
+
+        await this.audioContext.resume();
+
         this.stopVolumeMeter = () =>
         {
             micNode.disconnect();
