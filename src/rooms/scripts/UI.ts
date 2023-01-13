@@ -137,6 +137,8 @@ export class UI
 
     public readonly volumeMeterElem = document.getElementById("volume-meter") as HTMLMeterElement;
 
+    public readonly micOptions = document.getElementById("mic-options") as HTMLDivElement;
+
     /** Количество строк в раскладке. */
     private videoRows = 2;
 
@@ -210,19 +212,12 @@ export class UI
             this.toggleSoundsButtons();
         });
 
-        const btn_showMicOptions = this.buttons.get('show-mic-options')!;
-        btn_showMicOptions.addEventListener('click', () =>
-        {
-            const micOptions = document.getElementById("mic-options")!;
-            micOptions.hidden = !micOptions.hidden;
-        });
-
         const btn_toggleMicFilter = document.getElementById("btn-toggle-mic-filter")!;
         btn_toggleMicFilter.addEventListener("click", () =>
         {
-            const isFilterEnabled = (btn_toggleMicFilter.innerText === "Включить интеллектуальное шумоподавление");
-            btn_toggleMicFilter.innerText = isFilterEnabled ? "Выключить интеллектуальное шумоподавление" : "Включить интеллектуальное шумоподавление";
-            btn_toggleMicFilter.className = isFilterEnabled ? "background-red" : "background-darkgreen";
+            const isFilterDisabled = (btn_toggleMicFilter.innerText === "Вкл. интеллектуальное шумоподавление");
+            btn_toggleMicFilter.innerText = isFilterDisabled ? "Выкл. интеллектуальное шумоподавление" : "Вкл. интеллектуальное шумоподавление";
+            btn_toggleMicFilter.className = isFilterDisabled ? "background-red" : "background-darkgreen";
         });
     }
 
@@ -397,6 +392,7 @@ export class UI
         buttons.set('disable-sounds', document.getElementById('btn-disable-sounds') as HTMLButtonElement);
         buttons.set('set-new-username', document.getElementById('btn-set-new-username') as HTMLButtonElement);
         buttons.set("show-mic-options", document.getElementById("btn-show-mic-options") as HTMLButtonElement);
+        buttons.set("toggle-mic-output", document.getElementById("btn-toggle-mic-output") as HTMLButtonElement);
 
         return buttons;
     }

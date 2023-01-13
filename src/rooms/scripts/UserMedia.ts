@@ -1,7 +1,6 @@
 import { UI, UiSound } from "./UI";
 import { Room } from "./Room";
-
-import { WorkerUrl } from "worker-url";
+import { MicAudioProcessing } from "./MicAudioProcessing";
 
 declare global
 {
@@ -43,7 +42,7 @@ export class UserMedia
 
     private audioContext: AudioContext = new AudioContext();
 
-    private stopVolumeMeter?: () => void;
+    private micAudioProcessing: MicAudioProcessing = new MicAudioProcessing(this.audioContext);
 
     constructor(_ui: UI, _room: Room)
     {
@@ -167,6 +166,27 @@ export class UserMedia
         {
             this.handleStopDisplay();
         });
+
+        // Кнопка дополнительных настроек микрофона.
+        const btn_showMicOptions = this.ui.buttons.get('show-mic-options')!;
+        btn_showMicOptions.addEventListener('click', () =>
+        {
+            const micOptions = this.ui.micOptions;
+            micOptions.hidden = !micOptions.hidden;
+
+            this.handleVolumeMeter();
+        });
+
+        // Кнопка прослушивания микрофона в панели доп. настрок микрофона.
+        const btn_toggleMicOutput = this.ui.buttons.get('toggle-mic-output')!;
+        btn_toggleMicOutput.addEventListener('click', () =>
+        {
+            const isOutputDisabled = (btn_toggleMicOutput.innerText === "Вкл. прослушивание микрофона");
+            btn_toggleMicOutput.innerText = isOutputDisabled ? "Выкл. прослушивание микрофона" : "Вкл. прослушивание микрофона";
+            btn_toggleMicOutput.className = isOutputDisabled ? "background-red" : "background-darkgreen";
+
+            this.handleMicOutput();
+        });
     }
 
     /** Обработка нажатия на кнопку "Захватить микрофон". */
@@ -221,7 +241,18 @@ export class UserMedia
             this.ui.buttons.get('pause-mic')!.hidden = false;
             this.ui.toggleMicButtons();
 
-            await this.handleVolumeMeter();
+            // Проверяем, готова ли VolumeMeter, и если нет, то инициализируем эту ноду.
+            if (!this.micAudioProcessing.isVolumeMeterReady)
+            {
+                await this.micAudioProcessing.initVolumeMeter(this.ui.volumeMeterElem);
+            }
+
+            // Инициализируем ноду с микрофонным потоком для последующей обработки.
+            const micStream = this.streams.get("main")!;
+            await this.micAudioProcessing.initMicNode(micStream);
+
+            this.handleVolumeMeter();
+            this.handleMicOutput();
         }
         catch (error) // В случае ошибки.
         {
@@ -734,12 +765,8 @@ export class UserMedia
             // И переключаем кнопку захвата микрофона.
             this.ui.toggleMicButtons();
 
-            if (this.stopVolumeMeter)
-            {
-                this.stopVolumeMeter();
-
-                this.stopVolumeMeter = undefined;
-            }
+            // Удалим ноду с микрофонным потоком.
+            this.micAudioProcessing.destroyMicNode();
         }
 
         // Если дорожек не осталось, выключаем элементы управления плеера.
@@ -1087,39 +1114,18 @@ export class UserMedia
         }
     }
 
-    private async handleVolumeMeter(): Promise<void>
+    // Если панель скрыта, то отключаем индикатор громкости, иначе подключаем.
+    private handleVolumeMeter(): void
     {
-        const workletUrl = new WorkerUrl(new URL("./VolumeMeter.ts", import.meta.url), {
-            name: "public/VolumeMeterWorklet", customPath: () =>
-            {
-                return new URL("VolumeMeterWorklet.js", window.location.origin);
-            }
-        });
+        const micOptionsHidden = this.ui.micOptions.hidden;
+        micOptionsHidden ? this.micAudioProcessing.disconnectVolumeMeter() : this.micAudioProcessing.connectVolumeMeter();
+    }
 
-        await this.audioContext.audioWorklet.addModule(workletUrl);
+    private handleMicOutput(): void
+    {
+        const btn_toggleMicOutput = this.ui.buttons.get('toggle-mic-output')!;
+        const isOutputDisabled = (btn_toggleMicOutput.innerText === "Вкл. прослушивание микрофона");
 
-        const meter = this.ui.volumeMeterElem;
-        const stream = this.streams.get("main")!;
-        const micNode = this.audioContext.createMediaStreamSource(stream);
-
-        const volumeMeterNode = new AudioWorkletNode(this.audioContext, "volume-meter");
-
-        volumeMeterNode.port.onmessage = ({ data }) =>
-        {
-            meter.value = data * 500;
-        };
-
-        micNode.connect(volumeMeterNode).connect(this.audioContext.destination);
-
-
-        await this.audioContext.resume();
-
-        this.stopVolumeMeter = () =>
-        {
-            micNode.disconnect();
-
-            volumeMeterNode.port.close();
-            volumeMeterNode.disconnect();
-        };
+        isOutputDisabled ? this.micAudioProcessing.stopListenMic() : this.micAudioProcessing.listenMic();
     }
 }
