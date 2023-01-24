@@ -19,7 +19,7 @@ export class MicAudioProcessing
 
     public async initVolumeMeter(meter: HTMLMeterElement): Promise<void>
     {
-        const workletUrl = new WorkerUrl(new URL("./VolumeMeter.ts", import.meta.url), {
+        const workletUrl = new WorkerUrl(new URL("./AudioWorklets/VolumeMeter.ts", import.meta.url), {
             name: "public/VolumeMeterWorklet", customPath: () =>
             {
                 return new URL("VolumeMeterWorklet.js", window.location.origin);
