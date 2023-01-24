@@ -6,15 +6,26 @@ export class MicAudioProcessing
 
     private volumeMeterNode?: AudioWorkletNode;
 
+    private noiseGateNode?: AudioWorkletNode;
+
     private micNode?: MediaStreamAudioSourceNode;
 
-    public isVolumeMeterReady = false;
-    private isVolumeMeterConnected = false;
+    private outputNodeDestination: MediaStreamAudioDestinationNode;
+
+    private outputNode: MediaStreamAudioSourceNode;
+
     private isMicListening = false;
+    private isVolumeMeterConnected = false;
+    private isNoiseGateConnected = false;
+    public isVolumeMeterReady = false;
+    public isNoiseGateReady = false;
 
     constructor(ctx: AudioContext)
     {
         this.ctx = ctx;
+
+        this.outputNodeDestination = this.ctx.createMediaStreamDestination();
+        this.outputNode = this.ctx.createMediaStreamSource(this.outputNodeDestination.stream);
     }
 
     public async initVolumeMeter(meter: HTMLMeterElement): Promise<void>
@@ -38,9 +49,26 @@ export class MicAudioProcessing
         this.isVolumeMeterReady = true;
     }
 
+    public async initNoiseGate(): Promise<void>
+    {
+        const workletUrl = new WorkerUrl(new URL("./AudioWorklets/NoiseGate.ts", import.meta.url), {
+            name: "public/NoiseGateWorklet", customPath: () =>
+            {
+                return new URL("NoiseGateWorklet.js", window.location.origin);
+            }
+        });
+
+        await this.ctx.audioWorklet.addModule(workletUrl);
+
+        this.noiseGateNode = new AudioWorkletNode(this.ctx, "noise-gate");
+
+        this.isNoiseGateReady = true;
+    }
+
     public async initMicNode(stream: MediaStream): Promise<void>
     {
         this.micNode = this.ctx.createMediaStreamSource(stream);
+        this.micNode.connect(this.outputNodeDestination);
 
         if (this.ctx.state != "running")
         {
@@ -53,15 +81,18 @@ export class MicAudioProcessing
         this.micNode?.disconnect();
         this.micNode = undefined;
 
+        this.outputNode.disconnect();
         this.isVolumeMeterConnected = false;
         this.isMicListening = false;
+
+        this.isNoiseGateConnected = false;
     }
 
     public connectVolumeMeter()
     {
         if (this.micNode && this.volumeMeterNode && !this.isVolumeMeterConnected)
         {
-            this.micNode.connect(this.volumeMeterNode);
+            this.outputNode.connect(this.volumeMeterNode);
             this.isVolumeMeterConnected = true;
         }
     }
@@ -70,7 +101,7 @@ export class MicAudioProcessing
     {
         if (this.micNode && this.volumeMeterNode && this.isVolumeMeterConnected)
         {
-            this.micNode.disconnect(this.volumeMeterNode);
+            this.outputNode.disconnect(this.volumeMeterNode);
             this.isVolumeMeterConnected = false;
         }
     }
@@ -79,7 +110,7 @@ export class MicAudioProcessing
     {
         if (this.micNode && !this.isMicListening)
         {
-            this.micNode.connect(this.ctx.destination);
+            this.outputNode.connect(this.ctx.destination);
             this.isMicListening = true;
         }
     }
@@ -88,8 +119,37 @@ export class MicAudioProcessing
     {
         if (this.micNode && this.isMicListening)
         {
-            this.micNode.disconnect(this.ctx.destination);
+            this.outputNode.disconnect(this.ctx.destination);
             this.isMicListening = false;
+        }
+    }
+
+    public connectNoiseGate()
+    {
+        if (this.micNode && this.noiseGateNode && !this.isNoiseGateConnected)
+        {
+            // Прогоняем звук микрофона через NoiseGate.
+            this.micNode.disconnect(this.outputNodeDestination);
+            this.micNode.connect(this.noiseGateNode);
+
+            console.log("HAH", this.micNode.context.sampleRate);
+
+            // Выводим обработанный звук в output.
+            this.noiseGateNode.connect(this.outputNodeDestination);
+            this.isNoiseGateConnected = true;
+        }
+    }
+
+    public disconnectNoiseGate()
+    {
+        if (this.micNode && this.noiseGateNode && this.isNoiseGateConnected)
+        {
+            // Делаем все как было до этого.
+            this.noiseGateNode.disconnect(this.outputNodeDestination);
+            this.micNode.disconnect(this.noiseGateNode);
+            this.micNode.connect(this.outputNodeDestination);
+
+            this.isNoiseGateConnected = false;
         }
     }
 }

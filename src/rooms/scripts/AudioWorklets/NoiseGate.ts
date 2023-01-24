@@ -115,7 +115,7 @@ export class NoiseGate extends AudioWorkletProcessor
     ): boolean
     {
         //TODO: считывать из параметров
-        this.sampleRate = 44100;
+        this.sampleRate = sampleRate;
 
         //TODO: считывать из параметров
         this.timeConstant = 0.0025;
@@ -128,15 +128,25 @@ export class NoiseGate extends AudioWorkletProcessor
         this.release = 0.05;
         this.threshold = -40;
 
-        const inputChannelData = inputs[0][0];
-        const outputChannelData = outputs[0][0];
+        const input = inputs[0];
+        const output = outputs[0];
 
-        this.calcEnvelope(inputChannelData);
+        const inputFirstChannelData = input[0];
+
+        if (inputFirstChannelData === undefined)
+        {
+            return false;
+        }
+
+        this.calcEnvelope(inputFirstChannelData);
         this.calcWeights();
 
-        for (let i = 0; i < inputChannelData.length; ++i)
+        for (let channel = 0; channel < output.length; ++channel)
         {
-            outputChannelData[i] = this.weights[i] * inputChannelData[i];
+            for (let i = 0; i < output[channel].length; ++i)
+            {
+                output[channel][i] = input[channel][i] * this.weights[i];
+            }
         }
 
         return true;

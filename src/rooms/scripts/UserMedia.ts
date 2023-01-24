@@ -187,6 +187,16 @@ export class UserMedia
 
             this.handleMicOutput();
         });
+
+        const btn_toggleMicNoiseGate = document.getElementById("btn-toggle-mic-noise-gate")!;
+        btn_toggleMicNoiseGate.addEventListener("click", () =>
+        {
+            const isFilterDisabled = (btn_toggleMicNoiseGate.innerText === "Вкл. шумовой порог");
+            btn_toggleMicNoiseGate.innerText = isFilterDisabled ? "Выкл. шумовой порог" : "Вкл. шумовой порог";
+            btn_toggleMicNoiseGate.className = isFilterDisabled ? "background-red" : "background-darkgreen";
+
+            this.handleMicNoiseGate();
+        });
     }
 
     /** Обработка нажатия на кнопку "Захватить микрофон". */
@@ -247,12 +257,19 @@ export class UserMedia
                 await this.micAudioProcessing.initVolumeMeter(this.ui.volumeMeterElem);
             }
 
+            // Проверяем, готов ли NoiseGate, и если нет, то инициализируем эту ноду.
+            if (!this.micAudioProcessing.isNoiseGateReady)
+            {
+                await this.micAudioProcessing.initNoiseGate();
+            }
+
             // Инициализируем ноду с микрофонным потоком для последующей обработки.
             const micStream = this.streams.get("main")!;
             await this.micAudioProcessing.initMicNode(micStream);
 
             this.handleVolumeMeter();
             this.handleMicOutput();
+            this.handleMicNoiseGate();
         }
         catch (error) // В случае ошибки.
         {
@@ -1127,5 +1144,13 @@ export class UserMedia
         const isOutputDisabled = (btn_toggleMicOutput.innerText === "Вкл. прослушивание микрофона");
 
         isOutputDisabled ? this.micAudioProcessing.stopListenMic() : this.micAudioProcessing.listenMic();
+    }
+
+    private handleMicNoiseGate(): void
+    {
+        const btn_toggleMicNoiseGate = this.ui.buttons.get('toggle-mic-noise-gate')!;
+        const isFilterDisabled = (btn_toggleMicNoiseGate.innerText === "Вкл. шумовой порог");
+
+        isFilterDisabled ? this.micAudioProcessing.disconnectNoiseGate() : this.micAudioProcessing.connectNoiseGate();
     }
 }

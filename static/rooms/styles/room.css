@@ -215,7 +215,7 @@ video {
     width: auto;
 }
 
-#btn-toggle-mic-filter
+#btn-toggle-mic-noise-gate
 {
     margin-top: 5px;
     cursor: pointer;
