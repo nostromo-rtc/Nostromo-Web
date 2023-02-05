@@ -1085,12 +1085,18 @@ export class UserMedia
         for (const device of mediaDevices)
         {
             if (device.kind == kind
-                && device.deviceId != "default"
                 && device.deviceId != "communications")
             {
                 console.log("Обнаружено устройство: ", device);
                 const kindDeviceLabel = isMicDevices ? "Микрофон" : "Веб-камера";
-                const label = (device.label.length != 0) ? device.label : `${kindDeviceLabel} #${devicesSelect.length + 1}`;
+
+                let label = (device.label.length != 0) ? device.label : `${kindDeviceLabel} #${devicesSelect.length + 1}`;
+
+                if (device.deviceId == "default")
+                {
+                    label = "Как в системе";
+                }
+
                 this.ui.addOptionToSelect(devicesSelect, label, device.deviceId);
             }
         }
@@ -1106,7 +1112,7 @@ export class UserMedia
         for (const deviceOption of devicesSelect)
         {
             // Если нет Id устройства, то и название не обновить.
-            if (deviceOption.value == "")
+            if (deviceOption.value == "" || deviceOption.value == "default")
             {
                 return;
             }
