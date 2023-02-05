@@ -1,4 +1,5 @@
 import { WorkerUrl } from "worker-url";
+import { DoublyLinkedList } from "./Utils/DoublyLinkedList";
 
 export class MicAudioProcessing
 {
@@ -15,6 +16,8 @@ export class MicAudioProcessing
     private outputNodeDestination: MediaStreamAudioDestinationNode;
 
     private outputNode: MediaStreamAudioSourceNode;
+
+    private processingNodesList = new DoublyLinkedList<AudioNode>();
 
     private isMicListening = false;
     private isVolumeMeterConnected = false;
@@ -61,7 +64,8 @@ export class MicAudioProcessing
     public async initMicNode(stream: MediaStream): Promise<void>
     {
         this.micNode = this.ctx.createMediaStreamSource(stream);
-        this.micNode.connect(this.outputNodeDestination);
+
+        this.addLastProcessingNode(this.micNode);
 
         if (this.ctx.state != "running")
         {
@@ -71,14 +75,18 @@ export class MicAudioProcessing
 
     public destroyMicNode(): void
     {
-        this.disconnectVolumeMeter();
-        this.disconnectNoiseGate();
-        this.stopListenMic();
+        if (this.micNode !== undefined)
+        {
+            this.disconnectVolumeMeter();
+            this.disconnectNoiseGate();
+            this.stopListenMic();
 
-        this.micNode?.disconnect();
-        this.micNode = undefined;
+            this.removeProcessingNode(this.micNode);
+            this.micNode.disconnect();
+            this.micNode = undefined;
 
-        console.debug(`[${this._className}] destroyMicNode`);
+            console.debug(`[${this._className}] destroyMicNode`);
+        }
     }
 
     public connectVolumeMeter(meter: HTMLMeterElement)
@@ -148,12 +156,7 @@ export class MicAudioProcessing
 
         if (this.micNode && !this.isNoiseGateConnected)
         {
-            // Прогоняем звук микрофона через NoiseGate.
-            this.micNode.disconnect(this.outputNodeDestination);
-            this.micNode.connect(this.noiseGateNode);
-
-            // Выводим обработанный звук в output.
-            this.noiseGateNode.connect(this.outputNodeDestination);
+            this.addLastProcessingNode(this.noiseGateNode);
             this.isNoiseGateConnected = true;
 
             console.debug(`[${this._className}] connectNoiseGate`);
@@ -164,15 +167,55 @@ export class MicAudioProcessing
     {
         if (this.micNode && this.noiseGateNode && this.isNoiseGateConnected)
         {
-            this.noiseGateNode.disconnect(this.outputNodeDestination);
-            this.micNode.disconnect(this.noiseGateNode);
-            this.micNode.connect(this.outputNodeDestination);
+            this.removeProcessingNode(this.noiseGateNode);
 
             this.noiseGateNode = undefined;
 
             this.isNoiseGateConnected = false;
 
             console.debug(`[${this._className}] disconnectNoiseGate`);
+        }
+    }
+
+    private addLastProcessingNode(newNode: AudioNode)
+    {
+        const oldNode = this.processingNodesList.getLast();
+
+        if (oldNode !== undefined)
+        {
+            oldNode.disconnect(this.outputNodeDestination);
+            oldNode.connect(newNode);
+        }
+
+        newNode.connect(this.outputNodeDestination);
+        this.processingNodesList.addLast(newNode);
+    }
+
+    private removeProcessingNode(node: AudioNode)
+    {
+        const lastNode = this.processingNodesList.getLast();
+
+        if (lastNode === undefined)
+        {
+            return;
+        }
+
+        if (node === lastNode)
+        {
+            node.disconnect(this.outputNodeDestination);
+            this.processingNodesList.removeLast();
+
+            const prevNode = this.processingNodesList.getLast();
+
+            if (prevNode !== undefined)
+            {
+                prevNode.disconnect(node);
+                prevNode.connect(this.outputNodeDestination);
+            }
+        }
+        else
+        {
+            //TODO: Если удаляемый узел не в конце...
         }
     }
 }
