@@ -2,6 +2,8 @@ import { WorkerUrl } from "worker-url";
 
 export class MicAudioProcessing
 {
+    private readonly _className = "MicAudioProcessing";
+
     private ctx: AudioContext;
 
     private volumeMeterNode?: AudioWorkletNode;
@@ -28,7 +30,7 @@ export class MicAudioProcessing
         this.outputNode = this.ctx.createMediaStreamSource(this.outputNodeDestination.stream);
     }
 
-    public async initVolumeMeter(meter: HTMLMeterElement): Promise<void>
+    public async initVolumeMeter(): Promise<void>
     {
         const workletUrl = new WorkerUrl(new URL("./AudioWorklets/VolumeMeter.ts", import.meta.url), {
             name: "public/VolumeMeterWorklet", customPath: () =>
@@ -38,13 +40,6 @@ export class MicAudioProcessing
         });
 
         await this.ctx.audioWorklet.addModule(workletUrl);
-
-        this.volumeMeterNode = new AudioWorkletNode(this.ctx, "volume-meter");
-
-        this.volumeMeterNode.port.onmessage = ({ data }) =>
-        {
-            meter.value = data * 500;
-        };
 
         this.isVolumeMeterReady = true;
     }
@@ -59,8 +54,6 @@ export class MicAudioProcessing
         });
 
         await this.ctx.audioWorklet.addModule(workletUrl);
-
-        this.noiseGateNode = new AudioWorkletNode(this.ctx, "noise-gate");
 
         this.isNoiseGateReady = true;
     }
@@ -78,22 +71,34 @@ export class MicAudioProcessing
 
     public destroyMicNode(): void
     {
+        this.disconnectVolumeMeter();
+        this.disconnectNoiseGate();
+        this.stopListenMic();
+
         this.micNode?.disconnect();
         this.micNode = undefined;
 
-        this.outputNode.disconnect();
-        this.isVolumeMeterConnected = false;
-        this.isMicListening = false;
-
-        this.isNoiseGateConnected = false;
+        console.debug(`[${this._className}] destroyMicNode`);
     }
 
-    public connectVolumeMeter()
+    public connectVolumeMeter(meter: HTMLMeterElement)
     {
-        if (this.micNode && this.volumeMeterNode && !this.isVolumeMeterConnected)
+        if (this.volumeMeterNode === undefined)
+        {
+            this.volumeMeterNode = new AudioWorkletNode(this.ctx, "volume-meter");
+
+            this.volumeMeterNode.port.onmessage = ({ data }) =>
+            {
+                meter.value = data * 500;
+            };
+        }
+
+        if (this.micNode && !this.isVolumeMeterConnected)
         {
             this.outputNode.connect(this.volumeMeterNode);
             this.isVolumeMeterConnected = true;
+
+            console.debug(`[${this._className}] connectVolumeMeter`);
         }
     }
 
@@ -102,7 +107,13 @@ export class MicAudioProcessing
         if (this.micNode && this.volumeMeterNode && this.isVolumeMeterConnected)
         {
             this.outputNode.disconnect(this.volumeMeterNode);
+
+            this.volumeMeterNode.port.close();
+            this.volumeMeterNode = undefined;
+
             this.isVolumeMeterConnected = false;
+
+            console.debug(`[${this._className}] disconnectVolumeMeter`);
         }
     }
 
@@ -112,6 +123,8 @@ export class MicAudioProcessing
         {
             this.outputNode.connect(this.ctx.destination);
             this.isMicListening = true;
+
+            console.debug(`[${this._className}] listenMic`);
         }
     }
 
@@ -121,22 +134,29 @@ export class MicAudioProcessing
         {
             this.outputNode.disconnect(this.ctx.destination);
             this.isMicListening = false;
+
+            console.debug(`[${this._className}] stopListenMic`);
         }
     }
 
     public connectNoiseGate()
     {
-        if (this.micNode && this.noiseGateNode && !this.isNoiseGateConnected)
+        if (this.noiseGateNode === undefined)
+        {
+            this.noiseGateNode = new AudioWorkletNode(this.ctx, "noise-gate");
+        }
+
+        if (this.micNode && !this.isNoiseGateConnected)
         {
             // Прогоняем звук микрофона через NoiseGate.
             this.micNode.disconnect(this.outputNodeDestination);
             this.micNode.connect(this.noiseGateNode);
 
-            console.log("HAH", this.micNode.context.sampleRate);
-
             // Выводим обработанный звук в output.
             this.noiseGateNode.connect(this.outputNodeDestination);
             this.isNoiseGateConnected = true;
+
+            console.debug(`[${this._className}] connectNoiseGate`);
         }
     }
 
@@ -144,12 +164,15 @@ export class MicAudioProcessing
     {
         if (this.micNode && this.noiseGateNode && this.isNoiseGateConnected)
         {
-            // Делаем все как было до этого.
             this.noiseGateNode.disconnect(this.outputNodeDestination);
             this.micNode.disconnect(this.noiseGateNode);
             this.micNode.connect(this.outputNodeDestination);
 
+            this.noiseGateNode = undefined;
+
             this.isNoiseGateConnected = false;
+
+            console.debug(`[${this._className}] disconnectNoiseGate`);
         }
     }
 }

@@ -254,7 +254,7 @@ export class UserMedia
             // Проверяем, готова ли VolumeMeter, и если нет, то инициализируем эту ноду.
             if (!this.micAudioProcessing.isVolumeMeterReady)
             {
-                await this.micAudioProcessing.initVolumeMeter(this.ui.volumeMeterElem);
+                await this.micAudioProcessing.initVolumeMeter();
             }
 
             // Проверяем, готов ли NoiseGate, и если нет, то инициализируем эту ноду.
@@ -1141,7 +1141,8 @@ export class UserMedia
     private handleVolumeMeter(): void
     {
         const micOptionsHidden = this.ui.micOptions.hidden;
-        micOptionsHidden ? this.micAudioProcessing.disconnectVolumeMeter() : this.micAudioProcessing.connectVolumeMeter();
+        micOptionsHidden ? this.micAudioProcessing.disconnectVolumeMeter()
+            : this.micAudioProcessing.connectVolumeMeter(this.ui.volumeMeterElem);
     }
 
     private handleMicOutput(): void

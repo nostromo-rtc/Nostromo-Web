@@ -36,6 +36,11 @@ export class VolumeMeter extends AudioWorkletProcessor
     {
         const inputChannelData = inputs[0][0];
 
+        if (inputChannelData === undefined)
+        {
+            return false;
+        }
+
         if (currentTime - this.lastUpdate > this.FRAME_INTERVAL)
         {
             this.calculateRms(inputChannelData);
