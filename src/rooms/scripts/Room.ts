@@ -498,6 +498,7 @@ export class Room
     private pauseAndPlayEventsPlayerHandler(userId: string, streamId: string): void
     {
         const remoteVideo = this.ui.getVideo(userId, streamId);
+
         if (!remoteVideo)
         {
             return;
@@ -506,6 +507,7 @@ export class Room
         const listenerFunc = (playerPause: boolean) =>
         {
             const stream = remoteVideo.srcObject as MediaStream | null;
+
             if (!stream)
             {
                 return;
@@ -513,11 +515,11 @@ export class Room
 
             if (playerPause)
             {
-                console.debug(`[Room] > Плеер (${remoteVideo.id}) был поставлен на паузу`);
+                console.debug(`[Room] > Плеер (${userId}, ${streamId}) был поставлен на паузу.`);
             }
             else
             {
-                console.debug(`[Room] > Плеер (${remoteVideo.id}) был снят с паузы`);
+                console.debug(`[Room] > Плеер (${userId}, ${streamId}) был снят с паузы.`);
             }
 
             for (const track of stream.getTracks())
