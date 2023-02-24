@@ -919,6 +919,11 @@ export class UserMedia
     {
         const _constraints = new Map<string, MediaStreamConstraints>();
 
+        const constraintsDefault: MediaStreamConstraints = {
+            video: {},
+            audio: false
+        };
+
         const constraints1440p: MediaStreamConstraints = {
             video: {
                 width: 2560, height: 1440
@@ -963,6 +968,11 @@ export class UserMedia
 
         const settingsCam = this.ui.captureSettingsCam;
 
+        _constraints.set('default', constraintsDefault);
+        this.ui.addOptionToSelect(settingsCam, 'По умолчанию', 'default');
+
+        this.ui.addSeparatorToSelect(settingsCam);
+
         _constraints.set('1440p', constraints1440p);
         this.ui.addOptionToSelect(settingsCam, '2560x1440', '1440p');
 
@@ -980,8 +990,6 @@ export class UserMedia
 
         _constraints.set('240p', constraints240p);
         this.ui.addOptionToSelect(settingsCam, '320x240', '240p');
-
-        _constraints.set('default', constraints720p);
 
         return _constraints;
     }
