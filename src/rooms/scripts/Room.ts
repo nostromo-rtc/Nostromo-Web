@@ -21,7 +21,7 @@ type CallbackOnProduce = {
 };
 
 type Errback = {
-    (error?: unknown): void;
+    (error: Error): void;
 };
 
 /** Класс - комната. */
@@ -614,7 +614,7 @@ export class Room
             catch (error)
             {
                 // Сообщаем транспорту, что что-то пошло не так.
-                errback(error);
+                errback(error as Error);
             }
         });
 
@@ -684,7 +684,7 @@ export class Room
                     transportId: localTransport.id,
                     kind: parameters.kind,
                     rtpParameters: parameters.rtpParameters,
-                    streamId: parameters.appData.streamId
+                    streamId: parameters.appData.streamId!
                 };
 
                 this.socket.emit(SE.NewProducer, info);
@@ -699,7 +699,7 @@ export class Room
             catch (error)
             {
                 // сообщаем транспорту, что что-то пошло не так
-                errback(error);
+                errback(error as Error);
             }
         });
     }

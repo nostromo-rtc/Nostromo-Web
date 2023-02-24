@@ -6,14 +6,12 @@ import Consumer = MediasoupTypes.Consumer;
 import Producer = MediasoupTypes.Producer;
 export { MediasoupTypes };
 
-export interface ClientProducerAppData
-{
-    streamId: string;
+export type ClientProducerAppData = {
+    streamId?: string;
 }
 
 /** Дополнительные данные для Consumer. */
-export interface ClientConsumerAppData
-{
+export type ClientConsumerAppData = {
     /** Consumer был поставлен на паузу со стороны клиента (плеер на паузе) */
     localPaused: boolean;
 
@@ -28,7 +26,7 @@ export interface ClientConsumerAppData
 
     /** Идентификатор видеоэлемента, где дорожка выводится. */
     streamId: string;
-}
+};
 
 export type TransportProduceParameters = {
     kind: MediasoupTypes.MediaKind;
@@ -87,6 +85,7 @@ export class Mediasoup
         try
         {
             this.device = new mediasoup.Device();
+            console.debug("Device: ", this.device.handlerName);
         }
         catch (error)
         {
