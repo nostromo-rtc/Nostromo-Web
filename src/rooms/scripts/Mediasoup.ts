@@ -8,7 +8,7 @@ export { MediasoupTypes };
 
 export type ClientProducerAppData = {
     streamId?: string;
-}
+};
 
 /** Дополнительные данные для Consumer. */
 export type ClientConsumerAppData = {
@@ -194,10 +194,14 @@ export class Mediasoup
 
             producerOptions.encodings = [
                 {
-                    maxBitrate: videoBitrate,
-                    maxFramerate: (track.getConstraints().frameRate as number) / 1.5
+                    maxBitrate: videoBitrate
                 }
             ];
+
+            if (streamId == "display")
+            {
+                producerOptions.encodings[0].maxFramerate = (track.getConstraints().frameRate as number) / 1.5;
+            }
         }
         else
         {
