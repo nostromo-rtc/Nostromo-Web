@@ -348,6 +348,18 @@ export class UI
         select.add(newOption);
     }
 
+    /** Добавить новый выбор в виджет Select. */
+    public addSeparatorToSelect(select: HTMLSelectElement): void
+    {
+        const newOption = new Option();
+
+        newOption.disabled = true;
+        newOption.style.fontSize = "0.1em";
+        newOption.style.background = "#c9c9c9";
+
+        select.add(newOption);
+    }
+
     /** Подготовить контейнер map с кнопками. */
     private prepareButtons(): Map<string, HTMLButtonElement>
     {
