@@ -74,7 +74,7 @@ export class Mediasoup
     private linkMapTrackConsumer = new Map<string, string>();
 
     /** Максимальный разумный битрейт для видеодорожки. */
-    public maxReasonableVideoBitrate = 25 * PrefixConstants.MEGA;
+    public maxReasonableVideoBitrate = 11 * PrefixConstants.MEGA;
 
     /** Максимальный битрейт для видеодорожек. */
     public maxVideoBitrate = this.maxReasonableVideoBitrate;
