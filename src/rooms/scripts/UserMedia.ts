@@ -905,6 +905,12 @@ export class UserMedia
         _constraints.set('144p@30', constraints144p30);
         this.ui.addOptionToSelect(settingsDisplay, '256x144@30', '144p@30');
 
+        for (const constraint of _constraints)
+        {
+            const currentFrameRate = Number((constraint[1].video as MediaTrackConstraintSet).frameRate);
+            (constraint[1].video as MediaTrackConstraintSet).frameRate = currentFrameRate * 1.5;
+        }
+
         return _constraints;
     }
 

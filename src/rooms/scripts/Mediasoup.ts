@@ -196,7 +196,7 @@ export class Mediasoup
             producerOptions.encodings = [
                 {
                     maxBitrate: videoBitrate,
-                    maxFramerate: track.getConstraints().frameRate as number
+                    maxFramerate: (track.getConstraints().frameRate as number) / 1.5
                 }
             ];
         }
