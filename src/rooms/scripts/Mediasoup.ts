@@ -6,14 +6,12 @@ import Consumer = MediasoupTypes.Consumer;
 import Producer = MediasoupTypes.Producer;
 export { MediasoupTypes };
 
-export interface ClientProducerAppData
-{
-    streamId: string;
-}
+export type ClientProducerAppData = {
+    streamId?: string;
+};
 
 /** Дополнительные данные для Consumer. */
-export interface ClientConsumerAppData
-{
+export type ClientConsumerAppData = {
     /** Consumer был поставлен на паузу со стороны клиента (плеер на паузе) */
     localPaused: boolean;
 
@@ -28,7 +26,7 @@ export interface ClientConsumerAppData
 
     /** Идентификатор видеоэлемента, где дорожка выводится. */
     streamId: string;
-}
+};
 
 export type TransportProduceParameters = {
     kind: MediasoupTypes.MediaKind;
@@ -74,7 +72,7 @@ export class Mediasoup
     private linkMapTrackConsumer = new Map<string, string>();
 
     /** Максимальный разумный битрейт для видеодорожки. */
-    public maxReasonableVideoBitrate = 25 * PrefixConstants.MEGA;
+    public maxReasonableVideoBitrate = 11 * PrefixConstants.MEGA;
 
     /** Максимальный битрейт для видеодорожек. */
     public maxVideoBitrate = this.maxReasonableVideoBitrate;
@@ -87,6 +85,7 @@ export class Mediasoup
         try
         {
             this.device = new mediasoup.Device();
+            console.debug("Device: ", this.device.handlerName);
         }
         catch (error)
         {
@@ -195,10 +194,14 @@ export class Mediasoup
 
             producerOptions.encodings = [
                 {
-                    maxBitrate: videoBitrate,
-                    maxFramerate: track.getConstraints().frameRate as number
+                    maxBitrate: videoBitrate
                 }
             ];
+
+            if (streamId == "display")
+            {
+                producerOptions.encodings[0].maxFramerate = (track.getConstraints().frameRate as number) / 1.5;
+            }
         }
         else
         {

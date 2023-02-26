@@ -34,6 +34,11 @@ export class UserMedia
         audio: { noiseSuppression: true, echoCancellation: true }, video: false
     };
 
+    /** Настройки медиапотока при захвате микрофона без шумоподавления. */
+    private readonly streamConstraintsMicWithoutNoiseSuppression: MediaStreamConstraints = {
+        audio: { noiseSuppression: false, echoCancellation: false }, video: false
+    };
+
     /** Настройки медиапотока при захвате видеоизображения экрана. */
     private captureConstraintsDisplay: Map<string, MediaStreamConstraints>;
 
@@ -212,7 +217,7 @@ export class UserMedia
         console.debug("[UserMedia] > handleGetMic", deviceId);
 
         // Используем spread оператор для копирования объекта streamConstraintsMic.
-        const constraints = { ...this.streamConstraintsMic };
+        const constraints = this.ui.checkboxEnableNoiseSuppression.checked ? { ...this.streamConstraintsMic } : { ...this.streamConstraintsMicWithoutNoiseSuppression };
         (constraints.audio as MediaTrackConstraints).deviceId = { ideal: deviceId };
 
         // Применяем настройки шумоподавления и эхоподавления.
@@ -837,165 +842,137 @@ export class UserMedia
         this.ui.playSound(UiSound.micOn);
     }
 
+    private createDisplayConstraints(
+        width: number,
+        height: number,
+        frameRate: number
+    ): MediaStreamConstraints
+    {
+        const result: MediaStreamConstraints = {
+            video: {
+                frameRate,
+                width,
+                height
+            },
+            audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
+        };
+
+        return result;
+    }
+
     /** Подготовить опции с разрешениями захватываемого видеоизображения. */
     private prepareCaptureDisplayConstraints(): Map<string, MediaStreamConstraints>
     {
         const _constraints = new Map<string, MediaStreamConstraints>();
 
-        const constraints1440p: MediaStreamConstraints = {
-            video: {
-                frameRate: 30,
-                width: 2560, height: 1440
-            },
-            audio: { echoCancellation: false, noiseSuppression: false }
-        };
+        const constraints1440p60 = this.createDisplayConstraints(2560, 1440, 60);
+        const constraints1440p30 = this.createDisplayConstraints(2560, 1440, 30);
+        const constraints1440p5 = this.createDisplayConstraints(2560, 1440, 5);
 
-        const constraints1080p: MediaStreamConstraints = {
-            video: {
-                frameRate: 30,
-                width: 1920, height: 1080
-            },
-            audio: { echoCancellation: false, noiseSuppression: false }
-        };
+        const constraints1080p60 = this.createDisplayConstraints(1920, 1080, 60);
+        const constraints1080p30 = this.createDisplayConstraints(1920, 1080, 30);
+        const constraints1080p5 = this.createDisplayConstraints(1920, 1080, 5);
 
-        const constraints1080p60: MediaStreamConstraints = {
-            video: {
-                frameRate: 60,
-                width: 1920, height: 1080
-            },
-            audio: { echoCancellation: false, noiseSuppression: false }
-        };
+        const constraints900p60 = this.createDisplayConstraints(1600, 900, 60);
+        const constraints900p30 = this.createDisplayConstraints(1600, 900, 30);
+        const constraints900p5 = this.createDisplayConstraints(1600, 900, 5);
 
-        const constraints1080p5: MediaStreamConstraints = {
-            video: {
-                frameRate: 5,
-                width: 1920, height: 1080
-            },
-            audio: { echoCancellation: false, noiseSuppression: false }
-        };
+        const constraints720p60 = this.createDisplayConstraints(1280, 720, 60);
+        const constraints720p30 = this.createDisplayConstraints(1280, 720, 30);
+        const constraints720p5 = this.createDisplayConstraints(1280, 720, 5);
 
-        const constraints900p: MediaStreamConstraints = {
-            video: {
-                frameRate: 30,
-                width: 1600, height: 900
-            },
-            audio: { echoCancellation: false, noiseSuppression: false }
-        };
+        const constraints480p30 = this.createDisplayConstraints(854, 480, 30);
+        const constraints360p30 = this.createDisplayConstraints(640, 360, 30);
+        const constraints240p30 = this.createDisplayConstraints(426, 240, 30);
+        const constraints144p30 = this.createDisplayConstraints(256, 144, 30);
 
-        const constraints900p60: MediaStreamConstraints = {
-            video: {
-                frameRate: 60,
-                width: 1600, height: 900
-            },
-            audio: { echoCancellation: false, noiseSuppression: false }
-        };
-
-        const constraints720p: MediaStreamConstraints = {
-            video: {
-                frameRate: 30,
-                width: 1280, height: 720
-            },
-            audio: { echoCancellation: false, noiseSuppression: false }
-        };
-
-        const constraints720p60: MediaStreamConstraints = {
-            video: {
-                frameRate: 60,
-                width: 1280, height: 720
-            },
-            audio: { echoCancellation: false, noiseSuppression: false }
-        };
-
-        const constraints720p5: MediaStreamConstraints = {
-            video: {
-                frameRate: 5,
-                width: 1280, height: 720
-            },
-            audio: { echoCancellation: false, noiseSuppression: false }
-        };
-
-        const constraints480p: MediaStreamConstraints = {
-            video: {
-                frameRate: 30,
-                width: 854, height: 480
-            },
-            audio: { echoCancellation: false, noiseSuppression: false }
-        };
-
-        const constraints360p: MediaStreamConstraints = {
-            video: {
-                frameRate: 30,
-                width: 640, height: 360
-            },
-            audio: { echoCancellation: false, noiseSuppression: false }
-        };
-
-        const constraints240p: MediaStreamConstraints = {
-            video: {
-                frameRate: 30,
-                width: 426, height: 240
-            },
-            audio: { echoCancellation: false, noiseSuppression: false }
-        };
-
-        const constraints144p: MediaStreamConstraints = {
-            video: {
-                frameRate: 30,
-                width: 256, height: 144
-            },
-            audio: { echoCancellation: false, noiseSuppression: false }
+        const defaultConstraints: MediaStreamConstraints = {
+            video: { frameRate: 30 },
+            audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
         };
 
         const settingsDisplay = this.ui.captureSettingsDisplay;
 
+
+        _constraints.set('default', defaultConstraints);
+        this.ui.addOptionToSelect(settingsDisplay, 'По умолчанию', 'default');
+        this.ui.addSeparatorToSelect(settingsDisplay);
+
         // 1440
-        _constraints.set('1440p', constraints1440p);
-        this.ui.addOptionToSelect(settingsDisplay, '2560x1440', '1440p');
+        _constraints.set('1440p@60', constraints1440p60);
+        this.ui.addOptionToSelect(settingsDisplay, '2560x1440@60', '1440p@60');
+
+        _constraints.set('1440p@30', constraints1440p30);
+        this.ui.addOptionToSelect(settingsDisplay, '2560x1440@30', '1440p@30');
+
+        _constraints.set('1440p@5', constraints1440p5);
+        this.ui.addOptionToSelect(settingsDisplay, '2560x1440@5', '1440p@5');
+
+        this.ui.addSeparatorToSelect(settingsDisplay);
 
         // 1080
-        _constraints.set('1080p', constraints1080p);
-        this.ui.addOptionToSelect(settingsDisplay, '1920x1080', '1080p');
-
         _constraints.set('1080p@60', constraints1080p60);
         this.ui.addOptionToSelect(settingsDisplay, '1920x1080@60', '1080p@60');
+
+        _constraints.set('1080p@30', constraints1080p30);
+        this.ui.addOptionToSelect(settingsDisplay, '1920x1080@30', '1080p@30');
 
         _constraints.set('1080p@5', constraints1080p5);
         this.ui.addOptionToSelect(settingsDisplay, '1920x1080@5', '1080p@5');
 
-        // 900
-        _constraints.set('900p', constraints900p);
-        this.ui.addOptionToSelect(settingsDisplay, '1600x900', '900p');
+        this.ui.addSeparatorToSelect(settingsDisplay);
 
+        // 900
         _constraints.set('900p@60', constraints900p60);
         this.ui.addOptionToSelect(settingsDisplay, '1600x900@60', '900p@60');
 
-        // 720
-        _constraints.set('720p', constraints720p);
-        this.ui.addOptionToSelect(settingsDisplay, '1280x720', '720p');
+        _constraints.set('900p@30', constraints900p30);
+        this.ui.addOptionToSelect(settingsDisplay, '1600x900@30', '900p@30');
 
+        _constraints.set('900p@5', constraints900p5);
+        this.ui.addOptionToSelect(settingsDisplay, '1600x900@5', '900p@5');
+
+        this.ui.addSeparatorToSelect(settingsDisplay);
+
+        // 720
         _constraints.set('720p@60', constraints720p60);
         this.ui.addOptionToSelect(settingsDisplay, '1280x720@60', '720p@60');
+
+        _constraints.set('720p@30', constraints720p30);
+        this.ui.addOptionToSelect(settingsDisplay, '1280x720@30', '720p@30');
 
         _constraints.set('720p@5', constraints720p5);
         this.ui.addOptionToSelect(settingsDisplay, '1280x720@5', '720p@5');
 
+        this.ui.addSeparatorToSelect(settingsDisplay);
+
         // 480
-        _constraints.set('480p', constraints480p);
-        this.ui.addOptionToSelect(settingsDisplay, '854x480', '480p');
+        _constraints.set('480p@30', constraints480p30);
+        this.ui.addOptionToSelect(settingsDisplay, '854x480@30', '480p@30');
+
+        this.ui.addSeparatorToSelect(settingsDisplay);
 
         // 360
-        _constraints.set('360p', constraints360p);
-        this.ui.addOptionToSelect(settingsDisplay, '640x360', '360p');
+        _constraints.set('360p@30', constraints360p30);
+        this.ui.addOptionToSelect(settingsDisplay, '640x360@30', '360p@30');
+
+        this.ui.addSeparatorToSelect(settingsDisplay);
 
         // 240
-        _constraints.set('240p', constraints240p);
-        this.ui.addOptionToSelect(settingsDisplay, '426x240', '240p');
+        _constraints.set('240p@30', constraints240p30);
+        this.ui.addOptionToSelect(settingsDisplay, '426x240@30', '240p@30');
+
+        this.ui.addSeparatorToSelect(settingsDisplay);
 
         // 144
-        _constraints.set('144p', constraints144p);
-        this.ui.addOptionToSelect(settingsDisplay, '256x144', '144p');
+        _constraints.set('144p@30', constraints144p30);
+        this.ui.addOptionToSelect(settingsDisplay, '256x144@30', '144p@30');
 
-        _constraints.set('default', constraints720p);
+        for (const constraint of _constraints)
+        {
+            const currentFrameRate = Number((constraint[1].video as MediaTrackConstraintSet).frameRate);
+            (constraint[1].video as MediaTrackConstraintSet).frameRate = currentFrameRate * 1.5;
+        }
 
         return _constraints;
     }
@@ -1004,6 +981,11 @@ export class UserMedia
     private prepareCaptureCamConstraints(): Map<string, MediaStreamConstraints>
     {
         const _constraints = new Map<string, MediaStreamConstraints>();
+
+        const constraintsDefault: MediaStreamConstraints = {
+            video: {},
+            audio: false
+        };
 
         const constraints1440p: MediaStreamConstraints = {
             video: {
@@ -1049,6 +1031,11 @@ export class UserMedia
 
         const settingsCam = this.ui.captureSettingsCam;
 
+        _constraints.set('default', constraintsDefault);
+        this.ui.addOptionToSelect(settingsCam, 'По умолчанию', 'default');
+
+        this.ui.addSeparatorToSelect(settingsCam);
+
         _constraints.set('1440p', constraints1440p);
         this.ui.addOptionToSelect(settingsCam, '2560x1440', '1440p');
 
@@ -1066,8 +1053,6 @@ export class UserMedia
 
         _constraints.set('240p', constraints240p);
         this.ui.addOptionToSelect(settingsCam, '320x240', '240p');
-
-        _constraints.set('default', constraints720p);
 
         return _constraints;
     }
