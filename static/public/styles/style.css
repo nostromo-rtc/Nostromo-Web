@@ -168,6 +168,12 @@ select {
     margin-right: 5px;
 }
 
+.vertical-line
+{
+    background-color: rgba(27,31,35,0.75);
+    min-width: 1px;
+}
+
 .max-w-150 {
     max-width: 150px;
 }

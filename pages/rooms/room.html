@@ -33,30 +33,30 @@
             <span>Ваше имя:</span>
             <input type="text" id="username-input">
             <button id="btn-set-new-username">Сохранить имя</button>
-            <span class="vl">|</span>
+            <span class="vl vertical-line"></span>
             <span>Выбор устройств:</span>
             <select id="mic-devices" class="vl max-w-150"></select>
             <select id="cam-devices" class="vl max-w-150"></select>
-            <span class="vl">|</span>
+            <span class="vl vertical-line"></span>
             <input type="checkbox" id="checkbox-display-settings">
             <label for="checkbox-display-settings"> Отображать настройки</label><br>
         </div>
         <div id="settings" class="d-flex flex-start p-2" hidden>
             <input type="checkbox" id="checkbox-notifications">
             <label for="checkbox-notifications"> Вкл. оповещения</label><br>
-            <span class="vl">|</span>
+            <span class="vl vertical-line"></span>
             <input type="checkbox" id="checkbox-display-local-videos">
             <label for="checkbox-display-local-videos"> Отображать локальные видео</label><br>
-            <span class="vl">|</span>
+            <span class="vl vertical-line"></span>
             <input type="checkbox" id="checkbox-display-inactive-videos">
             <label for="checkbox-display-inactive-videos"> Отображать неактивных участников</label><br>
-            <span class="vl">|</span>
+            <span class="vl vertical-line"></span>
             <input type="checkbox" id="checkbox-enable-noise-suppression">
             <label for="checkbox-enable-noise-suppression"> Вкл. шумоподавление</label><br>
-            <span class="vl">|</span>
+            <span class="vl vertical-line"></span>
             <input type="checkbox" id="checkbox-enable-echo-cancellation">
             <label for="checkbox-enable-echo-cancellation"> Вкл. эхоподавление</label><br>
-            <span class="vl">|</span>
+            <span class="vl vertical-line"></span>
             <input type="checkbox" id="checkbox-enable-ice-tcp-protocol">
             <label for="checkbox-enable-ice-tcp-protocol"> TCP</label><br>
         </div>
@@ -65,31 +65,31 @@
             <button id="btn-enable-sounds" class="bold background-green">Вкл. звуки собеседников</button>
             <button id="btn-disable-sounds" class="bold background-red" hidden>Выкл. звуки собеседников</button>
             <div id="media-controls" class="d-flex flex-start" hidden>
-                <span class="vl">|</span>
+                <span class="vl vertical-line"></span>
                 <button id="btn-get-mic">Захватить микрофон</button>
                 <button id="btn-stop-mic" class="bold background-red" hidden>Прекратить захват микрофона</button>
                 <button id="btn-pause-mic" class="bold background-orange" hidden>Временно откл. микрофон</button>
                 <button id="btn-unpause-mic" class="bold background-green" hidden>Включить микрофон</button>
-                <span class="vl">|</span>
+                <span class="vl vertical-line"></span>
                 <div class="d-flex" id="div-get-cam">
                     <button id="btn-get-cam">Захватить веб-камеру</button>
-                    <span class="vl">&larr;</span>
+                    <span class="vl align-self-center">&larr;</span>
                     <select id="capture-settings-cam">
                         <option disabled selected value="default">Выберите разрешение</option>
                     </select>
                 </div>
                 <button id="btn-stop-cam" class="bold background-red" hidden>Прекратить захват веб-камеры</button>
                 <button id="btn-stop-all-cams" class="bold background-red" hidden>Прекратить захват всех веб-камер</button>
-                <span class="vl">|</span>
+                <span class="vl vertical-line"></span>
                 <div class="d-flex" id="div-get-display">
                     <button id="btn-get-display">Демонстрация экрана компьютера</button>
-                    <span class="vl">&larr;</span>
+                    <span class="vl align-self-center">&larr;</span>
                     <select id="capture-settings-display">
                         <option disabled selected value="default">Выберите разрешение</option>
                     </select>
                 </div>
                 <button id="btn-stop-display" class="bold background-red" hidden>Прекратить захват экрана</button>
-                <span class="vl">|</span>
+                <span class="vl vertical-line"></span>
                 <button id="btn-show-mic-options">Доп. настройки микрофона</button>
             </div>
         </div>
