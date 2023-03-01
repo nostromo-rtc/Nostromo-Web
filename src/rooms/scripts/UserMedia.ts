@@ -1135,7 +1135,7 @@ export class UserMedia
         const btn_toggleMicOutput = this.ui.buttons.get('toggle-mic-output')!;
         const isOutputDisabled = (btn_toggleMicOutput.innerText === "Вкл. прослушивание микрофона");
 
-        isOutputDisabled ? this.micAudioProcessing.stopListenMic() : this.micAudioProcessing.listenMic();
+        isOutputDisabled ? this.micAudioProcessing.stopListenOutput() : this.micAudioProcessing.listenOutput();
     }
 
     private handleMicNoiseGate(): void

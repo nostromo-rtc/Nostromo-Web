@@ -7,19 +7,25 @@ export class MicAudioProcessing
 
     private ctx: AudioContext;
 
-    private volumeMeterNode?: AudioWorkletNode;
-
-    private noiseGateNode?: AudioWorkletNode;
-
+    /** Микрофон (источник, вход). */
     private micNode?: MediaStreamAudioSourceNode;
 
+    /** Индикатор громкости, не является эффектом. */
+    private volumeMeterNode?: AudioWorkletNode;
+
+    /** Нода для вывода звука в outputNode. */
     private outputNodeDestination: MediaStreamAudioDestinationNode;
 
+    /** Выходной звук. */
     private outputNode: MediaStreamAudioSourceNode;
 
+    /** Двусвязный список нод-эффектов. */
     private processingNodesList = new DoublyLinkedList<AudioNode>();
 
-    private isMicListening = false;
+    /** Шумовой порог, является эффектом. */
+    private noiseGateNode?: AudioWorkletNode;
+
+    private isOutputListening = false;
     private isVolumeMeterConnected = false;
     private isNoiseGateConnected = false;
     public isVolumeMeterReady = false;
@@ -79,10 +85,9 @@ export class MicAudioProcessing
         {
             this.disconnectVolumeMeter();
             this.disconnectNoiseGate();
-            this.stopListenMic();
+            this.stopListenOutput();
 
             this.removeProcessingNode(this.micNode);
-            this.micNode.disconnect();
             this.micNode = undefined;
 
             console.debug(`[${this._className}] destroyMicNode`);
@@ -91,7 +96,7 @@ export class MicAudioProcessing
 
     public connectVolumeMeter(meter: HTMLMeterElement)
     {
-        if (this.volumeMeterNode === undefined)
+        if (this.isVolumeMeterReady && this.volumeMeterNode === undefined)
         {
             this.volumeMeterNode = new AudioWorkletNode(this.ctx, "volume-meter");
 
@@ -101,7 +106,7 @@ export class MicAudioProcessing
             };
         }
 
-        if (this.micNode && !this.isVolumeMeterConnected)
+        if (this.micNode && this.volumeMeterNode && !this.isVolumeMeterConnected)
         {
             this.outputNode.connect(this.volumeMeterNode);
             this.isVolumeMeterConnected = true;
@@ -125,36 +130,36 @@ export class MicAudioProcessing
         }
     }
 
-    public listenMic(): void
+    public listenOutput(): void
     {
-        if (this.micNode && !this.isMicListening)
+        if (this.micNode && !this.isOutputListening)
         {
             this.outputNode.connect(this.ctx.destination);
-            this.isMicListening = true;
+            this.isOutputListening = true;
 
-            console.debug(`[${this._className}] listenMic`);
+            console.debug(`[${this._className}] listenOutput`);
         }
     }
 
-    public stopListenMic(): void
+    public stopListenOutput(): void
     {
-        if (this.micNode && this.isMicListening)
+        if (this.micNode && this.isOutputListening)
         {
             this.outputNode.disconnect(this.ctx.destination);
-            this.isMicListening = false;
+            this.isOutputListening = false;
 
-            console.debug(`[${this._className}] stopListenMic`);
+            console.debug(`[${this._className}] stopListenOutput`);
         }
     }
 
     public connectNoiseGate()
     {
-        if (this.noiseGateNode === undefined)
+        if (this.isNoiseGateReady && this.noiseGateNode === undefined)
         {
             this.noiseGateNode = new AudioWorkletNode(this.ctx, "noise-gate");
         }
 
-        if (this.micNode && !this.isNoiseGateConnected)
+        if (this.micNode && this.noiseGateNode && !this.isNoiseGateConnected)
         {
             this.addLastProcessingNode(this.noiseGateNode);
             this.isNoiseGateConnected = true;
@@ -168,7 +173,6 @@ export class MicAudioProcessing
         if (this.micNode && this.noiseGateNode && this.isNoiseGateConnected)
         {
             this.removeProcessingNode(this.noiseGateNode);
-
             this.noiseGateNode = undefined;
 
             this.isNoiseGateConnected = false;
@@ -195,14 +199,18 @@ export class MicAudioProcessing
     {
         const lastNode = this.processingNodesList.getLast();
 
+        // Если список пуст.
         if (lastNode === undefined)
         {
             return;
         }
 
+        // Отключаем исходящие соединения.
+        node.disconnect();
+
+        // Если удаляемый узел находится в конце.
         if (node === lastNode)
         {
-            node.disconnect(this.outputNodeDestination);
             this.processingNodesList.removeLast();
 
             const prevNode = this.processingNodesList.getLast();
