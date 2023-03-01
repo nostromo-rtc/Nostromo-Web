@@ -314,3 +314,10 @@ video {
 {
     align-self: center;
 }
+
+#mic-constraints-label
+{
+    font-weight: 300;
+    display: inline-block;
+    margin-bottom: 4px;
+}

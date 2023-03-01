@@ -31,12 +31,7 @@ export class UserMedia
 
     /** Настройки медиапотока при захвате микрофона. */
     private readonly streamConstraintsMic: MediaStreamConstraints = {
-        audio: { noiseSuppression: true, echoCancellation: true }, video: false
-    };
-
-    /** Настройки медиапотока при захвате микрофона без шумоподавления. */
-    private readonly streamConstraintsMicWithoutNoiseSuppression: MediaStreamConstraints = {
-        audio: { noiseSuppression: false, echoCancellation: false }, video: false
+        audio: { noiseSuppression: true, echoCancellation: true, autoGainControl: true }, video: false
     };
 
     /** Настройки медиапотока при захвате видеоизображения экрана. */
@@ -203,7 +198,7 @@ export class UserMedia
             this.handleMicNoiseGate();
         });
 
-        this.ui.checkboxEnableNoiseSuppression.addEventListener("click", () =>
+        const getMicAgain = () =>
         {
             // Если микрофон уже захвачен.
             if (!btn_stopMic.hidden)
@@ -211,16 +206,21 @@ export class UserMedia
                 btn_stopMic.click();
                 btn_getMic.click();
             }
+        };
+
+        this.ui.checkboxEnableNoiseSuppression.addEventListener("click", () =>
+        {
+            getMicAgain();
         });
 
         this.ui.checkboxEnableEchoCancellation.addEventListener("click", () =>
         {
-            // Если микрофон уже захвачен.
-            if (!btn_stopMic.hidden)
-            {
-                btn_stopMic.click();
-                btn_getMic.click();
-            }
+            getMicAgain();
+        });
+
+        this.ui.checkboxEnableAutoGainControl.addEventListener("click", () =>
+        {
+            getMicAgain();
         });
     }
 
@@ -236,13 +236,13 @@ export class UserMedia
 
         console.debug("[UserMedia] > handleGetMic", deviceId);
 
-        // Используем spread оператор для копирования объекта streamConstraintsMic.
-        const constraints = this.ui.checkboxEnableNoiseSuppression.checked ? { ...this.streamConstraintsMic } : { ...this.streamConstraintsMicWithoutNoiseSuppression };
+        const constraints = this.streamConstraintsMic;
         (constraints.audio as MediaTrackConstraints).deviceId = { ideal: deviceId };
 
         // Применяем настройки шумоподавления и эхоподавления.
         (constraints.audio as MediaTrackConstraints).noiseSuppression = this.ui.checkboxEnableNoiseSuppression.checked;
         (constraints.audio as MediaTrackConstraints).echoCancellation = this.ui.checkboxEnableEchoCancellation.checked;
+        (constraints.audio as MediaTrackConstraints).autoGainControl = this.ui.checkboxEnableAutoGainControl.checked;
 
         // Это происходит на Chrome, при первом заходе на страницу
         // когда нет прав на получение Id устройства.

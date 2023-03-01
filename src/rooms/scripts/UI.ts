@@ -126,6 +126,9 @@ export class UI
     /** Чекбокс для включения/выключения эхоподавления микрофона. */
     public readonly checkboxEnableEchoCancellation = document.getElementById("checkbox-enable-echo-cancellation") as HTMLInputElement;
 
+    /** Чекбокс для включения/выключения автоматическую регулировку усиления микрофона. */
+    public readonly checkboxEnableAutoGainControl = document.getElementById("checkbox-enable-auto-gain-control") as HTMLInputElement;
+
     /** Чекбокс для включения/выключения TCP протокола для ICE-соединений. */
     public readonly checkboxEnableIceTcpProtocol = document.getElementById("checkbox-enable-ice-tcp-protocol") as HTMLInputElement;
 
@@ -275,6 +278,12 @@ export class UI
         this.checkboxEnableEchoCancellation.addEventListener("click", () =>
         {
             this.setCheckboxEnableEchoCancellationState();
+        });
+
+        this.setupCheckboxEnableAutoGainControlFromLS();
+        this.checkboxEnableAutoGainControl.addEventListener("click", () =>
+        {
+            this.setCheckboxEnableAutoGainControlState();
         });
 
         this.setupCheckboxEnableIceTcpProtocolFromLS();
@@ -948,6 +957,15 @@ export class UI
         this.checkboxEnableEchoCancellation.checked = (localStorage["enable-echo-cancellation"] == "true");
     }
 
+    private setupCheckboxEnableAutoGainControlFromLS(): void
+    {
+        if (localStorage["enable-auto-gain-control"] == undefined)
+        {
+            localStorage["enable-auto-gain-control"] = "true";
+        }
+        this.checkboxEnableAutoGainControl.checked = (localStorage["enable-auto-gain-control"] == "true");
+    }
+
     /** Прочитать из локального хранилище настройку включения/выключения TCP-протокола для ICE-соединений. */
     private setupCheckboxEnableIceTcpProtocolFromLS(): void
     {
@@ -991,6 +1009,11 @@ export class UI
     private setCheckboxEnableEchoCancellationState(): void
     {
         localStorage["enable-echo-cancellation"] = this.checkboxEnableEchoCancellation.checked;
+    }
+
+    private setCheckboxEnableAutoGainControlState(): void
+    {
+        localStorage["enable-auto-gain-control"] = this.checkboxEnableAutoGainControl.checked;
     }
 
     /** Установить новое состояние для чекбокса enable-ice-tcp-protocol. */

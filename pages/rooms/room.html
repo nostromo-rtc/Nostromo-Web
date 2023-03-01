@@ -51,14 +51,8 @@
             <input type="checkbox" id="checkbox-display-inactive-videos">
             <label for="checkbox-display-inactive-videos"> Отображать неактивных участников</label><br>
             <span class="vl vertical-line"></span>
-            <input type="checkbox" id="checkbox-enable-noise-suppression">
-            <label for="checkbox-enable-noise-suppression"> Вкл. шумоподавление</label><br>
-            <span class="vl vertical-line"></span>
-            <input type="checkbox" id="checkbox-enable-echo-cancellation">
-            <label for="checkbox-enable-echo-cancellation"> Вкл. эхоподавление</label><br>
-            <span class="vl vertical-line"></span>
             <input type="checkbox" id="checkbox-enable-ice-tcp-protocol">
-            <label for="checkbox-enable-ice-tcp-protocol"> TCP</label><br>
+            <label for="checkbox-enable-ice-tcp-protocol"> TCP (не рекомендуется)</label><br>
         </div>
         <div class="d-flex flex-start p-2">
             <span id="attention" class="vl">&#9888;</span>
@@ -96,10 +90,24 @@
         <div id="mic-options" hidden>
             <div id="volume-meter-label">Индикатор громкости:</div>
             <meter id="volume-meter" high="33" max="50"></meter>
-	    <div class="d-flex">
-	    	<button id="btn-toggle-mic-output" class="btn btn-mic background-darkgreen" disabled>Вкл. прослушивание микрофона</button>
-            <button id="btn-toggle-mic-noise-gate" class="btn btn-mic ml-auto background-darkgreen" role="button">Вкл. шумовой порог</button>
-	    </div>
+            <div class="d-flex">
+                <button id="btn-toggle-mic-output" class="btn btn-mic background-darkgreen" disabled>Вкл. прослушивание микрофона</button>
+                <button id="btn-toggle-mic-noise-gate" class="btn btn-mic ml-auto background-darkgreen" role="button">Вкл. шумовой порог</button>
+            </div>
+            <span class="horizontal-line"></span>
+            <div id="mic-constraints-label">Опции обработки микрофона:</div>
+            <div class="d-flex font16 m-b-3">
+                <input type="checkbox" id="checkbox-enable-noise-suppression">
+                <label for="checkbox-enable-noise-suppression"> Включить шумоподавление</label><br>
+            </div>
+            <div class="d-flex font16 m-b-3">
+                <input type="checkbox" id="checkbox-enable-echo-cancellation">
+                <label for="checkbox-enable-echo-cancellation"> Включить эхоподавление</label><br>
+            </div>
+            <div class="d-flex font16">
+                <input type="checkbox" id="checkbox-enable-auto-gain-control">
+                <label for="checkbox-enable-auto-gain-control"> Включить автоматическую регулировку усиления</label><br>
+            </div>
         </div>
         <div id="videos"></div>
         <section id="chat-section">
