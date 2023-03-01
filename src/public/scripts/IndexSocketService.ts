@@ -1,7 +1,7 @@
 import { io, Socket } from "socket.io-client";
 import { SocketEvents as SE } from "nostromo-shared/types/SocketEvents";
 import { PublicRoomInfo } from "nostromo-shared/types/RoomTypes";
-import { NewRoomNameInfo } from "nostromo-shared/types/AdminTypes";
+import { RoomNameInfo } from "nostromo-shared/types/AdminTypes";
 
 // Класс для работы с сокетами на главной странице
 export default class IndexSocketService
@@ -32,7 +32,7 @@ export default class IndexSocketService
         this.socket.on(SE.RoomList, (rooms: PublicRoomInfo[]) => this.createRoomList(rooms));
         this.socket.on(SE.RoomCreated, (room: PublicRoomInfo) => this.addRoomToList(room));
         this.socket.on(SE.RoomDeleted, (id: string) => this.removeRoomFromList(id));
-        this.socket.on(SE.RoomNameChanged, (info: NewRoomNameInfo) => this.updateRoomInList(info));
+        this.socket.on(SE.RoomNameChanged, (info: RoomNameInfo) => this.updateRoomInList(info));
 
         this.socket.on(SE.Disconnect, () => this.onDisconnect());
     }
@@ -83,7 +83,7 @@ export default class IndexSocketService
         }
     }
 
-    private updateRoomInList(info: NewRoomNameInfo): void
+    private updateRoomInList(info: RoomNameInfo): void
     {
         const roomListItem = document.getElementById(info.id) as HTMLAnchorElement | undefined;
         if (roomListItem)

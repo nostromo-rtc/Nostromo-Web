@@ -1,7 +1,7 @@
 import { io, Socket } from "socket.io-client";
 import { SocketEvents as SE } from "nostromo-shared/types/SocketEvents";
 
-import { ActionOnUserInfo, ChangeUserNameInfo, NewRoomInfo, NewRoomModeInfo, NewRoomNameInfo, NewRoomPassInfo, NewRoomSaveChatPolicyInfo } from "nostromo-shared/types/AdminTypes";
+import { ActionOnUserInfo, ChangeUserNameInfo, NewRoomInfo, NewRoomModeInfo, RoomNameInfo, RoomPassInfo, NewRoomSaveChatPolicyInfo } from "nostromo-shared/types/AdminTypes";
 import { VideoCodec, UserInfo, PublicRoomInfo } from "nostromo-shared/types/RoomTypes";
 
 // Класс для работы с сокетами при авторизации в панель администратора
@@ -95,7 +95,7 @@ export default class AdminSocketService
         btn_changeRoomName.addEventListener('click', () =>
         {
             const newName = changeRoomNameInput.value.trim();
-            const info: NewRoomNameInfo = {
+            const info: RoomNameInfo = {
                 id: this.getSelectedRoom(),
                 name: newName
             };
@@ -109,7 +109,7 @@ export default class AdminSocketService
         btn_changeRoomPass.addEventListener('click', () =>
         {
             const newPass = changeRoomPassInput.value.trim();
-            const info: NewRoomPassInfo = {
+            const info: RoomPassInfo = {
                 id: this.getSelectedRoom(),
                 password: newPass
             };
@@ -184,6 +184,13 @@ export default class AdminSocketService
         btn_kickAllUsers.addEventListener('click', () =>
         {
             this.kickAllUsers(this.getSelectedRoom());
+        });
+
+        // Обработка кнопки получения ссылки на комнату.
+        const btn_getRoomLink = document.getElementById('btn-get-room-link')! as HTMLButtonElement;
+        btn_getRoomLink.addEventListener('click', () =>
+        {
+            this.getRoomHashPass(this.getSelectedRoom());
         });
     }
 
@@ -280,6 +287,7 @@ export default class AdminSocketService
     private handleEvents()
     {
         this.socket.on(SE.RoomList, this.setInitialRoomList);
+        this.socket.on(SE.GetRoomHashPass, this.setRoomLink);
         this.generalSocket.on(SE.UserList, this.setUserList);
         this.generalSocket.on(SE.RoomDeleted, this.roomDeleted);
         this.generalSocket.on(SE.RoomCreated, this.roomCreated);
@@ -345,7 +353,7 @@ export default class AdminSocketService
     };
 
     /** Обрабатываем событие изменения названия комнаты. */
-    private roomNameChanged = (info: NewRoomNameInfo): void =>
+    private roomNameChanged = (info: RoomNameInfo): void =>
     {
         const roomInfo = this.roomInfoList.get(info.id);
 
@@ -423,7 +431,31 @@ export default class AdminSocketService
                 this.subscribeUserList(roomId);
                 this.latestSubscribedRoomId = roomId;
             }
+
+            const roomLinkInput = document.getElementById('room-link-input')! as HTMLInputElement;
+            roomLinkInput.value = "";
         });
+    };
+
+    /** Обрабатываем событие получения хеша пароля от выбранной комнаты. */
+    private setRoomLink = (info: RoomPassInfo) =>
+    {
+        const roomLinkInput = document.getElementById('room-link-input')! as HTMLInputElement;
+
+        roomLinkInput.value = `${window.location.origin}/r/${info.id}`;
+
+        if (info.password !== "")
+        {
+            roomLinkInput.value += `?p=${info.password}`;
+        }
+
+        roomLinkInput.select();
+
+        const roomSelect = document.getElementById('room-select') as HTMLSelectElement;
+        roomSelect.disabled = false;
+
+        const btn_getRoomLink = document.getElementById('btn-get-room-link')! as HTMLButtonElement;
+        btn_getRoomLink.disabled = false;
     };
 
     /** Сообщаем серверу, что хотим получать список юзеров этой комнаты. */
@@ -592,7 +624,7 @@ export default class AdminSocketService
     }
 
     /** Изменить название комнаты. */
-    private changeRoomName(info: NewRoomNameInfo)
+    private changeRoomName(info: RoomNameInfo)
     {
         if (this.checkIsSelectOptionCorrect(info.id) && info.name.length > 0)
         {
@@ -601,11 +633,26 @@ export default class AdminSocketService
     }
 
     /** Изменить пароль комнаты. */
-    private changeRoomPass(info: NewRoomPassInfo)
+    private changeRoomPass(info: RoomPassInfo)
     {
         if (this.checkIsSelectOptionCorrect(info.id))
         {
             this.socket.emit(SE.ChangeRoomPass, info);
+        }
+    }
+
+    /** Получить хэш пароля комнаты. */
+    private getRoomHashPass(roomId: string)
+    {
+        if (this.checkIsSelectOptionCorrect(roomId))
+        {
+            const roomSelect = document.getElementById('room-select') as HTMLSelectElement;
+            roomSelect.disabled = true;
+
+            const btn_getRoomLink = document.getElementById('btn-get-room-link')! as HTMLButtonElement;
+            btn_getRoomLink.disabled = true;
+
+            this.socket.emit(SE.GetRoomHashPass, roomId);
         }
     }
 
