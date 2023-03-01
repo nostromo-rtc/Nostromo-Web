@@ -202,6 +202,26 @@ export class UserMedia
 
             this.handleMicNoiseGate();
         });
+
+        this.ui.checkboxEnableNoiseSuppression.addEventListener("click", () =>
+        {
+            // Если микрофон уже захвачен.
+            if (!btn_stopMic.hidden)
+            {
+                btn_stopMic.click();
+                btn_getMic.click();
+            }
+        });
+
+        this.ui.checkboxEnableEchoCancellation.addEventListener("click", () =>
+        {
+            // Если микрофон уже захвачен.
+            if (!btn_stopMic.hidden)
+            {
+                btn_stopMic.click();
+                btn_getMic.click();
+            }
+        });
     }
 
     /** Обработка нажатия на кнопку "Захватить микрофон". */
