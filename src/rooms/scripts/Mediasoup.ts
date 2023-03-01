@@ -315,7 +315,7 @@ export class Mediasoup
             && !producer.closed
         )
         {
-            const newBitrate = this.getReasonableVideoBitrate(this.maxVideoBitrate);
+            const newBitrate = Math.trunc(this.getReasonableVideoBitrate(this.maxVideoBitrate));
             const params = producer.rtpSender.getParameters();
             const oldBitrate = params.encodings[0].maxBitrate;
 
