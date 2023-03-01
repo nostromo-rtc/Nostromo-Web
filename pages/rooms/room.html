@@ -21,7 +21,7 @@
             <span class="vl">//</span>
             <span id="users-count-label">
                 Количество участников (<span id="users-count">1</span>):
-                <select id="user-list" class="vl">
+                <select id="user-list" class="my-select vl">
                     <option value="none" selected disabled hidden>...</option>
                 </select>
             </span>
@@ -32,11 +32,11 @@
         <div class="d-flex flex-start p-2">
             <span>Ваше имя:</span>
             <input type="text" id="username-input">
-            <button id="btn-set-new-username">Сохранить имя</button>
+            <button id="btn-set-new-username" class="btn">Сохранить имя</button>
             <span class="vl vertical-line"></span>
             <span>Выбор устройств:</span>
-            <select id="mic-devices" class="vl max-w-150"></select>
-            <select id="cam-devices" class="vl max-w-150"></select>
+            <select id="mic-devices" class="my-select vl max-w-150"></select>
+            <select id="cam-devices" class="my-select vl max-w-150"></select>
             <span class="vl vertical-line"></span>
             <input type="checkbox" id="checkbox-display-settings">
             <label for="checkbox-display-settings"> Отображать настройки</label><br>
@@ -62,43 +62,43 @@
         </div>
         <div class="d-flex flex-start p-2">
             <span id="attention" class="vl">&#9888;</span>
-            <button id="btn-enable-sounds" class="bold background-green">Вкл. звуки собеседников</button>
-            <button id="btn-disable-sounds" class="bold background-red" hidden>Выкл. звуки собеседников</button>
+            <button id="btn-enable-sounds" class="btn bold background-green">Вкл. звуки собеседников</button>
+            <button id="btn-disable-sounds" class="btn bold background-red" hidden>Выкл. звуки собеседников</button>
             <div id="media-controls" class="d-flex flex-start" hidden>
                 <span class="vl vertical-line"></span>
-                <button id="btn-get-mic">Захватить микрофон</button>
-                <button id="btn-stop-mic" class="bold background-red" hidden>Прекратить захват микрофона</button>
-                <button id="btn-pause-mic" class="bold background-orange" hidden>Временно откл. микрофон</button>
-                <button id="btn-unpause-mic" class="bold background-green" hidden>Включить микрофон</button>
+                <button id="btn-get-mic" class="btn">Захватить микрофон</button>
+                <button id="btn-stop-mic" class="btn bold background-red" hidden>Прекратить захват микрофона</button>
+                <button id="btn-pause-mic" class="btn bold background-orange" hidden>Временно откл. микрофон</button>
+                <button id="btn-unpause-mic" class="btn bold background-green" hidden>Включить микрофон</button>
                 <span class="vl vertical-line"></span>
                 <div class="d-flex" id="div-get-cam">
-                    <button id="btn-get-cam">Захватить веб-камеру</button>
+                    <button id="btn-get-cam" class="btn">Захватить веб-камеру</button>
                     <span class="vl align-self-center">&larr;</span>
-                    <select id="capture-settings-cam">
+                    <select id="capture-settings-cam" class="my-select">
                         <option disabled selected value="default">Выберите разрешение</option>
                     </select>
                 </div>
-                <button id="btn-stop-cam" class="bold background-red" hidden>Прекратить захват веб-камеры</button>
-                <button id="btn-stop-all-cams" class="bold background-red" hidden>Прекратить захват всех веб-камер</button>
+                <button id="btn-stop-cam" class="btn bold background-red" hidden>Прекратить захват веб-камеры</button>
+                <button id="btn-stop-all-cams" class="btn bold background-red" hidden>Прекратить захват всех веб-камер</button>
                 <span class="vl vertical-line"></span>
                 <div class="d-flex" id="div-get-display">
-                    <button id="btn-get-display">Демонстрация экрана компьютера</button>
+                    <button id="btn-get-display" class="btn">Демонстрация экрана компьютера</button>
                     <span class="vl align-self-center">&larr;</span>
-                    <select id="capture-settings-display">
+                    <select id="capture-settings-display" class="my-select">
                         <option disabled selected value="default">Выберите разрешение</option>
                     </select>
                 </div>
-                <button id="btn-stop-display" class="bold background-red" hidden>Прекратить захват экрана</button>
+                <button id="btn-stop-display" class="btn bold background-red" hidden>Прекратить захват экрана</button>
                 <span class="vl vertical-line"></span>
-                <button id="btn-show-mic-options">Доп. настройки микрофона</button>
+                <button id="btn-show-mic-options" class="btn">Доп. настройки микрофона</button>
             </div>
         </div>
         <div id="mic-options" hidden>
             <div id="volume-meter-label">Индикатор громкости:</div>
             <meter id="volume-meter" high="33" max="50"></meter>
 	    <div class="d-flex">
-	    	<button id="btn-toggle-mic-output" class="btn-mic background-darkgreen" disabled>Вкл. прослушивание микрофона</button>
-            <button id="btn-toggle-mic-noise-gate" class="btn-mic ml-auto background-darkgreen" role="button">Вкл. шумовой порог</button>
+	    	<button id="btn-toggle-mic-output" class="btn btn-mic background-darkgreen" disabled>Вкл. прослушивание микрофона</button>
+            <button id="btn-toggle-mic-noise-gate" class="btn btn-mic ml-auto background-darkgreen" role="button">Вкл. шумовой порог</button>
 	    </div>
         </div>
         <div id="videos"></div>
@@ -107,13 +107,13 @@
             <div id="chat" readonly></div>
             <div class="flex">
                 <textarea id="message-textarea" placeholder="Введите ваше сообщение"></textarea>
-                <button id="btn-send-message" accesskey="enter" autofocus>Отправить</button>
+                <button id="btn-send-message" accesskey="enter" autofocus class="btn">Отправить</button>
             </div>
         </section>
         <section id="file-section">
             <span>Отправка файлов:</span><br>
             <input type="file" id="file-input" name="file" multiple="true" /><br>
-            <button id="btn-send-file">Отправить</button><br>
+            <button id="btn-send-file" class="btn">Отправить</button><br>
             <div id="files-progress"></div>
         </section>
     </div>

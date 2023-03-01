@@ -216,7 +216,7 @@ video {
     width: auto;
 }
 
-button
+.btn
 {
     border: 1px solid rgba(27,31,35,0.25);
     box-shadow: rgba(27, 31, 35, 0.04) 0 1px 0, rgba(255, 255, 255, 0.25) 0 1px 0 inset;
@@ -229,7 +229,7 @@ button
     background-color: #ebebeb;
 }
 
-select
+.my-select
 {
     border: 1px solid rgba(27,31,35,0.25);
     box-shadow: rgba(27, 31, 35, 0.04) 0 1px 0, rgba(255, 255, 255, 0.25) 0 1px 0 inset;
@@ -260,14 +260,14 @@ select
     margin-left: 5px;
 }
 
+#btn-set-new-username
+{
+    margin-left: 5px;
+}
+
 .ml-auto
 {
     margin-left: auto;
-}
-
-.background-darkgreen
-{
-    background-color: rgb(30, 185, 30)
 }
 
 #mic-is-not-captured

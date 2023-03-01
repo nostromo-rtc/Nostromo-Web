@@ -184,23 +184,28 @@ select {
 }
 
 .background-green {
-    background-color: lightgreen;
+    background-color: lightgreen !important;
 }
 
 .background-white {
-    background-color: white;
+    background-color: white !important;
 }
 
 .background-lightgreen {
-    background-color: rgb(163, 233, 163);
+    background-color: rgb(163, 233, 163) !important;
 }
 
 .background-orange {
-    background-color: rgb(248, 178, 152);
+    background-color: rgb(248, 178, 152) !important;
 }
 
 .background-red {
-    background-color: lightcoral;
+    background-color: lightcoral !important;
+}
+
+.background-darkgreen
+{
+    background-color: rgb(30, 185, 30) !important
 }
 
 .bold {
