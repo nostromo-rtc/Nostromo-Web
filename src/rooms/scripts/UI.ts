@@ -323,8 +323,10 @@ export class UI
         btn_getMic.hidden = !btn_getMic.hidden;
         btn_stopMic.hidden = !btn_stopMic.hidden;
 
-        const micIsNotCapturedOverlay = document.getElementById("mic-is-not-captured")!;
-        micIsNotCapturedOverlay.hidden = btn_getMic.hidden;
+        const btn_toggleMicOutput = this.buttons.get('toggle-mic-output')!;
+        btn_toggleMicOutput.disabled = !btn_getMic.hidden;
+
+        this.volumeMeterElem.value = 0;
     }
 
     /** Переключить видимость кнопок захвата/прекращения захвата вебки. */

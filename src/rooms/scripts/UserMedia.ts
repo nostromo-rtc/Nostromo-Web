@@ -188,7 +188,7 @@ export class UserMedia
         {
             const isOutputDisabled = (btn_toggleMicOutput.innerText === "Вкл. прослушивание микрофона");
             btn_toggleMicOutput.innerText = isOutputDisabled ? "Выкл. прослушивание микрофона" : "Вкл. прослушивание микрофона";
-            btn_toggleMicOutput.className = isOutputDisabled ? "background-red" : "background-darkgreen";
+            btn_toggleMicOutput.className = isOutputDisabled ? "btn-mic background-red" : "btn-mic background-darkgreen";
 
             this.handleMicOutput();
         });
@@ -198,7 +198,7 @@ export class UserMedia
         {
             const isFilterDisabled = (btn_toggleMicNoiseGate.innerText === "Вкл. шумовой порог");
             btn_toggleMicNoiseGate.innerText = isFilterDisabled ? "Выкл. шумовой порог" : "Вкл. шумовой порог";
-            btn_toggleMicNoiseGate.className = isFilterDisabled ? "background-red" : "background-darkgreen";
+            btn_toggleMicNoiseGate.className = isFilterDisabled ? "btn-mic ml-auto background-red" : "btn-mic ml-auto background-darkgreen";
 
             this.handleMicNoiseGate();
         });
