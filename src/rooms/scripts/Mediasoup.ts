@@ -80,6 +80,9 @@ export class Mediasoup
     /** Максимальный битрейт для аудиодорожек. */
     public maxAudioBitrate = 64 * PrefixConstants.KILO;
 
+    /** Производители, которым ждут изменения битрейта (если true). */
+    private waitingProducersForUpdatingBitrate = new Map<string, boolean>();
+
     constructor()
     {
         try
@@ -220,7 +223,7 @@ export class Mediasoup
         // и соответственно это значение не применилось.
         if (producer.kind == "video" && (currentVideoBitrate != this.maxVideoBitrate))
         {
-            await this.setBitrateForProducerVideoTracks(producer, this.maxVideoBitrate);
+            this.registerUpdatingBitrateForProducer(producer);
         }
 
         this.producers.set(producer.id, producer);
@@ -267,7 +270,7 @@ export class Mediasoup
     }
 
     /** Обновить значение максимального битрейта для исходящих видеопотоков. */
-    public async updateMaxBitrate(bitrate: number): Promise<void>
+    public updateMaxBitrate(bitrate: number): void
     {
         // Если битрейт изменился.
         if (this.maxVideoBitrate != bitrate)
@@ -275,32 +278,60 @@ export class Mediasoup
             this.maxVideoBitrate = bitrate;
             console.debug('[Mediasoup] > Update new maxVideoBitrate in Mbit', bitrate / PrefixConstants.MEGA);
 
-            await this.setBitrateForAllProducersVideoTracks(bitrate);
+            this.setBitrateForAllProducersVideoTracks();
         }
     }
 
     /** Применить новое значение максимального битрейта для исходящих видеопотоков. */
-    private async setBitrateForAllProducersVideoTracks(bitrate: number)
+    private setBitrateForAllProducersVideoTracks()
     {
         for (const producer of this.getProducers())
         {
-            await this.setBitrateForProducerVideoTracks(producer, bitrate);
+            this.registerUpdatingBitrateForProducer(producer);
+        }
+    }
+
+    private registerUpdatingBitrateForProducer(producer: MediasoupTypes.Producer): void
+    {
+        const isProducerAlreadyUpdating = this.waitingProducersForUpdatingBitrate.get(producer.id);
+
+        if (!isProducerAlreadyUpdating)
+        {
+            this.waitingProducersForUpdatingBitrate.set(producer.id, true);
+
+            setTimeout(async () =>
+            {
+                await this.setBitrateForProducer(producer);
+                this.waitingProducersForUpdatingBitrate.delete(producer.id);
+            }, 5000);
         }
     }
 
     /** Применить новое значение максимального битрейта для исходящего видеопотока. */
-    private async setBitrateForProducerVideoTracks(producer: MediasoupTypes.Producer, bitrate: number)
+    private async setBitrateForProducer(producer: MediasoupTypes.Producer)
     {
-        if (producer.kind == 'video')
+        if (producer.kind == 'video'
+            && producer.rtpSender
+            && !producer.closed
+        )
         {
-            const params = producer.rtpSender!.getParameters();
-            const newBitrate = this.getReasonableVideoBitrate(bitrate);
+            const newBitrate = this.getReasonableVideoBitrate(this.maxVideoBitrate);
+            const params = producer.rtpSender.getParameters();
+            const oldBitrate = params.encodings[0].maxBitrate;
 
-            if (params.encodings[0].maxBitrate != newBitrate)
+            if (oldBitrate != newBitrate)
             {
-                console.debug("[Mediasoup] setBitrateForProducerVideoTracks", producer.id, newBitrate);
+                console.debug("[Mediasoup] setBitrateForProducerVideoTracks", producer.id, oldBitrate, newBitrate);
                 params.encodings[0].maxBitrate = newBitrate;
-                await producer.rtpSender!.setParameters(params);
+
+                try
+                {
+                    await producer.rtpSender.setParameters(params);
+                }
+                catch (error)
+                {
+                    console.error("[Mediasoup] can't setBitrateForProducerVideoTracks", producer.id, oldBitrate, newBitrate);
+                }
             }
         }
     }
