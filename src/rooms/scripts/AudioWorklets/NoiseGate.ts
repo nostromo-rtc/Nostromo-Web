@@ -2,6 +2,12 @@ export type NoiseGateOptions = {
     contextSampleRate: number;
 };
 
+export type NoiseGateParams = {
+    threshold?: number;
+    attack?: number;
+    release?: number;
+};
+
 export class NoiseGate extends AudioWorkletProcessor
 {
     /** Огибающая громкости сигнала. */
@@ -34,6 +40,14 @@ export class NoiseGate extends AudioWorkletProcessor
     /** Порог - уровень громкости в дБ, ниже которого звук не пропускать. */
     private threshold = -40;
 
+    static get parameterDescriptors()
+    {
+        return [
+            { name: "attack", defaultValue: 0.05, minValue: 0, maxValue: 0.3 },
+            { name: "release", defaultValue: 0.05, minValue: 0, maxValue: 0.3 },
+            { name: "threshold", defaultValue: -40, minValue: -100, maxValue: 0 }
+        ];
+    }
 
     constructor(options: AudioWorkletNodeOptions)
     {
@@ -124,10 +138,9 @@ export class NoiseGate extends AudioWorkletProcessor
         parameters: Record<string, Float32Array>
     ): boolean
     {
-        //TODO: считывать из параметров
-        this.attack = 0.05;
-        this.release = 0.05;
-        this.threshold = -40;
+        this.attack = parameters.attack[0];
+        this.release = parameters.release[0];
+        this.threshold = parameters.threshold[0];
 
         const input = inputs[0];
         const output = outputs[0];

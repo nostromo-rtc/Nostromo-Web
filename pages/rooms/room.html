@@ -88,14 +88,13 @@
             </div>
         </div>
         <div id="mic-options" hidden>
-            <div id="volume-meter-label">Индикатор громкости:</div>
+            <div id="volume-meter-label" class="mic-settings-label">Индикатор громкости:</div>
             <meter id="volume-meter" high="33" max="50"></meter>
             <div class="d-flex">
                 <button id="btn-toggle-mic-output" class="btn btn-mic background-darkgreen" disabled>Вкл. прослушивание микрофона</button>
-                <button id="btn-toggle-mic-noise-gate" class="btn btn-mic ml-auto background-darkgreen" role="button">Вкл. шумовой порог</button>
             </div>
             <span class="horizontal-line"></span>
-            <div id="mic-constraints-label">Опции обработки микрофона:</div>
+            <div id="mic-constraints-label" class="mic-settings-label">Опции обработки микрофона:</div>
             <div class="d-flex font16 m-b-3">
                 <input type="checkbox" id="checkbox-enable-noise-suppression">
                 <label for="checkbox-enable-noise-suppression"> Включить шумоподавление</label><br>
@@ -104,9 +103,23 @@
                 <input type="checkbox" id="checkbox-enable-echo-cancellation">
                 <label for="checkbox-enable-echo-cancellation"> Включить эхоподавление</label><br>
             </div>
-            <div class="d-flex font16">
+            <div class="d-flex font16 m-b-3">
                 <input type="checkbox" id="checkbox-enable-auto-gain-control">
                 <label for="checkbox-enable-auto-gain-control"> Включить автоматическую регулировку усиления</label><br>
+            </div>
+            <span class="horizontal-line"></span>
+            <div id="noise-gate-label" class="mic-settings-label">Параметры шумового порога:</div>
+            <div class="d-flex font16 m-b-10">
+                <input type="checkbox" id="checkbox-enable-noise-gate">
+                <label for="checkbox-enable-noise-gate"> Включить шумовой порог</label><br>
+            </div>
+            <div class="d-flex flex-column font16 m-b-3">
+                <div> Пороговое значение (дБ): <span id="value-threshold">-50</span></div>
+                <input id="range-threshold" type="range" value="-50" min="-100" max="0" step="1" class="slider">
+            </div>
+            <div class="d-flex flex-column font16">
+                <div> Задержка (сек.): <span id="value-delay">0.2</span></div>
+                <input id="range-delay" type="range" value="0.2" min="0" max="0.3" step="0.01" class="slider">
             </div>
         </div>
         <div id="videos"></div>

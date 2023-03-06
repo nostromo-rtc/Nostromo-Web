@@ -403,9 +403,9 @@ export class Room
         });
 
         // Новое значение максимального битрейта видео.
-        this.socket.on(SE.NewMaxVideoBitrate, async (bitrate: number) =>
+        this.socket.on(SE.NewMaxVideoBitrate, (bitrate: number) =>
         {
-            await this.mediasoup.updateMaxBitrate(bitrate);
+            this.mediasoup.updateMaxBitrate(bitrate);
         });
 
         // другой пользователь отключился

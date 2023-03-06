@@ -251,6 +251,11 @@ select {
     margin-bottom: 3px;
 }
 
+.m-b-10
+{
+    margin-bottom: 10px;
+}
+
 [hidden] {
     display: none !important;
 }

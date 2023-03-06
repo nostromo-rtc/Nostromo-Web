@@ -132,6 +132,15 @@ export class UI
     /** Чекбокс для включения/выключения TCP протокола для ICE-соединений. */
     public readonly checkboxEnableIceTcpProtocol = document.getElementById("checkbox-enable-ice-tcp-protocol") as HTMLInputElement;
 
+    /** Ползунок регулирования порогового значения для шумового порога. */
+    public readonly thresholdRange = document.getElementById("range-threshold") as HTMLInputElement;
+
+    /** Ползунок регулирования значения задержки для шумового порога. */
+    public readonly delayRange = document.getElementById("range-delay") as HTMLInputElement;
+
+    /** Чекбокс для включения/выключения шумового порога. */
+    public readonly checkboxEnableNoiseGate = document.getElementById("checkbox-enable-noise-gate") as HTMLInputElement;
+
     /** Текстовая метка - количество пользователей. */
     public readonly spanUsersCount = document.getElementById("users-count") as HTMLSpanElement;
 
@@ -167,6 +176,7 @@ export class UI
         this.prepareMessageText();
         this.handleButtons();
         this.handleCheckboxes();
+        this.handleNoiseGateParams();
 
         this.addVideo("local", "main", "local");
         this.resizeVideos();
@@ -299,6 +309,12 @@ export class UI
                 ev.preventDefault();
             }
         });
+
+        this.setupCheckboxEnableNoiseGateFromLS();
+        this.checkboxEnableNoiseGate.addEventListener("click", () =>
+        {
+            this.setCheckboxEnableNoiseGateState();
+        });
     }
 
     /** Переключить видимость кнопок включения/выключения звуков собеседника. */
@@ -311,6 +327,22 @@ export class UI
         btn_enableSounds.hidden = !btn_enableSounds.hidden;
         btn_disableSounds.hidden = !btn_disableSounds.hidden;
         attention.hidden = !attention.hidden;
+    }
+
+    private handleNoiseGateParams(): void
+    {
+        const thresholdValueView = document.getElementById("value-threshold") as HTMLSpanElement;
+        const delayValueView = document.getElementById("value-delay") as HTMLSpanElement;
+
+        this.thresholdRange.addEventListener("change", () =>
+        {
+            thresholdValueView.textContent = this.thresholdRange.value;
+        });
+
+        this.delayRange.addEventListener("change", () =>
+        {
+            delayValueView.textContent = this.delayRange.value;
+        });
     }
 
     /** Переключить видимость кнопок включения/выключения (пауза) микрофона. */
@@ -408,7 +440,6 @@ export class UI
         buttons.set('set-new-username', document.getElementById('btn-set-new-username') as HTMLButtonElement);
         buttons.set("show-mic-options", document.getElementById("btn-show-mic-options") as HTMLButtonElement);
         buttons.set("toggle-mic-output", document.getElementById("btn-toggle-mic-output") as HTMLButtonElement);
-        buttons.set("toggle-mic-noise-gate", document.getElementById("btn-toggle-mic-noise-gate") as HTMLButtonElement);
 
         return buttons;
     }
@@ -966,6 +997,15 @@ export class UI
         this.checkboxEnableAutoGainControl.checked = (localStorage["enable-auto-gain-control"] == "true");
     }
 
+    private setupCheckboxEnableNoiseGateFromLS(): void
+    {
+        if (localStorage["enable-noise-gate"] == undefined)
+        {
+            localStorage["enable-noise-gate"] = "true";
+        }
+        this.checkboxEnableNoiseGate.checked = (localStorage["enable-noise-gate"] == "true");
+    }
+
     /** Прочитать из локального хранилище настройку включения/выключения TCP-протокола для ICE-соединений. */
     private setupCheckboxEnableIceTcpProtocolFromLS(): void
     {
@@ -1014,6 +1054,11 @@ export class UI
     private setCheckboxEnableAutoGainControlState(): void
     {
         localStorage["enable-auto-gain-control"] = this.checkboxEnableAutoGainControl.checked;
+    }
+
+    private setCheckboxEnableNoiseGateState(): void
+    {
+        localStorage["enable-noise-gate"] = this.checkboxEnableNoiseGate.checked;
     }
 
     /** Установить новое состояние для чекбокса enable-ice-tcp-protocol. */

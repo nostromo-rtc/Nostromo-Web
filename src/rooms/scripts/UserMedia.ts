@@ -42,7 +42,7 @@ export class UserMedia
 
     private audioContext: AudioContext = new AudioContext();
 
-    private micAudioProcessing: MicAudioProcessing = new MicAudioProcessing(this.audioContext);
+    private micAudioProcessing: MicAudioProcessing;
 
     constructor(_ui: UI, _room: Room)
     {
@@ -52,6 +52,8 @@ export class UserMedia
         this.room = _room;
         this.captureConstraintsDisplay = this.prepareCaptureDisplayConstraints();
         this.captureConstraintsCam = this.prepareCaptureCamConstraints();
+
+        this.micAudioProcessing = new MicAudioProcessing(this.audioContext, this.ui);
 
         this.handleDevicesList();
         this.handleChoosingCamDevices();
@@ -188,13 +190,8 @@ export class UserMedia
             this.handleMicOutput();
         });
 
-        const btn_toggleMicNoiseGate = document.getElementById("btn-toggle-mic-noise-gate")!;
-        btn_toggleMicNoiseGate.addEventListener("click", () =>
+        this.ui.checkboxEnableNoiseGate.addEventListener("click", () =>
         {
-            const isFilterDisabled = (btn_toggleMicNoiseGate.innerText === "Вкл. шумовой порог");
-            btn_toggleMicNoiseGate.innerText = isFilterDisabled ? "Выкл. шумовой порог" : "Вкл. шумовой порог";
-            btn_toggleMicNoiseGate.className = isFilterDisabled ? "btn-mic ml-auto background-red" : "btn-mic ml-auto background-darkgreen";
-
             this.handleMicNoiseGate();
         });
 
@@ -275,26 +272,6 @@ export class UserMedia
             // Переключим кнопки для захвата микрофона.
             this.ui.buttons.get('pause-mic')!.hidden = false;
             this.ui.toggleMicButtons();
-
-            // Проверяем, готова ли VolumeMeter, и если нет, то инициализируем эту ноду.
-            if (!this.micAudioProcessing.isVolumeMeterReady)
-            {
-                await this.micAudioProcessing.initVolumeMeter();
-            }
-
-            // Проверяем, готов ли NoiseGate, и если нет, то инициализируем эту ноду.
-            if (!this.micAudioProcessing.isNoiseGateReady)
-            {
-                await this.micAudioProcessing.initNoiseGate();
-            }
-
-            // Инициализируем ноду с микрофонным потоком для последующей обработки.
-            const micStream = this.streams.get("main")!;
-            await this.micAudioProcessing.initMicNode(micStream);
-
-            this.handleVolumeMeter();
-            this.handleMicOutput();
-            this.handleMicNoiseGate();
         }
         catch (error) // В случае ошибки.
         {
@@ -466,6 +443,9 @@ export class UserMedia
         if (streamConstraints.audio)
         {
             await this.handleMediaStream("main", mediaStream);
+
+            const micStream: MediaStream = this.streams.get("main")!;
+            const proccessedStream = await this.handleMicAudioProcessing(micStream);
             console.debug("[UserMedia] > Captured mic settings:", mediaStream.getAudioTracks()[0].getSettings());
             return deviceId;
         }
@@ -1160,9 +1140,30 @@ export class UserMedia
 
     private handleMicNoiseGate(): void
     {
-        const btn_toggleMicNoiseGate = this.ui.buttons.get('toggle-mic-noise-gate')!;
-        const isFilterDisabled = (btn_toggleMicNoiseGate.innerText === "Вкл. шумовой порог");
+        this.ui.checkboxEnableNoiseGate.checked ? this.micAudioProcessing.connectNoiseGate() : this.micAudioProcessing.disconnectNoiseGate();
+    }
 
-        isFilterDisabled ? this.micAudioProcessing.disconnectNoiseGate() : this.micAudioProcessing.connectNoiseGate();
+    private async handleMicAudioProcessing(micStream: MediaStream): Promise<MediaStream>
+    {
+        // Проверяем, готова ли VolumeMeter, и если нет, то инициализируем эту ноду.
+        if (!this.micAudioProcessing.isVolumeMeterReady)
+        {
+            await this.micAudioProcessing.initVolumeMeter();
+        }
+
+        // Проверяем, готов ли NoiseGate, и если нет, то инициализируем эту ноду.
+        if (!this.micAudioProcessing.isNoiseGateReady)
+        {
+            await this.micAudioProcessing.initNoiseGate();
+        }
+
+        // Инициализируем ноду с микрофонным потоком для последующей обработки.
+        await this.micAudioProcessing.initMicNode(micStream);
+
+        this.handleVolumeMeter();
+        this.handleMicOutput();
+        this.handleMicNoiseGate();
+
+        return this.micAudioProcessing.getOutputStream();
     }
 }

@@ -1,12 +1,15 @@
 import { WorkerUrl } from "worker-url";
 import { DoublyLinkedList } from "./Utils/DoublyLinkedList";
-import { NoiseGateOptions } from "./AudioWorklets/NoiseGate";
+import { NoiseGateOptions, NoiseGateParams } from "./AudioWorklets/NoiseGate";
+import { UI } from "./UI";
 
 export class MicAudioProcessing
 {
     private readonly _className = "MicAudioProcessing";
 
     private ctx: AudioContext;
+
+    private readonly ui: UI;
 
     /** Микрофон (источник, вход). */
     private micNode?: MediaStreamAudioSourceNode;
@@ -32,9 +35,27 @@ export class MicAudioProcessing
     public isVolumeMeterReady = false;
     public isNoiseGateReady = false;
 
-    constructor(ctx: AudioContext)
+    private onChangeNoiseGateThresholdRange = () =>
+    {
+        if (this.noiseGateNode)
+        {
+            this.noiseGateNode.parameters.get("threshold")!.value = Number(this.ui.thresholdRange.value);
+        }
+    };
+
+    private onChangeNoiseGateDelayRange = () =>
+    {
+        if (this.noiseGateNode)
+        {
+            this.noiseGateNode.parameters.get("attack")!.value = Number(this.ui.delayRange.value);
+            this.noiseGateNode.parameters.get("release")!.value = Number(this.ui.delayRange.value);
+        }
+    };
+
+    constructor(ctx: AudioContext, ui: UI)
     {
         this.ctx = ctx;
+        this.ui = ui;
 
         this.outputNodeDestination = this.ctx.createMediaStreamDestination();
         this.outputNode = this.ctx.createMediaStreamSource(this.outputNodeDestination.stream);
@@ -158,7 +179,19 @@ export class MicAudioProcessing
         if (this.isNoiseGateReady && this.noiseGateNode === undefined)
         {
             const noiseGateOptions: NoiseGateOptions = { contextSampleRate: this.ctx.sampleRate };
-            this.noiseGateNode = new AudioWorkletNode(this.ctx, "noise-gate", { processorOptions: noiseGateOptions });
+            const noiseGateParams: NoiseGateParams = {
+                threshold: Number(this.ui.thresholdRange.value),
+                attack: Number(this.ui.delayRange.value),
+                release: Number(this.ui.delayRange.value)
+            };
+
+            this.noiseGateNode = new AudioWorkletNode(this.ctx, "noise-gate", {
+                parameterData: noiseGateParams,
+                processorOptions: noiseGateOptions
+            });
+
+            this.ui.thresholdRange.addEventListener("change", this.onChangeNoiseGateThresholdRange);
+            this.ui.delayRange.addEventListener("change", this.onChangeNoiseGateDelayRange);
         }
 
         if (this.micNode && this.noiseGateNode && !this.isNoiseGateConnected)
@@ -175,6 +208,10 @@ export class MicAudioProcessing
         if (this.micNode && this.noiseGateNode && this.isNoiseGateConnected)
         {
             this.removeProcessingNode(this.noiseGateNode);
+
+            this.ui.thresholdRange.removeEventListener("change", this.onChangeNoiseGateThresholdRange);
+            this.ui.delayRange.removeEventListener("change", this.onChangeNoiseGateDelayRange);
+
             this.noiseGateNode = undefined;
 
             this.isNoiseGateConnected = false;
@@ -227,5 +264,10 @@ export class MicAudioProcessing
         {
             //TODO: Если удаляемый узел не в конце...
         }
+    }
+
+    public getOutputStream(): MediaStream
+    {
+        return this.outputNode.mediaStream;
     }
 }

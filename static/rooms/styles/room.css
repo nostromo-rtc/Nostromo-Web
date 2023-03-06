@@ -3,6 +3,10 @@
     display: flex;
 }
 
+.flex-column {
+    flex-direction: column;
+}
+
 .flex-start {
     justify-content: flex-start;
 }
@@ -204,12 +208,6 @@ video {
     min-width: 650px;
 }
 
-#volume-meter-label
-{
-    font-weight: 300;
-    display: inline-block;
-}
-
 #volume-meter
 {
     min-width: 500px;
@@ -315,7 +313,7 @@ video {
     align-self: center;
 }
 
-#mic-constraints-label
+.mic-settings-label
 {
     font-weight: 300;
     display: inline-block;
