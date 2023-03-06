@@ -1,5 +1,6 @@
 import { WorkerUrl } from "worker-url";
 import { DoublyLinkedList } from "./Utils/DoublyLinkedList";
+import { NoiseGateOptions } from "./AudioWorklets/NoiseGate";
 
 export class MicAudioProcessing
 {
@@ -156,7 +157,8 @@ export class MicAudioProcessing
     {
         if (this.isNoiseGateReady && this.noiseGateNode === undefined)
         {
-            this.noiseGateNode = new AudioWorkletNode(this.ctx, "noise-gate");
+            const noiseGateOptions: NoiseGateOptions = { contextSampleRate: this.ctx.sampleRate };
+            this.noiseGateNode = new AudioWorkletNode(this.ctx, "noise-gate", { processorOptions: noiseGateOptions });
         }
 
         if (this.micNode && this.noiseGateNode && !this.isNoiseGateConnected)

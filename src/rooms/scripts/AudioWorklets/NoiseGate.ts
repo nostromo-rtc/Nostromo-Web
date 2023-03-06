@@ -1,3 +1,7 @@
+export type NoiseGateOptions = {
+    contextSampleRate: number;
+};
+
 export class NoiseGate extends AudioWorkletProcessor
 {
     /** Огибающая громкости сигнала. */
@@ -31,9 +35,15 @@ export class NoiseGate extends AudioWorkletProcessor
     private threshold = -40;
 
 
-    constructor()
+    constructor(options: AudioWorkletNodeOptions)
     {
         super();
+
+        const contextSampleRate = (options.processorOptions as NoiseGateOptions).contextSampleRate;
+        this.sampleRate = contextSampleRate;
+
+        // Сглаживающий коэффициент.
+        this.smoothFactor = this.calcSmoothFactor(this.timeConstant, this.sampleRate);
     }
 
     /** Вычислить сглаживающий коэффициент для плавности работы фильтра шумового порога. */
@@ -114,15 +124,6 @@ export class NoiseGate extends AudioWorkletProcessor
         parameters: Record<string, Float32Array>
     ): boolean
     {
-        //TODO: считывать из параметров
-        this.sampleRate = sampleRate;
-
-        //TODO: считывать из параметров
-        this.timeConstant = 0.0025;
-
-        // Сглаживающий коэффициент.
-        this.smoothFactor = this.calcSmoothFactor(this.timeConstant, this.sampleRate);
-
         //TODO: считывать из параметров
         this.attack = 0.05;
         this.release = 0.05;
