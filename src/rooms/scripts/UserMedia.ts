@@ -442,10 +442,10 @@ export class UserMedia
         // Если это микрофон.
         if (streamConstraints.audio)
         {
-            await this.handleMediaStream("main", mediaStream);
+            const proccessedStream = (await this.handleMicAudioProcessing(mediaStream)).clone();
 
-            const micStream: MediaStream = this.streams.get("main")!;
-            const proccessedStream = await this.handleMicAudioProcessing(micStream);
+            await this.handleMediaStream("main", proccessedStream);
+
             console.debug("[UserMedia] > Captured mic settings:", mediaStream.getAudioTracks()[0].getSettings());
             return deviceId;
         }

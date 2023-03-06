@@ -110,6 +110,9 @@ export class MicAudioProcessing
             this.stopListenOutput();
 
             this.removeProcessingNode(this.micNode);
+
+            this.micNode.mediaStream.getAudioTracks()[0].stop();
+
             this.micNode = undefined;
 
             console.debug(`[${this._className}] destroyMicNode`);
