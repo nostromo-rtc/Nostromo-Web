@@ -334,14 +334,21 @@ export class UI
         const thresholdValueView = document.getElementById("value-threshold") as HTMLSpanElement;
         const delayValueView = document.getElementById("value-delay") as HTMLSpanElement;
 
+        this.setupNoiseGateParamsFromLS();
+
+        thresholdValueView.textContent = this.thresholdRange.value;
+        delayValueView.textContent = this.delayRange.value;
+
         this.thresholdRange.addEventListener("change", () =>
         {
             thresholdValueView.textContent = this.thresholdRange.value;
+            this.setThresholdValueState();
         });
 
         this.delayRange.addEventListener("change", () =>
         {
             delayValueView.textContent = this.delayRange.value;
+            this.setDelayValueState();
         });
     }
 
@@ -1006,6 +1013,27 @@ export class UI
         this.checkboxEnableNoiseGate.checked = (localStorage["enable-noise-gate"] == "true");
     }
 
+    private setupNoiseGateParamsFromLS(): void
+    {
+        if (localStorage["noise-gate-threshold"] == undefined)
+        {
+            this.setThresholdValueState();
+        }
+        else
+        {
+            this.thresholdRange.value = localStorage["noise-gate-threshold"] as string;
+        }
+
+        if (localStorage["noise-gate-delay"] == undefined)
+        {
+            this.setDelayValueState();
+        }
+        else
+        {
+            this.delayRange.value = localStorage["noise-gate-delay"] as string;
+        }
+    }
+
     /** Прочитать из локального хранилище настройку включения/выключения TCP-протокола для ICE-соединений. */
     private setupCheckboxEnableIceTcpProtocolFromLS(): void
     {
@@ -1059,6 +1087,16 @@ export class UI
     private setCheckboxEnableNoiseGateState(): void
     {
         localStorage["enable-noise-gate"] = this.checkboxEnableNoiseGate.checked;
+    }
+
+    private setThresholdValueState(): void
+    {
+        localStorage["noise-gate-threshold"] = this.thresholdRange.value;
+    }
+
+    private setDelayValueState(): void
+    {
+        localStorage["noise-gate-delay"] = this.delayRange.value;
     }
 
     /** Установить новое состояние для чекбокса enable-ice-tcp-protocol. */
