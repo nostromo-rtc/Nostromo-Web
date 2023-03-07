@@ -1,6 +1,7 @@
 import { UI, UiSound } from "./UI";
 import { Room } from "./Room";
 import { MicAudioProcessing } from "./MicAudioProcessing";
+import { UnsupportedError } from "./AppError";
 
 declare global
 {
@@ -8,6 +9,11 @@ declare global
     {
         autoGainControl?: ConstrainBoolean,
         noiseSuppression?: ConstrainBoolean;
+    }
+
+    interface Window
+    {
+        webkitAudioContext: typeof AudioContext;
     }
 }
 
@@ -40,7 +46,7 @@ export class UserMedia
     /** Настройки медиапотока при захвате изображения веб-камеры. */
     private captureConstraintsCam: Map<string, MediaStreamConstraints>;
 
-    private audioContext: AudioContext = new AudioContext();
+    private audioContext: AudioContext = this.createAudioContext();
 
     private micAudioProcessing: MicAudioProcessing;
 
@@ -58,6 +64,20 @@ export class UserMedia
         this.handleDevicesList();
         this.handleChoosingCamDevices();
         this.handleButtons();
+    }
+
+    /** Создать контекст для Web Audio API. */
+    private createAudioContext(): AudioContext
+    {
+        window.AudioContext = window.AudioContext // Default
+            || window.webkitAudioContext          // Workaround for Safari;
+
+        if (AudioContext)
+        {
+            return new AudioContext();
+        }
+
+        throw new UnsupportedError("Web Audio API is not supported by this browser.");
     }
 
     /** Подготовить список устройств и подключение обработчика событий изменения устройств. */
