@@ -1008,7 +1008,7 @@ export class UI
     {
         if (localStorage["enable-noise-gate"] == undefined)
         {
-            localStorage["enable-noise-gate"] = "true";
+            localStorage["enable-noise-gate"] = "false";
         }
         this.checkboxEnableNoiseGate.checked = (localStorage["enable-noise-gate"] == "true");
     }
