@@ -192,6 +192,7 @@ export class Mediasoup
 
             producerOptions.codecOptions = {
                 videoGoogleStartBitrate: 1000,
+                videoGoogleMinBitrate: this.maxReasonableVideoBitrate / PrefixConstants.KILO,
                 videoGoogleMaxBitrate: this.maxReasonableVideoBitrate / PrefixConstants.KILO
             };
 
