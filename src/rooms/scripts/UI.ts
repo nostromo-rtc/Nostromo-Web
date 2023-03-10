@@ -166,6 +166,9 @@ export class UI
     /** Кулдаун (пауза между действиями) для воспроизведения звуков. */
     private uiSoundCooldown = false;
 
+    /** Аудиоконтекст хотя бы раз был запущен. */
+    private uiSoundsAudioContextStartedOnce = false;
+
     /** Связка userId - username. */
     public usernames = new Map<string, string>();
 
@@ -204,6 +207,17 @@ export class UI
         this.uiSounds.set(UiSound.soundOn, new Howl({ src: "/rooms/sounds/sound-on.mp3" }));
         this.uiSounds.set(UiSound.videoOff, new Howl({ src: "/rooms/sounds/video-off.mp3" }));
         this.uiSounds.set(UiSound.videoOn, new Howl({ src: "/rooms/sounds/video-on.mp3" }));
+
+        const howlerCtxStateHandler = (ev: Event) =>
+        {
+            if ((ev.target as AudioContext).state === "running")
+            {
+                this.uiSoundsAudioContextStartedOnce = true;
+                Howler.ctx.removeEventListener("statechange", howlerCtxStateHandler);
+            }
+        };
+
+        Howler.ctx.addEventListener("statechange", howlerCtxStateHandler);
     }
 
     /** Подключить обработчики к кнопкам. */
@@ -1108,7 +1122,7 @@ export class UI
     public playSound(sound: UiSound)
     {
         if (this.checkboxNotifications.checked
-            && Howler.ctx.state === "running")
+            && this.uiSoundsAudioContextStartedOnce)
         {
             this.uiSounds.get(sound)?.play();
         }
