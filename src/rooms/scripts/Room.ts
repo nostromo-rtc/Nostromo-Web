@@ -283,17 +283,31 @@ export class Room
         });
 
         // Получаем максимальный битрейт для аудио.
-        this.socket.on(SE.MaxAudioBitrate, (bitrate: number) =>
+        this.socket.once(SE.MaxAudioBitrate, (bitrate: number) =>
         {
             console.debug('[Room] > maxAudioBitrate in Kbit', bitrate / PrefixConstants.KILO);
             this.mediasoup.maxAudioBitrate = bitrate;
         });
 
-        // Получаем максимальный битрейт для видео.
-        this.socket.on(SE.MaxVideoBitrate, (bitrate: number) =>
+        // Получаем максимальный битрейт для видеопотока демонстрации экрана.
+        this.socket.once(SE.MaxDisplayVideoBitrate, (bitrate: number) =>
         {
-            console.debug('[Room] > maxVideoBitrate in Mbit', bitrate / PrefixConstants.MEGA);
-            this.mediasoup.maxVideoBitrate = bitrate;
+            console.debug('[Room] > maxDisplayVideoBitrate in Mbit', bitrate / PrefixConstants.MEGA);
+            this.mediasoup.maxDisplayVideoBitrate = bitrate;
+        });
+
+        // Получаем максимальный битрейт для видеопотока веб-камеры.
+        this.socket.once(SE.MaxCamVideoBitrate, (bitrate: number) =>
+        {
+            console.debug('[Room] > maxCamVideoBitrate in Mbit', bitrate / PrefixConstants.MEGA);
+            this.mediasoup.maxCamVideoBitrate = bitrate;
+        });
+
+        // Получаем максимальный доступный битрейт для видео.
+        this.socket.on(SE.MaxAvailableVideoBitrate, (bitrate: number) =>
+        {
+            console.debug('[Room] > maxAvailableVideoBitrate in Mbit', bitrate / PrefixConstants.MEGA);
+            this.mediasoup.maxAvailableVideoBitrate = bitrate;
         });
 
         // Новый другой пользователь зашел в комнату.
@@ -402,10 +416,10 @@ export class Room
             }
         });
 
-        // Новое значение максимального битрейта видео.
-        this.socket.on(SE.NewMaxVideoBitrate, (bitrate: number) =>
+        // Новое значение максимального доступного битрейта видео.
+        this.socket.on(SE.NewMaxAvailableVideoBitrate, (bitrate: number) =>
         {
-            this.mediasoup.updateMaxBitrate(bitrate);
+            this.mediasoup.updateMaxAvailableBitrate(bitrate);
         });
 
         // другой пользователь отключился

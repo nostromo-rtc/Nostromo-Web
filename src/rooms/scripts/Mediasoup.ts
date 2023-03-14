@@ -71,11 +71,14 @@ export class Mediasoup
      */
     private linkMapTrackConsumer = new Map<string, string>();
 
-    /** Максимальный разумный битрейт для видеодорожки. */
-    public maxReasonableVideoBitrate = 11 * PrefixConstants.MEGA;
+    /** Максимальный битрейт для видеодорожки с демонстрацией экрана. */
+    public maxDisplayVideoBitrate = 10 * PrefixConstants.MEGA;
 
-    /** Максимальный битрейт для видеодорожек. */
-    public maxVideoBitrate = this.maxReasonableVideoBitrate;
+    /** Максимальный битрейт для видеодорожек с веб-камерами. */
+    public maxCamVideoBitrate = 5 * PrefixConstants.MEGA;
+
+    /** Максимальный доступный битрейт для исходящих видеодорожек. */
+    public maxAvailableVideoBitrate = Math.max(this.maxDisplayVideoBitrate, this.maxCamVideoBitrate);
 
     /** Максимальный битрейт для аудиодорожек. */
     public maxAudioBitrate = 64 * PrefixConstants.KILO;
@@ -182,18 +185,19 @@ export class Mediasoup
             appData: producerAppData
         };
 
-        const currentVideoBitrate = this.maxVideoBitrate;
-        const videoBitrate = this.getReasonableVideoBitrate(currentVideoBitrate);
+        const currentAvailableVideoBitrate = this.maxAvailableVideoBitrate;
 
         if (track.kind == "video")
         {
             // Для фикса бага с 5 фпс для Chrome и кодека VP9.
             track.contentHint = "motion";
 
+            const maxVideoBitrate = (streamId === "display") ? this.maxDisplayVideoBitrate : this.maxCamVideoBitrate;
+            const videoBitrate = Math.min(currentAvailableVideoBitrate, maxVideoBitrate);
+
             producerOptions.codecOptions = {
                 videoGoogleStartBitrate: 1000,
-                videoGoogleMinBitrate: this.maxReasonableVideoBitrate / PrefixConstants.KILO,
-                videoGoogleMaxBitrate: this.maxReasonableVideoBitrate / PrefixConstants.KILO
+                videoGoogleMinBitrate: this.maxDisplayVideoBitrate / PrefixConstants.KILO
             };
 
             producerOptions.encodings = [
@@ -222,7 +226,7 @@ export class Mediasoup
         // Если пока создавали producer,
         // сервер прислал новое значение максимального битрейта для видео
         // и соответственно это значение не применилось.
-        if (producer.kind == "video" && (currentVideoBitrate != this.maxVideoBitrate))
+        if (producer.kind == "video" && (currentAvailableVideoBitrate != this.maxAvailableVideoBitrate))
         {
             this.registerUpdatingBitrateForProducer(producer);
         }
@@ -270,14 +274,14 @@ export class Mediasoup
         return this.producers.delete(producer.id);
     }
 
-    /** Обновить значение максимального битрейта для исходящих видеопотоков. */
-    public updateMaxBitrate(bitrate: number): void
+    /** Обновить значение максимального доступного битрейта для исходящих видеопотоков. */
+    public updateMaxAvailableBitrate(bitrate: number): void
     {
         // Если битрейт изменился.
-        if (this.maxVideoBitrate != bitrate)
+        if (this.maxAvailableVideoBitrate != bitrate)
         {
-            this.maxVideoBitrate = bitrate;
-            console.debug('[Mediasoup] > Update new maxVideoBitrate in Mbit', bitrate / PrefixConstants.MEGA);
+            this.maxAvailableVideoBitrate = bitrate;
+            console.debug('[Mediasoup] > Update new maxAvailableVideoBitrate in Mbit', bitrate / PrefixConstants.MEGA);
 
             this.setBitrateForAllProducersVideoTracks();
         }
@@ -316,7 +320,10 @@ export class Mediasoup
             && !producer.closed
         )
         {
-            const newBitrate = Math.trunc(this.getReasonableVideoBitrate(this.maxVideoBitrate));
+            const streamId = (producer.appData as ClientProducerAppData).streamId;
+            const maxVideoBitrate = (streamId === "display") ? this.maxDisplayVideoBitrate : this.maxCamVideoBitrate;
+
+            const newBitrate = Math.trunc(Math.min(this.maxAvailableVideoBitrate, maxVideoBitrate));
             const params = producer.rtpSender.getParameters();
             const oldBitrate = params.encodings[0].maxBitrate;
 
@@ -335,11 +342,5 @@ export class Mediasoup
                 }
             }
         }
-    }
-
-    /** Вернуть максимальный разумный битрейт для видеодорожки. */
-    private getReasonableVideoBitrate(bitrate: number): number
-    {
-        return (bitrate <= this.maxReasonableVideoBitrate) ? bitrate : this.maxReasonableVideoBitrate;
     }
 }
