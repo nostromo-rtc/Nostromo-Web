@@ -86,12 +86,15 @@ export class Mediasoup
     /** Производители, которым ждут изменения битрейта (если true). */
     private waitingProducersForUpdatingBitrate = new Map<string, boolean>();
 
+    public readonly isFirefoxDevice!: boolean;
+
     constructor()
     {
         try
         {
             this.device = new mediasoup.Device();
             console.debug("Device: ", this.device.handlerName);
+            this.isFirefoxDevice = this.device.handlerName.includes("Firefox");
         }
         catch (error)
         {
@@ -206,9 +209,11 @@ export class Mediasoup
                 }
             ];
 
-            if (streamId == "display")
+            producerOptions.encodings[0].maxFramerate = (track.getConstraints().frameRate as number);
+
+            if (streamId == "display" && this.isFirefoxDevice)
             {
-                producerOptions.encodings[0].maxFramerate = (track.getConstraints().frameRate as number) / 1.5;
+                producerOptions.encodings[0].maxFramerate /= 1.5;
             }
         }
         else

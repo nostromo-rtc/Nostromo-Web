@@ -27,4 +27,4 @@ const fileService = new FileService();
 /** Комната. */
 const room = new Room(ui, mediasoup, fileService);
 /** Для работы с локальными медиапотоками пользователя. */
-const userMedia = new UserMedia(ui, room);
+const userMedia = new UserMedia(ui, room, mediasoup.isFirefoxDevice);
