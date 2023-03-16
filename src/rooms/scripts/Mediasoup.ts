@@ -198,11 +198,6 @@ export class Mediasoup
             const maxVideoBitrate = (streamId === "display") ? this.maxDisplayVideoBitrate : this.maxCamVideoBitrate;
             const videoBitrate = Math.min(currentAvailableVideoBitrate, maxVideoBitrate);
 
-            producerOptions.codecOptions = {
-                videoGoogleStartBitrate: 1000,
-                videoGoogleMinBitrate: this.maxDisplayVideoBitrate / PrefixConstants.KILO
-            };
-
             producerOptions.encodings = [
                 {
                     maxBitrate: videoBitrate
