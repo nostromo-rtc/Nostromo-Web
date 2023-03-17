@@ -50,15 +50,12 @@ export class UserMedia
 
     private micAudioProcessing: MicAudioProcessing;
 
-    private readonly isFirefoxDevice: boolean;
-
-    constructor(_ui: UI, _room: Room, _isFirefoxDevice: boolean)
+    constructor(_ui: UI, _room: Room)
     {
         console.debug("[UserMedia] > ctor");
 
         this.ui = _ui;
         this.room = _room;
-        this.isFirefoxDevice = _isFirefoxDevice;
 
         this.captureConstraintsDisplay = this.prepareCaptureDisplayConstraints();
         this.captureConstraintsCam = this.prepareCaptureCamConstraints();
@@ -1007,21 +1004,10 @@ export class UserMedia
         _constraints.set('144p@30', constraints144p30);
         this.ui.addOptionToSelect(settingsDisplay, '256x144@30', '144p@30');
 
-        if (this.isFirefoxDevice)
+        for (const constraint of _constraints)
         {
-            for (const constraint of _constraints)
-            {
-                const currentFrameRate = Number((constraint[1].video as MediaTrackConstraintSet).frameRate);
-                (constraint[1].video as MediaTrackConstraintSet).frameRate = currentFrameRate * 1.5;
-            }
-        }
-        else
-        {
-            for (const constraint of _constraints)
-            {
-                const currentFrameRate = Number((constraint[1].video as MediaTrackConstraintSet).frameRate);
-                (constraint[1].video as MediaTrackConstraintSet).frameRate = currentFrameRate + 2;
-            }
+            const currentFrameRate = Number((constraint[1].video as MediaTrackConstraintSet).frameRate);
+            (constraint[1].video as MediaTrackConstraintSet).frameRate = currentFrameRate * 1.5;
         }
 
         return _constraints;
