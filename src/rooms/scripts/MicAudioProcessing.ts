@@ -29,9 +29,14 @@ export class MicAudioProcessing
     /** Шумовой порог, является эффектом. */
     private noiseGateNode?: AudioWorkletNode;
 
+    /** Усиление звука, является эффектом. */
+    private gainNode: GainNode;
+
     private isOutputListening = false;
     private isVolumeMeterConnected = false;
     private isNoiseGateConnected = false;
+    private isGainNodeConnected = false;
+
     public isVolumeMeterReady = false;
     public isNoiseGateReady = false;
 
@@ -52,6 +57,11 @@ export class MicAudioProcessing
         }
     };
 
+    private onChangeGainRange = () =>
+    {
+        this.gainNode.gain.value = Number(this.ui.manualGainRange.value);
+    };
+
     constructor(ctx: AudioContext, ui: UI)
     {
         this.ctx = ctx;
@@ -59,6 +69,7 @@ export class MicAudioProcessing
 
         this.outputNodeDestination = this.ctx.createMediaStreamDestination();
         this.outputNode = this.ctx.createMediaStreamSource(this.outputNodeDestination.stream);
+        this.gainNode = this.ctx.createGain();
     }
 
     public async initVolumeMeter(): Promise<void>
@@ -106,6 +117,7 @@ export class MicAudioProcessing
         if (this.micNode !== undefined)
         {
             this.disconnectVolumeMeter();
+            this.disconnectGain();
             this.disconnectNoiseGate();
             this.stopListenOutput();
 
@@ -199,7 +211,15 @@ export class MicAudioProcessing
 
         if (this.micNode && this.noiseGateNode && !this.isNoiseGateConnected)
         {
-            this.addLastProcessingNode(this.noiseGateNode);
+            if (this.isGainNodeConnected)
+            {
+                this.addBeforeProcessingNode(this.gainNode, this.noiseGateNode);
+            }
+            else
+            {
+                this.addLastProcessingNode(this.noiseGateNode);
+            }
+
             this.isNoiseGateConnected = true;
 
             console.debug(`[${this._className}] connectNoiseGate`);
@@ -223,6 +243,34 @@ export class MicAudioProcessing
         }
     }
 
+    public connectGain(): void
+    {
+        if (this.micNode && !this.isGainNodeConnected)
+        {
+            this.ui.manualGainRange.addEventListener("change", this.onChangeGainRange);
+
+            this.gainNode.gain.value = Number(this.ui.manualGainRange.value);
+
+            this.addLastProcessingNode(this.gainNode);
+            this.isGainNodeConnected = true;
+
+            console.debug(`[${this._className}] connectGain`);
+        }
+    }
+
+    public disconnectGain(): void
+    {
+        if (this.micNode && this.isGainNodeConnected)
+        {
+            this.ui.manualGainRange.removeEventListener("change", this.onChangeGainRange);
+
+            this.removeProcessingNode(this.gainNode);
+            this.isGainNodeConnected = false;
+
+            console.debug(`[${this._className}] disconnectGain`);
+        }
+    }
+
     private addLastProcessingNode(newNode: AudioNode)
     {
         const oldNode = this.processingNodesList.getLast();
@@ -235,6 +283,20 @@ export class MicAudioProcessing
 
         newNode.connect(this.outputNodeDestination);
         this.processingNodesList.addLast(newNode);
+    }
+
+    private addBeforeProcessingNode(beforeNode: AudioNode, newNode: AudioNode)
+    {
+        const prevNode = this.processingNodesList.getNeighboringNodes(beforeNode)[0];
+
+        if (prevNode !== undefined)
+        {
+            prevNode.disconnect(beforeNode);
+            prevNode.connect(newNode);
+        }
+
+        newNode.connect(beforeNode);
+        this.processingNodesList.addBefore(beforeNode, newNode);
     }
 
     private removeProcessingNode(node: AudioNode)
@@ -263,9 +325,21 @@ export class MicAudioProcessing
                 prevNode.connect(this.outputNodeDestination);
             }
         }
-        else
+        else // Если в середине
         {
-            //TODO: Если удаляемый узел не в конце...
+            const [prevNode, nextNode] = this.processingNodesList.getNeighboringNodes(node);
+
+            this.processingNodesList.remove(node);
+
+            if (prevNode !== undefined)
+            {
+                prevNode.disconnect(node);
+
+                if (nextNode !== undefined)
+                {
+                    prevNode.connect(nextNode);
+                }
+            }
         }
     }
 

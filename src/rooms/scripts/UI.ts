@@ -138,6 +138,9 @@ export class UI
     /** Ползунок регулирования значения задержки для шумового порога. */
     public readonly delayRange = document.getElementById("range-delay") as HTMLInputElement;
 
+    /** Ползунок регулирования ручного усиления микрофона. */
+    public readonly manualGainRange = document.getElementById("range-manual-gain") as HTMLInputElement;
+
     /** Чекбокс для включения/выключения шумового порога. */
     public readonly checkboxEnableNoiseGate = document.getElementById("checkbox-enable-noise-gate") as HTMLInputElement;
 
@@ -180,6 +183,7 @@ export class UI
         this.handleButtons();
         this.handleCheckboxes();
         this.handleNoiseGateParams();
+        this.handleManualGainParams();
 
         this.addVideo("local", "main", "local");
         this.resizeVideos();
@@ -363,6 +367,21 @@ export class UI
         {
             delayValueView.textContent = this.delayRange.value;
             this.setDelayValueState();
+        });
+    }
+
+    private handleManualGainParams(): void
+    {
+        const gainValueView = document.getElementById("value-manual-gain") as HTMLSpanElement;
+
+        this.setupManualGainParamsFromLS();
+
+        gainValueView.textContent = this.manualGainRange.value;
+
+        this.manualGainRange.addEventListener("change", () =>
+        {
+            gainValueView.textContent = this.manualGainRange.value;
+            this.setManualGainValueState();
         });
     }
 
@@ -1048,6 +1067,18 @@ export class UI
         }
     }
 
+    private setupManualGainParamsFromLS(): void
+    {
+        if (localStorage["manual-gain-value"] == undefined)
+        {
+            this.setManualGainValueState();
+        }
+        else
+        {
+            this.manualGainRange.value = localStorage["manual-gain-value"] as string;
+        }
+    }
+
     /** Прочитать из локального хранилище настройку включения/выключения TCP-протокола для ICE-соединений. */
     private setupCheckboxEnableIceTcpProtocolFromLS(): void
     {
@@ -1111,6 +1142,11 @@ export class UI
     private setDelayValueState(): void
     {
         localStorage["noise-gate-delay"] = this.delayRange.value;
+    }
+
+    private setManualGainValueState(): void
+    {
+        localStorage["manual-gain-value"] = this.manualGainRange.value;
     }
 
     /** Установить новое состояние для чекбокса enable-ice-tcp-protocol. */

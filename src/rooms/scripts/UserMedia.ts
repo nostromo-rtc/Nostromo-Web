@@ -1238,6 +1238,11 @@ export class UserMedia
         this.ui.checkboxEnableNoiseGate.checked ? this.micAudioProcessing.connectNoiseGate() : this.micAudioProcessing.disconnectNoiseGate();
     }
 
+    private handleMicManualGain(): void
+    {
+        this.micAudioProcessing.connectGain();
+    }
+
     private async handleMicAudioProcessing(micStream: MediaStream): Promise<MediaStream>
     {
         // Проверяем, готова ли VolumeMeter, и если нет, то инициализируем эту ноду.
@@ -1258,6 +1263,7 @@ export class UserMedia
         this.handleVolumeMeter();
         this.handleMicOutput();
         this.handleMicNoiseGate();
+        this.handleMicManualGain();
 
         return this.micAudioProcessing.getOutputStream();
     }
