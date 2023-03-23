@@ -216,6 +216,11 @@ export class UserMedia
             this.handleMicNoiseGate();
         });
 
+        this.ui.checkboxEnableManualGainControl.addEventListener("click", () =>
+        {
+            this.handleMicManualGain();
+        });
+
         const getMicAgain = () =>
         {
             // Если микрофон уже захвачен.
@@ -1235,12 +1240,16 @@ export class UserMedia
 
     private handleMicNoiseGate(): void
     {
-        this.ui.checkboxEnableNoiseGate.checked ? this.micAudioProcessing.connectNoiseGate() : this.micAudioProcessing.disconnectNoiseGate();
+        this.ui.checkboxEnableNoiseGate.checked ?
+            this.micAudioProcessing.connectNoiseGate() :
+            this.micAudioProcessing.disconnectNoiseGate();
     }
 
     private handleMicManualGain(): void
     {
-        this.micAudioProcessing.connectGain();
+        this.ui.checkboxEnableManualGainControl.checked ?
+            this.micAudioProcessing.connectGain() :
+            this.micAudioProcessing.disconnectGain();
     }
 
     private async handleMicAudioProcessing(micStream: MediaStream): Promise<MediaStream>
