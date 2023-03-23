@@ -247,16 +247,6 @@ export class UI
         });
     }
 
-    private toggleCheckboxes(first: HTMLInputElement, second: HTMLInputElement)
-    {
-        second.disabled = first.checked;
-
-        if (first.checked)
-        {
-            second.checked = false;
-        }
-    }
-
     /** Подключить обработчики к чекбоксам. */
     private handleCheckboxes(): void
     {
@@ -326,18 +316,30 @@ export class UI
         this.checkboxEnableAutoGainControl.addEventListener("click", () =>
         {
             this.setCheckboxEnableAutoGainControlState();
-            this.toggleCheckboxes(this.checkboxEnableAutoGainControl, this.checkboxEnableManualGainControl);
-            this.setCheckboxEnableManualGainControlState();
 
+            const isAutoGainChecked = this.checkboxEnableAutoGainControl.checked;
+
+            if (isAutoGainChecked && this.checkboxEnableManualGainControl.checked)
+            {
+                this.checkboxEnableManualGainControl.click();
+            }
+
+            this.checkboxEnableManualGainControl.disabled = isAutoGainChecked;
             this.manualGainRange.disabled = !this.checkboxEnableManualGainControl.checked;
         });
 
         this.checkboxEnableManualGainControl.addEventListener("click", () =>
         {
             this.setCheckboxEnableManualGainControlState();
-            this.toggleCheckboxes(this.checkboxEnableManualGainControl, this.checkboxEnableAutoGainControl);
-            this.setCheckboxEnableAutoGainControlState();
 
+            const isManualGainChecked = this.checkboxEnableManualGainControl.checked;
+
+            if (isManualGainChecked && this.checkboxEnableAutoGainControl.checked)
+            {
+                this.checkboxEnableAutoGainControl.click();
+            }
+
+            this.checkboxEnableAutoGainControl.disabled = isManualGainChecked || this.checkboxEnableNoiseGate.checked;
             this.manualGainRange.disabled = !this.checkboxEnableManualGainControl.checked;
         });
 
@@ -359,6 +361,17 @@ export class UI
         this.checkboxEnableNoiseGate.addEventListener("click", () =>
         {
             this.setCheckboxEnableNoiseGateState();
+
+            if (this.checkboxEnableNoiseGate.checked &&
+                this.checkboxEnableAutoGainControl.checked)
+            {
+                this.checkboxEnableAutoGainControl.click();
+            }
+
+            this.checkboxEnableAutoGainControl.disabled = (
+                this.checkboxEnableNoiseGate.checked ||
+                this.checkboxEnableManualGainControl.checked
+            );
         });
     }
 
@@ -1068,17 +1081,18 @@ export class UI
         }
 
         const isAutoGainControlEnabled = (localStorage["enable-auto-gain-control"] === "true");
-        const isManualGainControlEnabled = (localStorage["enable-manual-gain-control"] === "true");
+        let isManualGainControlEnabled = (localStorage["enable-manual-gain-control"] === "true");
 
         if (isAutoGainControlEnabled && isManualGainControlEnabled)
         {
             localStorage["enable-manual-gain-control"] = "false";
+            isManualGainControlEnabled = false;
         }
 
         this.checkboxEnableAutoGainControl.checked = isAutoGainControlEnabled;
         this.checkboxEnableManualGainControl.checked = isManualGainControlEnabled;
 
-        this.checkboxEnableAutoGainControl.disabled = isManualGainControlEnabled;
+        this.checkboxEnableAutoGainControl.disabled = isManualGainControlEnabled || this.checkboxEnableNoiseGate.checked;
         this.checkboxEnableManualGainControl.disabled = isAutoGainControlEnabled;
 
         this.manualGainRange.disabled = !isManualGainControlEnabled;
@@ -1090,7 +1104,18 @@ export class UI
         {
             localStorage["enable-noise-gate"] = "false";
         }
-        this.checkboxEnableNoiseGate.checked = (localStorage["enable-noise-gate"] == "true");
+
+        const isNoiseGateEnabled = (localStorage["enable-noise-gate"] === "true");
+        const isAutoGainControlEnabled = (localStorage["enable-auto-gain-control"] === "true");
+
+        if (isNoiseGateEnabled && isAutoGainControlEnabled)
+        {
+            localStorage["enable-auto-gain-control"] = "false";
+            this.checkboxEnableAutoGainControl.checked = false;
+        }
+
+        this.checkboxEnableNoiseGate.checked = isNoiseGateEnabled;
+        this.checkboxEnableAutoGainControl.disabled = isNoiseGateEnabled || this.checkboxEnableManualGainControl.checked;
     }
 
     private setupNoiseGateParamsFromLS(): void
