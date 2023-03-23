@@ -126,8 +126,11 @@ export class UI
     /** Чекбокс для включения/выключения эхоподавления микрофона. */
     public readonly checkboxEnableEchoCancellation = document.getElementById("checkbox-enable-echo-cancellation") as HTMLInputElement;
 
-    /** Чекбокс для включения/выключения автоматическую регулировку усиления микрофона. */
+    /** Чекбокс для включения/выключения автоматической регулировки усиления микрофона. */
     public readonly checkboxEnableAutoGainControl = document.getElementById("checkbox-enable-auto-gain-control") as HTMLInputElement;
+
+    /** Чекбокс для включения/выключения ручной регулировки усиления микрофона. */
+    public readonly checkboxEnableManualGainControl = document.getElementById("checkbox-enable-manual-gain-control") as HTMLInputElement;
 
     /** Чекбокс для включения/выключения TCP протокола для ICE-соединений. */
     public readonly checkboxEnableIceTcpProtocol = document.getElementById("checkbox-enable-ice-tcp-protocol") as HTMLInputElement;
@@ -244,6 +247,16 @@ export class UI
         });
     }
 
+    private toggleCheckboxes(first: HTMLInputElement, second: HTMLInputElement)
+    {
+        second.disabled = first.checked;
+
+        if (first.checked)
+        {
+            second.checked = false;
+        }
+    }
+
     /** Подключить обработчики к чекбоксам. */
     private handleCheckboxes(): void
     {
@@ -308,10 +321,24 @@ export class UI
             this.setCheckboxEnableEchoCancellationState();
         });
 
-        this.setupCheckboxEnableAutoGainControlFromLS();
+        this.setupCheckboxesEnableGainControlFromLS();
+
         this.checkboxEnableAutoGainControl.addEventListener("click", () =>
         {
             this.setCheckboxEnableAutoGainControlState();
+            this.toggleCheckboxes(this.checkboxEnableAutoGainControl, this.checkboxEnableManualGainControl);
+            this.setCheckboxEnableManualGainControlState();
+
+            this.manualGainRange.disabled = !this.checkboxEnableManualGainControl.checked;
+        });
+
+        this.checkboxEnableManualGainControl.addEventListener("click", () =>
+        {
+            this.setCheckboxEnableManualGainControlState();
+            this.toggleCheckboxes(this.checkboxEnableManualGainControl, this.checkboxEnableAutoGainControl);
+            this.setCheckboxEnableAutoGainControlState();
+
+            this.manualGainRange.disabled = !this.checkboxEnableManualGainControl.checked;
         });
 
         this.setupCheckboxEnableIceTcpProtocolFromLS();
@@ -1028,13 +1055,33 @@ export class UI
         this.checkboxEnableEchoCancellation.checked = (localStorage["enable-echo-cancellation"] == "true");
     }
 
-    private setupCheckboxEnableAutoGainControlFromLS(): void
+    private setupCheckboxesEnableGainControlFromLS(): void
     {
         if (localStorage["enable-auto-gain-control"] == undefined)
         {
             localStorage["enable-auto-gain-control"] = "true";
         }
-        this.checkboxEnableAutoGainControl.checked = (localStorage["enable-auto-gain-control"] == "true");
+
+        if (localStorage["enable-manual-gain-control"] == undefined)
+        {
+            localStorage["enable-manual-gain-control"] = "false";
+        }
+
+        const isAutoGainControlEnabled = (localStorage["enable-auto-gain-control"] === "true");
+        const isManualGainControlEnabled = (localStorage["enable-manual-gain-control"] === "true");
+
+        if (isAutoGainControlEnabled && isManualGainControlEnabled)
+        {
+            localStorage["enable-manual-gain-control"] = "false";
+        }
+
+        this.checkboxEnableAutoGainControl.checked = isAutoGainControlEnabled;
+        this.checkboxEnableManualGainControl.checked = isManualGainControlEnabled;
+
+        this.checkboxEnableAutoGainControl.disabled = isManualGainControlEnabled;
+        this.checkboxEnableManualGainControl.disabled = isAutoGainControlEnabled;
+
+        this.manualGainRange.disabled = !isManualGainControlEnabled;
     }
 
     private setupCheckboxEnableNoiseGateFromLS(): void
@@ -1127,6 +1174,11 @@ export class UI
     private setCheckboxEnableAutoGainControlState(): void
     {
         localStorage["enable-auto-gain-control"] = this.checkboxEnableAutoGainControl.checked;
+    }
+
+    private setCheckboxEnableManualGainControlState(): void
+    {
+        localStorage["enable-manual-gain-control"] = this.checkboxEnableManualGainControl.checked;
     }
 
     private setCheckboxEnableNoiseGateState(): void
