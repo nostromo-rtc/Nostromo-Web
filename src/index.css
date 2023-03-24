@@ -37,3 +37,23 @@ select {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
+
+* {
+    scrollbar-width: thin;
+}
+
+*::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+*::-webkit-scrollbar-track
+{
+    background: rgb(45, 41, 41);
+}
+
+*::-webkit-scrollbar-thumb
+{
+    background-color: grey;
+    border: none;
+}
