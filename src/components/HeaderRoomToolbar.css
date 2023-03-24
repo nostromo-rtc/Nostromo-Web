@@ -1,0 +1,14 @@
+.toolbar-btn
+{
+    font-size: 0.8rem;
+    color: #d4d4d4;
+    margin-right: 15px;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+    border: none;
+    background: none;
+}
