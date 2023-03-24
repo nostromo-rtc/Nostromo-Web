@@ -1,5 +1,5 @@
-.toolbar-btn
-{
+.toolbar-btn {
+    position: relative;
     font-size: 0.8rem;
     color: #d4d4d4;
     margin-right: 15px;
@@ -11,4 +11,12 @@
     -webkit-user-select: none;
     border: none;
     background: none;
+}
+
+#header-room-toolbar {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    height: 100%;
 }

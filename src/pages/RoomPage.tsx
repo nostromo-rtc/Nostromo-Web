@@ -36,7 +36,7 @@ export const RoomPage: React.FC = () =>
 
     return (
         <div id="base">
-            <Header title={`Комната - ${roomName}`} roomToolbarProps={roomToolbarProps} />
+            <Header title={roomName} roomToolbarProps={roomToolbarProps} />
             <div id="main" className="flex-row">
                 {isChatHidden ? callContainer : <VerticalLayout upperContainer={callContainer} lowerContainer={chatContainer} />}
                 {isUserListHidden ? <></> : userListContainer}
