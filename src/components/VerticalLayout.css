@@ -12,10 +12,33 @@
     cursor: ns-resize;
     min-height: 4px;
     width: 100%;
+    border-radius: 20px;
+    touch-action: manipulation;
+    background: repeating-linear-gradient(45deg,
+            #383a49,
+            #383a49 10px,
+            #272831 10px,
+            #272831 20px);
+}
+
+@media (width <=600px) {
+    .vl-resizer-bar {
+        min-height: 8px;
+    }
+}
+
+@media (height <=400px) {
+    .vl-resizer-bar {
+        min-height: 8px;
+    }
 }
 
 .vl-resizer-bar-activated {
-    background-color: #496381;
+    background: repeating-linear-gradient(45deg,
+            #496381,
+            #496381 10px,
+            #393a4a 10px,
+            #393a4a 20px);
 }
 
 .vl-upper-elem {

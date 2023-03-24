@@ -17,14 +17,14 @@ export const VerticalLayout: React.FC<Params> = ({ upperContainer, lowerContaine
     const [heightForLower, setHeightForLower] = useState("20%");
     const [cursorStyle, setCursorStyle] = useState("default");
 
-    const onMouseDown = (event: MouseEvent) =>
+    const onPointerDown = (event: MouseEvent) =>
     {
         setMouseY(event.clientY);
         setResizing(true);
         setCursorStyle("ns-resize");
     };
 
-    const onMouseUp = (event: MouseEvent) =>
+    const onPointerUp = (event: MouseEvent) =>
     {
         if (resizing)
         {
@@ -33,7 +33,7 @@ export const VerticalLayout: React.FC<Params> = ({ upperContainer, lowerContaine
         }
     };
 
-    const onMouseMove = (event: MouseEvent) =>
+    const onPointerMove = (event: MouseEvent) =>
     {
         if (resizing)
         {
@@ -50,12 +50,12 @@ export const VerticalLayout: React.FC<Params> = ({ upperContainer, lowerContaine
     return (
         <div className={resizing ? "vertical-layout non-selectable" : "vertical-layout"}
             style={{ cursor: cursorStyle }}
-            onMouseMove={onMouseMove}
-            onMouseUp={onMouseUp}
-            onMouseLeave={onMouseUp}
+            onPointerMove={onPointerMove}
+            onPointerUp={onPointerUp}
+            onPointerLeave={onPointerUp}
         >
             <div className="vl-upper-elem">{upperContainer}</div>
-            <div className={resizing ? "vl-resizer-bar vl-resizer-bar-activated" : "vl-resizer-bar"} onMouseDown={onMouseDown}></div>
+            <div className={resizing ? "vl-resizer-bar vl-resizer-bar-activated" : "vl-resizer-bar"} onPointerDown={onPointerDown}></div>
             <div className="vl-lower-elem" ref={lowerContainerRef} style={({ height: heightForLower })}>{lowerContainer}</div>
         </div>
     );
