@@ -7,26 +7,16 @@
     filter: drop-shadow(1px 0px 1px rgba(0, 0, 0, 0.6));
 }
 
+.toolbar-btn.MuiButtonBase-root svg {
+    font-size: 1.4rem;
+}
+
 .toolbar-btn-active.toolbar-btn.MuiButtonBase-root {
     color: #f0e9e9;
 }
 
 .toolbar-btn-inactive.toolbar-btn.MuiButtonBase-root {
     color: #b5bac1;
-}
-
-.tooltip .MuiTooltip-tooltip {
-    background-color: rgba(0, 0, 0, 0.98);
-    font-size: 0.9rem;
-    user-select: none;
-    -webkit-user-select: none;
-    border: none;
-    touch-action: manipulation;
-    box-shadow: 0px 4px 4px -4px rgba(0, 0, 0, 0.85);
-}
-
-.tooltip .MuiTooltip-arrow {
-    color: black;
 }
 
 #header-room-toolbar {
@@ -36,4 +26,5 @@
     white-space: nowrap;
     margin-right: 8px;
     align-items: center;
+    min-width: max-content;
 }

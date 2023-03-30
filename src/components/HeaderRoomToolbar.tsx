@@ -2,8 +2,9 @@ import React from "react";
 
 import "./HeaderRoomToolbar.css";
 
-import { IconButton, Tooltip, TooltipProps } from "@mui/material";
+import { IconButton } from "@mui/material";
 import { BsChatTextFill, BsPeopleFill } from "react-icons/bs";
+import { Tooltip } from "./Tooltip";
 
 export type ToggleUserListBtnInfo = {
     isUserListHidden: boolean,
@@ -19,26 +20,10 @@ export interface HeaderRoomToolbarProps
     toggleChatBtnInfo: ToggleChatBtnInfo;
 }
 
-const MyTooltip: React.FC<TooltipProps> = (props) =>
-{
-    return (
-        <Tooltip {...props} arrow
-            TransitionProps={{ timeout: 100 }}
-            PopperProps={{
-                popperOptions: {
-                    modifiers: [{
-                        name: 'offset',
-                        options: { offset: [0, 0] }
-                    }],
-                },
-            }} classes={{ popper: "tooltip" }} />
-    );
-};
-
 export const HeaderRoomToolbar: React.FC<HeaderRoomToolbarProps> = ({ toggleUserListBtnInfo, toggleChatBtnInfo }) =>
 {
     const toggleChatBtn =
-        <MyTooltip title={!toggleChatBtnInfo.isChatHidden ? "Скрыть чат" : "Показать чат"}>
+        <Tooltip title={!toggleChatBtnInfo.isChatHidden ? "Скрыть чат" : "Показать чат"}>
             <IconButton aria-label="Hide/show chat"
                 className={
                     toggleChatBtnInfo.isChatHidden
@@ -48,10 +33,10 @@ export const HeaderRoomToolbar: React.FC<HeaderRoomToolbarProps> = ({ toggleUser
                 onClick={() => toggleChatBtnInfo.setIsChatHidden(!toggleChatBtnInfo.isChatHidden)}>
                 <BsChatTextFill />
             </IconButton>
-        </MyTooltip>;
+        </Tooltip>;
 
     const toggleUserListBtn =
-        <MyTooltip title={!toggleUserListBtnInfo.isUserListHidden ? "Скрыть список участников" : "Показать список участников"}>
+        <Tooltip title={!toggleUserListBtnInfo.isUserListHidden ? "Скрыть список участников" : "Показать список участников"}>
             <IconButton aria-label="Hide/show user list" size="medium"
                 className={
                     toggleUserListBtnInfo.isUserListHidden
@@ -61,7 +46,7 @@ export const HeaderRoomToolbar: React.FC<HeaderRoomToolbarProps> = ({ toggleUser
                 onClick={() => toggleUserListBtnInfo.setIsUserListHidden(!toggleUserListBtnInfo.isUserListHidden)}>
                 <BsPeopleFill />
             </IconButton>
-        </MyTooltip>;
+        </Tooltip>;
 
     return (
         <div id="header-room-toolbar">

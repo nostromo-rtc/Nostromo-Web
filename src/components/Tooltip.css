@@ -1,0 +1,13 @@
+.tooltip .MuiTooltip-tooltip {
+    background-color: rgba(0, 0, 0, 0.98);
+    font-size: 0.9rem;
+    user-select: none;
+    -webkit-user-select: none;
+    border: none;
+    touch-action: manipulation;
+    box-shadow: 0px 4px 4px -4px rgba(0, 0, 0, 0.85);
+}
+
+.tooltip .MuiTooltip-arrow {
+    color: black;
+}
