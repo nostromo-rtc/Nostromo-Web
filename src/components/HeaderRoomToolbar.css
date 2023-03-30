@@ -13,7 +13,7 @@
 }
 
 .toolbar-btn.MuiButtonBase-root:active {
-    background-color: #9293955b;
+    background-color: #00000000;
 }
 
 .toolbar-btn.MuiButtonBase-root svg {
