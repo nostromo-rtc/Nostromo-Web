@@ -8,7 +8,7 @@ import { Tooltip } from "./Tooltip";
 export const Navbar: React.FC = () =>
 (
     <div className="nav">
-        <NavLink to="/" className={({ isActive }) => isActive ? "navbutton-active" : "navbutton-inactive"}>
+        <NavLink to="/" className={({ isActive }) => isActive ? "navbutton-active" : ""}>
             <Tooltip title="Главная" placement="right">
                 <img src={logo} alt="Home" className="navbutton-icon"></img>
             </Tooltip>
