@@ -1,10 +1,19 @@
 .toolbar-btn.MuiButtonBase-root {
-    width: 24px;
-    height: 24px;
+    min-width: 36px;
+    width: 36px;
+    height: 36px;
     border-radius: 4px;
-    padding: 0;
-    margin: 0 8px;
+    margin-left: 4px;
     filter: drop-shadow(1px 0px 1px rgba(0, 0, 0, 0.6));
+    padding: 0;
+}
+
+.toolbar-btn.MuiButtonBase-root:hover {
+    background-color: #ffffff1b;
+}
+
+.toolbar-btn.MuiButtonBase-root:active {
+    background-color: #9293955b;
 }
 
 .toolbar-btn.MuiButtonBase-root svg {
