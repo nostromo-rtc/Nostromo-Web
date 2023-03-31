@@ -11,11 +11,11 @@
     align-items: center;
     padding: 10px;
     background-color: #495f68;
-    color: white;
+    color: var(--primary-text-color);
     text-decoration: none;
     margin-top: 8px;
     min-height: 50px;
-    border-radius: 0.5rem;
+    border-radius: 8px;
     box-shadow: 0px 2px 10px -1px rgba(0, 0, 0, 0.3);
 }
 
@@ -28,7 +28,7 @@
 
 .room-list-item-id {
     margin-left: 5px;
-    color: #d4d4d4;
+    color: var(--secondary-text-color);
     font-weight: 300;
     font-size: 0.875rem;
     margin-top: 6px;
@@ -41,6 +41,5 @@
 
 .room-list-item:hover {
     background-color: #628695;
-    color: #00BFFF;
-    font-size: 1.4375rem;
+    color: white;
 }

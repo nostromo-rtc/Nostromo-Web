@@ -1,3 +1,4 @@
+import { createTheme, ThemeProvider } from "@mui/material";
 import { BrowserRouter } from "react-router-dom";
 import "./App.css";
 
@@ -5,14 +6,25 @@ import "./App.css";
 import { Navbar } from "./components/Navbar";
 import { PageRouter } from "./components/PageRouter";
 
+const theme = createTheme({
+    typography: {
+        fontFamily: "inherit"
+    },
+    palette: {
+        mode: "dark"
+    }
+});
+
 function App()
 {
     return (
         <BrowserRouter>
-            <div id="app">
-                <Navbar />
-                <PageRouter />
-            </div>
+            <ThemeProvider theme={theme}>
+                <div id="app">
+                    <Navbar />
+                    <PageRouter />
+                </div>
+            </ThemeProvider>
         </BrowserRouter>
     );
 }

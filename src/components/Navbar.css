@@ -11,7 +11,7 @@
 .nav a {
     display: flex;
     text-decoration: none;
-    color: #d4d4d4;
+    color: var(--secondary-text-color);
     margin-bottom: 2px;
     height: 60px;
     width: 100%;
@@ -52,7 +52,7 @@
 
 .navbutton-underline {
     width: 45%;
-    background-color: rgb(158, 151, 151);
+    background-color: #9e9797;
     height: 3px;
     margin-left: auto;
     margin-right: auto;

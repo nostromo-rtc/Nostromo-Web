@@ -1,10 +1,9 @@
 import React from "react";
-import { Avatar, Button } from "@mui/material";
-import { BiChevronDown } from "react-icons/bi";
 
 import "./Header.css";
 import { HeaderRoomToolbar, HeaderRoomToolbarProps } from "./HeaderRoomToolbar";
 import { Tooltip } from "./Tooltip";
+import { AccountMenu } from "./AccountMenu";
 
 interface HeaderParams
 {
@@ -14,7 +13,7 @@ interface HeaderParams
 
 export const Header: React.FC<HeaderParams> = ({ title, roomToolbarProps }) =>
 {
-    const headerTitle = <div id="header-title" title={title}>{title}</div>;
+    const headerTitle = <div id="header-title">{title}</div>;
 
     const headerTitleWithTooltip = <Tooltip title={title} TransitionProps={{ timeout: 500 }}>
         {headerTitle}
@@ -25,10 +24,7 @@ export const Header: React.FC<HeaderParams> = ({ title, roomToolbarProps }) =>
             {roomToolbarProps !== undefined ? headerTitleWithTooltip : headerTitle}
             <div className="header-expander"></div>
             {roomToolbarProps !== undefined ? <HeaderRoomToolbar {...roomToolbarProps} /> : <></>}
-            <Button id="profile-btn">
-                <Avatar id="profile-btn-avatar" />
-                <BiChevronDown id="profile-btn-down-icon" />
-            </Button>
+            <AccountMenu />
         </div>
     );
 };

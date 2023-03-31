@@ -17,11 +17,11 @@
 }
 
 .toolbar-btn.MuiButtonBase-root svg {
-    font-size: 1.4rem;
+    font-size: 22.5px;
 }
 
 .toolbar-btn-active.toolbar-btn.MuiButtonBase-root {
-    color: #f0e9e9;
+    color: #f7f1f1;
 }
 
 .toolbar-btn-inactive.toolbar-btn.MuiButtonBase-root {
@@ -33,7 +33,7 @@
     overflow-x: auto;
     overflow-y: hidden;
     white-space: nowrap;
-    margin-right: 8px;
+    margin-right: 4px;
     align-items: center;
     min-width: max-content;
 }
