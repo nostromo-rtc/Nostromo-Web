@@ -1,5 +1,5 @@
 import { Button, Dialog, DialogTitle, DialogContent, DialogContentText, TextField, DialogActions } from "@mui/material";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 
 interface EditUsernameDialogProps
 {
@@ -44,7 +44,7 @@ export const EditUsernameDialog: React.FC<EditUsernameDialogProps> = ({ open, pr
     };
 
     return (
-        <Dialog open={open} onClose={handleClose}>
+        <Dialog open={open} onClose={handleClose} transitionDuration={100}>
             <DialogTitle>Изменение имени</DialogTitle>
             <DialogContent>
                 <DialogContentText>

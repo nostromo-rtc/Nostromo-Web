@@ -127,7 +127,6 @@
     display: inline-flex;
 }
 
-#account-menu-btn .MuiAvatar-root
-{
+#account-menu-btn .MuiAvatar-root {
     color: var(--primary-text-color);
 }

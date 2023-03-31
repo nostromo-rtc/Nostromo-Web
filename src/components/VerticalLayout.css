@@ -21,13 +21,7 @@
             #272831 20px);
 }
 
-@media (width <=600px) {
-    .vl-resizer-bar {
-        min-height: 8px;
-    }
-}
-
-@media (height <=400px) {
+@media (width <=600px) or (height <=400px) {
     .vl-resizer-bar {
         min-height: 8px;
     }

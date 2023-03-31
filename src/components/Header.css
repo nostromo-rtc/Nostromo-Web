@@ -11,8 +11,7 @@
     overflow-y: hidden;
 }
 
-.header-expander
-{
+.header-expander {
     flex: auto;
     height: 100%;
 }
@@ -28,13 +27,7 @@
     white-space: nowrap;
 }
 
-@media (width <= 600px) {
-    #header-title {
-        font-size: 1rem;
-    }
-}
-
-@media (height <= 400px) {
+@media (width <=600px) or (height <=400px) {
     #header-title {
         font-size: 1rem;
     }

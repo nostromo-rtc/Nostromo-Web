@@ -65,6 +65,7 @@ export const AccountMenu: React.FC = () =>
                 transformOrigin={{ horizontal: 'right', vertical: 'top' }}
                 anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                 disableRestoreFocus
+                transitionDuration={150}
             >
                 <div id="account-menu-header" onClick={handleClickOnInfoHeader}>
                     <div id="account-menu-avatar-container">
