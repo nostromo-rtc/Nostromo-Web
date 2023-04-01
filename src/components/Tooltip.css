@@ -6,11 +6,17 @@
     border: none;
     touch-action: manipulation;
     box-shadow: 0px 4px 4px -4px rgba(0, 0, 0, 0.85);
+    box-sizing: border-box;
+    max-width: 190px;
+}
+
+.tooltip.MuiTooltip-popper[data-popper-placement] .MuiTooltip-tooltip  {
+    margin: 0;
 }
 
 @media (width <=600px) or (height <=400px) {
     .tooltip .MuiTooltip-tooltip {
-        max-width: 140px;
+        max-width: 150px;
     }
 }
 

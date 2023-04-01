@@ -36,7 +36,7 @@ export const HeaderRoomToolbar: React.FC<HeaderRoomToolbarProps> = ({ toggleUser
         </Tooltip>;
 
     const toggleUserListBtn =
-        <Tooltip title={!toggleUserListBtnInfo.isUserListHidden ? "Скрыть список участников" : "Показать список участников"}>
+        <Tooltip id="tooltip-user-list-btn" title={!toggleUserListBtnInfo.isUserListHidden ? "Скрыть список участников" : "Показать список участников"}>
             <Button aria-label="Hide/show user list"
                 className={
                     toggleUserListBtnInfo.isUserListHidden

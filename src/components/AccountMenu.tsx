@@ -78,7 +78,7 @@ export const AccountMenu: React.FC = () =>
                         <Tooltip title="Ваш идентификатор в системе" placement="left">
                             <span id="account-menu-info-id">#UsgHhiGI6UDkitt8GTUOl</span>
                         </Tooltip>
-                        <Tooltip title="Ваша роль в системе" placement="left">
+                        <Tooltip id="tooltip-account-menu-info-role" title="Ваша роль в системе" placement="left">
                             <span id="account-menu-info-role">Гость</span>
                         </Tooltip>
                     </div>

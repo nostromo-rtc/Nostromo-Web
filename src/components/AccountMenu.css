@@ -87,7 +87,6 @@
     color: var(--primary-text-color);
 }
 
-
 #account-menu-info {
     flex: 1 1 auto;
     min-width: 0;
@@ -108,6 +107,7 @@
 #account-menu-info-name {
     font-size: 1.15rem;
     color: var(--primary-text-color);
+    word-wrap: anywhere;
 }
 
 #account-menu-info-id {
@@ -129,4 +129,10 @@
 
 #account-menu-btn .MuiAvatar-root {
     color: var(--primary-text-color);
+}
+
+@media (width <=600px) or (height <=400px) {
+    #tooltip-account-menu-info-role {
+        width: 100px;
+    }
 }
