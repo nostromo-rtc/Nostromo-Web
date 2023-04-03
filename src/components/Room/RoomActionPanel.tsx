@@ -108,6 +108,8 @@ export const RoomActionPanel: React.FC<RoomActionPanelProps> = ({
             </div >
         </Tooltip>;
 
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
     const toggleScreenBtnMsg = toggleScreenBtnInfo.state ? "Прекратить демонстрацию экрана" : "Запустить демонстрацию экрана";
 
     const toggleScreenBtnOnClick = () =>
@@ -136,7 +138,7 @@ export const RoomActionPanel: React.FC<RoomActionPanelProps> = ({
             {toggleMicBtn}
             {toggleMicBtnInfo.state ? toggleMicPauseBtn : <></>}
             {toggleCamBtn}
-            {toggleScreenBtn}
+            {isMobile ? <></> : toggleScreenBtn}
             <div className="horizontal-expander"></div>
         </div>
     );
