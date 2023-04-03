@@ -1,8 +1,9 @@
 #action-panel-container {
     display: flex;
-    max-height: 64px;
-    min-height: 64px;
-    margin-bottom: 4px;
+    max-height: 75px;
+    min-height: 75px;
+    margin-bottom: 1px;
+    margin-top: 4px;
     overflow-x: auto;
     overflow-y: hidden;
     border-radius: 7px;
@@ -10,35 +11,36 @@
     box-shadow: 0px 2px 4px -4px rgba(0, 0, 0, 0.85);
     border-bottom: 1px solid #262729;
     box-sizing: border-box;
-    padding: 5px 8px;
+    padding: 5px 5px;
 }
-
 
 .action-btn-box
 {
     box-sizing: border-box;
-    min-width: 36px;
+    min-width: 80px;
     width: 80px;
     height: 100%;
     display: flex;
     flex-direction: column;
     padding: 0;
-    justify-content: space-evenly;
+    justify-content: center;
     align-items: center;
-    margin-left: 8px;
+    margin-left: 6px;
+    margin-right: 6px;
 }
 
 .action-btn.MuiButtonBase-root {
-    border-radius: 12px;
+    border-radius: 16px;
     line-height: initial;
     padding: 0;
-    min-width: 36px;
-    min-height: 36px;
+    min-width: 38px;
+    min-height: 38px;
     background-color: #444b50;
+    margin-bottom: 5px;
 }
 
 .action-btn.MuiButtonBase-root:hover {
-    background-color: #ffffff1b;
+    background-color: #595f64;
 }
 
 .action-btn.MuiButtonBase-root:active {
@@ -46,19 +48,28 @@
 }
 
 .action-btn.MuiButtonBase-root svg {
-    font-size: 22.5px;
+    font-size: 22px;
 }
 
 .action-btn-box .action-btn-desc {
     text-transform: none;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     text-align: center;
+    display: flex;
+    overflow: hidden;
+    font-weight: 500;
 }
 
-.action-btn-active.action-btn.MuiButtonBase-root {
+.action-btn-on.action-btn.MuiButtonBase-root {
     color: #f7f1f1;
 }
 
-.action-btn-inactive.action-btn.MuiButtonBase-root {
-    color: #b5bac1;
+.action-btn-off.action-btn.MuiButtonBase-root {
+    background-color: #c73335;
+    color: #fff;
+}
+
+.action-btn-off.action-btn.MuiButtonBase-root:hover {
+    background-color: #a2292b;
+    color: #fff;
 }

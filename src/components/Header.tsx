@@ -22,7 +22,7 @@ export const Header: React.FC<HeaderParams> = ({ title, roomToolbarProps }) =>
     return (
         <div className="header">
             {roomToolbarProps !== undefined ? headerTitleWithTooltip : headerTitle}
-            <div className="header-expander"></div>
+            <div className="horizontal-expander"></div>
             {roomToolbarProps !== undefined ? <RoomHeaderToolbar {...roomToolbarProps} /> : <></>}
             <AccountMenu />
         </div>

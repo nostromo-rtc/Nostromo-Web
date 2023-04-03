@@ -17,6 +17,7 @@
     display: flex;
     flex-direction: column;
     flex: auto;
+    min-width: 270px;
 }
 
 #user-list-container
@@ -30,5 +31,5 @@
 #room-alerts-container {
     overflow-x: hidden;
     overflow-y: auto;
-    max-height: 50%;
+    max-height: 30%;
 }

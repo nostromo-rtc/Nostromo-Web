@@ -2,10 +2,15 @@ import "./Tooltip.css";
 
 import { Tooltip as TooltipMui, TooltipProps } from "@mui/material";
 
-export const Tooltip: React.FC<TooltipProps> = (props) =>
+interface ModTooltipProps extends TooltipProps
+{
+    offset?: number;
+}
+
+export const Tooltip: React.FC<ModTooltipProps> = (props) =>
 {
     return (
-        <TooltipMui {...props} arrow enterTouchDelay={300} leaveTouchDelay={3000}
+        <TooltipMui {...props} arrow enterTouchDelay={400} enterDelay={200}
             TransitionProps={props.TransitionProps ?? { timeout: 150 }}
             PopperProps={{
                 popperOptions: {
@@ -13,7 +18,7 @@ export const Tooltip: React.FC<TooltipProps> = (props) =>
                         {
                             name: 'offset',
                             options: {
-                                offset: [0, 12]
+                                offset: [0, props.offset ?? 12]
                             },
                         },
                         {

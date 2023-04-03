@@ -9,11 +9,7 @@
     box-shadow: 0px 2px 4px -4px rgba(0, 0, 0, 0.85);
     overflow-x: auto;
     overflow-y: hidden;
-}
-
-.header-expander {
-    flex: auto;
-    height: 100%;
+    box-sizing: border-box;
 }
 
 #header-title {

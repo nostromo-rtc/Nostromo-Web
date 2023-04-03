@@ -3,7 +3,7 @@ import { Header } from "../components/Header";
 
 import "../App.css";
 import { VerticalLayout } from "../components/VerticalLayout";
-import { RoomActionPanel } from "../components/Room/RoomActionPanel";
+import { RoomActionPanel, RoomActionPanelProps } from "../components/Room/RoomActionPanel";
 
 import "./RoomPage.css";
 import { RoomHeaderToolbarProps } from "../components/Room/RoomHeaderToolbar";
@@ -14,33 +14,47 @@ export const RoomPage: React.FC = () =>
 {
     const roomName = "Тестовая";
 
-    const [disabledAudioAlertOpen, setDisabledAudioAlertOpen] = useState(false);
+    const [isSoundOn, setIsSoundOn] = useState<boolean>(false);
+    const [isMicOn, setIsMicOn] = useState<boolean>(false);
+    const [isMicPaused, setIsMicPaused] = useState<boolean>(false);
+    const [isCamOn, setIsCamOn] = useState<boolean>(false);
+    const [isScreenOn, setIsScreenOn] = useState<boolean>(false);
 
-    useEffect(() =>
+    const toggleSound = (state: boolean) =>
     {
-        document.title = `Nostromo - Комната "${roomName}"`;
-    }, []);
+        setIsSoundOn(state);
+        setDisabledAudioAlertOpen(!state);
+    };
 
-    useEffect(() =>
-    {
-        //setDisabledAudioAlertOpen(true);
-    }, []);
+    const roomActionPanelProps: RoomActionPanelProps = {
+        toggleSoundBtnInfo: { state: isSoundOn, setState: toggleSound },
+        toggleMicBtnInfo: { state: isMicOn, setState: setIsMicOn },
+        toggleMicPauseBtnInfo: { state: isMicPaused, setState: setIsMicPaused },
+        toggleCamBtnInfo: { state: isCamOn, setState: setIsCamOn },
+        toggleScreenBtnInfo: { state: isScreenOn, setState: setIsScreenOn }
+    };
 
-    const disabledAudioAlertMessage =
-        <>
-            Не слышите собеседников? В данный момент у вас <b>выключен звук</b> в приложении. {"Нажмите "}
-            <Link
-                component="button"
-                variant="body2"
-                onClick={() =>
-                {
-                    setDisabledAudioAlertOpen(false);
-                }}
-            >
-                <b>здесь</b>
-            </Link>
-            , чтобы включить звук.
-        </>;
+    const [disabledAudioAlertOpen, setDisabledAudioAlertOpen] = useState(!isSoundOn);
+
+    const [isUserListHidden, setIsUserListHidden] = useState(true);
+    const [isChatHidden, setIsChatHidden] = useState(true);
+
+    const roomToolbarProps: RoomHeaderToolbarProps = {
+        toggleUserListBtnInfo: { isUserListHidden, setIsUserListHidden },
+        toggleChatBtnInfo: { isChatHidden, setIsChatHidden }
+    };
+
+    const disabledAudioAlertMessage = <>
+        Не слышите собеседников? В данный момент у вас <b>выключен звук</b> в приложении. {"Нажмите "}
+        <Link
+            component="button"
+            variant="body2"
+            onClick={() => { toggleSound(true); }}
+        >
+            <b>здесь</b>
+        </Link>
+        , чтобы включить звук.
+    </>;
 
     const roomAlerts =
         <div id="room-alerts-container">
@@ -56,18 +70,15 @@ export const RoomPage: React.FC = () =>
     const callContainer =
         <div id="call-container">
             {roomAlerts}
-            <RoomActionPanel />
             {videoContainer}
+            <RoomActionPanel {...roomActionPanelProps} />
         </div>;
     const userListContainer = <div id="user-list-container">user-list-container</div>;
 
-    const [isUserListHidden, setIsUserListHidden] = useState(false);
-    const [isChatHidden, setIsChatHidden] = useState(false);
-
-    const roomToolbarProps: RoomHeaderToolbarProps = {
-        toggleUserListBtnInfo: { isUserListHidden, setIsUserListHidden },
-        toggleChatBtnInfo: { isChatHidden, setIsChatHidden }
-    };
+    useEffect(() =>
+    {
+        document.title = `Nostromo - Комната "${roomName}"`;
+    }, []);
 
     return (
         <div id="base">
