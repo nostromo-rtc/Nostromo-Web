@@ -27,13 +27,6 @@
     min-width: 240px;
 }
 
-#action-panel-container
-{
-    background-color: #252e34;
-    border-radius: 7px;
-    margin-bottom: 4px;
-}
-
 #room-alerts-container {
     overflow-x: hidden;
     overflow-y: auto;

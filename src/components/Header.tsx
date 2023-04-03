@@ -1,14 +1,14 @@
 import React from "react";
 
 import "./Header.css";
-import { HeaderRoomToolbar, HeaderRoomToolbarProps } from "./HeaderRoomToolbar";
+import { RoomHeaderToolbar, RoomHeaderToolbarProps } from "./Room/RoomHeaderToolbar";
 import { Tooltip } from "./Tooltip";
 import { AccountMenu } from "./AccountMenu";
 
 interface HeaderParams
 {
     title: string;
-    roomToolbarProps?: HeaderRoomToolbarProps;
+    roomToolbarProps?: RoomHeaderToolbarProps;
 }
 
 export const Header: React.FC<HeaderParams> = ({ title, roomToolbarProps }) =>
@@ -23,7 +23,7 @@ export const Header: React.FC<HeaderParams> = ({ title, roomToolbarProps }) =>
         <div className="header">
             {roomToolbarProps !== undefined ? headerTitleWithTooltip : headerTitle}
             <div className="header-expander"></div>
-            {roomToolbarProps !== undefined ? <HeaderRoomToolbar {...roomToolbarProps} /> : <></>}
+            {roomToolbarProps !== undefined ? <RoomHeaderToolbar {...roomToolbarProps} /> : <></>}
             <AccountMenu />
         </div>
     );

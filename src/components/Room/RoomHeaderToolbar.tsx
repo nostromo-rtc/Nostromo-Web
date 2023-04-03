@@ -1,10 +1,10 @@
 import React from "react";
 
-import "./HeaderRoomToolbar.css";
+import "./RoomHeaderToolbar.css";
 
 import { Button } from "@mui/material";
 import { BsChatTextFill, BsPeopleFill } from "react-icons/bs";
-import { Tooltip } from "./Tooltip";
+import { Tooltip } from "../Tooltip";
 
 export type ToggleUserListBtnInfo = {
     isUserListHidden: boolean,
@@ -14,13 +14,13 @@ export type ToggleChatBtnInfo = {
     isChatHidden: boolean,
     setIsChatHidden: (state: boolean) => void;
 };
-export interface HeaderRoomToolbarProps
+export interface RoomHeaderToolbarProps
 {
     toggleUserListBtnInfo: ToggleUserListBtnInfo;
     toggleChatBtnInfo: ToggleChatBtnInfo;
 }
 
-export const HeaderRoomToolbar: React.FC<HeaderRoomToolbarProps> = ({ toggleUserListBtnInfo, toggleChatBtnInfo }) =>
+export const RoomHeaderToolbar: React.FC<RoomHeaderToolbarProps> = ({ toggleUserListBtnInfo, toggleChatBtnInfo }) =>
 {
     const toggleChatBtn =
         <Tooltip title={!toggleChatBtnInfo.isChatHidden ? "Скрыть чат" : "Показать чат"}>

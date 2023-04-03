@@ -3,11 +3,11 @@ import { Header } from "../components/Header";
 
 import "../App.css";
 import { VerticalLayout } from "../components/VerticalLayout";
-import { ActionPanel } from "../components/ActionPanel";
+import { RoomActionPanel } from "../components/Room/RoomActionPanel";
 
 import "./RoomPage.css";
-import { HeaderRoomToolbarProps } from "../components/HeaderRoomToolbar";
-import { RoomAlert } from "../components/RoomAlert";
+import { RoomHeaderToolbarProps } from "../components/Room/RoomHeaderToolbar";
+import { RoomAlert } from "../components/Room/RoomAlert";
 import { Link } from "@mui/material";
 
 export const RoomPage: React.FC = () =>
@@ -23,7 +23,7 @@ export const RoomPage: React.FC = () =>
 
     useEffect(() =>
     {
-        setDisabledAudioAlertOpen(true);
+        //setDisabledAudioAlertOpen(true);
     }, []);
 
     const disabledAudioAlertMessage =
@@ -56,7 +56,7 @@ export const RoomPage: React.FC = () =>
     const callContainer =
         <div id="call-container">
             {roomAlerts}
-            <ActionPanel />
+            <RoomActionPanel />
             {videoContainer}
         </div>;
     const userListContainer = <div id="user-list-container">user-list-container</div>;
@@ -64,7 +64,7 @@ export const RoomPage: React.FC = () =>
     const [isUserListHidden, setIsUserListHidden] = useState(false);
     const [isChatHidden, setIsChatHidden] = useState(false);
 
-    const roomToolbarProps: HeaderRoomToolbarProps = {
+    const roomToolbarProps: RoomHeaderToolbarProps = {
         toggleUserListBtnInfo: { isUserListHidden, setIsUserListHidden },
         toggleChatBtnInfo: { isChatHidden, setIsChatHidden }
     };

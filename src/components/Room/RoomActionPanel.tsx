@@ -1,8 +1,8 @@
 import React from 'react';
 
-import "./ActionPanel.css";
+import "./RoomActionPanel.css";
 
-export const ActionPanel: React.FC = () =>
+export const RoomActionPanel: React.FC = () =>
 (
     <div id="action-panel-container">
         action-panel-container
