@@ -1,5 +1,5 @@
 import { Button } from "@mui/material";
-import React, { useRef } from 'react';
+import React, { useRef, Dispatch, SetStateAction } from 'react';
 import { MdVolumeOff, MdVolumeUp, MdMic, MdMicOff, MdVideocam, MdVideocamOff, MdScreenShare, MdStopScreenShare } from "react-icons/md";
 import { Tooltip } from "../../Tooltip";
 import { BiChevronDown } from "react-icons/bi";
@@ -11,13 +11,13 @@ import { MicBtnMenu } from "./MicBtnMenu";
 export interface ToggleBtnInfo
 {
     enabled: boolean;
-    setEnabled: (state: boolean) => void;
+    setEnabled: Dispatch<SetStateAction<boolean>>;
 }
 
 export interface ToggleBtnWithMenuInfo extends ToggleBtnInfo
 {
     menuOpen: boolean;
-    setMenuOpen: (state: boolean) => void;
+    setMenuOpen: Dispatch<SetStateAction<boolean>>;
 }
 
 export interface RoomActionPanelProps
@@ -41,57 +41,66 @@ export const RoomActionPanel: React.FC<RoomActionPanelProps> = ({
 
     const toggleSoundBtnOnClick = () =>
     {
-        toggleSoundBtnInfo.setEnabled(!toggleSoundBtnInfo.enabled);
+        toggleSoundBtnInfo.setEnabled((prevState) => !prevState);
     };
 
     const toggleSoundBtn =
         <Tooltip id="tooltip-toggle-sound-btn" title={toggleSoundBtnMsg} offset={10}>
-            <div className="action-btn-box non-selectable"
-                onClick={toggleSoundBtnOnClick}>
+            <div className="action-btn-box non-selectable">
                 <Button aria-label="Turn on/off sound"
                     className={"action-btn " + (toggleSoundBtnInfo.enabled ? "action-btn-off" : "action-btn-on")}
                     onClick={toggleSoundBtnOnClick}>
                     {toggleSoundBtnInfo.enabled ? <MdVolumeOff /> : <MdVolumeUp />}
                 </Button>
                 <span className="action-btn-desc">Звук</span>
-            </div >
+                <div className="action-btn-clickable-area non-selectable" onClick={toggleSoundBtnOnClick}></div>
+            </div>
         </Tooltip>;
 
-    const micBtnBox = useRef<HTMLDivElement>(null);
+    const micBtnBoxRef = useRef<HTMLDivElement>(null);
 
     const toggleMicBtnMsg = toggleMicBtnInfo.enabled ? "Прекратить захват микрофона" : "Захватить микрофон";
 
     const toggleMicBtnOnClick = () =>
     {
-        toggleMicBtnInfo.setEnabled(!toggleMicBtnInfo.enabled);
+        toggleMicBtnInfo.setEnabled((prevState) => !prevState);
     };
 
-    const toggleMicBtnMenuOpen = () => {
-        toggleMicBtnInfo.setMenuOpen(true);
-    }
+    const toggleMicBtnMenuOpen = () =>
+    {
+        toggleMicBtnInfo.setMenuOpen(prevState => !prevState);
+    };
 
     const toggleMicBtn = <>
         <Tooltip id="tooltip-toggle-mic-btn" title={toggleMicBtnMsg} offset={10}>
-            <div className="action-btn-box non-selectable" ref={micBtnBox}>
+            <div className="action-btn-box non-selectable" ref={micBtnBoxRef}>
                 <Button aria-label="Start/stop capture mic"
                     className={"action-btn " + (toggleMicBtnInfo.enabled ? "action-btn-off" : "action-btn-on")}
-                    onClick={toggleMicBtnOnClick}>
+                    onClick={toggleMicBtnOnClick}
+                >
                     {toggleMicBtnInfo.enabled ? <MdMicOff /> : <MdMic />}
                 </Button>
-                <Button className="action-list-btn" onClick={toggleMicBtnMenuOpen}><BiChevronDown /></Button>
+                <Button className="action-list-btn"
+                    onClick={toggleMicBtnMenuOpen}>
+                    <BiChevronDown />
+                </Button>
                 <span className="action-btn-desc">Микрофон</span>
                 <div className="action-btn-clickable-area non-selectable" onClick={toggleMicBtnOnClick}></div>
                 <div className="action-list-btn-clickable-area non-selectable" onClick={toggleMicBtnMenuOpen}></div>
             </div >
         </Tooltip>
-        <MicBtnMenu anchorRef={micBtnBox} open={toggleMicBtnInfo.menuOpen} setOpen={toggleMicBtnInfo.setMenuOpen} />
+        <MicBtnMenu
+            anchorRef={micBtnBoxRef}
+            open={toggleMicBtnInfo.menuOpen}
+            setOpen={toggleMicBtnInfo.setMenuOpen}
+        />
     </>;
 
     const toggleMicPauseBtnMsg = toggleMicPauseBtnInfo.enabled ? "Включить звук микрофона" : "Временно приглушить звук микрофона";
 
     const toggleMicPauseBtnOnClick = () =>
     {
-        toggleMicPauseBtnInfo.setEnabled(!toggleMicPauseBtnInfo.enabled);
+        toggleMicPauseBtnInfo.setEnabled((prevState) => !prevState);
     };
 
     const toggleMicPauseBtn =
@@ -111,7 +120,7 @@ export const RoomActionPanel: React.FC<RoomActionPanelProps> = ({
 
     const toggleCamBtnOnClick = () =>
     {
-        toggleCamBtnInfo.setEnabled(!toggleCamBtnInfo.enabled);
+        toggleCamBtnInfo.setEnabled((prevState) => !prevState);
     };
 
     const toggleCamBtn =
@@ -135,7 +144,7 @@ export const RoomActionPanel: React.FC<RoomActionPanelProps> = ({
 
     const toggleScreenBtnOnClick = () =>
     {
-        toggleScreenBtnInfo.setEnabled(!toggleScreenBtnInfo.enabled);
+        toggleScreenBtnInfo.setEnabled((prevState) => !prevState);
     };
 
     const toggleScreenBtn =

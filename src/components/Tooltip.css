@@ -8,6 +8,7 @@
     box-shadow: 0px 4px 4px -4px rgba(0, 0, 0, 0.85);
     box-sizing: border-box;
     max-width: 190px;
+    font-weight: 400;
 }
 
 .tooltip.MuiTooltip-popper[data-popper-placement] .MuiTooltip-tooltip  {

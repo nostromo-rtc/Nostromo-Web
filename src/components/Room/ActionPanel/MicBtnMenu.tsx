@@ -1,10 +1,9 @@
-import React, { ReactElement, ReactEventHandler, useRef, useState } from "react";
-import { Avatar, Button, Divider, Menu, MenuItem } from "@mui/material";
-import { BiChevronDown } from "react-icons/bi";
-import { MdSettings, MdEdit } from "react-icons/md";
+import React from "react";
+import { ClickAwayListener, Grow, MenuList, Paper, Popper } from "@mui/material";
+import { MdEdit } from "react-icons/md";
 
 import "./MicBtnMenu.css";
-import { Tooltip } from "../../Tooltip";
+import { MenuItemWithIcon } from "../../MenuItems";
 
 interface MicBtnMenuProps
 {
@@ -15,45 +14,74 @@ interface MicBtnMenuProps
 
 export const MicBtnMenu: React.FC<MicBtnMenuProps> = ({ anchorRef, open, setOpen }) =>
 {
-    const handleClose: ReactEventHandler = (ev) =>
+    const handleClose = (ev: Event | React.SyntheticEvent) =>
     {
+        if (anchorRef.current?.contains(ev.target as HTMLElement))
+        {
+            return;
+        }
+
         setOpen(false);
     };
 
-    const MenuItemWithIconContent = (icon: ReactElement, text: string) =>
+    const handleListKeyDown = (ev: React.KeyboardEvent) =>
     {
-        return <>
-            <div className="menu-list-item-icon">
-                {icon}
-            </div>
-            <p className="text-no-wrap m-0 p-0">{text}</p>
-        </>;
+        if (ev.key === "Tab")
+        {
+            ev.preventDefault();
+            setOpen(false);
+        }
+        else if (ev.key === "Escape")
+        {
+            setOpen(false);
+        }
     };
 
     return (
         <>
-            <Menu
+            <Popper
                 anchorEl={anchorRef.current}
                 id="toggle-mic-btn-menu"
                 open={open}
-                onClose={handleClose}
                 onClick={handleClose}
-                PaperProps={{
-                    elevation: 0,
+                placement="top"
+                transition
+                popperOptions={{
+                    modifiers: [
+                        {
+                            name: 'offset',
+                            options: {
+                                offset: [0, 8]
+                            },
+                        }
+                    ],
                 }}
-                transformOrigin={{ horizontal: 'center', vertical: 'bottom' }}
-                anchorOrigin={{ horizontal: 'center', vertical: 'top' }}
-                marginThreshold={50}
-                disableRestoreFocus
-                transitionDuration={150}
             >
-                <MenuItem>
-                    {MenuItemWithIconContent(<MdEdit />, "Тест")}
-                </MenuItem>
-                <MenuItem>
-                    {MenuItemWithIconContent(<MdSettings />, "Тест2")}
-                </MenuItem>
-            </Menu>
+                {({ TransitionProps, placement }) => (
+                    <Grow
+                        {...TransitionProps}
+                        style={{
+                            transformOrigin:
+                                placement === 'bottom' ? 'center top' : 'center bottom',
+                        }}
+                        timeout={150}
+                    >
+                        <Paper>
+                            <ClickAwayListener onClickAway={handleClose}>
+                                <MenuList
+                                    autoFocusItem={open}
+                                    onKeyDown={handleListKeyDown}
+                                >
+                                    <MenuItemWithIcon icon={<MdEdit />} text="Тест1" onClick={handleClose} />
+                                    <MenuItemWithIcon icon={<MdEdit />} text="Тест2" onClick={handleClose} />
+                                    <MenuItemWithIcon icon={<MdEdit />} text="Тест3" onClick={handleClose} />
+                                    <MenuItemWithIcon icon={<MdEdit />} text="Тест4" onClick={handleClose} />
+                                </MenuList>
+                            </ClickAwayListener>
+                        </Paper>
+                    </Grow>
+                )}
+            </Popper>
         </>
     );
 };

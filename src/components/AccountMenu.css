@@ -121,12 +121,6 @@
     background-color: #45484f;
 }
 
-.menu-list-item-icon {
-    margin-right: 12px;
-    font-size: 1.2rem;
-    display: inline-flex;
-}
-
 #account-menu-btn .MuiAvatar-root {
     color: var(--primary-text-color);
 }

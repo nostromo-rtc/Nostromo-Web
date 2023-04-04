@@ -38,6 +38,7 @@
     background-color: #444b50;
     margin-bottom: 5px;
     z-index: 2;
+    position: relative;
 }
 
 .action-list-btn.MuiButtonBase-root {
@@ -73,6 +74,7 @@
 
 .action-btn.MuiButtonBase-root svg {
     font-size: 22px;
+    pointer-events: none;
 }
 
 .action-btn-box .action-btn-desc {
@@ -117,16 +119,16 @@
 
 #tooltip-toggle-sound-btn
 {
-    width: 150px;
+    width: 140px;
 }
 
 #tooltip-toggle-mic-btn
 {
-    width: 168px;
+    width: 162px;
 }
 
 #tooltip-toggle-screen-btn
 {
-    width: 180px;
+    width: 175px;
 }
 

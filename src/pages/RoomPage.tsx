@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Header } from "../components/Header";
 
 import "../App.css";
@@ -26,10 +26,18 @@ export const RoomPage: React.FC = () =>
     const [screenEnabled, setScreenEnabled] = useState<boolean>(false);
     const [screenMenuOpen, setScreenMenuOpen] = useState<boolean>(false);
 
-    const toggleSound = (state: boolean) =>
+    const toggleSound: Dispatch<SetStateAction<boolean>> = (state) =>
     {
         setSoundEnabled(state);
-        setDisabledAudioAlertOpen(!state);
+
+        if (typeof state === "boolean")
+        {
+            setDisabledAudioAlertOpen(!state);
+        }
+        else
+        {
+            setDisabledAudioAlertOpen(state);
+        }
     };
 
     const roomActionPanelProps: RoomActionPanelProps = {

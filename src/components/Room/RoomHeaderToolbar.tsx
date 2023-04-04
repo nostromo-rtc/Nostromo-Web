@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 
 import "./RoomHeaderToolbar.css";
 
@@ -8,11 +8,11 @@ import { Tooltip } from "../Tooltip";
 
 export type ToggleUserListBtnInfo = {
     isUserListHidden: boolean,
-    setIsUserListHidden: (state: boolean) => void;
+    setIsUserListHidden: Dispatch<SetStateAction<boolean>>;
 };
 export type ToggleChatBtnInfo = {
     isChatHidden: boolean,
-    setIsChatHidden: (state: boolean) => void;
+    setIsChatHidden: Dispatch<SetStateAction<boolean>>;
 };
 export interface RoomHeaderToolbarProps
 {
@@ -30,7 +30,7 @@ export const RoomHeaderToolbar: React.FC<RoomHeaderToolbarProps> = ({ toggleUser
                         ? "toolbar-btn toolbar-btn-inactive"
                         : "toolbar-btn toolbar-btn-active"
                 }
-                onClick={() => toggleChatBtnInfo.setIsChatHidden(!toggleChatBtnInfo.isChatHidden)}>
+                onClick={() => toggleChatBtnInfo.setIsChatHidden((prevState) => !prevState)}>
                 <BsChatTextFill />
             </Button>
         </Tooltip>;
@@ -43,7 +43,7 @@ export const RoomHeaderToolbar: React.FC<RoomHeaderToolbarProps> = ({ toggleUser
                         ? "toolbar-btn toolbar-btn-inactive"
                         : "toolbar-btn toolbar-btn-active"
                 }
-                onClick={() => toggleUserListBtnInfo.setIsUserListHidden(!toggleUserListBtnInfo.isUserListHidden)}>
+                onClick={() => toggleUserListBtnInfo.setIsUserListHidden((prevState) => !prevState)}>
                 <BsPeopleFill />
             </Button>
         </Tooltip>;

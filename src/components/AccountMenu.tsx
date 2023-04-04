@@ -1,11 +1,12 @@
-import React, { ReactElement, ReactEventHandler, useRef, useState } from "react";
-import { Avatar, Button, Divider, Menu, MenuItem } from "@mui/material";
+import React, { ReactEventHandler, useRef, useState } from "react";
+import { Avatar, Button, Divider, Menu } from "@mui/material";
 import { BiChevronDown } from "react-icons/bi";
 import { MdSettings, MdEdit } from "react-icons/md";
 
 import "./AccountMenu.css";
 import { EditUsernameDialog } from "./EditUsernameDialog";
 import { Tooltip } from "./Tooltip";
+import { MenuItemWithIcon } from "./MenuItems";
 
 export const AccountMenu: React.FC = () =>
 {
@@ -35,16 +36,6 @@ export const AccountMenu: React.FC = () =>
     {
         setOpen(false);
         setOpenEditDialog(true);
-    };
-
-    const MenuItemWithIconContent = (icon: ReactElement, text: string) =>
-    {
-        return <>
-            <div className="menu-list-item-icon">
-                {icon}
-            </div>
-            <p className="text-no-wrap m-0 p-0">{text}</p>
-        </>;
     };
 
     return (
@@ -84,12 +75,8 @@ export const AccountMenu: React.FC = () =>
                     </div>
                 </div>
                 <Divider />
-                <MenuItem onClick={handleClickOnEditName}>
-                    {MenuItemWithIconContent(<MdEdit />, "Изменить имя")}
-                </MenuItem>
-                <MenuItem onClick={handleClose}>
-                    {MenuItemWithIconContent(<MdSettings />, "Настройки")}
-                </MenuItem>
+                <MenuItemWithIcon onClick={handleClickOnEditName} icon={<MdEdit />} text="Изменить имя" />
+                <MenuItemWithIcon onClick={handleClose} icon={<MdSettings />} text="Настройки" />
             </Menu>
             <EditUsernameDialog open={openEditDialog} prevName={username} setOpen={setOpenEditDialog} setUsername={setUsername} />
         </>
