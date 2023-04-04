@@ -1,7 +1,8 @@
 import { Button } from "@mui/material";
-import React, { useState } from 'react';
+import React from 'react';
 import { MdVolumeOff, MdVolumeUp, MdMic, MdMicOff, MdVideocam, MdVideocamOff, MdScreenShare, MdStopScreenShare } from "react-icons/md";
 import { Tooltip } from "../Tooltip";
+import { BiChevronDown } from "react-icons/bi";
 
 import "./RoomActionPanel.css";
 import { MicPauseIcon, MicUnpauseIcon } from "../CustomIcons";
@@ -57,14 +58,16 @@ export const RoomActionPanel: React.FC<RoomActionPanelProps> = ({
 
     const toggleMicBtn =
         <Tooltip title={toggleMicBtnMsg} offset={10}>
-            <div className="action-btn-box non-selectable"
-                onClick={toggleMicBtnOnClick}>
+            <div className="action-btn-box non-selectable">
                 <Button aria-label="Start/stop capture mic"
                     className={"action-btn " + (toggleMicBtnInfo.state ? "action-btn-off" : "action-btn-on")}
                     onClick={toggleMicBtnOnClick}>
                     {toggleMicBtnInfo.state ? <MdMicOff /> : <MdMic />}
                 </Button>
+                <Button className="action-list-btn"><BiChevronDown /></Button>
                 <span className="action-btn-desc">Микрофон</span>
+                <div className="action-btn-clickable-area non-selectable" onClick={toggleMicBtnOnClick}></div>
+                <div className="action-list-btn-clickable-area non-selectable" onClick={() => {console.log("2")}}></div>
             </div >
         </Tooltip>;
 
@@ -97,14 +100,16 @@ export const RoomActionPanel: React.FC<RoomActionPanelProps> = ({
 
     const toggleCamBtn =
         <Tooltip title={toggleCamBtnMsg} offset={10}>
-            <div className="action-btn-box non-selectable"
-                onClick={toggleCamBtnOnClick}>
+            <div className="action-btn-box non-selectable">
                 <Button aria-label="Start/stop capture webcam"
                     className={"action-btn " + (toggleCamBtnInfo.state ? "action-btn-off" : "action-btn-on")}
                     onClick={toggleCamBtnOnClick}>
                     {toggleCamBtnInfo.state ? <MdVideocamOff /> : <MdVideocam />}
                 </Button>
+                <Button className="action-list-btn"><BiChevronDown /></Button>
                 <span className="action-btn-desc">Камера</span>
+                <div className="action-btn-clickable-area non-selectable" onClick={toggleCamBtnOnClick}></div>
+                <div className="action-list-btn-clickable-area non-selectable" onClick={() => {console.log("2")}}></div>
             </div >
         </Tooltip>;
 
@@ -119,14 +124,16 @@ export const RoomActionPanel: React.FC<RoomActionPanelProps> = ({
 
     const toggleScreenBtn =
         <Tooltip title={toggleScreenBtnMsg} offset={10}>
-            <div className="action-btn-box non-selectable"
-                onClick={toggleScreenBtnOnClick}>
+            <div className="action-btn-box non-selectable">
                 <Button aria-label="Start/stop capture webcam"
                     className={"action-btn " + (toggleScreenBtnInfo.state ? "action-btn-off" : "action-btn-on")}
                     onClick={toggleScreenBtnOnClick}>
                     {toggleScreenBtnInfo.state ? <MdStopScreenShare /> : <MdScreenShare />}
                 </Button>
+                <Button className="action-list-btn"><BiChevronDown /></Button>
                 <span className="action-btn-desc">Экран</span>
+                <div className="action-btn-clickable-area non-selectable" onClick={toggleScreenBtnOnClick}></div>
+                <div className="action-list-btn-clickable-area non-selectable" onClick={() => {console.log("2")}}></div>
             </div >
         </Tooltip>;
 
