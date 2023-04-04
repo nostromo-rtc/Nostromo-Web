@@ -3,7 +3,7 @@ import { Header } from "../components/Header";
 
 import "../App.css";
 import { VerticalLayout } from "../components/VerticalLayout";
-import { RoomActionPanel, RoomActionPanelProps } from "../components/Room/RoomActionPanel";
+import { RoomActionPanel, RoomActionPanelProps } from "../components/Room/ActionPanel/RoomActionPanel";
 
 import "./RoomPage.css";
 import { RoomHeaderToolbarProps } from "../components/Room/RoomHeaderToolbar";
@@ -14,27 +14,33 @@ export const RoomPage: React.FC = () =>
 {
     const roomName = "Тестовая";
 
-    const [isSoundOn, setIsSoundOn] = useState<boolean>(false);
-    const [isMicOn, setIsMicOn] = useState<boolean>(false);
-    const [isMicPaused, setIsMicPaused] = useState<boolean>(false);
-    const [isCamOn, setIsCamOn] = useState<boolean>(false);
-    const [isScreenOn, setIsScreenOn] = useState<boolean>(false);
+    const [soundEnabled, setSoundEnabled] = useState<boolean>(false);
+
+    const [micEnabled, setMicEnabled] = useState<boolean>(false);
+    const [micMenuOpen, setMicMenuOpen] = useState<boolean>(false);
+    const [micPaused, setMicPaused] = useState<boolean>(false);
+
+    const [camEnabled, setCamEnabled] = useState<boolean>(false);
+    const [camMenuOpen, setCamMenuOpen] = useState<boolean>(false);
+
+    const [screenEnabled, setScreenEnabled] = useState<boolean>(false);
+    const [screenMenuOpen, setScreenMenuOpen] = useState<boolean>(false);
 
     const toggleSound = (state: boolean) =>
     {
-        setIsSoundOn(state);
+        setSoundEnabled(state);
         setDisabledAudioAlertOpen(!state);
     };
 
     const roomActionPanelProps: RoomActionPanelProps = {
-        toggleSoundBtnInfo: { state: isSoundOn, setState: toggleSound },
-        toggleMicBtnInfo: { state: isMicOn, setState: setIsMicOn },
-        toggleMicPauseBtnInfo: { state: isMicPaused, setState: setIsMicPaused },
-        toggleCamBtnInfo: { state: isCamOn, setState: setIsCamOn },
-        toggleScreenBtnInfo: { state: isScreenOn, setState: setIsScreenOn }
+        toggleSoundBtnInfo: { enabled: soundEnabled, setEnabled: toggleSound },
+        toggleMicBtnInfo: { enabled: micEnabled, setEnabled: setMicEnabled, menuOpen: micMenuOpen, setMenuOpen: setMicMenuOpen },
+        toggleMicPauseBtnInfo: { enabled: micPaused, setEnabled: setMicPaused },
+        toggleCamBtnInfo: { enabled: camEnabled, setEnabled: setCamEnabled, menuOpen: camMenuOpen, setMenuOpen: setCamMenuOpen },
+        toggleScreenBtnInfo: { enabled: screenEnabled, setEnabled: setScreenEnabled, menuOpen: screenMenuOpen, setMenuOpen: setScreenMenuOpen }
     };
 
-    const [disabledAudioAlertOpen, setDisabledAudioAlertOpen] = useState(!isSoundOn);
+    const [disabledAudioAlertOpen, setDisabledAudioAlertOpen] = useState(!soundEnabled);
 
     const [isUserListHidden, setIsUserListHidden] = useState(true);
     const [isChatHidden, setIsChatHidden] = useState(true);
