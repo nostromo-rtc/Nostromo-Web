@@ -37,7 +37,7 @@ export const RoomActionPanel: React.FC<RoomActionPanelProps> = ({
     };
 
     const toggleSoundBtn =
-        <Tooltip title={toggleSoundBtnMsg} offset={10}>
+        <Tooltip id="tooltip-toggle-sound-btn" title={toggleSoundBtnMsg} offset={10}>
             <div className="action-btn-box non-selectable"
                 onClick={toggleSoundBtnOnClick}>
                 <Button aria-label="Turn on/off sound"
@@ -57,7 +57,7 @@ export const RoomActionPanel: React.FC<RoomActionPanelProps> = ({
     };
 
     const toggleMicBtn =
-        <Tooltip title={toggleMicBtnMsg} offset={10}>
+        <Tooltip id="tooltip-toggle-mic-btn" title={toggleMicBtnMsg} offset={10}>
             <div className="action-btn-box non-selectable">
                 <Button aria-label="Start/stop capture mic"
                     className={"action-btn " + (toggleMicBtnInfo.state ? "action-btn-off" : "action-btn-on")}
@@ -123,7 +123,7 @@ export const RoomActionPanel: React.FC<RoomActionPanelProps> = ({
     };
 
     const toggleScreenBtn =
-        <Tooltip title={toggleScreenBtnMsg} offset={10}>
+        <Tooltip id="tooltip-toggle-screen-btn" title={toggleScreenBtnMsg} offset={10}>
             <div className="action-btn-box non-selectable">
                 <Button aria-label="Start/stop capture webcam"
                     className={"action-btn " + (toggleScreenBtnInfo.state ? "action-btn-off" : "action-btn-on")}

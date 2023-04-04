@@ -114,3 +114,19 @@
     right: 0;
     z-index: 1;
 }
+
+#tooltip-toggle-sound-btn
+{
+    width: 150px;
+}
+
+#tooltip-toggle-mic-btn
+{
+    width: 168px;
+}
+
+#tooltip-toggle-screen-btn
+{
+    width: 180px;
+}
+
