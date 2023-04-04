@@ -64,10 +64,14 @@ export const MicBtnMenu: React.FC<MicBtnMenuProps> = ({ anchorRef, open, setOpen
                             transformOrigin:
                                 placement === 'bottom' ? 'center top' : 'center bottom',
                         }}
-                        timeout={150}
+                        timeout={100}
                     >
                         <Paper>
-                            <ClickAwayListener onClickAway={handleClose}>
+                            <ClickAwayListener
+                                onClickAway={handleClose}
+                                mouseEvent="onMouseDown"
+                                touchEvent="onTouchStart"
+                            >
                                 <MenuList
                                     autoFocusItem={open}
                                     onKeyDown={handleListKeyDown}
