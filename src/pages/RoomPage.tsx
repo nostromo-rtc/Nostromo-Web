@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Header } from "../components/Header";
 
 import "../App.css";
@@ -9,12 +9,14 @@ import "./RoomPage.css";
 import { RoomHeaderToolbarProps } from "../components/Room/RoomHeaderToolbar";
 import { RoomAlert } from "../components/Room/RoomAlert";
 import { Link } from "@mui/material";
+import { getToggleFunc } from "../Utils";
 
 export const RoomPage: React.FC = () =>
 {
     const roomName = "Тестовая";
 
     const [soundEnabled, setSoundEnabled] = useState<boolean>(false);
+    const [disabledAudioAlertOpen, setDisabledAudioAlertOpen] = useState(!soundEnabled);
 
     const [micEnabled, setMicEnabled] = useState<boolean>(false);
     const [micMenuOpen, setMicMenuOpen] = useState<boolean>(false);
@@ -26,29 +28,43 @@ export const RoomPage: React.FC = () =>
     const [screenEnabled, setScreenEnabled] = useState<boolean>(false);
     const [screenMenuOpen, setScreenMenuOpen] = useState<boolean>(false);
 
-    const toggleSound: Dispatch<SetStateAction<boolean>> = (state) =>
+    const toggleSound = () =>
     {
-        setSoundEnabled(state);
-
-        if (typeof state === "boolean")
+        setSoundEnabled((prevState) =>
         {
-            setDisabledAudioAlertOpen(!state);
-        }
-        else
-        {
-            setDisabledAudioAlertOpen(state);
-        }
+            const newState = !prevState;
+            setDisabledAudioAlertOpen(!newState);
+            return newState;
+        });
     };
 
-    const roomActionPanelProps: RoomActionPanelProps = {
-        toggleSoundBtnInfo: { enabled: soundEnabled, setEnabled: toggleSound },
-        toggleMicBtnInfo: { enabled: micEnabled, setEnabled: setMicEnabled, menuOpen: micMenuOpen, setMenuOpen: setMicMenuOpen },
-        toggleMicPauseBtnInfo: { enabled: micPaused, setEnabled: setMicPaused },
-        toggleCamBtnInfo: { enabled: camEnabled, setEnabled: setCamEnabled, menuOpen: camMenuOpen, setMenuOpen: setCamMenuOpen },
-        toggleScreenBtnInfo: { enabled: screenEnabled, setEnabled: setScreenEnabled, menuOpen: screenMenuOpen, setMenuOpen: setScreenMenuOpen }
-    };
+    const roomActionPanelProps: RoomActionPanelProps =
+    {
+        toggleSoundBtnInfo: { enabled: soundEnabled, toggle: toggleSound },
 
-    const [disabledAudioAlertOpen, setDisabledAudioAlertOpen] = useState(!soundEnabled);
+        toggleMicBtnInfo: {
+            enabled: micEnabled,
+            toggle: getToggleFunc(setMicEnabled),
+            menuOpen: micMenuOpen,
+            toggleMenu: getToggleFunc(setMicMenuOpen)
+        },
+
+        toggleMicPauseBtnInfo: { enabled: micPaused, toggle: getToggleFunc(setMicPaused) },
+
+        toggleCamBtnInfo: {
+            enabled: camEnabled,
+            toggle: getToggleFunc(setCamEnabled),
+            menuOpen: camMenuOpen,
+            toggleMenu: getToggleFunc(setCamMenuOpen)
+        },
+
+        toggleScreenBtnInfo: {
+            enabled: screenEnabled,
+            toggle: getToggleFunc(setScreenEnabled),
+            menuOpen: screenMenuOpen, toggleMenu:
+                getToggleFunc(setScreenMenuOpen)
+        }
+    };
 
     const [isUserListHidden, setIsUserListHidden] = useState(true);
     const [isChatHidden, setIsChatHidden] = useState(true);
@@ -63,7 +79,7 @@ export const RoomPage: React.FC = () =>
         <Link
             component="button"
             variant="body2"
-            onClick={() => { toggleSound(true); }}
+            onClick={() => { toggleSound(); }}
         >
             <b>здесь</b>
         </Link>
