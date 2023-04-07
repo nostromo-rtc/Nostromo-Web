@@ -28,6 +28,11 @@
     padding-bottom: 4px;
 }
 
+.menu-list:focus
+{
+    outline: none;
+}
+
 .small-text.menu-list p
 {
     font-size: 0.85rem;

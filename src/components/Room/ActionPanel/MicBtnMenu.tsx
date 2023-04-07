@@ -73,7 +73,7 @@ export const MicBtnMenu: React.FC<MicBtnMenuProps> = ({ anchorRef, open, setOpen
                                 touchEvent="onTouchStart"
                             >
                                 <MenuList
-                                    autoFocusItem={open}
+                                    autoFocus={open}
                                     onKeyDown={handleListKeyDown}
                                     className="menu-list small-text"
                                 >

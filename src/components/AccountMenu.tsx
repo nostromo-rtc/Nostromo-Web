@@ -58,8 +58,9 @@ export const AccountMenu: React.FC = () =>
                 disableRestoreFocus
                 transitionDuration={150}
                 classes={{paper: "menu-paper", list: "menu-list"}}
+                disableAutoFocusItem
             >
-                <div id="account-menu-header" onClick={handleClickOnInfoHeader}>
+                <div id="account-menu-header" onClick={handleClickOnInfoHeader} aria-disabled>
                     <div id="account-menu-avatar-container">
                         <Avatar className="account-menu-avatar" children={username[0]} />
                     </div>
