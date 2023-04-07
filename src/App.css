@@ -1,4 +1,5 @@
-:root {
+:root
+{
     --primary-text-color: #e1e3e6;
     --secondary-text-color: #c1c2c3;
 
@@ -19,19 +20,23 @@
     --success-text-color: #cce8cd;
 }
 
-.flex {
+.flex
+{
     display: flex;
 }
 
-.flex-column {
+.flex-column
+{
     flex-direction: column !important;
 }
 
-.flex-row {
+.flex-row
+{
     flex-direction: row !important;
 }
 
-#base {
+#base
+{
     position: relative;
     flex-direction: column;
     display: flex;
@@ -39,7 +44,8 @@
     overflow: hidden;
 }
 
-#app {
+#app
+{
     position: relative;
     display: flex;
     overflow: hidden;
@@ -50,7 +56,8 @@
     color: var(--primary-text-color);
 }
 
-#main {
+#main
+{
     display: flex;
     flex: auto;
     flex-direction: column;
@@ -60,39 +67,48 @@
     overflow: hidden;
 }
 
-.bold {
+.bold
+{
     font-weight: 600;
 }
 
-.semi-bold {
+.semi-bold
+{
     font-weight: 500;
 }
 
-.m-a {
+.m-a
+{
     margin: auto;
 }
 
-.m-0 {
+.m-0
+{
     margin: 0;
 }
 
-.p-0 {
+.p-0
+{
     padding: 0;
 }
 
-[hidden] {
+[hidden]
+{
     display: none !important;
 }
 
-.non-selectable {
+.non-selectable
+{
     user-select: none;
 }
 
-.clickable {
+.clickable
+{
     cursor: pointer;
 }
 
-.text-no-wrap {
+.text-no-wrap
+{
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -103,7 +119,8 @@
     white-space: normal;
 }
 
-.horizontal-expander {
+.horizontal-expander
+{
     flex: auto;
     height: 100%;
 }

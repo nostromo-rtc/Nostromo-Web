@@ -1,4 +1,5 @@
-.toolbar-btn.MuiButtonBase-root {
+.toolbar-btn
+{
     min-width: 36px;
     width: 36px;
     height: 36px;
@@ -8,27 +9,33 @@
     padding: 0;
 }
 
-.toolbar-btn.MuiButtonBase-root:hover {
+.toolbar-btn:hover
+{
     background-color: #ffffff1b;
 }
 
-.toolbar-btn.MuiButtonBase-root:active {
+.toolbar-btn:active
+{
     background-color: #00000000;
 }
 
-.toolbar-btn.MuiButtonBase-root svg {
+.toolbar-btn svg
+{
     font-size: 22.5px;
 }
 
-.toolbar-btn-active.toolbar-btn.MuiButtonBase-root {
+.toolbar-btn-active.toolbar-btn
+{
     color: #f7f1f1;
 }
 
-.toolbar-btn-inactive.toolbar-btn.MuiButtonBase-root {
+.toolbar-btn-inactive.toolbar-btn
+{
     color: #b5bac1;
 }
 
-#header-room-toolbar {
+#header-room-toolbar
+{
     display: flex;
     overflow-x: auto;
     overflow-y: hidden;

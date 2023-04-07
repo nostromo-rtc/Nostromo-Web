@@ -1,4 +1,5 @@
-#account-menu-btn {
+#account-menu-btn
+{
     margin-right: 8px;
     margin-left: 8px;
     padding: 4px 0 4px 0;
@@ -7,30 +8,36 @@
     width: 64px;
 }
 
-#account-menu-btn:hover {
+#account-menu-btn:hover
+{
     background-color: #92939534;
 }
 
-#account-menu-btn:active {
+#account-menu-btn:active
+{
     background-color: #9293955b;
 }
 
-#account-menu-btn-avatar {
+#account-menu-btn-avatar
+{
     width: 26px;
     height: 26px;
     margin-left: 6px;
     margin-right: 2px;
     box-shadow: 1px 1px 4px -3px rgba(0, 0, 0, 0.85);
     font-size: 1rem;
+    color: var(--primary-text-color);
 }
 
-#account-menu-btn-down-icon {
+#account-menu-btn-down-icon
+{
     font-size: 19.5px;
     margin-left: 2px;
     margin-right: 2px;
 }
 
-#account-menu .MuiPaper-root {
+#account-menu .menu-paper
+{
     overflow: visible;
     filter: drop-shadow(0px 2px 8px rgba(0, 0, 0, 0.32));
     margin-top: 12px;
@@ -39,7 +46,8 @@
     border: 1px solid rgb(0, 0, 0, 0.35);
 }
 
-#account-menu .MuiPaper-root::before {
+#account-menu .menu-paper::before
+{
     content: "";
     display: block;
     position: absolute;
@@ -54,16 +62,24 @@
     z-index: 0;
 }
 
-#account-menu .MuiList-root {
+#account-menu .menu-paper .divider
+{
+    border-color: rgba(0, 0, 0, 0.35);
+}
+
+#account-menu .menu-list
+{
     color: var(--primary-text-color);
     padding-top: 0;
 }
 
-#account-menu .MuiList-root .MuiDivider-root {
-    border-color: rgba(0, 0, 0, 0.35);
+#account-menu .menu-item:hover
+{
+    background-color: #45484f;
 }
 
-#account-menu-header {
+#account-menu-header
+{
     display: flex;
     justify-content: center;
     align-items: center;
@@ -78,16 +94,19 @@
     border-top-right-radius: 6px;
 }
 
-#account-menu-avatar-container {
+#account-menu-avatar-container
+{
     min-width: 56px;
     flex-shrink: 0;
 }
 
-#account-menu-avatar-container .MuiAvatar-root {
+#account-menu-avatar-container .account-menu-avatar
+{
     color: var(--primary-text-color);
 }
 
-#account-menu-info {
+#account-menu-info
+{
     flex: 1 1 auto;
     min-width: 0;
     display: flex;
@@ -96,7 +115,8 @@
     padding: 4px;
 }
 
-#account-menu-info-role {
+#account-menu-info-role
+{
     font-size: 1;
     justify-content: center;
     display: inline-flex;
@@ -104,29 +124,25 @@
     margin-top: 8px;
 }
 
-#account-menu-info-name {
+#account-menu-info-name
+{
     font-size: 1.15rem;
     color: var(--primary-text-color);
     word-wrap: anywhere;
 }
 
-#account-menu-info-id {
+#account-menu-info-id
+{
     font-size: 0.8rem;
     font-weight: 300;
     color: var(--secondary-text-color);
     margin-top: 2px;
 }
 
-#account-menu .MuiMenuItem-root:hover {
-    background-color: #45484f;
-}
-
-#account-menu-btn .MuiAvatar-root {
-    color: var(--primary-text-color);
-}
-
-@media (width <=600px) or (height <=400px) {
-    #tooltip-account-menu-info-role {
+@media (width <=600px) or (height <=400px)
+{
+    #tooltip-account-menu-info-role
+    {
         width: 100px;
     }
 }

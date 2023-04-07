@@ -1,5 +1,6 @@
 /* оформление для заголовка */
-.header {
+.header
+{
     display: flex;
     align-items: center;
     min-height: 48px;
@@ -12,7 +13,8 @@
     box-sizing: border-box;
 }
 
-#header-title {
+#header-title
+{
     margin-left: 10px;
     font-size: 1.4rem;
     color: var(--secondary-text-color);
@@ -23,8 +25,10 @@
     white-space: nowrap;
 }
 
-@media (width <=600px) or (height <=400px) {
-    #header-title {
+@media (width <=600px) or (height <=400px)
+{
+    #header-title
+    {
         font-size: 1rem;
     }
 }

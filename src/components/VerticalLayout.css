@@ -1,4 +1,5 @@
-.vertical-layout {
+.vertical-layout
+{
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -8,7 +9,8 @@
     background-color: #36393f;
 }
 
-.vl-resizer-bar {
+.vl-resizer-bar
+{
     cursor: ns-resize;
     min-height: 4px;
     width: 100%;
@@ -21,13 +23,16 @@
             #272831 20px);
 }
 
-@media (width <=600px) or (height <=400px) {
-    .vl-resizer-bar {
+@media (width <=600px) or (height <=400px)
+{
+    .vl-resizer-bar
+    {
         min-height: 8px;
     }
 }
 
-.vl-resizer-bar-activated {
+.vl-resizer-bar-activated
+{
     background: repeating-linear-gradient(45deg,
             #496381,
             #496381 10px,
@@ -35,13 +40,15 @@
             #393a4a 20px);
 }
 
-.vl-upper-elem {
+.vl-upper-elem
+{
     position: relative;
     display: flex;
     flex: auto;
 }
 
-.vl-lower-elem {
+.vl-lower-elem
+{
     position: relative;
     display: flex;
     min-height: 20%;

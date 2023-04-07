@@ -1,5 +1,6 @@
 /* оформление для меню навигации */
-.nav {
+.nav
+{
     position: relative;
     display: flex;
     flex-direction: column;
@@ -8,7 +9,8 @@
     height: 100%;
 }
 
-.nav a {
+.nav a
+{
     display: flex;
     text-decoration: none;
     color: var(--secondary-text-color);
@@ -20,23 +22,28 @@
     justify-content: center;
 }
 
-.nav a:hover {
+.nav a:hover
+{
     border-right: 2px solid #00BFFF;
 }
 
-.nav a:hover img {
+.nav a:hover img
+{
     margin-right: -2px;
 }
 
-.navbutton-active {
+.navbutton-active
+{
     border-right: 2px solid #00BFFF;
 }
 
-.navbutton-active img {
+.navbutton-active img
+{
     margin-right: -2px;
 }
 
-.navbutton-icon {
+.navbutton-icon
+{
     border-radius: 10px;
     background-color: #05516a;
     padding: 6px;
@@ -46,11 +53,13 @@
     box-sizing: border-box;
 }
 
-.navbutton-icon:hover {
+.navbutton-icon:hover
+{
     background-color: #0b799d;
 }
 
-.navbutton-underline {
+.navbutton-underline
+{
     width: 45%;
     background-color: #9e9797;
     height: 3px;

@@ -1,12 +1,14 @@
 /* оформление для главной части страницы */
-#room-list {
+#room-list
+{
     display: flex;
     flex-direction: column;
     font-size: 1.375rem;
     margin: 5px;
 }
 
-.room-list-item {
+.room-list-item
+{
     display: flex;
     align-items: center;
     padding: 10px;
@@ -19,14 +21,16 @@
     box-shadow: 0px 2px 10px -1px rgba(0, 0, 0, 0.3);
 }
 
-.room-list-item-label {
+.room-list-item-label
+{
     margin-left: 10px;
     overflow: hidden;
     max-width: 90%;
     text-overflow: ellipsis;
 }
 
-.room-list-item-id {
+.room-list-item-id
+{
     margin-left: 5px;
     color: var(--secondary-text-color);
     font-weight: 300;
@@ -34,12 +38,14 @@
     margin-top: 6px;
 }
 
-.room-list-item-join {
+.room-list-item-join
+{
     margin-left: auto;
     margin-right: 20px;
 }
 
-.room-list-item:hover {
+.room-list-item:hover
+{
     background-color: #628695;
     color: white;
 }

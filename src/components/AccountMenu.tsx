@@ -57,10 +57,11 @@ export const AccountMenu: React.FC = () =>
                 anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                 disableRestoreFocus
                 transitionDuration={150}
+                classes={{paper: "menu-paper", list: "menu-list"}}
             >
                 <div id="account-menu-header" onClick={handleClickOnInfoHeader}>
                     <div id="account-menu-avatar-container">
-                        <Avatar children={username[0]} />
+                        <Avatar className="account-menu-avatar" children={username[0]} />
                     </div>
                     <div id="account-menu-info">
                         <Tooltip title="Ваше имя" placement="left">
@@ -74,7 +75,7 @@ export const AccountMenu: React.FC = () =>
                         </Tooltip>
                     </div>
                 </div>
-                <Divider />
+                <Divider className="menu-divider" />
                 <MenuItemWithIcon onClick={handleClickOnEditName} icon={<MdEdit />} text="Изменить имя" />
                 <MenuItemWithIcon onClick={handleClose} icon={<MdSettings />} text="Настройки" />
             </Menu>

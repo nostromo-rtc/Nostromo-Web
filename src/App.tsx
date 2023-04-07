@@ -1,4 +1,4 @@
-import { createTheme, ThemeProvider } from "@mui/material";
+import { createTheme, ThemeProvider, StyledEngineProvider } from "@mui/material";
 import { BrowserRouter } from "react-router-dom";
 import "./App.css";
 
@@ -20,13 +20,15 @@ const App: React.FC = () =>
     return (
         <BrowserRouter>
             <ThemeProvider theme={theme}>
-                <div id="app">
-                    <Navbar />
-                    <PageRouter />
-                </div>
+                <StyledEngineProvider injectFirst>
+                    <div id="app">
+                        <Navbar />
+                        <PageRouter />
+                    </div>
+                </StyledEngineProvider>
             </ThemeProvider>
         </BrowserRouter>
     );
-}
+};
 
 export default App;

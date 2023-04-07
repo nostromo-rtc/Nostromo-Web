@@ -1,10 +1,12 @@
-.menu-item-icon {
+.menu-item-icon
+{
     margin-right: 12px;
     font-size: 1.25rem;
     display: inline-flex;
 }
 
-.menu-section-label {
+.menu-section-label
+{
     display: inline-flex;
     padding: 10px 15px;
     font-size: 0.7em;
@@ -14,36 +16,37 @@
     color: var(--secondary-text-color);
 }
 
-.MuiList-root .menu-divider.MuiDivider-root {
+.menu-list .menu-divider
+{
     margin-top: 2px;
     margin-bottom: 2px;
 }
 
-.menu-list.MuiList-root
+.menu-list
 {
     padding-top: 4px;
     padding-bottom: 4px;
 }
 
-.small-text.menu-list.MuiList-root p
+.small-text.menu-list p
 {
     font-size: 0.85rem;
 }
 
-.menu-item.MuiMenuItem-root
+.menu-item
 {
     line-height: normal;
     padding-top: 8px;
     padding-bottom: 8px;
 }
 
-.error-color.MuiMenuItem-root
+.error-color
 {
     color: var(--error-color);
     background-color: var(--error-bg-color);
 }
 
-.error-color.MuiMenuItem-root p
+.error-color p
 {
     color: var(--error-text-color);
 }

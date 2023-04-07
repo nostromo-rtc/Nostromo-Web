@@ -1,11 +1,13 @@
-#video-container {
+#video-container
+{
     background-color: #303338;
     border-radius: 7px;
     border-bottom: 1px rgb(34, 33, 33) solid;
     flex: auto;
 }
 
-#chat-container {
+#chat-container
+{
     background-color: #3d4248;
     border-radius: 7px;
     border-top: 1px rgb(34, 33, 33, 0.6) solid;
@@ -28,7 +30,8 @@
     min-width: 240px;
 }
 
-#room-alerts-container {
+#room-alerts-container
+{
     overflow-x: hidden;
     overflow-y: auto;
     max-height: 30%;

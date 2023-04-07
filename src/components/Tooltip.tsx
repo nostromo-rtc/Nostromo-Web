@@ -30,6 +30,6 @@ export const Tooltip: React.FC<ModTooltipProps> = (props) =>
                         }
                     ],
                 },
-            }} classes={{ popper: "tooltip" }} />
+            }} classes={{ tooltip: "tooltip", arrow: "tooltip-arrow" }} />
     );
 };
