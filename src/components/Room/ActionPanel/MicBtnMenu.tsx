@@ -1,9 +1,9 @@
 import React from "react";
-import { ClickAwayListener, Grow, MenuList, Paper, Popper } from "@mui/material";
-import { MdEdit } from "react-icons/md";
+import { ClickAwayListener, Divider, Grow, MenuList, Paper, Popper } from "@mui/material";
+import { MdEdit, MdClose } from "react-icons/md";
 
 import "./MicBtnMenu.css";
-import { MenuItemWithIcon } from "../../MenuItems";
+import { MenuItemWithIcon, MenuSectionLabel } from "../../MenuItems";
 
 interface MicBtnMenuProps
 {
@@ -75,11 +75,14 @@ export const MicBtnMenu: React.FC<MicBtnMenuProps> = ({ anchorRef, open, setOpen
                                 <MenuList
                                     autoFocusItem={open}
                                     onKeyDown={handleListKeyDown}
+                                    className="menu-list small-text"
                                 >
+                                    <MenuSectionLabel text="Выбор микрофона" />
                                     <MenuItemWithIcon icon={<MdEdit />} text="Тест1" onClick={handleClose} />
                                     <MenuItemWithIcon icon={<MdEdit />} text="Тест2" onClick={handleClose} />
                                     <MenuItemWithIcon icon={<MdEdit />} text="Тест3" onClick={handleClose} />
-                                    <MenuItemWithIcon icon={<MdEdit />} text="Тест4" onClick={handleClose} />
+                                    <Divider className="menu-divider" />
+                                    <MenuItemWithIcon className="error-color" semiBold icon={<MdClose />} text="Прекратить захват устройства" onClick={handleClose} />
                                 </MenuList>
                             </ClickAwayListener>
                         </Paper>

@@ -7,16 +7,31 @@ interface MenuItemWithIconProps extends MenuItemProps
 {
     icon: ReactElement;
     text: string;
+    semiBold?: boolean;
 }
 
-export const MenuItemWithIcon: React.FC<MenuItemWithIconProps> = ({ icon, text, ...props }) =>
+interface MenuSectionLabelProps
+{
+    text: string;
+}
+
+export const MenuItemWithIcon: React.FC<MenuItemWithIconProps> = ({ icon, text, semiBold, ...props }) =>
 {
     return (
-        <MenuItem {...props}>
-            <div className="menu-item-with-icon">
+        <MenuItem {...props} className={`${props.className ?? ''} menu-item`}>
+            <div className="menu-item-icon">
                 {icon}
             </div>
-            <p className="text-no-wrap m-0 p-0">{text}</p>
+            <p className={(semiBold ? "semi-bold" : '') + " text-wrap m-0 p-0"}>{text}</p>
         </MenuItem>
+    );
+};
+
+export const MenuSectionLabel: React.FC<MenuSectionLabelProps> = ({ text }) =>
+{
+    return (
+        <span className="menu-section-label text-wrap non-selectable">
+            {text}
+        </span>
     );
 };

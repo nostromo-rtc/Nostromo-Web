@@ -1,6 +1,22 @@
 :root {
     --primary-text-color: #e1e3e6;
     --secondary-text-color: #c1c2c3;
+
+    --error-color: #f44336;
+    --error-bg-color: #160b0b;
+    --error-text-color: #f4c7c7;
+
+    --warning-color: #ffa726;
+    --warning-bg-color: #191207;
+    --warning-text-color: #ffe2b7;
+
+    --info-color: #29b6f6;
+    --info-bg-color: #071318;
+    --info-text-color: #b8e7fb;
+
+    --success-color: #66bb6a;
+    --success-bg-color: #0c130d;
+    --success-text-color: #cce8cd;
 }
 
 .flex {
@@ -44,52 +60,12 @@
     overflow: hidden;
 }
 
-.max-w-150 {
-    max-width: 150px;
-}
-
-.w-100-proc {
-    width: 100%;
-}
-
-.background-green {
-    background-color: lightgreen;
-}
-
-.background-white {
-    background-color: white;
-}
-
-.background-lightgreen {
-    background-color: #a3e9a3;
-}
-
-.background-orange {
-    background-color: #f8b298;
-}
-
-.background-red {
-    background-color: lightcoral;
-}
-
 .bold {
     font-weight: 600;
 }
 
-.color-dodgerblue {
-    color: dodgerblue;
-}
-
-.color-customgray {
-    color: #546e7a;
-}
-
-.color-custom-lightgray {
-    color: var(--primary-text-color);
-}
-
-.color-darkviolet {
-    color: darkviolet;
+.semi-bold {
+    font-weight: 500;
 }
 
 .m-a {
@@ -120,6 +96,11 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.text-wrap
+{
+    white-space: normal;
 }
 
 .horizontal-expander {

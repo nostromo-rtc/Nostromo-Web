@@ -1,6 +1,49 @@
-.menu-item-with-icon
-{
+.menu-item-icon {
     margin-right: 12px;
-    font-size: 1.2rem;
+    font-size: 1.25rem;
     display: inline-flex;
+}
+
+.menu-section-label {
+    display: inline-flex;
+    padding: 10px 15px;
+    font-size: 0.7em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03rem;
+    color: var(--secondary-text-color);
+}
+
+.MuiList-root .menu-divider.MuiDivider-root {
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+.menu-list.MuiList-root
+{
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+.small-text.menu-list.MuiList-root p
+{
+    font-size: 0.85rem;
+}
+
+.menu-item.MuiMenuItem-root
+{
+    line-height: normal;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.error-color.MuiMenuItem-root
+{
+    color: var(--error-color);
+    background-color: var(--error-bg-color);
+}
+
+.error-color.MuiMenuItem-root p
+{
+    color: var(--error-text-color);
 }
