@@ -1,8 +1,12 @@
 .menu-item-icon
 {
-    margin-right: 12px;
     font-size: 1.25rem;
     display: inline-flex;
+}
+
+.icon-start.menu-item-icon
+{
+    margin-right: 12px;
 }
 
 .menu-section-label
@@ -33,7 +37,15 @@
     outline: none;
 }
 
-.small-text.menu-list p
+.menu-item-label
+{
+    display: inline-flex;
+    flex: auto;
+    padding: 0;
+    margin: 0;
+}
+
+.small-text.menu-list .menu-item-label
 {
     font-size: 0.85rem;
 }
@@ -54,4 +66,26 @@
 .error-color p
 {
     color: var(--error-text-color);
+}
+
+.info-color
+{
+    color: var(--info-color);
+    background-color: var(--info-bg-color);
+}
+
+.info-color p
+{
+    color: var(--info-text-color);
+}
+
+.success-color
+{
+    color: var(--success-color);
+    background-color: var(--success-bg-color);
+}
+
+.success-color p
+{
+    color: var(--success-text-color);
 }

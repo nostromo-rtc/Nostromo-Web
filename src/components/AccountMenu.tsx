@@ -1,12 +1,13 @@
 import React, { ReactEventHandler, useRef, useState } from "react";
 import { Avatar, Button, Divider, Menu } from "@mui/material";
-import { BiChevronDown } from "react-icons/bi";
+import { BiChevronDown, BiChevronUp } from "react-icons/bi";
 import { MdSettings, MdEdit } from "react-icons/md";
 
 import "./AccountMenu.css";
 import { EditUsernameDialog } from "./EditUsernameDialog";
 import { Tooltip } from "./Tooltip";
 import { MenuItemWithIcon } from "./MenuItems";
+import { doNotHandleEvent } from "../Utils";
 
 export const AccountMenu: React.FC = () =>
 {
@@ -26,12 +27,6 @@ export const AccountMenu: React.FC = () =>
         setOpen(false);
     };
 
-    const handleClickOnInfoHeader: ReactEventHandler = (ev) =>
-    {
-        ev.preventDefault();
-        ev.stopPropagation();
-    };
-
     const handleClickOnEditName: ReactEventHandler = (ev) =>
     {
         setOpen(false);
@@ -42,7 +37,10 @@ export const AccountMenu: React.FC = () =>
         <>
             <Button id="account-menu-btn" ref={btnRef} onClick={handleClick}>
                 <Avatar id="account-menu-btn-avatar" children={username[0]} />
-                <BiChevronDown id="account-menu-btn-down-icon" />
+                {
+                    open ? <BiChevronUp id="account-menu-btn-down-icon" />
+                        : <BiChevronDown id="account-menu-btn-down-icon" />
+                }
             </Button>
             <Menu
                 anchorEl={btnRef.current}
@@ -57,10 +55,10 @@ export const AccountMenu: React.FC = () =>
                 anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                 disableRestoreFocus
                 transitionDuration={150}
-                classes={{paper: "menu-paper", list: "menu-list"}}
+                classes={{ paper: "menu-paper", list: "menu-list" }}
                 disableAutoFocusItem
             >
-                <div id="account-menu-header" onClick={handleClickOnInfoHeader} aria-disabled>
+                <div id="account-menu-header" onClick={doNotHandleEvent} aria-disabled>
                     <div id="account-menu-avatar-container">
                         <Avatar className="account-menu-avatar" children={username[0]} />
                     </div>

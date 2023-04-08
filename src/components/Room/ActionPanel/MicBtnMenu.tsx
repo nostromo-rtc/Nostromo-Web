@@ -1,19 +1,58 @@
-import React from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 import { ClickAwayListener, Divider, Grow, MenuList, Paper, Popper } from "@mui/material";
-import { MdEdit, MdClose } from "react-icons/md";
+import { MdRadioButtonChecked, MdRadioButtonUnchecked, MdClose } from "react-icons/md";
 
 import "./MicBtnMenu.css";
 import { MenuItemWithIcon, MenuSectionLabel } from "../../MenuItems";
+import { doNotHandleEvent } from "../../../Utils";
 
 interface MicBtnMenuProps
 {
     anchorRef: React.RefObject<HTMLDivElement>;
     open: boolean;
     setOpen: (state: boolean) => void;
+    micEnabled: boolean;
+    disableMic: () => void;
 }
 
-export const MicBtnMenu: React.FC<MicBtnMenuProps> = ({ anchorRef, open, setOpen }) =>
+interface DeviceListItem
 {
+    name: string;
+    deviceId: string;
+    groupId: string;
+    kind: "audio" | "video";
+}
+
+export const MicBtnMenu: React.FC<MicBtnMenuProps> = ({ anchorRef, open, setOpen, micEnabled, disableMic }) =>
+{
+    //TODO: вытащить micList и selectedMic выше в RoomActionPanel -> RoomPage
+
+    const [micList, setMicList] = useState<DeviceListItem[]>(
+        [{ name: "Микрофон 1", deviceId: "testDeviceId1", groupId: "testGroupId1", kind: "audio" },
+        { name: "Микрофон 2", deviceId: "testDeviceId2", groupId: "testGroupId2", kind: "audio" },
+        { name: "Микрофон 3", deviceId: "testDeviceId3", groupId: "testGroupId3", kind: "audio" }]
+    );
+
+    const [selectedMic, setSelectedMic] = useState<string>("testDeviceId1");
+
+    const micListToListItems = (mic: DeviceListItem, index: number) =>
+    {
+        const isSelected = selectedMic === mic.deviceId;
+
+        return (
+            <MenuItemWithIcon
+                role="menuitemradio"
+                icon={isSelected ? <MdRadioButtonChecked /> : <MdRadioButtonUnchecked />}
+                text={mic.name}
+                key={index}
+                endIcon
+                onClick={() => setSelectedMic(mic.deviceId)}
+                aria-checked={isSelected}
+                className={isSelected ? "success-color" : ""}
+            />
+        );
+    };
+
     const handleClose = (ev: Event | React.SyntheticEvent) =>
     {
         if (anchorRef.current?.contains(ev.target as HTMLElement))
@@ -76,13 +115,25 @@ export const MicBtnMenu: React.FC<MicBtnMenuProps> = ({ anchorRef, open, setOpen
                                     autoFocus={open}
                                     onKeyDown={handleListKeyDown}
                                     className="menu-list small-text"
+                                    onClick={doNotHandleEvent}
                                 >
                                     <MenuSectionLabel text="Выбор микрофона" />
-                                    <MenuItemWithIcon icon={<MdEdit />} text="Тест1" onClick={handleClose} />
-                                    <MenuItemWithIcon icon={<MdEdit />} text="Тест2" onClick={handleClose} />
-                                    <MenuItemWithIcon icon={<MdEdit />} text="Тест3" onClick={handleClose} />
-                                    <Divider className="menu-divider" />
-                                    <MenuItemWithIcon className="error-color" semiBold icon={<MdClose />} text="Прекратить захват устройства" onClick={handleClose} />
+                                    {micList.map(micListToListItems)}
+                                    {micEnabled ?
+                                        <div>
+                                            <Divider className="menu-divider" />
+                                            <MenuItemWithIcon
+                                                className="error-color"
+                                                semiBold
+                                                icon={<MdClose />}
+                                                text="Прекратить захват устройства"
+                                                onClick={(ev) =>
+                                                {
+                                                    setOpen(false);
+                                                    disableMic();
+                                                }} />
+                                        </div> : undefined
+                                    }
                                 </MenuList>
                             </ClickAwayListener>
                         </Paper>
