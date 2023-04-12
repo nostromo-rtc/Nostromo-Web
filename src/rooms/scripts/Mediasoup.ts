@@ -174,7 +174,7 @@ export class Mediasoup
     }
 
     /** Создать медиапотока-производителя. */
-    public async createProducer(streamId: string, track: MediaStreamTrack): Promise<Producer>
+    public async createProducer(streamId: string, track: MediaStreamTrack): Promise<void>
     {
         const producerAppData: ClientProducerAppData = {
             streamId
@@ -220,6 +220,38 @@ export class Mediasoup
 
         const producer = await this.producerTransport!.produce(producerOptions);
 
+        let nackCount = 50;
+        let targetBitrate = this.maxCamVideoBitrate;
+
+        /*const intervalId = setInterval(async () =>
+        {
+            if (producer.closed)
+            {
+                clearInterval(intervalId);
+                return;
+            }
+
+            const stats = await producer.getStats();
+            for (const stat of stats.values())
+            {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                if (stat.type === "outbound-rtp")
+                {
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                    if (stat.nackCount >= nackCount)
+                    {
+                        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                        targetBitrate = 0.5 * PrefixConstants.MEGA;
+                        //TODO: другая функция должна быть
+                        await this.setBitrateForProducer(producer, targetBitrate);
+                        nackCount += 50;
+                        clearInterval(intervalId);
+                    }
+                    return;
+                }
+            }
+        }, 5000);*/
+
         // Если пока создавали producer,
         // сервер прислал новое значение максимального битрейта для видео
         // и соответственно это значение не применилось.
@@ -230,7 +262,7 @@ export class Mediasoup
 
         this.producers.set(producer.id, producer);
 
-        return producer;
+        //return producer;
     }
 
     /** Получить consumer по Id. */
@@ -310,7 +342,7 @@ export class Mediasoup
     }
 
     /** Применить новое значение максимального битрейта для исходящего видеопотока. */
-    private async setBitrateForProducer(producer: MediasoupTypes.Producer)
+    private async setBitrateForProducer(producer: MediasoupTypes.Producer, targetBitrate?: number)
     {
         if (producer.kind == 'video'
             && producer.rtpSender
@@ -320,7 +352,13 @@ export class Mediasoup
             const streamId = (producer.appData as ClientProducerAppData).streamId;
             const maxVideoBitrate = (streamId === "display") ? this.maxDisplayVideoBitrate : this.maxCamVideoBitrate;
 
-            const newBitrate = Math.trunc(Math.min(this.maxAvailableVideoBitrate, maxVideoBitrate));
+            let newBitrate = Math.trunc(Math.min(this.maxAvailableVideoBitrate, maxVideoBitrate));
+
+            if (targetBitrate)
+            {
+                newBitrate = Math.trunc(Math.min(newBitrate, targetBitrate));
+            }
+
             const params = producer.rtpSender.getParameters();
             const oldBitrate = params.encodings[0].maxBitrate;
 
