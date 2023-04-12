@@ -90,6 +90,7 @@ export const RoomPage: React.FC = () =>
             component="button"
             variant="body2"
             onClick={() => { setSoundState(SoundState.ENABLED); }}
+            className="v-align-default"
         >
             <b>здесь</b>
         </Link>

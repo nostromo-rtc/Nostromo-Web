@@ -124,3 +124,8 @@
     flex: auto;
     height: 100%;
 }
+
+.v-align-default
+{
+    vertical-align: baseline;
+}
