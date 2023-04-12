@@ -20,23 +20,6 @@
     color: var(--secondary-text-color);
 }
 
-.menu-list .menu-divider
-{
-    margin-top: 2px;
-    margin-bottom: 2px;
-}
-
-.menu-list
-{
-    padding-top: 4px;
-    padding-bottom: 4px;
-}
-
-.menu-list:focus
-{
-    outline: none;
-}
-
 .menu-item-label
 {
     display: inline-flex;

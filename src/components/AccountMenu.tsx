@@ -1,12 +1,12 @@
 import React, { ReactEventHandler, useRef, useState } from "react";
-import { Avatar, Button, Divider, Menu } from "@mui/material";
+import { Avatar, Button, Divider, Menu as MuiMenu } from "@mui/material";
 import { BiChevronDown, BiChevronUp } from "react-icons/bi";
 import { MdSettings, MdEdit } from "react-icons/md";
 
 import "./AccountMenu.css";
 import { EditUsernameDialog } from "./EditUsernameDialog";
 import { Tooltip } from "./Tooltip";
-import { MenuItemWithIcon } from "./MenuItems";
+import { MenuItemWithIcon } from "./Menu/MenuItems";
 import { doNotHandleEvent } from "../Utils";
 
 export const AccountMenu: React.FC = () =>
@@ -42,7 +42,7 @@ export const AccountMenu: React.FC = () =>
                         : <BiChevronDown id="account-menu-btn-down-icon" />
                 }
             </Button>
-            <Menu
+            <MuiMenu
                 anchorEl={btnRef.current}
                 id="account-menu"
                 open={open}
@@ -77,7 +77,7 @@ export const AccountMenu: React.FC = () =>
                 <Divider className="menu-divider" />
                 <MenuItemWithIcon onClick={handleClickOnEditName} icon={<MdEdit />} text="Изменить имя" />
                 <MenuItemWithIcon onClick={handleClose} icon={<MdSettings />} text="Настройки" />
-            </Menu>
+            </MuiMenu>
             <EditUsernameDialog open={openEditDialog} prevName={username} setOpen={setOpenEditDialog} setUsername={setUsername} />
         </>
     );

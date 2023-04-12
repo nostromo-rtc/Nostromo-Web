@@ -1,10 +1,10 @@
-import React, { Dispatch, SetStateAction, useState } from "react";
-import { ClickAwayListener, Divider, Grow, MenuList, Paper, Popper } from "@mui/material";
-import { MdRadioButtonChecked, MdRadioButtonUnchecked, MdClose } from "react-icons/md";
+import { Divider } from "@mui/material";
+import React, { useState } from "react";
+import { MdClose } from "react-icons/md";
 
+import { Menu } from "../../Menu/Menu";
+import { MenuItemRadio, MenuItemWithIcon, MenuSectionLabel } from "../../Menu/MenuItems";
 import "./MicBtnMenu.css";
-import { MenuItemWithIcon, MenuSectionLabel } from "../../MenuItems";
-import { doNotHandleEvent } from "../../../Utils";
 
 interface MicBtnMenuProps
 {
@@ -42,110 +42,44 @@ export const MicBtnMenu: React.FC<MicBtnMenuProps> = ({ anchorRef, open, setOpen
         const isSelected = selectedMic === mic.deviceId;
 
         return (
-            <MenuItemWithIcon
-                role="menuitemradio"
-                icon={isSelected ? <MdRadioButtonChecked /> : <MdRadioButtonUnchecked />}
+            <MenuItemRadio
+                isSelected={isSelected}
                 text={mic.name}
                 key={index}
-                endIcon
                 onClick={() => setSelectedMic(mic.deviceId)}
-                aria-checked={isSelected}
-                className={isSelected ? "success-color" : ""}
-            />
+             />
         );
     };
 
-    const handleClose = (ev: Event | React.SyntheticEvent) =>
-    {
-        if (anchorRef.current?.contains(ev.target as HTMLElement))
-        {
-            return;
-        }
-
-        setOpen(false);
-    };
-
-    const handleListKeyDown = (ev: React.KeyboardEvent) =>
-    {
-        if (ev.key === "Tab")
-        {
-            ev.preventDefault();
-            setOpen(false);
-        }
-        else if (ev.key === "Escape")
-        {
-            setOpen(false);
-        }
-    };
-
     return (
-        <>
-            <Popper
-                anchorEl={anchorRef.current}
-                id="toggle-mic-btn-menu"
-                open={open}
-                onClick={handleClose}
-                placement="top"
-                transition
-                popperOptions={{
-                    modifiers: [
+        <Menu
+            id="toggle-mic-btn-menu"
+            anchorRef={anchorRef}
+            open={open}
+            onClose={() => setOpen(false)}
+            transitionDuration={100}
+        >
+            <MenuSectionLabel text="Выбор микрофона" />
+            {micList.map(micListToListItems)}
+            {micEnabled ?
+                <div>
+                    <Divider className="menu-divider" />
+                    <MenuItemWithIcon
+                        className="error-color"
+                        semiBold
+                        icon={<MdClose />}
+                        text="Прекратить захват устройства"
+                        onClick={(ev) =>
                         {
-                            name: 'offset',
-                            options: {
-                                offset: [0, 8]
-                            },
-                        }
-                    ],
-                }}
-            >
-                {({ TransitionProps, placement }) => (
-                    <Grow
-                        {...TransitionProps}
-                        style={{
-                            transformOrigin:
-                                placement === 'bottom' ? 'center top' : 'center bottom',
-                        }}
-                        timeout={transitionTimeout}
-                    >
-                        <Paper>
-                            <ClickAwayListener
-                                onClickAway={handleClose}
-                                mouseEvent="onMouseDown"
-                                touchEvent="onTouchStart"
-                            >
-                                <MenuList
-                                    autoFocus={open}
-                                    onKeyDown={handleListKeyDown}
-                                    className="menu-list small-text"
-                                    onClick={doNotHandleEvent}
-                                >
-                                    <MenuSectionLabel text="Выбор микрофона" />
-                                    {micList.map(micListToListItems)}
-                                    {micEnabled ?
-                                        <div>
-                                            <Divider className="menu-divider" />
-                                            <MenuItemWithIcon
-                                                className="error-color"
-                                                semiBold
-                                                icon={<MdClose />}
-                                                text="Прекратить захват устройства"
-                                                onClick={(ev) =>
-                                                {
-                                                    setOpen(false);
+                            setOpen(false);
 
-                                                    setTimeout(() =>
-                                                    {
-                                                        disableMic();
-                                                    }, transitionTimeout);
-                                                }} />
-                                        </div> : undefined
-                                    }
-                                </MenuList>
-                            </ClickAwayListener>
-                        </Paper>
-                    </Grow>
-                )}
-            </Popper>
-        </>
+                            setTimeout(() =>
+                            {
+                                disableMic();
+                            }, transitionTimeout);
+                        }} />
+                </div> : undefined
+            }
+        </Menu>
     );
 };
