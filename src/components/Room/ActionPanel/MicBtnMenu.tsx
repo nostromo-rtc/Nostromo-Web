@@ -27,6 +27,8 @@ export const MicBtnMenu: React.FC<MicBtnMenuProps> = ({ anchorRef, open, setOpen
 {
     //TODO: вытащить micList и selectedMic выше в RoomActionPanel -> RoomPage
 
+    const transitionTimeout = 100;
+
     const [micList, setMicList] = useState<DeviceListItem[]>(
         [{ name: "Микрофон 1", deviceId: "testDeviceId1", groupId: "testGroupId1", kind: "audio" },
         { name: "Микрофон 2", deviceId: "testDeviceId2", groupId: "testGroupId2", kind: "audio" },
@@ -103,7 +105,7 @@ export const MicBtnMenu: React.FC<MicBtnMenuProps> = ({ anchorRef, open, setOpen
                             transformOrigin:
                                 placement === 'bottom' ? 'center top' : 'center bottom',
                         }}
-                        timeout={100}
+                        timeout={transitionTimeout}
                     >
                         <Paper>
                             <ClickAwayListener
@@ -130,7 +132,11 @@ export const MicBtnMenu: React.FC<MicBtnMenuProps> = ({ anchorRef, open, setOpen
                                                 onClick={(ev) =>
                                                 {
                                                     setOpen(false);
-                                                    disableMic();
+
+                                                    setTimeout(() =>
+                                                    {
+                                                        disableMic();
+                                                    }, transitionTimeout);
                                                 }} />
                                         </div> : undefined
                                     }
