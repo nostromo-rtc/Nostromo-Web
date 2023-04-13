@@ -1,8 +1,8 @@
-import { MenuItem, MenuItemProps } from "@mui/material";
-import { ReactElement } from "react";
+import { Divider, FormControl, MenuItem, MenuItemProps, Select, SelectProps } from "@mui/material";
+import { ReactElement, ReactNode } from "react";
 
+import { MdInfo, MdInfoOutline, MdRadioButtonChecked, MdRadioButtonUnchecked } from "react-icons/md";
 import "./MenuItems.css";
-import { MdRadioButtonChecked, MdRadioButtonUnchecked } from "react-icons/md";
 
 interface MenuItemWithIconProps extends MenuItemProps
 {
@@ -10,19 +10,6 @@ interface MenuItemWithIconProps extends MenuItemProps
     text: string;
     semiBold?: boolean;
     endIcon?: boolean;
-}
-
-interface MenuSectionLabelProps
-{
-    text: string;
-}
-
-interface MenuItemRadioProps
-{
-    text: string;
-    isSelected: boolean;
-    onClick: () => void;
-    key: React.Key;
 }
 
 export const MenuItemWithIcon: React.FC<MenuItemWithIconProps> = ({ icon, text, semiBold, endIcon, ...props }) =>
@@ -48,27 +35,69 @@ export const MenuItemWithIcon: React.FC<MenuItemWithIconProps> = ({ icon, text, 
     );
 };
 
-export const MenuSectionLabel: React.FC<MenuSectionLabelProps> = ({ text }) =>
+interface MenuSectionLabelProps
+{
+    text: string;
+    withTooltip?: boolean;
+}
+
+export const MenuSectionLabel: React.FC<MenuSectionLabelProps> = ({ text, withTooltip }) =>
 {
     return (
         <span className="menu-section-label text-wrap non-selectable">
             {text}
+            {withTooltip ? <MdInfoOutline className="ml-4" /> : undefined}
         </span>
     );
 };
 
-export const MenuItemRadio: React.FC<MenuItemRadioProps> = ({ isSelected, text, key, onClick }) =>
+interface MenuItemRadioProps
+{
+    text: string;
+    isSelected: boolean;
+    onClick: () => void;
+}
+export const MenuItemRadio: React.FC<MenuItemRadioProps> = ({ isSelected, text, onClick }) =>
 {
     return (
         <MenuItemWithIcon
             role="menuitemradio"
             icon={isSelected ? <MdRadioButtonChecked /> : <MdRadioButtonUnchecked />}
             text={text}
-            key={key}
             endIcon
             onClick={onClick}
             aria-checked={isSelected}
             className={isSelected ? "success-color" : ""}
         />
+    );
+};
+
+interface MenuSelectProps<T = unknown>
+{
+    id: string;
+    children: ReactNode;
+    value: SelectProps<T>["value"];
+    onChange: SelectProps<T>["onChange"];
+    transitionDuration: number;
+    variant?: SelectProps<T>["variant"];
+}
+
+export const MenuSelect: React.FC<MenuSelectProps<string>> = ({ id, value, onChange, children, transitionDuration, variant = "standard" }) =>
+{
+    return (
+        <div className="menu-select">
+            <FormControl className="menu-select-form-control">
+                <Select
+                    id={id}
+                    value={value}
+                    onChange={onChange}
+                    variant={variant}
+                    classes={{ select: "menu-select-input" }}
+                    MenuProps={{transitionDuration: transitionDuration}}
+                >
+                    {children}
+                </Select>
+            </FormControl>
+        </div>
     );
 };

@@ -1,3 +1,36 @@
+.error-color
+{
+    color: var(--error-color);
+    background-color: var(--error-bg-color);
+}
+
+.error-color p
+{
+    color: var(--error-text-color);
+}
+
+.info-color
+{
+    color: var(--info-color);
+    background-color: var(--info-bg-color);
+}
+
+.info-color p
+{
+    color: var(--info-text-color);
+}
+
+.success-color
+{
+    color: var(--success-color);
+    background-color: var(--success-bg-color);
+}
+
+.success-color p
+{
+    color: var(--success-text-color);
+}
+
 .menu-item-icon
 {
     font-size: 1.25rem;
@@ -40,35 +73,18 @@
     padding-bottom: 8px;
 }
 
-.error-color
+.menu-select
 {
-    color: var(--error-color);
-    background-color: var(--error-bg-color);
+    display: flex;
 }
 
-.error-color p
+.menu-select .menu-select-form-control
 {
-    color: var(--error-text-color);
+    width: 100%;
+    padding: 5px 10px 5px 10px;
 }
 
-.info-color
+.menu-select .menu-select-input
 {
-    color: var(--info-color);
-    background-color: var(--info-bg-color);
-}
-
-.info-color p
-{
-    color: var(--info-text-color);
-}
-
-.success-color
-{
-    color: var(--success-color);
-    background-color: var(--success-bg-color);
-}
-
-.success-color p
-{
-    color: var(--success-text-color);
+    padding-left: 6px;
 }

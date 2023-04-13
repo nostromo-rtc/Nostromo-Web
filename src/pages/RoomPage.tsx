@@ -25,8 +25,18 @@ export enum MicState
     WORKING
 }
 
+export interface DeviceListItem
+{
+    name: string;
+    deviceId: string;
+    groupId: string;
+    kind: "audio" | "video";
+}
+
 export const RoomPage: React.FC = () =>
 {
+    const transitionDuration = 100;
+
     const roomName = "Тестовая";
 
     const [soundState, setSoundState] = useState<SoundState>(SoundState.DISABLED_WITH_ALERT);
@@ -37,18 +47,20 @@ export const RoomPage: React.FC = () =>
     const [camEnabled, setCamEnabled] = useState<boolean>(false);
     const [camMenuOpen, setCamMenuOpen] = useState<boolean>(false);
 
-    const [screenEnabled, setScreenEnabled] = useState<boolean>(false);
-    const [screenMenuOpen, setScreenMenuOpen] = useState<boolean>(false);
+    const [displayEnabled, setDisplayEnabled] = useState<boolean>(false);
+    const [displayMenuOpen, setDisplayMenuOpen] = useState<boolean>(false);
 
-    useEffect(() =>
-    {
-        console.log("micState: ", micState);
-    }, [micState]);
+    const [micList, setMicList] = useState<DeviceListItem[]>(
+        [{ name: "Микрофон 1", deviceId: "testMicDeviceId1", groupId: "testMicGroupId1", kind: "audio" },
+        { name: "Микрофон 2", deviceId: "testMicDeviceId2", groupId: "testMicGroupId2", kind: "audio" },
+        { name: "Микрофон 3", deviceId: "testMicDeviceId3", groupId: "testMicGroupId3", kind: "audio" }]
+    );
 
-    useEffect(() =>
-    {
-        console.log("soundState: ", soundState);
-    }, [soundState]);
+    const [camList, setCamList] = useState<DeviceListItem[]>(
+        [{ name: "Веб-камера 1", deviceId: "testCamDeviceId1", groupId: "testCamGroupId1", kind: "video" },
+        { name: "Веб-камера 2", deviceId: "testCamDeviceId2", groupId: "testCamGroupId2", kind: "video" },
+        { name: "Веб-камера 3", deviceId: "testCamDeviceId3", groupId: "testCamGroupId3", kind: "video" }]
+    );
 
     const roomActionPanelProps: RoomActionPanelProps =
     {
@@ -58,22 +70,26 @@ export const RoomPage: React.FC = () =>
             state: micState,
             setState: setMicState,
             menuOpen: micMenuOpen,
-            toggleMenu: getToggleFunc(setMicMenuOpen)
+            toggleMenu: getToggleFunc(setMicMenuOpen),
+            deviceList: micList
         },
 
         camBtnInfo: {
             state: camEnabled,
             setState: setCamEnabled,
             menuOpen: camMenuOpen,
-            toggleMenu: getToggleFunc(setCamMenuOpen)
+            toggleMenu: getToggleFunc(setCamMenuOpen),
+            deviceList: camList
         },
 
-        screenBtnInfo: {
-            state: screenEnabled,
-            setState: setScreenEnabled,
-            menuOpen: screenMenuOpen,
-            toggleMenu: getToggleFunc(setScreenMenuOpen)
-        }
+        displayBtnInfo: {
+            state: displayEnabled,
+            setState: setDisplayEnabled,
+            menuOpen: displayMenuOpen,
+            toggleMenu: getToggleFunc(setDisplayMenuOpen)
+        },
+
+        transitionDuration: transitionDuration
     };
 
     const [isUserListHidden, setIsUserListHidden] = useState(true);

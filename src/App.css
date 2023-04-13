@@ -35,6 +35,11 @@
     flex-direction: row !important;
 }
 
+.inline
+{
+    display: inline;
+}
+
 #base
 {
     position: relative;
@@ -82,6 +87,11 @@
     margin: auto;
 }
 
+.ml-4
+{
+    margin-left: 4px;
+}
+
 .m-0
 {
     margin: 0;
@@ -123,9 +133,15 @@
 {
     flex: auto;
     height: 100%;
+    display: inline;
 }
 
 .v-align-default
 {
     vertical-align: baseline;
+}
+
+.v-align-middle
+{
+    vertical-align: middle;
 }

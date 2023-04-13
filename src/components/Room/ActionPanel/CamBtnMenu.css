@@ -1,0 +1,19 @@
+#tooltip-select-cam-resolution
+{
+    width: 140px;
+}
+
+#tooltip-select-cam-fps
+{
+    width: 140px;
+}
+
+.chip-resolution
+{
+    font-size: 0.77rem;
+    font-weight: 500;
+    background-color: #4a6c8f;
+    padding-left: 3px;
+    padding-right: 3px;
+    margin-left: 10px;
+}

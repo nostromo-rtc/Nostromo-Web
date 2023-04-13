@@ -10,14 +10,12 @@ interface MenuProps
     anchorRef: React.RefObject<HTMLDivElement>;
     open: boolean;
     onClose: () => void;
-    transitionDuration?: number;
     children: ReactNode;
+    transitionDuration: number;
 }
 
-export const Menu: React.FC<MenuProps> = ({ id, anchorRef, open, onClose, children }) =>
+export const Menu: React.FC<MenuProps> = ({ id, anchorRef, open, onClose, children, transitionDuration }) =>
 {
-    const transitionTimeout = 100;
-
     const handleClose = (ev: Event | React.SyntheticEvent) =>
     {
         if (anchorRef.current?.contains(ev.target as HTMLElement))
@@ -68,7 +66,7 @@ export const Menu: React.FC<MenuProps> = ({ id, anchorRef, open, onClose, childr
                             transformOrigin:
                                 placement === 'bottom' ? 'center top' : 'center bottom',
                         }}
-                        timeout={transitionTimeout}
+                        timeout={transitionDuration}
                     >
                         <Paper>
                             <ClickAwayListener

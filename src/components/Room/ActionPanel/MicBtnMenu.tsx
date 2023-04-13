@@ -2,6 +2,7 @@ import { Divider } from "@mui/material";
 import React, { useState } from "react";
 import { MdClose } from "react-icons/md";
 
+import { DeviceListItem } from "../../../pages/RoomPage";
 import { Menu } from "../../Menu/Menu";
 import { MenuItemRadio, MenuItemWithIcon, MenuSectionLabel } from "../../Menu/MenuItems";
 import "./MicBtnMenu.css";
@@ -13,29 +14,15 @@ interface MicBtnMenuProps
     setOpen: (state: boolean) => void;
     micEnabled: boolean;
     disableMic: () => void;
+    micList: DeviceListItem[];
+    transitionDuration: number;
 }
 
-interface DeviceListItem
+export const MicBtnMenu: React.FC<MicBtnMenuProps> = ({ anchorRef, open, setOpen, micEnabled, disableMic, micList, transitionDuration }) =>
 {
-    name: string;
-    deviceId: string;
-    groupId: string;
-    kind: "audio" | "video";
-}
-
-export const MicBtnMenu: React.FC<MicBtnMenuProps> = ({ anchorRef, open, setOpen, micEnabled, disableMic }) =>
-{
-    //TODO: вытащить micList и selectedMic выше в RoomActionPanel -> RoomPage
-
-    const transitionTimeout = 100;
-
-    const [micList, setMicList] = useState<DeviceListItem[]>(
-        [{ name: "Микрофон 1", deviceId: "testDeviceId1", groupId: "testGroupId1", kind: "audio" },
-        { name: "Микрофон 2", deviceId: "testDeviceId2", groupId: "testGroupId2", kind: "audio" },
-        { name: "Микрофон 3", deviceId: "testDeviceId3", groupId: "testGroupId3", kind: "audio" }]
-    );
-
-    const [selectedMic, setSelectedMic] = useState<string>("testDeviceId1");
+    //TODO: вытащить selectedMic выше в RoomActionPanel -> RoomPage
+    
+    const [selectedMic, setSelectedMic] = useState<string>("testMicDeviceId1");
 
     const micListToListItems = (mic: DeviceListItem, index: number) =>
     {
@@ -57,7 +44,7 @@ export const MicBtnMenu: React.FC<MicBtnMenuProps> = ({ anchorRef, open, setOpen
             anchorRef={anchorRef}
             open={open}
             onClose={() => setOpen(false)}
-            transitionDuration={100}
+            transitionDuration={transitionDuration}
         >
             <MenuSectionLabel text="Выбор микрофона" />
             {micList.map(micListToListItems)}
@@ -76,7 +63,7 @@ export const MicBtnMenu: React.FC<MicBtnMenuProps> = ({ anchorRef, open, setOpen
                             setTimeout(() =>
                             {
                                 disableMic();
-                            }, transitionTimeout);
+                            }, transitionDuration);
                         }} />
                 </div> : undefined
             }

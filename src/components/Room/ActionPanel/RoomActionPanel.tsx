@@ -1,13 +1,15 @@
 import { Button } from "@mui/material";
 import React, { Dispatch, SetStateAction, useRef } from 'react';
-import { MdVolumeOff, MdVolumeUp, MdMic, MdMicOff, MdVideocam, MdVideocamOff, MdScreenShare, MdStopScreenShare } from "react-icons/md";
-import { Tooltip } from "../../Tooltip";
 import { BiChevronDown, BiChevronUp } from "react-icons/bi";
+import { MdMic, MdMicOff, MdScreenShare, MdStopScreenShare, MdVideocam, MdVideocamOff, MdVolumeOff, MdVolumeUp } from "react-icons/md";
+import { Tooltip } from "../../Tooltip";
 
-import "./RoomActionPanel.css";
-import { MicBtnMenu } from "./MicBtnMenu";
-import { MicState, SoundState } from "../../../pages/RoomPage";
 import { getToggleFunc } from "../../../Utils";
+import { DeviceListItem, MicState, SoundState } from "../../../pages/RoomPage";
+import { MicBtnMenu } from "./MicBtnMenu";
+import "./RoomActionPanel.css";
+import { CamBtnMenu } from "./CamBtnMenu";
+import { DisplayBtnMenu } from "./DisplayBtnMenu";
 
 export interface ActionBtnInfo<S>
 {
@@ -21,19 +23,32 @@ export interface ActionBtnWithMenuInfo<S> extends ActionBtnInfo<S>
     toggleMenu: () => void;
 }
 
+export interface ActionDeviceBtn<S> extends ActionBtnWithMenuInfo<S>
+{
+    deviceList: DeviceListItem[];
+}
+
+export type ResolutionObject = {
+    width: number;
+    height: number;
+    name: string;
+};
+
 export interface RoomActionPanelProps
 {
     soundBtnInfo: ActionBtnInfo<SoundState>;
-    micBtnInfo: ActionBtnWithMenuInfo<MicState>;
-    camBtnInfo: ActionBtnWithMenuInfo<boolean>;
-    screenBtnInfo: ActionBtnWithMenuInfo<boolean>;
+    micBtnInfo: ActionDeviceBtn<MicState>;
+    camBtnInfo: ActionDeviceBtn<boolean>;
+    displayBtnInfo: ActionBtnWithMenuInfo<boolean>;
+    transitionDuration: number;
 }
 
 export const RoomActionPanel: React.FC<RoomActionPanelProps> = ({
     soundBtnInfo,
     micBtnInfo,
     camBtnInfo,
-    screenBtnInfo
+    displayBtnInfo,
+    transitionDuration
 }) =>
 {
     /// Sound button ----------------------------- ///
@@ -119,6 +134,8 @@ export const RoomActionPanel: React.FC<RoomActionPanelProps> = ({
             setOpen={micBtnInfo.toggleMenu}
             micEnabled={micBtnInfo.state !== MicState.DISABLED}
             disableMic={() => { micBtnInfo.setState(MicState.DISABLED); }}
+            micList={micBtnInfo.deviceList}
+            transitionDuration={transitionDuration}
         />
     </>);
 
@@ -126,15 +143,16 @@ export const RoomActionPanel: React.FC<RoomActionPanelProps> = ({
 
     /// Cam button ------------------------------- ///
 
-    const camBtnMsg = camBtnInfo.state ? "Прекратить захват веб-камеры" : "Захватить веб-камеру";
+    const camBtnBoxRef = useRef<HTMLDivElement>(null);
+    const camBtnMsg = camBtnInfo.state ? "Выключить веб-камеру" : "Включить веб-камеру";
 
     const camBtnOnClick = getToggleFunc(camBtnInfo.setState);
 
-    const camBtn = (
-        <div className="action-btn-box non-selectable">
-            <Tooltip title={camBtnMsg} offset={10}>
+    const camBtn = (<>
+        <div className="action-btn-box non-selectable" ref={camBtnBoxRef}>
+            <Tooltip id="tooltip-toggle-cam-btn" title={camBtnMsg} offset={10}>
                 <div>
-                    <Button aria-label="Start/stop capture webcam"
+                    <Button aria-label="Enable/disable webcam"
                         className={"action-btn " + (camBtnInfo.state ? "action-btn-off" : "action-btn-on")}
                         onClick={camBtnOnClick}>
                         {camBtnInfo.state ? <MdVideocamOff /> : <MdVideocam />}
@@ -142,38 +160,58 @@ export const RoomActionPanel: React.FC<RoomActionPanelProps> = ({
                     <div className="action-btn-clickable-area non-selectable" onClick={camBtnOnClick}></div>
                 </div>
             </Tooltip>
-            <Button className="action-list-btn"><BiChevronDown /></Button>
+            <Button className="action-list-btn"
+                onClick={camBtnInfo.toggleMenu}>
+                {camBtnInfo.menuOpen ? <BiChevronUp /> : <BiChevronDown />}
+            </Button>
             <span className="action-btn-desc">Камера</span>
-            <div className="action-list-btn-clickable-area non-selectable" onClick={() => { console.log("2"); }}></div>
+            <div className="action-list-btn-clickable-area non-selectable" onClick={camBtnInfo.toggleMenu}></div>
         </div>
-    );
+        <CamBtnMenu
+            anchorRef={camBtnBoxRef}
+            open={camBtnInfo.menuOpen}
+            setOpen={camBtnInfo.toggleMenu}
+            camList={camBtnInfo.deviceList}
+            transitionDuration={transitionDuration}
+        />
+    </>);
 
     /// ------------------------------------------ ///
 
     /// Display button --------------------------- ///
 
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    const screenBtnMsg = screenBtnInfo.state ? "Прекратить демонстрацию экрана" : "Запустить демонстрацию экрана";
+    const displayBtnBoxRef = useRef<HTMLDivElement>(null);
+    const displayBtnMsg = displayBtnInfo.state ? "Выключить демонстрацию экрана" : "Включить демонстрацию экрана";
 
-    const screenBtnOnClick = getToggleFunc(screenBtnInfo.setState);
+    const displayBtnOnClick = getToggleFunc(displayBtnInfo.setState);
 
-    const screenBtn = (
-        <div className="action-btn-box non-selectable">
-            <Tooltip id="tooltip-toggle-screen-btn" title={screenBtnMsg} offset={10}>
+    const displayBtn = (<>
+        <div className="action-btn-box non-selectable" ref={displayBtnBoxRef}>
+            <Tooltip id="tooltip-toggle-display-btn" title={displayBtnMsg} offset={10}>
                 <div>
-                    <Button aria-label="Start/stop capture webcam"
-                        className={"action-btn " + (screenBtnInfo.state ? "action-btn-off" : "action-btn-on")}
-                        onClick={screenBtnOnClick}>
-                        {screenBtnInfo.state ? <MdStopScreenShare /> : <MdScreenShare />}
+                    <Button aria-label="Start/stop screensharing"
+                        className={"action-btn " + (displayBtnInfo.state ? "action-btn-off" : "action-btn-on")}
+                        onClick={displayBtnOnClick}>
+                        {displayBtnInfo.state ? <MdStopScreenShare /> : <MdScreenShare />}
                     </Button>
-                    <div className="action-btn-clickable-area non-selectable" onClick={screenBtnOnClick}></div>
+                    <div className="action-btn-clickable-area non-selectable" onClick={displayBtnOnClick}></div>
                 </div>
             </Tooltip>
-            <Button className="action-list-btn"><BiChevronDown /></Button>
+            <Button className="action-list-btn"
+                onClick={displayBtnInfo.toggleMenu}>
+                {displayBtnInfo.menuOpen ? <BiChevronUp /> : <BiChevronDown />}
+            </Button>
             <span className="action-btn-desc">Экран</span>
-            <div className="action-list-btn-clickable-area non-selectable" onClick={() => { console.log("2"); }}></div>
+            <div className="action-list-btn-clickable-area non-selectable" onClick={displayBtnInfo.toggleMenu}></div>
         </div>
-    );
+        <DisplayBtnMenu
+            anchorRef={displayBtnBoxRef}
+            open={displayBtnInfo.menuOpen}
+            setOpen={displayBtnInfo.toggleMenu}
+            transitionDuration={transitionDuration}
+        />
+    </>);
 
     /// ------------------------------------------ ///
 
@@ -184,7 +222,7 @@ export const RoomActionPanel: React.FC<RoomActionPanelProps> = ({
             {soundBtn}
             {micBtn}
             {camBtn}
-            {isMobile ? <></> : screenBtn}
+            {isMobile ? <></> : displayBtn}
             <div className="horizontal-expander"></div>
         </div>
     );

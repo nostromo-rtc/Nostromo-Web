@@ -131,6 +131,16 @@
     z-index: 1;
 }
 
+.chip-resolution
+{
+    font-size: 0.77rem;
+    font-weight: 500;
+    background-color: #4a6c8f;
+    padding-left: 3px;
+    padding-right: 3px;
+    margin-left: 10px;
+}
+
 #tooltip-toggle-sound-btn
 {
     width: 140px;
@@ -141,7 +151,7 @@
     width: 170px;
 }
 
-#tooltip-toggle-screen-btn
+#tooltip-toggle-display-btn
 {
     width: 175px;
 }
