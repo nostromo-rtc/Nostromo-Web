@@ -19,7 +19,7 @@ export const VideoLayout: React.FC = () =>
         setVideoList((prev) =>
         {
             const arr: string[] = [];
-            for (let i = 0; i < 23; ++i)
+            for (let i = 0; i < 0; ++i)
             {
                 arr[i] = `${i}`;
             }
@@ -56,38 +56,49 @@ export const VideoLayout: React.FC = () =>
         return { rows, col };
     }, [videoList]);
 
-    const { ref } = useResizeDetector<HTMLDivElement>({
-        onResize: (w, h) =>
+    const { width: layoutWidth, height: layoutHeight, ref } = useResizeDetector<HTMLDivElement>({
+        onResize: () =>
         {
-            if (w && h)
-            {
-                console.debug("[VideoLayout] video-layout size: ", w, h);
-                const { rows, col } = calcRowsAndColumns();
-
-                // TODO: сделать отступ не 50px, а на основе расчетов margin * кол-во строк / кол-во столбцов
-
-                const elemWidthByCol = (w - 50) / col;
-                const elemHeightByCol = elemWidthByCol * 9 / 16;
-
-                const elemHeightByRow = (h - 50) / rows;
-                const elemWidthByRow = elemHeightByRow * 16 / 9;
-
-                const newWidth = Math.min(elemWidthByCol, elemWidthByRow);
-                const newHeight = Math.min(elemHeightByCol, elemHeightByRow);
-
-                if (newWidth !== videoItemSize.width || newHeight !== videoItemSize.height)
-                {
-                    setVideoItemSize({
-                        width: Math.min(elemWidthByCol, elemWidthByRow),
-                        height: Math.min(elemHeightByCol, elemHeightByRow)
-                    });
-                }
-            }
+            console.debug("[VideoLayout] video-layout size: ", layoutWidth, layoutHeight);
+            recalculateVideoItemSize();
         }
     });
 
+    const recalculateVideoItemSize = useCallback(() =>
+    {
+        if (layoutWidth && layoutHeight)
+        {
+            const { rows, col } = calcRowsAndColumns();
+
+            // TODO: сделать отступ не 50px, а на основе расчетов margin * кол-во строк / кол-во столбцов
+
+            const elemWidthByCol = (layoutWidth - 50) / col;
+            const elemHeightByCol = elemWidthByCol * 9 / 16;
+
+            const elemHeightByRow = (layoutHeight - 50) / rows;
+            const elemWidthByRow = elemHeightByRow * 16 / 9;
+
+            const newWidth = Math.min(elemWidthByCol, elemWidthByRow);
+            const newHeight = Math.min(elemHeightByCol, elemHeightByRow);
+
+            if (newWidth !== videoItemSize.width || newHeight !== videoItemSize.height)
+            {
+                setVideoItemSize({
+                    width: Math.min(elemWidthByCol, elemWidthByRow),
+                    height: Math.min(elemHeightByCol, elemHeightByRow)
+                });
+            }
+        }
+    }, [layoutWidth, layoutHeight, calcRowsAndColumns, videoItemSize.height, videoItemSize.width]);
+
+    useEffect(() =>
+    {
+        recalculateVideoItemSize();
+    }, [videoList, recalculateVideoItemSize]);
+
     return (
         <div id="video-layout" ref={ref}>
+            <button className="debug-btn" onClick={() => { setVideoList(prev => [...prev, "new"]); }}>add</button>
             <MemoizedVideoLayoutContent videoList={videoList} videoItemSize={videoItemSize} calcRowsAndColumns={calcRowsAndColumns} />
         </div>
     );
