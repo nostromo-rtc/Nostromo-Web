@@ -1,19 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import "./VideoLayout.css";
 
 import { useResizeDetector } from 'react-resize-detector';
-
-type ElementSize = {
-    width: number;
-    height: number;
-};
+import { ElementSize, MemoizedVideoLayoutContent, VideoList } from "./VideoLayoutContent";
 
 export const VideoLayout: React.FC = () =>
 {
     const [videoItemSize, setVideoItemSize] = useState<ElementSize>({ width: 0, height: 0 });
 
-    const [videoList, setVideoList] = useState<string[]>(["1"]);
+    const [videoList, setVideoList] = useState<VideoList>(["1"]);
 
     // Типо загрузили список с сервера.
     useEffect(() =>
@@ -37,7 +33,7 @@ export const VideoLayout: React.FC = () =>
 
     }, []);
 
-    const calcRowsAndColumns = () =>
+    const calcRowsAndColumns = useCallback(() =>
     {
         console.debug("[VideoLayout] Calculating rows and columns.");
 
@@ -58,7 +54,7 @@ export const VideoLayout: React.FC = () =>
             }
         }
         return { rows, col };
-    };
+    }, [videoList]);
 
     const { ref } = useResizeDetector<HTMLDivElement>({
         onResize: (w, h) =>
@@ -68,7 +64,6 @@ export const VideoLayout: React.FC = () =>
                 console.debug("[VideoLayout] video-layout size: ", w, h);
                 const { rows, col } = calcRowsAndColumns();
 
-
                 // TODO: сделать отступ не 50px, а на основе расчетов margin * кол-во строк / кол-во столбцов
 
                 const elemWidthByCol = (w - 50) / col;
@@ -77,60 +72,23 @@ export const VideoLayout: React.FC = () =>
                 const elemHeightByRow = (h - 50) / rows;
                 const elemWidthByRow = elemHeightByRow * 16 / 9;
 
-                setVideoItemSize({
-                    width: Math.min(elemWidthByCol, elemWidthByRow),
-                    height: Math.min(elemHeightByCol, elemHeightByRow)
-                });
+                const newWidth = Math.min(elemWidthByCol, elemWidthByRow);
+                const newHeight = Math.min(elemHeightByCol, elemHeightByRow);
+
+                if (newWidth !== videoItemSize.width || newHeight !== videoItemSize.height)
+                {
+                    setVideoItemSize({
+                        width: Math.min(elemWidthByCol, elemWidthByRow),
+                        height: Math.min(elemHeightByCol, elemHeightByRow)
+                    });
+                }
             }
         }
     });
 
-    const videoListToItems = () =>
-    {
-        if (videoItemSize.width <= 0 || videoItemSize.height <= 0)
-        {
-            return undefined;
-        }
-
-        const { col } = calcRowsAndColumns();
-
-        console.debug("[VideoLayout] Render videos", videoItemSize.width, videoItemSize.height);
-
-        const matrix = [];
-        for (let i = 0; i < videoList.length; i = i + col)
-        {
-            matrix.push(videoList.slice(i, i + col));
-        }
-
-        const rowToMap = (val: string, index: number) =>
-        {
-            return (
-                <div className="video-layout-item" key={index} style={{
-                    width: videoItemSize.width,
-                    height: videoItemSize.height
-                }}>
-                    <div className="video-container" key={index}>
-                        <span className="v-align-middle">{val}</span>
-                    </div>
-                </div>
-            );
-        };
-
-        const matrixToMap = (row: string[], index: number) =>
-        {
-            return (
-                <div className="video-layout-row" key={index}>
-                    {row.map(rowToMap)}
-                </div>
-            );
-        };
-
-        return matrix.map(matrixToMap);
-    };
-
     return (
         <div id="video-layout" ref={ref}>
-            {videoListToItems()}
+            <MemoizedVideoLayoutContent videoList={videoList} videoItemSize={videoItemSize} calcRowsAndColumns={calcRowsAndColumns} />
         </div>
     );
 };
