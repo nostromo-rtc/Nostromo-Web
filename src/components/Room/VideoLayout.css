@@ -5,6 +5,8 @@
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
+    overflow: hidden;
+    min-height: 150px;
 
     background-color: #303338;
     border-radius: 7px;
@@ -14,21 +16,18 @@
 .video-layout-row {
     display: flex;
     flex-direction: row;
-    flex: auto;
     justify-content: center;
     width: 100%;
 }
 
 .video-layout-item {
     display: flex;
-    aspect-ratio: 16/9;
     margin: 3px;
     align-items: center;
 }
 
 .video-container {
-    aspect-ratio: 16/9;
     width: 100%;
-    height: max-content;
+    height: 100%;
     background-color: rgb(164, 155, 143);
 }

@@ -42,6 +42,8 @@ export const RoomPage: React.FC = () =>
 
     const [soundState, setSoundState] = useState<SoundState>(SoundState.DISABLED_WITH_ALERT);
 
+    // TODO: состояния открыто меню или закрыто попробовать прокинуть ниже в дочерние компоненты.
+
     const [micState, setMicState] = useState<MicState>(MicState.DISABLED);
     const [micMenuOpen, setMicMenuOpen] = useState<boolean>(false);
 
