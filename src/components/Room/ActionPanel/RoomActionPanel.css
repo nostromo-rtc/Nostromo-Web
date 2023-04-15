@@ -8,9 +8,9 @@
     overflow-x: auto;
     overflow-y: hidden;
     border-radius: 7px;
-    background-color: #252e34;
+    background-color: #1b282e;
     box-shadow: 0px 2px 4px -4px rgba(0, 0, 0, 0.85);
-    border-bottom: 1px solid #262729;
+    border-bottom: 1px solid #1f2022;
     box-sizing: border-box;
     padding: 5px 5px;
 }
