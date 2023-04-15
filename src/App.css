@@ -27,12 +27,12 @@
 
 .flex-column
 {
-    flex-direction: column !important;
+    flex-direction: column;
 }
 
 .flex-row
 {
-    flex-direction: row !important;
+    flex-direction: row;
 }
 
 .inline
@@ -65,7 +65,7 @@
 {
     display: flex;
     flex: auto;
-    flex-direction: column;
+    flex-direction: row;
     font-size: 1.125rem;
     padding: 4px 5px;
     background-color: #36393f;

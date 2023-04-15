@@ -10,6 +10,7 @@ import { RoomHeaderToolbarProps } from "../components/Room/RoomHeaderToolbar";
 import { RoomAlert } from "../components/Room/RoomAlert";
 import { Link } from "@mui/material";
 import { getToggleFunc } from "../Utils";
+import { VideoLayout } from "../components/Room/VideoLayout";
 
 export enum SoundState
 {
@@ -122,12 +123,11 @@ export const RoomPage: React.FC = () =>
             />
         </div>;
 
-    const videoContainer = <div id="video-container">video-container</div>;
     const chatContainer = <div id="chat-container">chat-container</div>;
     const callContainer =
         <div id="call-container">
             {roomAlerts}
-            {videoContainer}
+            <VideoLayout />
             <RoomActionPanel {...roomActionPanelProps} />
         </div>;
     const userListContainer = <div id="user-list-container">user-list-container</div>;
@@ -140,7 +140,7 @@ export const RoomPage: React.FC = () =>
     return (
         <div id="base">
             <Header title={roomName} roomToolbarProps={roomToolbarProps} />
-            <div id="main" className="flex-row">
+            <div id="main">
                 {isChatHidden ? callContainer : <VerticalLayout upperContainer={callContainer} lowerContainer={chatContainer} />}
                 {isUserListHidden ? <></> : userListContainer}
             </div>

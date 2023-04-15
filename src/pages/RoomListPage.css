@@ -2,6 +2,7 @@
 #room-list
 {
     display: flex;
+    flex: auto;
     flex-direction: column;
     font-size: 1.375rem;
     margin: 5px;

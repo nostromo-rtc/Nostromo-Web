@@ -1,11 +1,3 @@
-#video-container
-{
-    background-color: #303338;
-    border-radius: 7px;
-    border-bottom: 1px rgb(34, 33, 33) solid;
-    flex: auto;
-}
-
 #chat-container
 {
     background-color: #3d4248;
