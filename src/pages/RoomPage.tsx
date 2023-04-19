@@ -130,7 +130,7 @@ export const RoomPage: React.FC = () =>
         <div id="call-container">
             {roomAlerts}
             <VideoLayout />
-            <hr id="call-container-divider"/>
+            <hr id="call-container-divider" />
             <RoomActionPanel {...roomActionPanelProps} />
         </div>;
     const userListContainer = <div id="user-list-container">user-list-container</div>;
@@ -144,7 +144,10 @@ export const RoomPage: React.FC = () =>
         <div id="base">
             <Header title={roomName} roomToolbarProps={roomToolbarProps} />
             <div id="main">
-                {isChatHidden ? callContainer : <VerticalLayout upperContainer={callContainer} lowerContainer={chatContainer} />}
+                {isChatHidden ? callContainer : <VerticalLayout
+                    upperContainer={callContainer}
+                    lowerContainer={chatContainer}
+                    upperMinHeight="320px" />}
                 {isUserListHidden ? <></> : userListContainer}
             </div>
         </div>

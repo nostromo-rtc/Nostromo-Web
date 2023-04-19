@@ -23,7 +23,7 @@
             #272831 20px);
 }
 
-@media (width <=600px) or (height <=400px)
+@media (width <=600px) or (height <=600px)
 {
     .vl-resizer-bar
     {
@@ -44,13 +44,12 @@
 {
     position: relative;
     display: flex;
-    flex: auto;
 }
 
 .vl-lower-elem
 {
     position: relative;
     display: flex;
+    flex: auto;
     min-height: 20%;
-    max-height: 70%;
 }

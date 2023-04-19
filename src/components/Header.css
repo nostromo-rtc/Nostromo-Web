@@ -25,7 +25,7 @@
     white-space: nowrap;
 }
 
-@media (width <=600px) or (height <=400px)
+@media (width <=600px) or (height <=600px)
 {
     #header-title
     {

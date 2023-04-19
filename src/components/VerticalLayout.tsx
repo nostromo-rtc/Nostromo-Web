@@ -7,14 +7,15 @@ interface Params
 {
     upperContainer: ReactNode;
     lowerContainer: ReactNode;
+    upperMinHeight: string;
 }
-export const VerticalLayout: React.FC<Params> = ({ upperContainer, lowerContainer }) =>
+export const VerticalLayout: React.FC<Params> = ({ upperContainer, lowerContainer, upperMinHeight }) =>
 {
-    const lowerContainerRef = useRef<HTMLDivElement>(null);
+    const upperContainerRef = useRef<HTMLDivElement>(null);
 
     const [mouseY, setMouseY] = useState(0);
     const [resizing, setResizing] = useState(false);
-    const [heightForLower, setHeightForLower] = useState("20%");
+    const [heightForUpper, setHeightForUpper] = useState("80%");
     const [cursorStyle, setCursorStyle] = useState("default");
 
     const onPointerDown = (event: MouseEvent) =>
@@ -40,8 +41,8 @@ export const VerticalLayout: React.FC<Params> = ({ upperContainer, lowerContaine
             const newY = event.clientY;
             const diff = mouseY - newY;
 
-            const newHeight = lowerContainerRef.current!.clientHeight + diff;
-            setHeightForLower(String(newHeight) + "px");
+            const newHeight = upperContainerRef.current!.clientHeight - diff;
+            setHeightForUpper(String(newHeight) + "px");
 
             setMouseY(newY);
         }
@@ -54,9 +55,9 @@ export const VerticalLayout: React.FC<Params> = ({ upperContainer, lowerContaine
             onPointerUp={onPointerUp}
             onPointerLeave={onPointerUp}
         >
-            <div className="vl-upper-elem">{upperContainer}</div>
+            <div className="vl-upper-elem" ref={upperContainerRef} style={({ height: heightForUpper, minHeight: upperMinHeight })}>{upperContainer}</div>
             <div className={resizing ? "vl-resizer-bar vl-resizer-bar-activated" : "vl-resizer-bar"} onPointerDown={onPointerDown}></div>
-            <div className="vl-lower-elem" ref={lowerContainerRef} style={({ height: heightForLower })}>{lowerContainer}</div>
+            <div className="vl-lower-elem" style={({ height: `calc(100% - ${heightForUpper} - 10px)` })}>{lowerContainer}</div>
         </div>
     );
 };
