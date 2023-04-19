@@ -71,8 +71,8 @@ export const Menu: React.FC<MenuProps> = ({ id, anchorRef, open, onClose, childr
                         <Paper>
                             <ClickAwayListener
                                 onClickAway={handleClose}
-                                mouseEvent="onMouseDown"
-                                touchEvent="onTouchStart"
+                                mouseEvent="onPointerDown"
+                                touchEvent={false}
                             >
                                 <MenuList
                                     autoFocus={open}
