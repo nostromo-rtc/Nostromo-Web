@@ -4,12 +4,15 @@ import "./VideoLayout.css";
 
 import { useResizeDetector } from 'react-resize-detector';
 import { ElementSize, MemoizedVideoLayoutContent, VideoList } from "./VideoLayoutContent";
+import { useMediaQuery } from "@mui/material";
 
 export const VideoLayout: React.FC = () =>
 {
     const [videoItemSize, setVideoItemSize] = useState<ElementSize>({ width: 0, height: 0 });
 
     const [videoList, setVideoList] = useState<VideoList>(["1"]);
+
+    const verticalOrientation = useMediaQuery('(orientation: portrait)');
 
     // Типо загрузили список с сервера.
     useEffect(() =>
@@ -37,14 +40,13 @@ export const VideoLayout: React.FC = () =>
     {
         console.debug("[VideoLayout] Calculating rows and columns.");
 
-        // TODO: сделать расчет другим при вертикальной ориентации экрана.
-
         let rows = 1;
         let col = 1;
 
         while (rows * col < videoList.length)
         {
-            if (rows === col)
+            if ((rows === col && !verticalOrientation) ||
+                (rows !== col && verticalOrientation))
             {
                 ++col;
             }
@@ -54,7 +56,7 @@ export const VideoLayout: React.FC = () =>
             }
         }
         return { rows, col };
-    }, [videoList]);
+    }, [videoList, verticalOrientation]);
 
     const { width: layoutWidth, height: layoutHeight, ref } = useResizeDetector<HTMLDivElement>({
         onResize: () =>
