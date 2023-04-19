@@ -130,6 +130,7 @@ export const RoomPage: React.FC = () =>
         <div id="call-container">
             {roomAlerts}
             <VideoLayout />
+            <hr id="call-container-divider"/>
             <RoomActionPanel {...roomActionPanelProps} />
         </div>;
     const userListContainer = <div id="user-list-container">user-list-container</div>;

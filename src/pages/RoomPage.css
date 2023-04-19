@@ -28,3 +28,10 @@
     overflow-y: auto;
     max-height: 30%;
 }
+
+#call-container-divider
+{
+    margin: 0;
+    border-width: 0px;
+    border-bottom: 3px #2b4b5a solid;
+}
