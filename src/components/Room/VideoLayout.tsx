@@ -70,12 +70,22 @@ export const VideoLayout: React.FC = () =>
         {
             const { rows, col } = calcRowsAndColumns();
 
-            // TODO: сделать отступ не 50px, а на основе расчетов margin * кол-во строк / кол-во столбцов
+            const marginValue = 6;
 
-            const elemWidthByCol = (layoutWidth - 50) / col;
+            // Между videoItem получается col-1 промежутков,
+            // к этому количеству добавляем еще 4 отступа (двойной промежуток относительно промежутка между item)
+            // для границ самого VideoLayout, в которых располагаются videoItem'ы
+            // например двойной отступ для левой границы и двойной отступ для правой границы контейнера VideoLayout.
+
+            const widthOffset = (col - 1 + 4) * marginValue;
+            const heightOffset = (rows - 1 + 4) * marginValue;
+
+            console.debug("widthOffset / heightOffset", widthOffset, heightOffset);
+
+            const elemWidthByCol = (layoutWidth - widthOffset) / col;
             const elemHeightByCol = elemWidthByCol * 9 / 16;
 
-            const elemHeightByRow = (layoutHeight - 50) / rows;
+            const elemHeightByRow = (layoutHeight - heightOffset) / rows;
             const elemWidthByRow = elemHeightByRow * 16 / 9;
 
             const newWidth = Math.min(elemWidthByCol, elemWidthByRow);
@@ -98,7 +108,21 @@ export const VideoLayout: React.FC = () =>
 
     return (
         <div id="video-layout" ref={ref}>
-            <button className="debug-btn" onClick={() => { setVideoList(prev => [...prev, "new"]); }}>add</button>
+            <button className="debug-btn" onClick={() => { setVideoList(prev => [...prev, "new"]); }}>+1</button>
+            <button className="debug-btn-2" onClick={() =>
+            {
+                setVideoList((prev) =>
+                {
+                    const arr: string[] = [];
+                    for (let i = 0; i < 10; ++i)
+                    {
+                        arr[i] = `${i}`;
+                    }
+                    return prev.concat(arr);
+                });
+            }}>
+                +10
+            </button>
             <MemoizedVideoLayoutContent videoList={videoList} videoItemSize={videoItemSize} calcRowsAndColumns={calcRowsAndColumns} />
         </div>
     );
