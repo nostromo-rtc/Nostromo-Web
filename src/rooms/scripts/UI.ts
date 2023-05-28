@@ -2,6 +2,7 @@ import Plyr from 'plyr';
 import { Howl } from 'howler';
 import svgSprite from "plyr/dist/plyr.svg";
 import { ChatFileInfo, ChatMessage } from "nostromo-shared/types/RoomTypes";
+import { escapeHtmlTags, wrapLinksInText } from './Utils/TextDecorators';
 
 // Plyr добавляет поле с плеером в класс HTMLVideoElement.
 declare global
@@ -1328,7 +1329,7 @@ export class UI
 
         const messageTextDiv = document.createElement("div");
         messageTextDiv.classList.add("message-text");
-        messageTextDiv.innerText = content as string;
+        messageTextDiv.innerHTML = wrapLinksInText(escapeHtmlTags(content as string));
 
         const messageDateDiv = document.createElement("div");
         messageDateDiv.classList.add("message-date");
