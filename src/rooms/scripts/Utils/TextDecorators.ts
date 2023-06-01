@@ -19,7 +19,7 @@ export function wrapLinksInText(text: string): string
         if (urlRe.test(words[i])) 
         {
             const ref = words[i].startsWith("http") ? words[i] : `http://${words[i]}`;
-            words[i] = `<a href="${ref}">${words[i]}</a>`;
+            words[i] = `<a href="${ref}" target="_blank" rel="noopener noreferrer">${words[i]}</a>`;
         }
     }
 
