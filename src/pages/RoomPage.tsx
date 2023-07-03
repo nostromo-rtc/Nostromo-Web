@@ -12,6 +12,7 @@ import { Link } from "@mui/material";
 import { getToggleFunc } from "../Utils";
 import { VideoLayout } from "../components/Room/VideoLayout";
 import { UserList } from "../components/Room/UserList";
+import { Chat } from "../components/Room/Chat";
 
 export enum SoundState
 {
@@ -127,7 +128,10 @@ export const RoomPage: React.FC = () =>
             />
         </div>;
 
-    const chatContainer = <div id="chat-container">chat-container</div>;
+    const chatContainer = 
+    <div id="chat-container">
+        <Chat />
+    </div>;
     const callContainer =
         <div id="call-container">
             {roomAlerts}
