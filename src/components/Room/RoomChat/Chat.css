@@ -3,6 +3,7 @@
     display: flex;
     flex-direction: column;
     background-color: #1b282e;
+    border-radius: 10px 10px 10px 10px;
 }
 
 #chat {
@@ -10,7 +11,7 @@
     resize: vertical;
     font-size: 0.8125rem;
     border: 1px solid #1f2022;
-    border-radius: 10px;
+    border-radius: 10px 10px 0px 0px;
     padding: 0.8rem;
     background-color: #152025;
     overflow-y: auto;
@@ -32,62 +33,28 @@
     width: fit-content;
 }
 
-#chat .message-sender-name {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-
-#chat .message-sender-id {
-    font-size: 0.75rem;
-    margin-top: 0.0625rem;
-    margin-left: 5px;
-    font-weight: 300;
-    color: rgba(84, 110, 122, 1.0);
-}
-
-#chat .message-text {
-    overflow-wrap: anywhere;
-    margin-top: 4px;
-}
-
-#chat .message-date {
-    font-size: 8pt;
-    color: rgba(84, 110, 122, 1.0);
-    text-align: right;
-}
-
-#chat .message-file-size {
-    font-size: 8pt;
-    color: rgba(84, 110, 122, 1.0);
-    margin-top: 4px;
-}
-
-#chat .message-link {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    z-index: 1;
-}
-
+/************** Строка ввода сообщения **************/
 #message-textarea {
     flex: 1 1 95%;
     resize: vertical;
     background-color:  #1b282e;
     border-radius: 10px;
-    border: 2px solid #5b5b5b;
+    border: 1px solid #5b5b5b;
     margin: 10px 2px 2px 2px;
     color: #fafafa;
     min-height: 20px;
-    height: 20px;
     padding: 10px;
+    max-height: 150px;
+    overflow: scroll;
+}
+#message-textarea:empty:before {
+    content:attr(data-text);
 }
 #message-textarea:focus{
     outline: none;
 }
 
+/************** Кнопка отправки сообщения **************/
 .btn-send-message {
     background-color: #1b282e;
     color: #fafafa;
@@ -102,48 +69,67 @@
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    justify-content: end;
-    padding: 5px;
+    justify-content: flex-end;
+    padding-left: 5px;
+    padding-right: 10px;
 }
+.btn-send-file-container{
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding-left: 10px;
+    padding-right: 5px;
+}
+/************** Блоки сообщений в чате **************/
+
+/* Собственное смс (справа) */
 .self-message-area{
     display: flex;
     width: 100%;
     justify-content: right;
     margin: 0.6rem 0 0.6rem 0;
 }
+/* Сообщение собеседника (слева) */
 .message-area{
     display: flex;
     width: 100%;
     justify-content: left;
     margin: 0.6rem 0 0.6rem 0;
 }
+/* Контейнер для сообщений */
 .message-container{
     padding: 10px;
     min-width: 10%;
     max-width: 60%;
+    
+    overflow-wrap: anywhere;
 }
 .message-body{
     margin-top: 4px;
 }
+/* Цвет и форма блоков сообщений собеседников */
 .text-left{
-    text-align: left;
-    border: 2px solid #1d3034;
-    background-color: #1d3034;
-    border-radius: 0.75rem 0.75rem 0.75rem 0;
-    margin-top: 4px;
-}
-.text-right{
     text-align: left;
     border: 2px solid #3d5054;
     background-color: #3d5054;
+    border-radius: 0.75rem 0.75rem 0.75rem 0;
+    margin-top: 4px;
+}
+/* Цвет и форма блоков собственных сообщений */
+.text-right{
+    text-align: left;
+    border: 2px solid #1d3034;
+    background-color: #1d3034;
     border-radius: 0.75rem 0.75rem 0 0.75rem;
     margin-top: 4px;
 }
+/* Стиль имени отправителя смс */
 .user-name{
     font-weight: 600;
     color: dodgerblue;
-
 }
+/* Стиль id отправителя смс */
 .user-id{
     font-size: 0.75rem;
     margin-top: 0.0625rem;
@@ -151,17 +137,14 @@
     font-weight: 300;
     color: #8999a0;
 }
+/* Стиль даты отправки смс */
 .date-msg-right{
     text-align: right;
     width: 100%;
     font-size: 8pt;
     color: #8999a0;
 }
-#file_load_logo{
-    width: 25px;
-    height: 25px;
-    padding: 5px;
-}
+
 
 .video-label {
     position: absolute;
@@ -234,7 +217,7 @@
     margin-bottom: 1px;
     overflow-x: auto;
     overflow-y: hidden;
-    border-radius: 7px;
+    border-radius: 10px;
     border-top-left-radius: 0px;
     border-top-right-radius: 0px;
     background-color: #1b282e;
@@ -248,11 +231,35 @@
 
 .drop-area-beyond{
     display: flex;
-    max-height: 25px;
-    min-height: 25px;
+    border-radius: 10px;
 }
 
 .frame{
-    margin-bottom: 1%;
+    margin-bottom: 10px;
     margin-top: 2px;
+}
+/* Лого для загрузки файла */
+#file_load_logo{
+    width: 25px;
+    height: 25px;
+    padding: 5px;
+}
+.message-file-size {
+    font-size: 8pt;
+    color: #8999a0;
+    margin-top: 4px;
+}
+.color-darkviolet{
+    color: rgb(192, 125, 223);
+}
+.color-customgray{
+    color: rgb(134, 163, 177);
+}
+
+/******** Ссылки ********/
+.message-link {
+    color: dodgerblue;
+}
+.message-link:visited {
+    color: rgb(192, 125, 223);
 }

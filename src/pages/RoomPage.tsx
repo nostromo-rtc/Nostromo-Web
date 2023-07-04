@@ -12,7 +12,7 @@ import { Link } from "@mui/material";
 import { getToggleFunc } from "../Utils";
 import { VideoLayout } from "../components/Room/VideoLayout";
 import { UserList } from "../components/Room/UserList";
-import { Chat } from "../components/Room/Chat";
+import { Chat } from "../components/Room/RoomChat/Chat";
 
 export enum SoundState
 {
