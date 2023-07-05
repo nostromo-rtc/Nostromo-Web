@@ -1,7 +1,9 @@
-import React, { MouseEvent, ReactNode, useRef, useState } from "react";
+import React, { ReactNode, useRef, useState } from "react";
 
 import "./Header.css";
 import "./VerticalLayout.css";
+
+type DivPointerEventHandler = React.PointerEventHandler<HTMLDivElement>;
 
 interface Params
 {
@@ -18,15 +20,16 @@ export const VerticalLayout: React.FC<Params> = ({ upperContainer, lowerContaine
     const [heightForUpper, setHeightForUpper] = useState("80%");
     const [cursorStyle, setCursorStyle] = useState("default");
 
-    const onPointerDown = (event: MouseEvent) =>
+    const onPointerDown: DivPointerEventHandler = (event) =>
     {
         setMouseY(event.clientY);
         setResizing(true);
         setCursorStyle("ns-resize");
     };
 
-    const onPointerUp = (event: MouseEvent) =>
+    const onPointerUp: DivPointerEventHandler = (event) =>
     {
+        console.log("up");
         if (resizing)
         {
             setResizing(false);
@@ -34,14 +37,32 @@ export const VerticalLayout: React.FC<Params> = ({ upperContainer, lowerContaine
         }
     };
 
-    const onPointerMove = (event: MouseEvent) =>
+    const onPointerEnter: DivPointerEventHandler = (event) =>
+    {
+        // Если все еще включен режим изменения размера layout, значит указатель с зажатым resizeBar вышел за границы layout.
+        // Проверяем при заходе в layout, зажат ли еще указатель (например, левая кнопка мыши) или нет.
+        // Если нет, тогда выключаем режим изменения размера layout.
+        const POINTER_NOT_PRESSED = 0;
+
+        if (resizing && event.pressure === POINTER_NOT_PRESSED)
+        {
+            onPointerUp(event);
+        }
+    };
+
+    const onPointerMove: DivPointerEventHandler = (event) =>
     {
         if (resizing)
         {
             const newY = event.clientY;
             const diff = mouseY - newY;
 
-            const newHeight = upperContainerRef.current!.clientHeight - diff;
+            if (upperContainerRef.current === null)
+            {
+                return;
+            }
+
+            const newHeight = upperContainerRef.current.clientHeight - diff;
             setHeightForUpper(String(newHeight) + "px");
 
             setMouseY(newY);
@@ -53,7 +74,7 @@ export const VerticalLayout: React.FC<Params> = ({ upperContainer, lowerContaine
             style={{ cursor: cursorStyle }}
             onPointerMove={onPointerMove}
             onPointerUp={onPointerUp}
-            onPointerLeave={onPointerUp}
+            onPointerEnter={onPointerEnter}
         >
             <div className="vl-upper-elem" ref={upperContainerRef} style={({ height: heightForUpper, minHeight: upperMinHeight })}>{upperContainer}</div>
             <div className={resizing ? "vl-resizer-bar vl-resizer-bar-activated" : "vl-resizer-bar"} onPointerDown={onPointerDown}></div>
