@@ -228,10 +228,12 @@ export const Chat: React.FC = () =>
                                 </div>
                                 
                                 <div className="flex">
-                                    <label className="btn-send-file-container">
-                                        <img src={load_file} id='file_load_logo' alt="Нажмите для выбора файла." />
-                                        <input type="file" id="file-input" name="file" multiple hidden />
-                                    </label>
+                                    <div className="btn-send-file-container">
+                                        <label>
+                                            <img src={load_file} id='file_load_logo' alt="Нажмите для выбора файла." />
+                                            <input type="file" id="file-input" name="file" multiple hidden />
+                                        </label>
+                                    </div>
                                     <div id="message-textarea"   
                                         data-text="Введите ваше сообщение"
                                         role="textbox" 
