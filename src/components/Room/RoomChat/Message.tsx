@@ -16,6 +16,7 @@ export const FileMessage = (props : FileInfoProps) =>
     return (
         <>
             <div className='message-text'>
+                <div className='placeholder' onClick={()=>console.log("File loaded")}></div>
                 <span className='color-customgray'>Файл: </span>
                 <span className='color-darkviolet'>{props.fileInfo.name}</span>
                 <div className='message-file-size bold'>{(props.fileInfo.size/(1024 * 1024)).toFixed(3)}MB</div>

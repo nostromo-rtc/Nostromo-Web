@@ -5,7 +5,7 @@ import "./App.css";
 // Мои компоненты
 import { Navbar } from "./components/Navbar";
 import { PageRouter } from "./components/PageRouter";
-import { useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 const theme = createTheme({
     typography: {
@@ -15,7 +15,7 @@ const theme = createTheme({
         mode: "dark"
     }
 });
-
+export const DndContext = createContext<boolean>(false);
 const App: React.FC = () =>
 {
     const [showSettings, setShowSettings] = useState<boolean>(false);
@@ -27,22 +27,25 @@ const App: React.FC = () =>
         </div>
     );
 
+    const [context, setContext] = useState(false);
     return (
-        <BrowserRouter>
-            <ThemeProvider theme={theme}>
-                <StyledEngineProvider injectFirst>
-                    <div id="app">
-                        <div id="layer-main" className="overflow-container">
-                            <Navbar openSettings={() => { setShowSettings(true); }} />
-                            <div id="base">
-                                <PageRouter />
+        <DndContext.Provider value={context}>
+            <BrowserRouter>
+                <ThemeProvider theme={theme}>
+                    <StyledEngineProvider injectFirst>
+                        <div onDragEnter={() => { setContext(true); }} onDragExit={() => { setContext(false); }} id="app">
+                            <div id="layer-main" className="overflow-container">
+                                <Navbar openSettings={() => { setShowSettings(true); }} />
+                                <div id="base">
+                                    <PageRouter />
+                                </div>
                             </div>
+                            {showSettings ? settingsLayer : <></>}
                         </div>
-                        {showSettings ? settingsLayer : <></>}
-                    </div>
-                </StyledEngineProvider>
-            </ThemeProvider>
-        </BrowserRouter>
+                    </StyledEngineProvider>
+                </ThemeProvider>
+            </BrowserRouter>
+        </DndContext.Provider>
     );
 };
 

@@ -1,9 +1,13 @@
-import React, { useCallback, useEffect, useState} from 'react';
-
+import React, { useCallback, useContext, useEffect, useRef, useState} from 'react';
+import {ImAttachment} from 'react-icons/im'
+import {MdSend} from 'react-icons/md'
 import "./Chat.css";
 import load_file from "../../../assets/images/file_load.svg";
 import send_msg from "../../../assets/images/send_msg.svg";
 import { FileMessage, TextMessage, Message } from './Message';
+import { TooltipTopBottom } from '../../Tooltip';
+import { Button } from '@mui/material';
+import {DndContext } from '../../../App';
 
 /* для передачи на сервер */
 const formData = new FormData();
@@ -47,16 +51,6 @@ export const Chat: React.FC = () =>
         // TODO: Добавить вывод смс;
     }, [textMsg]);
 
-    /* Перевод файла в область */
-    const DragStartHandler = (e: React.DragEvent<HTMLDivElement>)=>{
-        e.preventDefault()
-        setDrag(true);
-    }
-    /* Перевод файла из области */
-    const DragLeaveHandler = (e: React.DragEvent<HTMLDivElement>)=>{
-        e.preventDefault()
-        setDrag(false);
-    }
     /* После того, как отпустили файл в область */
     const onDropHandler = (e: React.DragEvent<HTMLDivElement>) =>{
         e.preventDefault();
@@ -195,7 +189,7 @@ export const Chat: React.FC = () =>
         this.chat.append(messageDiv);
         this.chat.scrollTop = this.chat.scrollHeight;
     });*/
-    const displayChatMessage = (() =>
+    const sendMsgOnClick = (() =>
     {
         const date = new Date().toLocaleString() + "";
         console.log(textMsg, date);
@@ -205,58 +199,79 @@ export const Chat: React.FC = () =>
         setMsgs(temp);
     });
 
-    return (
-        <>
-            <section id="chat-section">
-                <div className="frame">
-                    {drag
-                        ? <div className='drop-area-before'
-                            onDragStart={e => DragStartHandler(e)}
-                            onDragLeave={e => DragLeaveHandler(e)}
-                            onDragOver={e => DragStartHandler(e)}
-                            onDrop={e => onDropHandler(e)}
-                        >Ператащите сюда файлы, если хотите загрузить их</div>
-                        : <div 
-                            
-                            onDragLeave={e => DragLeaveHandler(e)}
-                            onDragOver={e => DragStartHandler(e)}
-                            >
-                                <div id="chat" aria-readonly>
-                                    {msgs.map(m=>{
-                                        return <Message message={m}/>})
-                                    }
-                                </div>
-                                
-                                <div className="flex">
-                                    <div className="btn-send-file-container">
-                                        <label>
-                                            <img src={load_file} id='file_load_logo' alt="Нажмите для выбора файла." />
-                                            <input type="file" id="file-input" name="file" multiple hidden />
-                                        </label>
-                                    </div>
-                                    <div id="message-textarea"   
-                                        data-text="Введите ваше сообщение"
-                                        role="textbox" 
-                                        aria-multiline="true"
-                                        contentEditable="true"
-                                        onInput={e=>setTextMsg(e.currentTarget.textContent as string)}>
-                                    </div>
-                                    <div className="btn-send-message-container">
-                                        <button
-                                            className="btn-send-message" 
-                                            type='button' 
-                                            accessKey="enter" 
-                                            onClick={displayChatMessage} 
-                                            autoFocus>
-                                            <img src={send_msg} className='send_msg' alt='Отправить'/>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                    }
+    const sendMsgBoxRef = useRef<HTMLDivElement>(null);
+    const sendMsg = (<>
+        <div className="chat-btn-box non-selectable" ref={sendMsgBoxRef}>
+            <TooltipTopBottom id="tooltip-send-btn" title="Отправить">
+                <div className="btn-send-message">
+                    <Button aria-label='Отправить'
+                        onClick={sendMsgOnClick}
+                        className='send-btn-width'
+                    >
+                        <MdSend className='btn-icon'/>
+                    </Button>
+                    <div className="chat-btn-clickable-area non-selectable" onClick={sendMsgOnClick}></div>
                 </div>
-                <div className='drop-area-beyond'></div>
-            </section>
+            </TooltipTopBottom>
+        </div>
+    </>);
+    /*** Кнопка отправки файлов ***/
+    const loadFileOnClick = (e: React.FormEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        console.log(e.target);
+        /*files = [...e.target.files];
+        formData.append('file', files[0]);
+        setInfo(files[0].name + " " + files[0].size/1000 + "KB");*/
+    }
+    const loadFileBoxRef = useRef<HTMLDivElement>(null);
+    const loadFile = (<>
+        <div className="chat-btn-box non-selectable" ref={loadFileBoxRef}>
+            <TooltipTopBottom id="tooltip-send-btn" title="Загрузить">
+                <div className="btn-send-message">
+                    <Button aria-label='Загрузить'
+                        component='label'
+                        className='send-btn-width'>
+                        <label>
+                            <ImAttachment className='btn-icon'/>
+                            <input type="file" id="file-input" onChange={e=>loadFileOnClick(e)} name="file" multiple hidden />
+                        </label>
+                    </Button>
+                    <label className="chat-btn-clickable-area non-selectable" >
+                        <input type="file" id="file-input" onChange={e=>loadFileOnClick(e)} name="file" multiple hidden />
+                    </label>
+                </div>
+            </TooltipTopBottom>
+        </div>
+    </>);
+    const flagDnd = useContext(DndContext);
+    console.log(flagDnd);
+    return (
+        <>{!flagDnd?
+            <div className="drop-area" onDrop={(e)=>onDropHandler(e)}><div className='drop-area-border'>Отпустите файл для загрузки</div></div>
+        :
+            <><div id="chat" aria-readonly>
+                {msgs.map(m=>{
+                    return <Message message={m}/>})
+                }
+            </div>
+            
+            <div className="input-area">
+                <div className="btn-upload-file-container">
+                    {loadFile}
+                </div>
+                <div id="message-textarea"   
+                    data-text="Введите ваше сообщение"
+                    role="textbox" 
+                    aria-multiline="true"
+                    contentEditable="true"
+                    onInput={e=>setTextMsg(e.currentTarget.textContent as string)}>
+                </div>
+                <div className="btn-send-message-container">
+                    {sendMsg}
+                </div>
+            </div>
+            </>
+        }
         </>
     );
 };

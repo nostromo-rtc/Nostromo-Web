@@ -42,3 +42,29 @@ export const Tooltip: React.FC<ModTooltipProps> = (props) =>
             }} classes={{ tooltip: "tooltip", arrow: "tooltip-arrow" }} />
     );
 };
+export const TooltipTopBottom: React.FC<ModTooltipProps> = (props) =>
+{
+    return (
+        <TooltipMui {...props} arrow enterTouchDelay={400} enterDelay={200}
+            TransitionProps={props.TransitionProps ?? { timeout: 150 }}
+            PopperProps={{
+                popperOptions: {
+                    modifiers: [
+                        {
+                            name: 'offset',
+                            options: {
+                                offset: [0, props.offset ?? 12]
+                            },
+                        },
+                        {
+                            name: "flip",
+                            options: {
+                                fallbackPlacements: ["bottom", "top"],
+                                padding: 0,
+                            }
+                        }
+                    ],
+                },
+            }} classes={{ tooltip: "tooltip", arrow: "tooltip-arrow" }} />
+    );
+};

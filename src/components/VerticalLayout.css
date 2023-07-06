@@ -12,6 +12,7 @@
 
 .vl-resizer-bar
 {
+    user-select: none;
     cursor: ns-resize;
     min-height: 4px;
     width: 100%;
