@@ -11,6 +11,8 @@ import { doNotHandleEvent } from "../Utils";
 
 export const AccountMenu: React.FC = () =>
 {
+    const INDEX_OF_FIRST_SYMBOL = 0;
+
     const btnRef = useRef<HTMLButtonElement>(null);
     const [open, setOpen] = useState<boolean>(false);
 
@@ -36,7 +38,7 @@ export const AccountMenu: React.FC = () =>
     return (
         <>
             <Button id="account-menu-btn" ref={btnRef} onClick={handleClick}>
-                <Avatar id="account-menu-btn-avatar" children={username[0]} />
+                <Avatar id="account-menu-btn-avatar" children={username[INDEX_OF_FIRST_SYMBOL]} />
                 {
                     open ? <BiChevronUp id="account-menu-btn-down-icon" />
                         : <BiChevronDown id="account-menu-btn-down-icon" />
@@ -60,7 +62,7 @@ export const AccountMenu: React.FC = () =>
             >
                 <div id="account-menu-header" onClick={doNotHandleEvent} aria-disabled>
                     <div id="account-menu-avatar-container">
-                        <Avatar className="account-menu-avatar" children={username[0]} />
+                        <Avatar className="account-menu-avatar" children={username[INDEX_OF_FIRST_SYMBOL]} />
                     </div>
                     <div id="account-menu-info">
                         <Tooltip title="Ваше имя" placement="left">

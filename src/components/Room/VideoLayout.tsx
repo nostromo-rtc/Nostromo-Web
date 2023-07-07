@@ -14,6 +14,18 @@ export const VideoLayout: React.FC = () =>
 
     const verticalOrientation = useMediaQuery('(orientation: portrait)');
 
+    const {
+        width: layoutWidth,
+        height: layoutHeight,
+        ref: layoutRef
+    } = useResizeDetector<HTMLDivElement>({
+        onResize: () =>
+        {
+            //console.debug("[VideoLayout] video-layout size: ", layoutWidth, layoutHeight);
+            recalculateVideoItemSize();
+        }
+    });
+
     // Типо загрузили список с сервера.
     useEffect(() =>
     {
@@ -22,7 +34,7 @@ export const VideoLayout: React.FC = () =>
         setVideoList((prev) =>
         {
             const arr: string[] = [];
-            for (let i = 0; i < 0; ++i)
+            for (let i = 0; i < arr.length; ++i)
             {
                 arr[i] = `${i}`;
             }
@@ -38,7 +50,7 @@ export const VideoLayout: React.FC = () =>
 
     const calcRowsAndColumns = useCallback(() =>
     {
-        console.debug("[VideoLayout] Calculating rows and columns.");
+        //console.debug("[VideoLayout] Calculating rows and columns.");
 
         let rows = 1;
         let col = 1;
@@ -58,17 +70,9 @@ export const VideoLayout: React.FC = () =>
         return { rows, col };
     }, [videoList, verticalOrientation]);
 
-    const { width: layoutWidth, height: layoutHeight, ref } = useResizeDetector<HTMLDivElement>({
-        onResize: () =>
-        {
-            console.debug("[VideoLayout] video-layout size: ", layoutWidth, layoutHeight);
-            recalculateVideoItemSize();
-        }
-    });
-
     const recalculateVideoItemSize = useCallback(() =>
     {
-        if (layoutWidth && layoutHeight)
+        if ((layoutWidth != null) && (layoutHeight != null))
         {
             const { rows, col } = calcRowsAndColumns();
 
@@ -78,17 +82,22 @@ export const VideoLayout: React.FC = () =>
             // к этому количеству добавляем еще 4 отступа (двойной промежуток относительно промежутка между item)
             // для границ самого VideoLayout, в которых располагаются videoItem'ы
             // например двойной отступ для левой границы и двойной отступ для правой границы контейнера VideoLayout.
+            // Таким образом получаем: 3.
+            const offsetFactorForGaps = 3;
 
-            const widthOffset = (col - 1 + 4) * marginValue;
-            const heightOffset = (rows - 1 + 4) * marginValue;
+            const widthOffset = (col + offsetFactorForGaps) * marginValue;
+            const heightOffset = (rows + offsetFactorForGaps) * marginValue;
 
-            console.debug("widthOffset / heightOffset", widthOffset, heightOffset);
+            //console.debug("widthOffset / heightOffset", widthOffset, heightOffset);
+
+            const aspectRatioForWidth = 16;
+            const aspectRatioForHeight = 9;
 
             const elemWidthByCol = (layoutWidth - widthOffset) / col;
-            const elemHeightByCol = elemWidthByCol * 9 / 16;
+            const elemHeightByCol = elemWidthByCol * aspectRatioForHeight / aspectRatioForWidth;
 
             const elemHeightByRow = (layoutHeight - heightOffset) / rows;
-            const elemWidthByRow = elemHeightByRow * 16 / 9;
+            const elemWidthByRow = elemHeightByRow * aspectRatioForWidth / aspectRatioForHeight;
 
             const newWidth = Math.min(elemWidthByCol, elemWidthByRow);
             const newHeight = Math.min(elemHeightByCol, elemHeightByRow);
@@ -109,14 +118,15 @@ export const VideoLayout: React.FC = () =>
     }, [videoList, recalculateVideoItemSize]);
 
     return (
-        <div id="video-layout" ref={ref}>
+        <div id="video-layout" ref={layoutRef}>
             <button className="debug-btn" onClick={() => { setVideoList(prev => [...prev, "new"]); }}>+1</button>
             <button className="debug-btn-2" onClick={() =>
             {
                 setVideoList((prev) =>
                 {
                     const arr: string[] = [];
-                    for (let i = 0; i < 10; ++i)
+                    const TEN = 10;
+                    for (let i = 0; i < TEN; ++i)
                     {
                         arr[i] = `${i}`;
                     }

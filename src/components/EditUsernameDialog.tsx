@@ -1,5 +1,8 @@
 import { Button, Dialog, DialogTitle, DialogContent, DialogContentText, TextField, DialogActions } from "@mui/material";
 import React, { useState } from "react";
+import { isEmptyString } from "../Utils";
+
+type ButtonMouseEventHandler = React.MouseEventHandler<HTMLButtonElement>;
 
 interface EditUsernameDialogProps
 {
@@ -11,22 +14,18 @@ interface EditUsernameDialogProps
 
 export const EditUsernameDialog: React.FC<EditUsernameDialogProps> = ({ open, prevName, setOpen, setUsername }) =>
 {
-    const [newName, setNewName] = useState<string>();
+    const [newName, setNewName] = useState<string>("");
 
-    const handleClose = () =>
+    const handleClose: ButtonMouseEventHandler = () =>
     {
         setOpen(false);
     };
 
-    const handleSave = () =>
+    const handleSave = (): void =>
     {
-        const trimmedName = newName?.trim();
+        const trimmedName = newName.trim();
 
-        if (!newName
-            || !trimmedName
-            || trimmedName?.length === 0
-            || prevName === newName
-        )
+        if (isEmptyString(trimmedName) || prevName === newName)
         {
             return;
         }

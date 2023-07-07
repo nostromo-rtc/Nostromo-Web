@@ -16,7 +16,7 @@ export const RoomAlert: React.FC<RoomAlertProps> = ({ isOpen, onCloseAction, sev
     return (
         <Collapse in={isOpen} unmountOnExit>
             <Alert severity={severity}
-                onClose={(ev) => onCloseAction(false)}
+                onClose={(ev) => { onCloseAction(false); }}
                 className="room-alert"
             >
                 {children}

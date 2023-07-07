@@ -56,7 +56,7 @@ export const RoomActionPanel: React.FC<RoomActionPanelProps> = ({
     const isSoundEnabled = (soundBtnInfo.state === SoundState.ENABLED);
     const soundBtnMsg = isSoundEnabled ? "Выключить звуки собеседников" : "Включить звуки собеседников";
 
-    const soundBtnOnClick = () =>
+    const soundBtnOnClick = (): void =>
     {
         soundBtnInfo.setState((prevState) =>
         {
@@ -93,7 +93,7 @@ export const RoomActionPanel: React.FC<RoomActionPanelProps> = ({
     const micBtnBoxRef = useRef<HTMLDivElement>(null);
     const micBtnMsg = isMicWorking ? "Выключить микрофон" : "Включить микрофон";
 
-    const micBtnOnClick = () =>
+    const micBtnOnClick = (): void =>
     {
         micBtnInfo.setState((prevState) =>
         {
@@ -214,7 +214,6 @@ export const RoomActionPanel: React.FC<RoomActionPanelProps> = ({
     </>);
 
     /// ------------------------------------------ ///
-
 
     return (
         <div id="action-panel-container">

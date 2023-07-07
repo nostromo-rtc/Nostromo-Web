@@ -15,15 +15,15 @@ import { VideoLayout } from "../components/Room/VideoLayout";
 export enum SoundState
 {
     DISABLED = 0,
-    DISABLED_WITH_ALERT,
-    ENABLED
+    DISABLED_WITH_ALERT = 1,
+    ENABLED = 2
 }
 
 export enum MicState
 {
     DISABLED = 0,
-    PAUSED,
-    WORKING
+    PAUSED = 1,
+    WORKING = 2
 }
 
 export interface DeviceListItem
@@ -147,7 +147,7 @@ export const RoomPage: React.FC = () =>
                 {isChatHidden ? callContainer : <VerticalLayout
                     upperContainer={callContainer}
                     lowerContainer={chatContainer}
-                    upperMinHeight="320px" />}
+                    upperMinHeight="200px" />}
                 {isUserListHidden ? <></> : userListContainer}
             </div>
         </div>

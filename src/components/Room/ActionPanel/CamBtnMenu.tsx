@@ -21,7 +21,7 @@ interface CamBtnMenuProps
 export const CamBtnMenu: React.FC<CamBtnMenuProps> = ({ anchorRef, open, setOpen, camList, transitionDuration }) =>
 {
     //TODO: вытащить selectedCam выше в RoomActionPanel -> RoomPage
-    
+
     const [selectedCam, setSelectedCam] = useState<string>("testCamDeviceId1");
 
     const [fps, setFps] = useState<string>("default");
@@ -35,20 +35,20 @@ export const CamBtnMenu: React.FC<CamBtnMenuProps> = ({ anchorRef, open, setOpen
         { width: 320, height: 240, name: "240p" }
     ];
 
-    const resolutionListToListItems = (resolution: ResolutionObject, index: number) =>
+    const resolutionListToListItems = (resObj: ResolutionObject, index: number): JSX.Element =>
     {
-        const resolutionStr = `${resolution.width}⨯${resolution.height}`;
+        const resolutionStr = `${resObj.width}⨯${resObj.height}`;
 
         return (
             <MenuItem value={resolutionStr} key={index}>
                 <span className="v-align-middle">{resolutionStr}</span>
                 <div className="horizontal-expander" />
-                <span className="chip-resolution">{resolution.name}</span>
+                <span className="chip-resolution">{resObj.name}</span>
             </MenuItem>
         );
     };
 
-    const camListToListItems = (cam: DeviceListItem, index: number) =>
+    const camListToListItems = (cam: DeviceListItem, index: number): JSX.Element =>
     {
         const isSelected = selectedCam === cam.deviceId;
 
@@ -57,18 +57,18 @@ export const CamBtnMenu: React.FC<CamBtnMenuProps> = ({ anchorRef, open, setOpen
                 isSelected={isSelected}
                 text={cam.name}
                 key={index}
-                onClick={() => setSelectedCam(cam.deviceId)}
+                onClick={() => { setSelectedCam(cam.deviceId); }}
             />
         );
     };
 
-    const handleSelectResolution = (ev: SelectChangeEvent<string>) =>
+    const handleSelectResolution = (ev: SelectChangeEvent): void =>
     {
         setResolution(ev.target.value);
         console.log(ev.target.value);
     };
 
-    const selectResolution = () =>
+    const SelectResolution: React.FC = () =>
     {
         return (
             <MenuSelect
@@ -84,13 +84,13 @@ export const CamBtnMenu: React.FC<CamBtnMenuProps> = ({ anchorRef, open, setOpen
         );
     };
 
-    const handleSelectFps = (ev: SelectChangeEvent<string>) =>
+    const handleSelectFps = (ev: SelectChangeEvent): void =>
     {
         setFps(ev.target.value);
         console.log(ev.target.value);
     };
 
-    const selectFps = () =>
+    const SelectFps: React.FC = () =>
     {
         return (
             <MenuSelect
@@ -114,7 +114,7 @@ export const CamBtnMenu: React.FC<CamBtnMenuProps> = ({ anchorRef, open, setOpen
             id="toggle-cam-btn-menu"
             anchorRef={anchorRef}
             open={open}
-            onClose={() => setOpen(false)}
+            onClose={() => { setOpen(false); }}
             transitionDuration={transitionDuration}
         >
             <MenuSectionLabel text="Выбор камеры" />
@@ -123,12 +123,12 @@ export const CamBtnMenu: React.FC<CamBtnMenuProps> = ({ anchorRef, open, setOpen
             <Tooltip id="tooltip-select-cam-resolution" title={"Разрешение изображения в пикселях"} offset={2} placement="right">
                 <div className="inline"><MenuSectionLabel text="Настройка качества" withTooltip /></div>
             </Tooltip>
-            {selectResolution()}
+            <SelectResolution />
             <Divider className="menu-divider" />
             <Tooltip id="tooltip-select-cam-fps" title={"Количество кадров в секунду"} offset={2} placement="right">
                 <div className="inline"><MenuSectionLabel text="Настройка плавности (FPS)" withTooltip /></div>
             </Tooltip>
-            {selectFps()}
+            <SelectFps />
         </Menu>
     );
 };

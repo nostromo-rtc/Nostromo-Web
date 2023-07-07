@@ -20,6 +20,7 @@
     border-radius: 8px;
     box-shadow: 0px 2px 10px -1px rgba(0, 0, 0, 0.2);
     width: 480px;
+    box-sizing: border-box;
 }
 
 #pass
@@ -33,7 +34,7 @@
     box-shadow: 0px 2px 10px -1px rgba(0, 0, 0, 0.2);
 }
 
-@media (width <=600px)
+@media (width < 600px)
 {
     #auth
     {
@@ -42,7 +43,7 @@
     }
 }
 
-@media (height <=600px)
+@media (height < 600px)
 {
     #auth
     {

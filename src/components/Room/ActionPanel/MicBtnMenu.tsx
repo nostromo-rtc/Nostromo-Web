@@ -18,13 +18,21 @@ interface MicBtnMenuProps
     transitionDuration: number;
 }
 
-export const MicBtnMenu: React.FC<MicBtnMenuProps> = ({ anchorRef, open, setOpen, micEnabled, disableMic, micList, transitionDuration }) =>
+export const MicBtnMenu: React.FC<MicBtnMenuProps> = ({
+    anchorRef,
+    open,
+    setOpen,
+    micEnabled,
+    disableMic,
+    micList,
+    transitionDuration
+}) =>
 {
     //TODO: вытащить selectedMic выше в RoomActionPanel -> RoomPage
-    
+
     const [selectedMic, setSelectedMic] = useState<string>("testMicDeviceId1");
 
-    const micListToListItems = (mic: DeviceListItem, index: number) =>
+    const micListToListItems = (mic: DeviceListItem, index: number): JSX.Element =>
     {
         const isSelected = selectedMic === mic.deviceId;
 
@@ -33,8 +41,8 @@ export const MicBtnMenu: React.FC<MicBtnMenuProps> = ({ anchorRef, open, setOpen
                 isSelected={isSelected}
                 text={mic.name}
                 key={index}
-                onClick={() => setSelectedMic(mic.deviceId)}
-             />
+                onClick={() => { setSelectedMic(mic.deviceId); }}
+            />
         );
     };
 
@@ -43,7 +51,7 @@ export const MicBtnMenu: React.FC<MicBtnMenuProps> = ({ anchorRef, open, setOpen
             id="toggle-mic-btn-menu"
             anchorRef={anchorRef}
             open={open}
-            onClose={() => setOpen(false)}
+            onClose={() => { setOpen(false); }}
             transitionDuration={transitionDuration}
         >
             <MenuSectionLabel text="Выбор микрофона" />

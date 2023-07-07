@@ -9,6 +9,9 @@ interface ModTooltipProps extends TooltipProps
 
 export const Tooltip: React.FC<ModTooltipProps> = (props) =>
 {
+    const POPPER_OFFSET_SKIDDING = 0;
+    const POPPER_OFFSET_DISTANCE = 12;
+
     return (
         <TooltipMui {...props} arrow enterTouchDelay={400} enterDelay={200}
             TransitionProps={props.TransitionProps ?? { timeout: 150 }}
@@ -18,7 +21,7 @@ export const Tooltip: React.FC<ModTooltipProps> = (props) =>
                         {
                             name: 'offset',
                             options: {
-                                offset: [0, props.offset ?? 12]
+                                offset: [POPPER_OFFSET_SKIDDING, props.offset ?? POPPER_OFFSET_DISTANCE]
                             },
                         },
                         {

@@ -30,7 +30,7 @@ export const RoomHeaderToolbar: React.FC<RoomHeaderToolbarProps> = ({ toggleUser
                         ? "toolbar-btn toolbar-btn-inactive"
                         : "toolbar-btn toolbar-btn-active"
                 }
-                onClick={() => toggleChatBtnInfo.setIsChatHidden((prevState) => !prevState)}>
+                onClick={() => { toggleChatBtnInfo.setIsChatHidden((prevState) => !prevState); }}>
                 <BsChatTextFill />
             </Button>
         </Tooltip>;
@@ -43,7 +43,12 @@ export const RoomHeaderToolbar: React.FC<RoomHeaderToolbarProps> = ({ toggleUser
                         ? "toolbar-btn toolbar-btn-inactive"
                         : "toolbar-btn toolbar-btn-active"
                 }
-                onClick={() => toggleUserListBtnInfo.setIsUserListHidden((prevState) => !prevState)}>
+                onClick={() =>
+                {
+                    toggleUserListBtnInfo.setIsUserListHidden(
+                        (prevState) => !prevState
+                    );
+                }}>
                 <BsPeopleFill />
             </Button>
         </Tooltip>;

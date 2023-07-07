@@ -15,7 +15,9 @@ export const VerticalLayout: React.FC<Params> = ({ upperContainer, lowerContaine
 {
     const upperContainerRef = useRef<HTMLDivElement>(null);
 
-    const [mouseY, setMouseY] = useState(0);
+    const ZERO_VALUE_PX = 0;
+
+    const [mouseY, setMouseY] = useState(ZERO_VALUE_PX);
     const [resizing, setResizing] = useState(false);
     const [heightForUpper, setHeightForUpper] = useState("80%");
     const [cursorStyle, setCursorStyle] = useState("default");
@@ -29,7 +31,6 @@ export const VerticalLayout: React.FC<Params> = ({ upperContainer, lowerContaine
 
     const onPointerUp: DivPointerEventHandler = (event) =>
     {
-        console.log("up");
         if (resizing)
         {
             setResizing(false);
@@ -78,7 +79,7 @@ export const VerticalLayout: React.FC<Params> = ({ upperContainer, lowerContaine
         >
             <div className="vl-upper-elem" ref={upperContainerRef} style={({ height: heightForUpper, minHeight: upperMinHeight })}>{upperContainer}</div>
             <div className={resizing ? "vl-resizer-bar vl-resizer-bar-activated" : "vl-resizer-bar"} onPointerDown={onPointerDown}></div>
-            <div className="vl-lower-elem" style={({ height: `calc(100% - ${heightForUpper} - 10px)` })}>{lowerContainer}</div>
+            <div className="vl-lower-elem" /*style={({ height: `calc(100% - ${heightForUpper} - 10px)` })}*/>{lowerContainer}</div>
         </div>
     );
 };

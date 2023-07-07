@@ -31,26 +31,26 @@ export const DisplayBtnMenu: React.FC<DisplayBtnMenuProps> = ({ anchorRef, open,
         { width: 256, height: 144, name: "144p" }
     ];
 
-    const resolutionListToListItems = (resolution: ResolutionObject, index: number) =>
+    const resolutionListToListItems = (resObj: ResolutionObject, index: number): JSX.Element =>
     {
-        const resolutionStr = `${resolution.width}⨯${resolution.height}`;
+        const resolutionStr = `${resObj.width}⨯${resObj.height}`;
 
         return (
             <MenuItem value={resolutionStr} key={index}>
                 <span className="v-align-middle">{resolutionStr}</span>
                 <div className="horizontal-expander" />
-                <span className="chip-resolution">{resolution.name}</span>
+                <span className="chip-resolution">{resObj.name}</span>
             </MenuItem>
         );
     };
 
-    const handleSelectResolution = (ev: SelectChangeEvent<string>) =>
+    const handleSelectResolution = (ev: SelectChangeEvent): void =>
     {
         setResolution(ev.target.value);
         console.log(ev.target.value);
     };
 
-    const selectResolution = () =>
+    const SelectResolution: React.FC = () =>
     {
         return (
             <MenuSelect
@@ -66,13 +66,13 @@ export const DisplayBtnMenu: React.FC<DisplayBtnMenuProps> = ({ anchorRef, open,
         );
     };
 
-    const handleSelectFps = (ev: SelectChangeEvent<string>) =>
+    const handleSelectFps = (ev: SelectChangeEvent): void =>
     {
         setFps(ev.target.value);
         console.log(ev.target.value);
     };
 
-    const selectFps = () =>
+    const SelectFps: React.FC = () =>
     {
         return (
             <MenuSelect
@@ -96,18 +96,18 @@ export const DisplayBtnMenu: React.FC<DisplayBtnMenuProps> = ({ anchorRef, open,
             id="toggle-display-btn-menu"
             anchorRef={anchorRef}
             open={open}
-            onClose={() => setOpen(false)}
+            onClose={() => { setOpen(false); }}
             transitionDuration={transitionDuration}
         >
             <Tooltip id="tooltip-select-display-resolution" title={"Разрешение изображения в пикселях"} offset={2} placement="right">
                 <div className="inline"><MenuSectionLabel text="Настройка качества" withTooltip /></div>
             </Tooltip>
-            {selectResolution()}
+            <SelectResolution />
             <Divider className="menu-divider" />
             <Tooltip id="tooltip-select-display-fps" title={"Количество кадров в секунду"} offset={2} placement="right">
                 <div className="inline"><MenuSectionLabel text="Настройка плавности (FPS)" withTooltip /></div>
             </Tooltip>
-            {selectFps()}
+            <SelectFps />
         </Menu>
     );
 };

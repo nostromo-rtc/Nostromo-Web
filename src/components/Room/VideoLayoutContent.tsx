@@ -16,14 +16,16 @@ interface VideoLayoutContentProps
 
 const VideoLayoutContent: React.FC<VideoLayoutContentProps> = ({ videoItemSize, videoList, calcRowsAndColumns }) =>
 {
-    if (videoItemSize.width <= 0 || videoItemSize.height <= 0)
+    const ZERO_VALUE_PX = 0;
+
+    if (videoItemSize.width <= ZERO_VALUE_PX || videoItemSize.height <= ZERO_VALUE_PX)
     {
         return null;
     }
 
     const { col } = calcRowsAndColumns();
 
-    console.debug("[VideoLayout] Render videos", videoItemSize.width, videoItemSize.height);
+    //console.debug("[VideoLayout] Render videos", videoItemSize.width, videoItemSize.height);
 
     const matrix = [];
     for (let i = 0; i < videoList.length; i = i + col)
@@ -31,7 +33,7 @@ const VideoLayoutContent: React.FC<VideoLayoutContentProps> = ({ videoItemSize, 
         matrix.push(videoList.slice(i, i + col));
     }
 
-    const rowToMap = (val: string, index: number) =>
+    const rowToMap = (val: string, index: number): JSX.Element =>
     {
         return (
             <div className="video-layout-item" key={index} style={{
@@ -45,7 +47,7 @@ const VideoLayoutContent: React.FC<VideoLayoutContentProps> = ({ videoItemSize, 
         );
     };
 
-    const matrixToMap = (row: string[], index: number) =>
+    const matrixToMap = (row: string[], index: number): JSX.Element =>
     {
         return (
             <div className="video-layout-row" key={index}>

@@ -4,6 +4,7 @@
     font-size: 0.9rem;
     user-select: none;
     -webkit-user-select: none;
+    -moz-user-select: none;
     border: none;
     touch-action: manipulation;
     box-shadow: 0px 4px 4px -4px rgba(0, 0, 0, 0.85);
@@ -17,7 +18,7 @@
     margin: 0;
 }
 
-@media (width <=600px) or (height <=600px)
+@media (width < 600px) or (height < 600px)
 {
     .tooltip
     {

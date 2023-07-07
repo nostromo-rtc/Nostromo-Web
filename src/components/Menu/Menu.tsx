@@ -4,6 +4,8 @@ import React, { ReactNode } from "react";
 import { doNotHandleEvent } from "../../Utils";
 import "./Menu.css";
 
+type UListKeyboardEventHandler = React.KeyboardEventHandler<HTMLUListElement>;
+
 interface MenuProps
 {
     id?: string;
@@ -14,11 +16,19 @@ interface MenuProps
     transitionDuration: number;
 }
 
+// TODO: пофиксить во вложенном Select переключение на стрелки
+// Нужно вынести все что не MenuItem из под MenuList.
 export const Menu: React.FC<MenuProps> = ({ id, anchorRef, open, onClose, children, transitionDuration }) =>
 {
-    const handleClose = (ev: Event | React.SyntheticEvent) =>
+    const POPPER_OFFSET_SKIDDING = 0;
+    const POPPER_OFFSET_DISTANCE = 8;
+
+    const handleClose = (ev: Event | React.SyntheticEvent): void =>
     {
-        if (anchorRef.current?.contains(ev.target as HTMLElement))
+        // Не закрывать меню при нажатии на область, к которой привязано контекстное меню
+        // Например, это позволит захватывать веб-камеру при нажатии на кнопку захвата,
+        // не закрывая при этом контекстное меню веб-камеры.
+        if ((anchorRef.current?.contains(ev.target as HTMLElement)) === true)
         {
             return;
         }
@@ -26,14 +36,9 @@ export const Menu: React.FC<MenuProps> = ({ id, anchorRef, open, onClose, childr
         onClose();
     };
 
-    const handleListKeyDown = (ev: React.KeyboardEvent) =>
+    const handleListKeyDown: UListKeyboardEventHandler = (ev) =>
     {
-        if (ev.key === "Tab")
-        {
-            ev.preventDefault();
-            onClose();
-        }
-        else if (ev.key === "Escape")
+        if (ev.key === "Escape")
         {
             onClose();
         }
@@ -53,39 +58,41 @@ export const Menu: React.FC<MenuProps> = ({ id, anchorRef, open, onClose, childr
                         {
                             name: 'offset',
                             options: {
-                                offset: [0, 8]
+                                offset: [POPPER_OFFSET_SKIDDING, POPPER_OFFSET_DISTANCE]
                             },
                         }
                     ],
                 }}
             >
-                {({ TransitionProps, placement }) => (
-                    <Grow
-                        {...TransitionProps}
-                        style={{
-                            transformOrigin:
-                                placement === 'bottom' ? 'center top' : 'center bottom',
-                        }}
-                        timeout={transitionDuration}
-                    >
-                        <Paper>
-                            <ClickAwayListener
-                                onClickAway={handleClose}
-                                mouseEvent="onPointerDown"
-                                touchEvent={false}
-                            >
-                                <MenuList
-                                    autoFocus={open}
-                                    onKeyDown={handleListKeyDown}
-                                    className="menu-list small-text"
-                                    onClick={doNotHandleEvent}
+                {   // eslint-disable-next-line @typescript-eslint/naming-convention
+                    ({ TransitionProps, placement }) => (
+                        <Grow
+                            {...TransitionProps}
+                            style={{
+                                transformOrigin:
+                                    placement === 'bottom' ? 'center top' : 'center bottom',
+                            }}
+                            timeout={transitionDuration}
+                        >
+                            <Paper>
+                                <ClickAwayListener
+                                    onClickAway={handleClose}
+                                    mouseEvent="onPointerDown"
+                                    touchEvent={false}
                                 >
-                                    {children}
-                                </MenuList>
-                            </ClickAwayListener>
-                        </Paper>
-                    </Grow>
-                )}
+                                    <MenuList
+                                        autoFocus={open}
+                                        onKeyDown={handleListKeyDown}
+                                        className="menu-list small-text"
+                                        onClick={doNotHandleEvent}
+                                    >
+                                        {children}
+                                    </MenuList>
+                                </ClickAwayListener>
+                            </Paper>
+                        </Grow>
+                    )
+                }
             </Popper>
         </>
     );

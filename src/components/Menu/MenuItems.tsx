@@ -1,7 +1,7 @@
-import { Divider, FormControl, MenuItem, MenuItemProps, Select, SelectProps } from "@mui/material";
+import { FormControl, MenuItem, MenuItemProps, Select, SelectProps } from "@mui/material";
 import { ReactElement, ReactNode } from "react";
 
-import { MdInfo, MdInfoOutline, MdRadioButtonChecked, MdRadioButtonUnchecked } from "react-icons/md";
+import { MdInfoOutline, MdRadioButtonChecked, MdRadioButtonUnchecked } from "react-icons/md";
 import "./MenuItems.css";
 
 interface MenuItemWithIconProps extends MenuItemProps
@@ -12,7 +12,12 @@ interface MenuItemWithIconProps extends MenuItemProps
     endIcon?: boolean;
 }
 
-export const MenuItemWithIcon: React.FC<MenuItemWithIconProps> = ({ icon, text, semiBold, endIcon, ...props }) =>
+export const MenuItemWithIcon: React.FC<MenuItemWithIconProps> = ({
+    icon,
+    text,
+    semiBold = false,
+    endIcon = false,
+    ...props }) =>
 {
     const menuItemIcon = (
         <div className="menu-item-icon">
@@ -41,7 +46,7 @@ interface MenuSectionLabelProps
     withTooltip?: boolean;
 }
 
-export const MenuSectionLabel: React.FC<MenuSectionLabelProps> = ({ text, withTooltip }) =>
+export const MenuSectionLabel: React.FC<MenuSectionLabelProps> = ({ text, withTooltip = false }) =>
 {
     return (
         <span className="menu-section-label text-wrap non-selectable">
@@ -82,7 +87,14 @@ interface MenuSelectProps<T = unknown>
     variant?: SelectProps<T>["variant"];
 }
 
-export const MenuSelect: React.FC<MenuSelectProps<string>> = ({ id, value, onChange, children, transitionDuration, variant = "standard" }) =>
+export const MenuSelect: React.FC<MenuSelectProps<string>> = ({
+    id,
+    value,
+    onChange,
+    children,
+    transitionDuration,
+    variant = "standard"
+}) =>
 {
     return (
         <div className="menu-select">
@@ -93,7 +105,7 @@ export const MenuSelect: React.FC<MenuSelectProps<string>> = ({ id, value, onCha
                     onChange={onChange}
                     variant={variant}
                     classes={{ select: "menu-select-input" }}
-                    MenuProps={{transitionDuration: transitionDuration}}
+                    MenuProps={{ transitionDuration: transitionDuration }}
                 >
                     {children}
                 </Select>
