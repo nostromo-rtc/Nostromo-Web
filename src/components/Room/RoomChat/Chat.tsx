@@ -1,17 +1,11 @@
-import React, { useCallback, useContext, useEffect, useRef, useState} from 'react';
+import React, { useContext, useEffect, useRef, useState} from 'react';
 import {ImAttachment} from 'react-icons/im'
 import {MdSend} from 'react-icons/md'
 import "./Chat.css";
-import load_file from "../../../assets/images/file_load.svg";
-import send_msg from "../../../assets/images/send_msg.svg";
-import { FileMessage, TextMessage, Message } from './Message';
+import { Message } from './Message';
 import { TooltipTopBottom } from '../../Tooltip';
 import { Button } from '@mui/material';
 import {DndContext } from '../../../App';
-
-/* для передачи на сервер */
-const formData = new FormData();
-let files = [];
 
 /** Информация о файле в чате. */
 interface ChatFileInfo
@@ -29,12 +23,16 @@ interface ChatMessage
     content: string | ChatFileInfo;
 }
 const temp: ChatMessage[] = [];
+/* для передачи на сервер */
+const formData = new FormData();
+let files = [];
 export const Chat: React.FC = () =>
 {
     /* Хук для перехвата сообщения */
     const [textMsg, setTextMsg] = useState("");
     /* Хук для drag-n-drop */
-    const [drag, setDrag] = useState(false);
+    /* Хук для перехвата изменения длины строки ввода (placeholder)*/
+    const [checkPlaceH, setCheckPlaceH] = useState(true);
     const [info, setInfo] = useState("");
     const [msgs, setMsgs] = useState<ChatMessage[]>([
         {userId: "155sadjofdgknsdfk3", type: "text", datetime: (new Date().getTime())/2, content: "Hello, colleagues! "
@@ -50,19 +48,6 @@ export const Chat: React.FC = () =>
     useEffect(() => {   
         // TODO: Добавить вывод смс;
     }, [textMsg]);
-
-    /* После того, как отпустили файл в область */
-    const onDropHandler = (e: React.DragEvent<HTMLDivElement>) =>{
-        e.preventDefault();
-        files = [...e.dataTransfer.files]
-        formData.append('file', files[0]);
-        setInfo(files[0].name + " " + (files[0].size/1000).toString() + "KB");
-        console.log(files[0].name + " " + (files[0].size/1000).toString() + "KB");
-        setDrag(false);
-    }
-
-    
-    
 
     /*const displayChatMessage = (() =>
     {
@@ -192,10 +177,10 @@ export const Chat: React.FC = () =>
     const sendMsgOnClick = (() =>
     {
         const date = new Date().toLocaleString() + "";
-        console.log(textMsg, date);
+        const chatElement : HTMLElement = document.getElementById("chat") as HTMLElement;
+        chatElement.scrollTop = chatElement.scrollHeight;
         
-        
-        temp.push({userId: "1bvcbjofg23fxcvds", type: "text", datetime: new Date().getTime(), content: textMsg});
+        temp.push({userId: "1bvcbjofg23fxcvds", type: "text", datetime: new Date().getTime(), content: textMsg.trim()});
         setMsgs(temp);
     });
 
@@ -207,6 +192,7 @@ export const Chat: React.FC = () =>
                     <Button aria-label='Отправить'
                         onClick={sendMsgOnClick}
                         className='chat-btn-width'
+                        accessKey='enter'
                     >
                         <MdSend className='btn-icon'/>
                     </Button>
@@ -218,10 +204,32 @@ export const Chat: React.FC = () =>
     /*** Кнопка отправки файлов ***/
     const loadFileOnClick = (e: React.FormEvent<HTMLDivElement>) => {
         e.preventDefault();
-        console.log(e.target);
         /*files = [...e.target.files];
         formData.append('file', files[0]);
         setInfo(files[0].name + " " + files[0].size/1000 + "KB");*/
+    }
+    const InputHandler = (e: React.KeyboardEvent<HTMLDivElement>) => {
+        if (!e.shiftKey && e.code == 'Enter'){
+            e.preventDefault();
+            sendMsgOnClick();
+        }
+    }
+    // проверка на выставление placeholder-а для поля ввода
+    const checkPlaceholder = (text : string) => {
+        if(!text.length)
+            setCheckPlaceH(true);
+        else
+            setCheckPlaceH(false);
+    }
+    // Вставка файла через ctrl+v
+    const pasteFile =(e : React.ClipboardEvent<HTMLDivElement>)=>{
+        e.preventDefault();
+        //console.log(e.clipboardData.getData("image"));
+        files = [...e.clipboardData.files];
+        console.log(files);
+        formData.append('file', files[0]);
+        setInfo(files[0].name + " " + String(files[0].size/1000) + "KB");
+        console.log(info);
     }
     const loadFileBoxRef = useRef<HTMLDivElement>(null);
     const loadFile = (<>
@@ -244,11 +252,7 @@ export const Chat: React.FC = () =>
         </div>
     </>);
     const flagDnd = useContext(DndContext);
-    console.log(flagDnd);
     return (
-        <>{flagDnd?
-            <div className="drop-area" onDrop={(e)=>onDropHandler(e)}><div className='drop-area-border'>Отпустите файл для загрузки</div></div>
-        :
             <><div id="chat" aria-readonly>
                 {msgs.map(m=>{
                     return <Message key={m.userId + m.datetime.toString()} message={m}/>})
@@ -259,19 +263,27 @@ export const Chat: React.FC = () =>
                 <div className="btn-container btn-upload-file-container">
                     {loadFile}
                 </div>
+                <div className='up-placeholder' 
+                    onClick={e=>{setCheckPlaceH(false);
+                    const element = document.getElementById("message-textarea") as HTMLElement;
+                    element.focus()}}>
                 <div id="message-textarea"   
-                    data-text="Введите ваше сообщение"
                     role="textbox" 
+                    onKeyDown={e=>{InputHandler(e)}}
                     aria-multiline="true"
                     contentEditable="true"
-                    onInput={e=>setTextMsg(e.currentTarget.textContent as string)}>
+                    title='dasdsasda'
+                    onBlur={e=>checkPlaceholder(e.currentTarget.textContent as string)}
+                    onPaste={e=>pasteFile(e)}
+                    onInput={e=>{const tmp : HTMLDivElement = e.currentTarget; 
+                                const text : string = tmp.innerText;
+                                setTextMsg(text) }}>
+                </div>{checkPlaceH? <div className='down-placeholder'>Напишите сообщение...</div> : <></> }
                 </div>
                 <div className="btn-container btn-send-message-container">
                     {sendMsg}
                 </div>
             </div>
-            </>
-        }
         </>
     );
 };

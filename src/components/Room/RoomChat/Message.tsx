@@ -40,8 +40,9 @@ export const TextMessage = (props : contentProps) =>
                     const ref = w.startsWith("http") ? w : `http://${w}`;
                     return <a className="message-link" href={ref} target="_blank" rel="noopener noreferrer">{w}</a>
                 }
-                else
+                else{
                     return <>{w} </>
+                }
             })}
         </>
     );

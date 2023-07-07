@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Header } from "../components/Header";
 
 import "../App.css";
@@ -13,6 +13,8 @@ import { getToggleFunc } from "../Utils";
 import { VideoLayout } from "../components/Room/VideoLayout";
 import { UserList } from "../components/Room/UserList";
 import { Chat } from "../components/Room/RoomChat/Chat";
+import { DndContext } from "../App";
+import { GiFiles } from "react-icons/gi";
 
 export enum SoundState
 {
@@ -128,10 +130,10 @@ export const RoomPage: React.FC = () =>
             />
         </div>;
 
-    const chatContainer = 
-    <div id="chat-container">
-        <Chat />
-    </div>;
+    const chatContainer =
+        <div id="chat-container">
+            <Chat />
+        </div>;
     const callContainer =
         <div id="call-container">
             {roomAlerts}
@@ -145,10 +147,29 @@ export const RoomPage: React.FC = () =>
         document.title = `Nostromo - Комната "${roomName}"`;
     }, []);
 
+    /* После того, как отпустили файл в область */
+    const onDropHandler = (e: React.DragEvent<HTMLDivElement>) =>
+    {
+        e.preventDefault();
+        const files = [...e.dataTransfer.files];
+        console.log(files[0].name + " " + (files[0].size / 1000).toString() + "KB");
+    };
+
+    const flagDnd = useContext(DndContext);
     return (
         <>
             <Header title={roomName} roomToolbarProps={roomToolbarProps} />
-            <div id="main">
+            <div id="main" className={flagDnd ? "blurred" : ""}>
+                {flagDnd
+                    ? <div className="drop-area vertical-center" onDrop={(e) => onDropHandler(e)}>
+                        <div className='horizontal-center'>
+                            <div className='drop-area-panel'>
+                                <div className='drop-area-icon'><GiFiles className='drop-area-icon-sizes' /></div>
+                                <div className='drop-area-border'>Отпустите файл для загрузки</div>
+                            </div>
+                        </div>
+                    </div>
+                    : <></>}
                 {isChatHidden
                     ? <div className="overflow-container">{callContainer}</div>
                     : <VerticalLayout
