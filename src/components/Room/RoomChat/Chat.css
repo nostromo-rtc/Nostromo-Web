@@ -46,6 +46,7 @@
 
 
 /************** Строка ввода сообщения **************/
+
 #message-textarea {
     flex: 1 1 95%;
     resize: vertical;
@@ -66,7 +67,24 @@
     outline: none;
 }
 
-/************** Кнопка отправки сообщения **************/
+/************** Кнопки **************/
+
+/* Общий стиль для контейнеров кнопок */
+.btn-container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+/* Контейнер для кнопки отправки сообщения*/
+.btn-send-message-container{
+    max-height: 150px;
+}
+/* Контейнер для кнопки загрузки файла */
+.btn-upload-file-container{
+    max-height: 47px;
+}
+
 .btn-send-message {
     background-color: #1b282e;
     color: #fafafa;
@@ -76,7 +94,7 @@
     max-width: 45px;
     
 }
-#tooltip-send-btn
+.tooltip-send-btn
 {
     width: 115px;
 }
@@ -88,7 +106,7 @@
     left: 0;
     top: 0;
 }
-.send-btn-width{
+.chat-btn-width{
     max-width: 40px;
     min-width: 40px;
 }
@@ -109,38 +127,25 @@
     height: 25px;
     color: #656565;
 }
-.btn-send-message-container{
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    max-height: 150px;
-    justify-content: center;
-}
-.btn-upload-file-container{
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    max-height: 47px;
-    justify-content: center;
-}
+
 /************** Блоки сообщений в чате **************/
 
 /* Собственное смс (справа) */
-.self-message-area{
+.self-msg-area{
     display: flex;
     width: 100%;
     justify-content: right;
     margin: 0.6rem 0 0.6rem 0;
 }
 /* Сообщение собеседника (слева) */
-.message-area{
+.msg-area{
     display: flex;
     width: 100%;
     justify-content: left;
     margin: 0.6rem 0 0.6rem 0;
 }
 /* Контейнер для сообщений */
-.message-container{
+.msg-container{
     padding: 10px;
     min-width: 10%;
     max-width: 60%;
@@ -150,21 +155,27 @@
 .message-body{
     margin-top: 4px;
 }
-/* Цвет и форма блоков сообщений собеседников */
-.text-left{
+
+/* Стили блоков сообщений */
+
+/* Общий стиль всех сообщений */
+.msg-content {
     text-align: left;
-    border: 2px solid #363f47;
-    background-color: #363f47;
-    border-radius: 0.75rem 0.75rem 0.75rem 0;
+    border-width: 2px;
+    border-style: solid;
     margin-top: 4px;
 }
-/* Цвет и форма блоков собственных сообщений */
-.text-right{
-    text-align: left;
-    border: 2px solid #1d3034;
+/* Стиль сообщений других участников */
+.members-msg-content {
+    border-color: #363f47;
+    background-color: #363f47;
+    border-radius: 0.75rem 0.75rem 0.75rem 0;
+}
+/* Стиль собственных сообщений */
+.self-msg-content {
+    border-color: #1d3034;
     background-color: #1d3034;
     border-radius: 0.75rem 0.75rem 0 0.75rem;
-    margin-top: 4px;
 }
 /* Стиль имени отправителя смс */
 .user-name{
@@ -192,7 +203,8 @@
     color: #8999a0;
     z-index: 2;
 }
-.placeholder{
+/* Стиль кликабельного контейнера над сообщением (для обработки скачивания файла) */
+.msg-placeholder{
     z-index: 1;
     position: absolute;
     width: 100%;

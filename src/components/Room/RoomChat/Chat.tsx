@@ -39,11 +39,11 @@ export const Chat: React.FC = () =>
     const [msgs, setMsgs] = useState<ChatMessage[]>([
         {userId: "155sadjofdgknsdfk3", type: "text", datetime: (new Date().getTime())/2, content: "Hello, colleagues! "
         +"I think that everything will be fine with us, life is getting better, work is in full swing, the kettle is in the kitchen too." },
-        {userId: "12hnjofgl33154", type: "text", datetime: new Date().getTime(), content: "Hello everyone! Yes! "
+        {userId: "12hnjofgl33154", type: "text", datetime: new Date().getTime() - 20000, content: "Hello everyone! Yes! "
         + "Time goes by, nothing stands still. I am very glad that everything around is developing. I hope everything continues at the same pace." },
-        {userId: "1bvcbjofg23fxcvds", type: "text", datetime: new Date().getTime(), content: "Hi all!" },
-        {userId: "12hnjofgl33154", type: "text", datetime: new Date().getTime(), content: "Check this: https://bugs.documentfoundation.org/4р4рекарекрке456орпороен56оар5646666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666епопропаркепрке54н5445р4р45р5р45р54р4р6керкер " },
-        {userId: "155sadjofdgknsdfk3", type: "file", datetime: new Date().getTime(), content: {fileId: "cxzvzx23", name: "Master_and_Margo.txt", size: 412428}},
+        {userId: "1bvcbjofg23fxcvds", type: "text", datetime: new Date().getTime() - 15000, content: "Hi all!" },
+        {userId: "12hnjofgl33154", type: "text", datetime: new Date().getTime() - 10000, content: "Check this: https://bugs.documentfoundation.org/4р4рекарекрке456орпороен56оар5646666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666епопропаркепрке54н5445р4р45р5р45р54р4р6керкер " },
+        {userId: "155sadjofdgknsdfk3", type: "file", datetime: new Date().getTime() - 5000, content: {fileId: "cxzvzx23", name: "Master_and_Margo.txt", size: 412428}},
         {userId: "12hnjofgl33154", type: "file", datetime: new Date().getTime(), content: {fileId: "jghjghj2", name: "About_IT.txt", size: 4212428}}
     ]);
 
@@ -202,11 +202,11 @@ export const Chat: React.FC = () =>
     const sendMsgBoxRef = useRef<HTMLDivElement>(null);
     const sendMsg = (<>
         <div className="chat-btn-box non-selectable" ref={sendMsgBoxRef}>
-            <TooltipTopBottom id="tooltip-send-btn" title="Отправить">
+            <TooltipTopBottom className="tooltip-send-btn" title="Отправить">
                 <div className="btn-send-message">
                     <Button aria-label='Отправить'
                         onClick={sendMsgOnClick}
-                        className='send-btn-width'
+                        className='chat-btn-width'
                     >
                         <MdSend className='btn-icon'/>
                     </Button>
@@ -226,18 +226,18 @@ export const Chat: React.FC = () =>
     const loadFileBoxRef = useRef<HTMLDivElement>(null);
     const loadFile = (<>
         <div className="chat-btn-box non-selectable" ref={loadFileBoxRef}>
-            <TooltipTopBottom id="tooltip-send-btn" title="Загрузить">
+            <TooltipTopBottom className="tooltip-send-btn" title="Загрузить">
                 <div className="btn-send-message">
                     <Button aria-label='Загрузить'
                         component='label'
-                        className='send-btn-width'>
+                        className='chat-btn-width'>
                         <label>
                             <ImAttachment className='btn-icon'/>
-                            <input type="file" id="file-input" onChange={e=>loadFileOnClick(e)} name="file" multiple hidden />
+                            <input type="file" id="file-input-btn" onChange={e=>loadFileOnClick(e)} name="file" multiple hidden />
                         </label>
                     </Button>
                     <label className="chat-btn-clickable-area non-selectable" >
-                        <input type="file" id="file-input" onChange={e=>loadFileOnClick(e)} name="file" multiple hidden />
+                        <input type="file" id="file-input-btn-area" onChange={e=>loadFileOnClick(e)} name="file" multiple hidden />
                     </label>
                 </div>
             </TooltipTopBottom>
@@ -246,17 +246,17 @@ export const Chat: React.FC = () =>
     const flagDnd = useContext(DndContext);
     console.log(flagDnd);
     return (
-        <>{!flagDnd?
+        <>{flagDnd?
             <div className="drop-area" onDrop={(e)=>onDropHandler(e)}><div className='drop-area-border'>Отпустите файл для загрузки</div></div>
         :
             <><div id="chat" aria-readonly>
                 {msgs.map(m=>{
-                    return <Message message={m}/>})
+                    return <Message key={m.userId + m.datetime.toString()} message={m}/>})
                 }
             </div>
             
             <div className="input-area">
-                <div className="btn-upload-file-container">
+                <div className="btn-container btn-upload-file-container">
                     {loadFile}
                 </div>
                 <div id="message-textarea"   
@@ -266,7 +266,7 @@ export const Chat: React.FC = () =>
                     contentEditable="true"
                     onInput={e=>setTextMsg(e.currentTarget.textContent as string)}>
                 </div>
-                <div className="btn-send-message-container">
+                <div className="btn-container btn-send-message-container">
                     {sendMsg}
                 </div>
             </div>

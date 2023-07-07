@@ -114,8 +114,8 @@ export const Message = (props : messageProps) =>
     const userName = getUserName(props.message.userId);
     return (
         <>
-            <div className={isSelfMsg? 'self-message-area' : 'message-area'}>
-                <div className={isSelfMsg? 'message-container text-right' : 'message-container text-left'}>
+            <div className={isSelfMsg? 'self-msg-area' : 'msg-area'}>
+                <div className={ 'msg-container msg-content ' + (isSelfMsg ? 'self-msg-content' : 'members-msg-content')}>
                     <span className='user-name' title={userName}>{userName}</span>&nbsp;
                     <span className='user-id' title={'#'+props.message.userId}>#{props.message.userId.substring(0, 4)}</span><br></br>
                     <div className='message-body'>
