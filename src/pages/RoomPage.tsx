@@ -159,7 +159,7 @@ export const RoomPage: React.FC = () =>
     return (
         <>
             <Header title={roomName} roomToolbarProps={roomToolbarProps} />
-            <div id="main" className={flagDnd ? "blurred" : ""}>
+            <div id="main">
                 {flagDnd
                     ? <div className="drop-area vertical-center" onDrop={(e) => onDropHandler(e)}>
                         <div className='horizontal-center'>

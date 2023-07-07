@@ -55,6 +55,7 @@
 }
 .drop-area-panel {
     position: relative;
+    z-index: 1;
 }
 .drop-area-border{
     background-color: #22485e;
@@ -81,4 +82,6 @@
 .drop-area-icon-sizes {
     height: 100px;
     width: 100px;
+    position: relative;
+    z-index: 2;
 }
