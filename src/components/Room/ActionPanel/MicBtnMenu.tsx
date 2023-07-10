@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { MdClose } from "react-icons/md";
 
 import { DeviceListItem } from "../../../pages/RoomPage";
-import { Menu } from "../../Menu/Menu";
+import { Menu, MenuList } from "../../Menu/Menu";
 import { MenuItemRadio, MenuItemWithIcon, MenuSectionLabel } from "../../Menu/MenuItems";
 import "./MicBtnMenu.css";
 
@@ -46,35 +46,45 @@ export const MicBtnMenu: React.FC<MicBtnMenuProps> = ({
         );
     };
 
+    const handleClose = (): void =>
+    {
+        setOpen(false);
+    };
+
     return (
         <Menu
             id="toggle-mic-btn-menu"
             anchorRef={anchorRef}
             open={open}
-            onClose={() => { setOpen(false); }}
+            onClose={handleClose}
             transitionDuration={transitionDuration}
         >
             <MenuSectionLabel text="Выбор микрофона" />
-            {micList.map(micListToListItems)}
-            {micEnabled ?
-                <div>
-                    <Divider className="menu-divider" />
-                    <MenuItemWithIcon
-                        className="error-color"
-                        semiBold
-                        icon={<MdClose />}
-                        text="Прекратить захват устройства"
-                        onClick={(ev) =>
-                        {
-                            setOpen(false);
-
-                            setTimeout(() =>
+            <MenuList
+                open={open}
+                onClose={handleClose}
+            >
+                {micList.map(micListToListItems)}
+                {micEnabled ?
+                    <div>
+                        <Divider className="menu-divider" />
+                        <MenuItemWithIcon
+                            className="error-color"
+                            semiBold
+                            icon={<MdClose />}
+                            text="Прекратить захват устройства"
+                            onClick={(ev) =>
                             {
-                                disableMic();
-                            }, transitionDuration);
-                        }} />
-                </div> : undefined
-            }
+                                setOpen(false);
+
+                                setTimeout(() =>
+                                {
+                                    disableMic();
+                                }, transitionDuration);
+                            }} />
+                    </div> : undefined
+                }
+            </MenuList>
         </Menu>
     );
 };
