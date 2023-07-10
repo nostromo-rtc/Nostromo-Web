@@ -1,5 +1,5 @@
-import { FormControl, MenuItem, MenuItemProps, Select, SelectProps } from "@mui/material";
-import { ReactElement, ReactNode } from "react";
+import { MenuItem, MenuItemProps } from "@mui/material";
+import { ReactElement } from "react";
 
 import { MdInfoOutline, MdRadioButtonChecked, MdRadioButtonUnchecked } from "react-icons/md";
 import "./MenuItems.css";
@@ -74,42 +74,5 @@ export const MenuItemRadio: React.FC<MenuItemRadioProps> = ({ isSelected, text, 
             aria-checked={isSelected}
             className={isSelected ? "success-color" : ""}
         />
-    );
-};
-
-interface MenuSelectProps<T = unknown>
-{
-    id: string;
-    children: ReactNode;
-    value: SelectProps<T>["value"];
-    onChange: SelectProps<T>["onChange"];
-    transitionDuration: number;
-    variant?: SelectProps<T>["variant"];
-}
-
-export const MenuSelect: React.FC<MenuSelectProps<string>> = ({
-    id,
-    value,
-    onChange,
-    children,
-    transitionDuration,
-    variant = "standard"
-}) =>
-{
-    return (
-        <div className="menu-select">
-            <FormControl className="menu-select-form-control">
-                <Select
-                    id={id}
-                    value={value}
-                    onChange={onChange}
-                    variant={variant}
-                    classes={{ select: "menu-select-input" }}
-                    MenuProps={{ transitionDuration: transitionDuration }}
-                >
-                    {children}
-                </Select>
-            </FormControl>
-        </div>
     );
 };

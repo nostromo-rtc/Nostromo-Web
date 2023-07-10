@@ -72,20 +72,3 @@
     padding-top: 8px;
     padding-bottom: 8px;
 }
-
-.menu-select
-{
-    display: flex;
-}
-
-.menu-select .menu-select-form-control
-{
-    width: 100%;
-    padding: 5px 10px 5px 10px;
-    box-sizing: border-box;
-}
-
-.menu-select .menu-select-input
-{
-    padding-left: 6px;
-}

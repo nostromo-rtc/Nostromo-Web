@@ -2,8 +2,9 @@ import { Divider, MenuItem, SelectChangeEvent } from "@mui/material";
 import React, { useState } from "react";
 
 import { DeviceListItem } from "../../../pages/RoomPage";
-import { Menu } from "../../Menu/Menu";
-import { MenuItemRadio, MenuSectionLabel, MenuSelect } from "../../Menu/MenuItems";
+import { Menu, MenuList } from "../../Menu/Menu";
+import { MenuItemRadio, MenuSectionLabel } from "../../Menu/MenuItems";
+import { Select } from "../../Select";
 import { Tooltip } from "../../Tooltip";
 
 import "./CamBtnMenu.css";
@@ -35,17 +36,21 @@ export const CamBtnMenu: React.FC<CamBtnMenuProps> = ({ anchorRef, open, setOpen
         { width: 320, height: 240, name: "240p" }
     ];
 
-    const resolutionListToListItems = (resObj: ResolutionObject, index: number): JSX.Element =>
+    const handleSelectResolution = (ev: SelectChangeEvent): void =>
     {
-        const resolutionStr = `${resObj.width}⨯${resObj.height}`;
+        setResolution(ev.target.value);
+        console.log(ev.target.value);
+    };
 
-        return (
-            <MenuItem value={resolutionStr} key={index}>
-                <span className="v-align-middle">{resolutionStr}</span>
-                <div className="horizontal-expander" />
-                <span className="chip-resolution">{resObj.name}</span>
-            </MenuItem>
-        );
+    const handleSelectFps = (ev: SelectChangeEvent): void =>
+    {
+        setFps(ev.target.value);
+        console.log(ev.target.value);
+    };
+
+    const handleClose = (): void =>
+    {
+        setOpen(false);
     };
 
     const camListToListItems = (cam: DeviceListItem, index: number): JSX.Element =>
@@ -62,16 +67,35 @@ export const CamBtnMenu: React.FC<CamBtnMenuProps> = ({ anchorRef, open, setOpen
         );
     };
 
-    const handleSelectResolution = (ev: SelectChangeEvent): void =>
+    const resolutionListToListItems = (resObj: ResolutionObject, index: number): JSX.Element =>
     {
-        setResolution(ev.target.value);
-        console.log(ev.target.value);
+        const resolutionStr = `${resObj.width}⨯${resObj.height}`;
+
+        return (
+            <MenuItem value={resolutionStr} key={index}>
+                <span className="v-align-middle">{resolutionStr}</span>
+                <div className="horizontal-expander" />
+                <span className="chip-resolution">{resObj.name}</span>
+            </MenuItem>
+        );
+    };
+
+    const CamMenuList: React.FC = () =>
+    {
+        return (
+            <MenuList
+                open={open}
+                onClose={handleClose}
+            >
+                {camList.map(camListToListItems)}
+            </MenuList>
+        );
     };
 
     const SelectResolution: React.FC = () =>
     {
         return (
-            <MenuSelect
+            <Select
                 id="select-cam-resolution"
                 value={resolution}
                 onChange={handleSelectResolution}
@@ -80,20 +104,14 @@ export const CamBtnMenu: React.FC<CamBtnMenuProps> = ({ anchorRef, open, setOpen
                 <MenuItem value={"default"}>По умолчанию</MenuItem>
                 <Divider className="menu-divider" />
                 {resolutionList.map(resolutionListToListItems)}
-            </MenuSelect>
+            </Select>
         );
-    };
-
-    const handleSelectFps = (ev: SelectChangeEvent): void =>
-    {
-        setFps(ev.target.value);
-        console.log(ev.target.value);
     };
 
     const SelectFps: React.FC = () =>
     {
         return (
-            <MenuSelect
+            <Select
                 id="select-cam-fps"
                 value={fps}
                 onChange={handleSelectFps}
@@ -105,7 +123,7 @@ export const CamBtnMenu: React.FC<CamBtnMenuProps> = ({ anchorRef, open, setOpen
                 <MenuItem value={"50"}><span className="v-align-middle">50</span></MenuItem>
                 <MenuItem value={"30"}><span className="v-align-middle">30</span></MenuItem>
                 <MenuItem value={"15"}><span className="v-align-middle">15</span></MenuItem>
-            </MenuSelect>
+            </Select>
         );
     };
 
@@ -114,11 +132,11 @@ export const CamBtnMenu: React.FC<CamBtnMenuProps> = ({ anchorRef, open, setOpen
             id="toggle-cam-btn-menu"
             anchorRef={anchorRef}
             open={open}
-            onClose={() => { setOpen(false); }}
+            onClose={handleClose}
             transitionDuration={transitionDuration}
         >
             <MenuSectionLabel text="Выбор камеры" />
-            {camList.map(camListToListItems)}
+            <CamMenuList />
             <Divider className="menu-divider" />
             <Tooltip id="tooltip-select-cam-resolution" title={"Разрешение изображения в пикселях"} offset={2} placement="right">
                 <div className="inline"><MenuSectionLabel text="Настройка качества" withTooltip /></div>

@@ -2,8 +2,9 @@ import { Divider, MenuItem, SelectChangeEvent } from "@mui/material";
 import React, { useState } from "react";
 
 import { Menu } from "../../Menu/Menu";
-import { MenuSectionLabel, MenuSelect } from "../../Menu/MenuItems";
+import { MenuSectionLabel } from "../../Menu/MenuItems";
 import { Tooltip } from "../../Tooltip";
+import { Select } from "../../Select";
 
 import "./DisplayBtnMenu.css";
 import { ResolutionObject } from "./RoomActionPanel";
@@ -31,6 +32,18 @@ export const DisplayBtnMenu: React.FC<DisplayBtnMenuProps> = ({ anchorRef, open,
         { width: 256, height: 144, name: "144p" }
     ];
 
+    const handleSelectFps = (ev: SelectChangeEvent): void =>
+    {
+        setFps(ev.target.value);
+        console.log(ev.target.value);
+    };
+
+    const handleSelectResolution = (ev: SelectChangeEvent): void =>
+    {
+        setResolution(ev.target.value);
+        console.log(ev.target.value);
+    };
+
     const resolutionListToListItems = (resObj: ResolutionObject, index: number): JSX.Element =>
     {
         const resolutionStr = `${resObj.width}⨯${resObj.height}`;
@@ -44,16 +57,10 @@ export const DisplayBtnMenu: React.FC<DisplayBtnMenuProps> = ({ anchorRef, open,
         );
     };
 
-    const handleSelectResolution = (ev: SelectChangeEvent): void =>
-    {
-        setResolution(ev.target.value);
-        console.log(ev.target.value);
-    };
-
     const SelectResolution: React.FC = () =>
     {
         return (
-            <MenuSelect
+            <Select
                 id="select-display-resolution"
                 value={resolution}
                 onChange={handleSelectResolution}
@@ -62,20 +69,14 @@ export const DisplayBtnMenu: React.FC<DisplayBtnMenuProps> = ({ anchorRef, open,
                 <MenuItem value={"default"}>По умолчанию</MenuItem>
                 <Divider className="menu-divider" />
                 {resolutionList.map(resolutionListToListItems)}
-            </MenuSelect>
+            </Select>
         );
-    };
-
-    const handleSelectFps = (ev: SelectChangeEvent): void =>
-    {
-        setFps(ev.target.value);
-        console.log(ev.target.value);
     };
 
     const SelectFps: React.FC = () =>
     {
         return (
-            <MenuSelect
+            <Select
                 id="select-display-fps"
                 value={fps}
                 onChange={handleSelectFps}
@@ -87,7 +88,7 @@ export const DisplayBtnMenu: React.FC<DisplayBtnMenuProps> = ({ anchorRef, open,
                 <MenuItem value={"30"}><span className="v-align-middle">30</span></MenuItem>
                 <MenuItem value={"15"}><span className="v-align-middle">15</span></MenuItem>
                 <MenuItem value={"5"}><span className="v-align-middle">5</span></MenuItem>
-            </MenuSelect>
+            </Select>
         );
     };
 
