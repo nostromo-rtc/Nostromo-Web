@@ -60,10 +60,7 @@ export const MicBtnMenu: React.FC<MicBtnMenuProps> = ({
             transitionDuration={transitionDuration}
         >
             <MenuSectionLabel text="Выбор микрофона" />
-            <MenuList
-                open={open}
-                onClose={handleClose}
-            >
+            <MenuList open={open}>
                 {micList.map(micListToListItems)}
                 {micEnabled ?
                     <div>

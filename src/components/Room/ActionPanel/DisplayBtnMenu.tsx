@@ -65,6 +65,7 @@ export const DisplayBtnMenu: React.FC<DisplayBtnMenuProps> = ({ anchorRef, open,
                 value={resolution}
                 onChange={handleSelectResolution}
                 transitionDuration={transitionDuration}
+                autoFocus
             >
                 <MenuItem value={"default"}>По умолчанию</MenuItem>
                 <Divider className="menu-divider" />

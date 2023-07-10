@@ -12,6 +12,7 @@ interface SelectProps<T = unknown>
     onChange: MuiSelectProps<T>["onChange"];
     transitionDuration: number;
     variant?: MuiSelectProps<T>["variant"];
+    autoFocus?: boolean;
 }
 
 export const Select: React.FC<SelectProps<string>> = ({
@@ -20,7 +21,8 @@ export const Select: React.FC<SelectProps<string>> = ({
     onChange,
     children,
     transitionDuration,
-    variant = "standard"
+    variant = "standard",
+    autoFocus = false
 }) =>
 {
     return (
@@ -33,6 +35,7 @@ export const Select: React.FC<SelectProps<string>> = ({
                     variant={variant}
                     classes={{ select: "select-input" }}
                     MenuProps={{ transitionDuration: transitionDuration }}
+                    autoFocus={autoFocus}
                 >
                     {children}
                 </MuiSelect>

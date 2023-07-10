@@ -83,10 +83,7 @@ export const CamBtnMenu: React.FC<CamBtnMenuProps> = ({ anchorRef, open, setOpen
     const CamMenuList: React.FC = () =>
     {
         return (
-            <MenuList
-                open={open}
-                onClose={handleClose}
-            >
+            <MenuList open={open}>
                 {camList.map(camListToListItems)}
             </MenuList>
         );

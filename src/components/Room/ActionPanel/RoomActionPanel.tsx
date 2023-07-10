@@ -85,8 +85,6 @@ export const RoomActionPanel: React.FC<RoomActionPanelProps> = ({
         </Tooltip>
     );
 
-    /// ------------------------------------------ ///
-
     /// Mic button ------------------------------- ///
 
     const isMicWorking = (micBtnInfo.state === MicState.WORKING);
@@ -110,7 +108,7 @@ export const RoomActionPanel: React.FC<RoomActionPanelProps> = ({
 
     const micBtn = (<>
         <div className="action-btn-box non-selectable" ref={micBtnBoxRef}>
-            <Tooltip id="tooltip-toggle-mic-btn" title={micBtnMsg} offset={15}>
+            <Tooltip id="tooltip-toggle-mic-btn" title={micBtnMsg} offset={10}>
                 <div>
                     <Button aria-label="Enable/disable mic"
                         className={"action-btn " + (isMicWorking ? "action-btn-off" : "action-btn-on")}
@@ -138,8 +136,6 @@ export const RoomActionPanel: React.FC<RoomActionPanelProps> = ({
             transitionDuration={transitionDuration}
         />
     </>);
-
-    /// ------------------------------------------ ///
 
     /// Cam button ------------------------------- ///
 
@@ -175,8 +171,6 @@ export const RoomActionPanel: React.FC<RoomActionPanelProps> = ({
             transitionDuration={transitionDuration}
         />
     </>);
-
-    /// ------------------------------------------ ///
 
     /// Display button --------------------------- ///
 

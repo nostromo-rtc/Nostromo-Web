@@ -18,14 +18,6 @@
     margin: 0;
 }
 
-@media (width < 600px) or (height < 600px)
-{
-    .tooltip
-    {
-        max-width: 150px;
-    }
-}
-
 .tooltip .tooltip-arrow
 {
     color: black;

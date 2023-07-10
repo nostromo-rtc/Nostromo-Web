@@ -73,6 +73,7 @@ export const MenuItemRadio: React.FC<MenuItemRadioProps> = ({ isSelected, text, 
             onClick={onClick}
             aria-checked={isSelected}
             className={isSelected ? "success-color" : ""}
+            autoFocus={isSelected}
         />
     );
 };

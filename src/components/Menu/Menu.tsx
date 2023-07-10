@@ -4,7 +4,7 @@ import React, { ReactNode } from "react";
 import { doNotHandleEvent } from "../../Utils";
 import "./Menu.css";
 
-type UListKeyboardEventHandler = React.KeyboardEventHandler<HTMLUListElement>;
+type DivKeyboardEventHandler = React.KeyboardEventHandler<HTMLDivElement>;
 
 interface MenuProps
 {
@@ -43,28 +43,40 @@ export const Menu: React.FC<MenuProps> = ({
         onClose();
     };
 
+    const handleListKeyDown: DivKeyboardEventHandler = (ev) =>
+    {
+        if (ev.key === "Escape")
+        {
+            onClose();
+        }
+    };
+
     return (
-        <>
-            <Popper
-                anchorEl={anchorRef.current}
-                id={id}
-                open={open}
-                onClick={handleClose}
-                placement="top"
-                transition
-                popperOptions={{
-                    modifiers: [
-                        {
-                            name: 'offset',
-                            options: {
-                                offset: [POPPER_OFFSET_SKIDDING, POPPER_OFFSET_DISTANCE]
-                            },
-                        }
-                    ],
-                }}
-            >
-                {   // eslint-disable-next-line @typescript-eslint/naming-convention
-                    ({ TransitionProps, placement }) => (
+        <Popper
+            anchorEl={anchorRef.current}
+            id={id}
+            open={open}
+            onKeyDown={handleListKeyDown}
+            placement="top"
+            transition
+            popperOptions={{
+                modifiers: [
+                    {
+                        name: 'offset',
+                        options: {
+                            offset: [POPPER_OFFSET_SKIDDING, POPPER_OFFSET_DISTANCE]
+                        },
+                    }
+                ],
+            }}
+        >
+            {   // eslint-disable-next-line @typescript-eslint/naming-convention
+                ({ TransitionProps, placement }) => (
+                    <ClickAwayListener
+                        onClickAway={handleClose}
+                        mouseEvent="onPointerDown"
+                        touchEvent={false}
+                    >
                         <Grow
                             {...TransitionProps}
                             style={{
@@ -74,47 +86,30 @@ export const Menu: React.FC<MenuProps> = ({
                             timeout={transitionDuration}
                         >
                             <Paper>
-                                <ClickAwayListener
-                                    onClickAway={handleClose}
-                                    mouseEvent="onPointerDown"
-                                    touchEvent={false}
-                                >
-                                    <>{children}</>
-                                </ClickAwayListener>
+                                {children}
                             </Paper>
                         </Grow>
-                    )
-                }
-            </Popper>
-        </>
+                    </ClickAwayListener>
+                )
+            }
+        </Popper>
     );
 };
 
 interface MenuListProps
 {
     open: boolean;
-    onClose: () => void;
     children: ReactNode;
 }
 
 export const MenuList: React.FC<MenuListProps> = ({
     open,
-    onClose,
     children
 }) =>
 {
-    const handleListKeyDown: UListKeyboardEventHandler = (ev) =>
-    {
-        if (ev.key === "Escape")
-        {
-            onClose();
-        }
-    };
-
     return (
         <MuiMenuList
-            autoFocus={open}
-            onKeyDown={handleListKeyDown}
+            autoFocusItem={open}
             className="menu-list small-text"
             onClick={doNotHandleEvent}
         >
