@@ -75,9 +75,10 @@ export const RoomActionPanel: React.FC<RoomActionPanelProps> = ({
         <Tooltip id="tooltip-toggle-sound-btn" title={soundBtnMsg} offset={10}>
             <div className="action-btn-box non-selectable">
                 <Button aria-label="Turn on/off sound"
-                    className={"action-btn " + (isSoundEnabled ? "action-btn-off" : "action-btn-on")}
+                    className={"action-btn " + (isSoundEnabled ? "action-btn-on" : "action-btn-off")}
                     onClick={soundBtnOnClick}>
-                    {isSoundEnabled ? <MdVolumeOff /> : <MdVolumeUp />}
+                    <MdVolumeUp className="action-btn-icon action-btn-icon-on" />
+                    <MdVolumeOff className="action-btn-icon action-btn-icon-off" />
                 </Button>
                 <span className="action-btn-desc">Звук</span>
                 <div className="action-btn-clickable-area non-selectable" onClick={soundBtnOnClick}></div>
@@ -108,13 +109,14 @@ export const RoomActionPanel: React.FC<RoomActionPanelProps> = ({
 
     const micBtn = (<>
         <div className="action-btn-box non-selectable" ref={micBtnBoxRef}>
-            <Tooltip id="tooltip-toggle-mic-btn" title={micBtnMsg} offset={10}>
+            <Tooltip id="tooltip-toggle-mic-btn" title={micBtnMsg} offset={15}>
                 <div>
                     <Button aria-label="Enable/disable mic"
-                        className={"action-btn " + (isMicWorking ? "action-btn-off" : "action-btn-on")}
+                        className={"action-btn " + (isMicWorking ? "action-btn-on" : "action-btn-off")}
                         onClick={micBtnOnClick}
                     >
-                        {isMicWorking ? <MdMicOff /> : <MdMic />}
+                        <MdMic className="action-btn-icon action-btn-icon-on" />
+                        <MdMicOff className="action-btn-icon action-btn-icon-off" />
                     </Button>
                     <div className="action-btn-clickable-area non-selectable" onClick={micBtnOnClick}></div>
                 </div>
@@ -146,12 +148,13 @@ export const RoomActionPanel: React.FC<RoomActionPanelProps> = ({
 
     const camBtn = (<>
         <div className="action-btn-box non-selectable" ref={camBtnBoxRef}>
-            <Tooltip id="tooltip-toggle-cam-btn" title={camBtnMsg} offset={10}>
+            <Tooltip id="tooltip-toggle-cam-btn" title={camBtnMsg} offset={15}>
                 <div>
                     <Button aria-label="Enable/disable webcam"
-                        className={"action-btn " + (camBtnInfo.state ? "action-btn-off" : "action-btn-on")}
+                        className={"action-btn " + (camBtnInfo.state ? "action-btn-on" : "action-btn-off")}
                         onClick={camBtnOnClick}>
-                        {camBtnInfo.state ? <MdVideocamOff /> : <MdVideocam />}
+                        <MdVideocam className="action-btn-icon action-btn-icon-on" />
+                        <MdVideocamOff className="action-btn-icon action-btn-icon-off" />
                     </Button>
                     <div className="action-btn-clickable-area non-selectable" onClick={camBtnOnClick}></div>
                 </div>
@@ -182,12 +185,13 @@ export const RoomActionPanel: React.FC<RoomActionPanelProps> = ({
 
     const displayBtn = (<>
         <div className="action-btn-box non-selectable" ref={displayBtnBoxRef}>
-            <Tooltip id="tooltip-toggle-display-btn" title={displayBtnMsg} offset={10}>
+            <Tooltip id="tooltip-toggle-display-btn" title={displayBtnMsg} offset={15}>
                 <div>
                     <Button aria-label="Start/stop screensharing"
-                        className={"action-btn " + (displayBtnInfo.state ? "action-btn-off" : "action-btn-on")}
+                        className={"action-btn " + (displayBtnInfo.state ? "action-btn-optional action-btn-on" : "action-btn-optional action-btn-off")}
                         onClick={displayBtnOnClick}>
-                        {displayBtnInfo.state ? <MdStopScreenShare /> : <MdScreenShare />}
+                        <MdScreenShare className="action-btn-icon action-btn-icon-on" />
+                        <MdStopScreenShare className="action-btn-icon action-btn-icon-off" />
                     </Button>
                     <div className="action-btn-clickable-area non-selectable" onClick={displayBtnOnClick}></div>
                 </div>

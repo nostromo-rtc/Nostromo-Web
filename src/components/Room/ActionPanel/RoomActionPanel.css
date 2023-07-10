@@ -69,11 +69,6 @@
     background-color: #595f64;
 }
 
-.action-btn:hover
-{
-    background-color: #595f64;
-}
-
 .action-btn:active
 {
     background-color: #00000000;
@@ -95,21 +90,92 @@
     font-weight: 500;
 }
 
-.action-btn-on.action-btn
+.action-btn-icon
 {
-    color: #f7f1f1;
+    position: absolute;
+    transition: opacity 200ms;
 }
 
-.action-btn-off.action-btn
+.action-btn-on
+{
+    background-color: #e1e1e1;
+    color: #000;
+}
+
+.action-btn-on .action-btn-icon-off
+{
+    opacity: 0;
+}
+
+.action-btn-on .action-btn-icon-on
+{
+    opacity: 1;
+}
+
+.action-btn-on:hover
+{
+    background-color: #feb4b4;
+    color: #000;
+}
+
+.action-btn-on:hover .action-btn-icon-off
+{
+    opacity: 1;
+}
+
+.action-btn-on:hover .action-btn-icon-on
+{
+    opacity: 0;
+}
+
+.action-btn-off
 {
     background-color: #c73335;
     color: #fff;
 }
 
-.action-btn-off.action-btn:hover
+.action-btn-off .action-btn-icon-on
 {
-    background-color: #a2292b;
+    opacity: 0;
+}
+
+.action-btn-off .action-btn-icon-off
+{
+    opacity: 1;
+}
+
+.action-btn-off:hover
+{
+    background-color: #e6595b;
     color: #fff;
+}
+
+.action-btn-off:hover .action-btn-icon-on
+{
+    opacity: 1;
+}
+
+.action-btn-off:hover .action-btn-icon-off
+{
+    opacity: 0;
+}
+
+.action-btn-optional.action-btn-off
+{
+    background-color: #444b50;
+    color: #f7f1f1;
+}
+
+.action-btn-optional.action-btn-off:hover
+{
+    background-color: #646c72;
+    color: #f7f1f1;
+}
+
+.action-btn-optional.action-btn-on:hover
+{
+    background-color: #feb4b4;
+    color: #000;
 }
 
 .action-btn-clickable-area
