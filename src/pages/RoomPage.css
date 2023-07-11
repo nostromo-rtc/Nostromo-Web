@@ -14,14 +14,6 @@
     min-width: 270px;
 }
 
-#user-list-container
-{
-    background-color: #2e3133;
-    border-radius: 7px;
-    margin-left: 5px;
-    min-width: 240px;
-}
-
 #room-alerts-container
 {
     overflow-x: hidden;

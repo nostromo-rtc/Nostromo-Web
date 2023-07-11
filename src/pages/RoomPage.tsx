@@ -11,6 +11,7 @@ import { RoomAlert } from "../components/Room/RoomAlert";
 import { Link } from "@mui/material";
 import { getToggleFunc } from "../Utils";
 import { VideoLayout } from "../components/Room/VideoLayout";
+import { UserList } from "../components/Room/UserList";
 
 export enum SoundState
 {
@@ -133,7 +134,6 @@ export const RoomPage: React.FC = () =>
             <hr id="call-container-divider" />
             <RoomActionPanel {...roomActionPanelProps} />
         </div>;
-    const userListContainer = <div id="user-list-container">user-list-container</div>;
 
     useEffect(() =>
     {
@@ -150,7 +150,7 @@ export const RoomPage: React.FC = () =>
                         upperContainer={callContainer}
                         lowerContainer={chatContainer}
                         upperMinHeight="200px" />}
-                {isUserListHidden ? <></> : userListContainer}
+                {isUserListHidden ? <></> : <UserList transitionDuration={transitionDuration} />}
             </div>
         </div>
     );
