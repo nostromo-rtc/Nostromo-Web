@@ -144,10 +144,12 @@ export const RoomPage: React.FC = () =>
         <div id="base">
             <Header title={roomName} roomToolbarProps={roomToolbarProps} />
             <div id="main">
-                {isChatHidden ? callContainer : <VerticalLayout
-                    upperContainer={callContainer}
-                    lowerContainer={chatContainer}
-                    upperMinHeight="200px" />}
+                {isChatHidden
+                    ? <div className="overflow-container">{callContainer}</div>
+                    : <VerticalLayout
+                        upperContainer={callContainer}
+                        lowerContainer={chatContainer}
+                        upperMinHeight="200px" />}
                 {isUserListHidden ? <></> : userListContainer}
             </div>
         </div>

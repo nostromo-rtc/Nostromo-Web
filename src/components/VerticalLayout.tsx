@@ -19,7 +19,7 @@ export const VerticalLayout: React.FC<Params> = ({ upperContainer, lowerContaine
 
     const [mouseY, setMouseY] = useState(ZERO_VALUE_PX);
     const [resizing, setResizing] = useState(false);
-    const [heightForUpper, setHeightForUpper] = useState("80%");
+    const [heightForUpper, setHeightForUpper] = useState("50%");
     const [cursorStyle, setCursorStyle] = useState("default");
 
     const onPointerDown: DivPointerEventHandler = (event) =>
