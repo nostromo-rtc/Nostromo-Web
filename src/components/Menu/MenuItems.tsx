@@ -1,7 +1,7 @@
 import { MenuItem, MenuItemProps } from "@mui/material";
 import { ReactElement } from "react";
 
-import { MdInfoOutline, MdRadioButtonChecked, MdRadioButtonUnchecked } from "react-icons/md";
+import { MdCheckBox, MdCheckBoxOutlineBlank, MdInfoOutline, MdRadioButtonChecked, MdRadioButtonUnchecked } from "react-icons/md";
 import "./MenuItems.css";
 
 interface MenuItemWithIconProps extends MenuItemProps
@@ -19,8 +19,8 @@ export const MenuItemWithIcon: React.FC<MenuItemWithIconProps> = ({
     endIcon = false,
     ...props }) =>
 {
-    const menuItemIcon = (
-        <div className="menu-item-icon">
+    const endMenuItemIcon = (
+        <div className="menu-item-icon icon-end">
             {icon}
         </div>
     );
@@ -35,7 +35,7 @@ export const MenuItemWithIcon: React.FC<MenuItemWithIconProps> = ({
         <MenuItem {...props} className={`${props.className ?? ''} menu-item`}>
             {endIcon ? <></> : startMenuItemIcon}
             <p className={(semiBold ? "semi-bold " : '') + "menu-item-label text-wrap"}>{text}</p>
-            {endIcon ? menuItemIcon : <></>}
+            {endIcon ? endMenuItemIcon : <></>}
         </MenuItem>
     );
 };
@@ -74,6 +74,26 @@ export const MenuItemRadio: React.FC<MenuItemRadioProps> = ({ isSelected, text, 
             aria-checked={isSelected}
             className={isSelected ? "success-color" : ""}
             autoFocus={isSelected}
+        />
+    );
+};
+
+interface MenuItemCheckboxProps
+{
+    text: string;
+    isChecked: boolean;
+    onClick: () => void;
+}
+export const MenuItemCheckbox: React.FC<MenuItemCheckboxProps> = ({ isChecked, text, onClick }) =>
+{
+    return (
+        <MenuItemWithIcon
+            role="menuitemcheckbox"
+            icon={isChecked ? <MdCheckBox /> : <MdCheckBoxOutlineBlank />}
+            text={text}
+            endIcon
+            onClick={onClick}
+            aria-checked={isChecked}
         />
     );
 };

@@ -42,6 +42,11 @@
     margin-right: 12px;
 }
 
+.icon-end.menu-item-icon
+{
+    margin-left: 12px;
+}
+
 .menu-section-label
 {
     display: inline-flex;

@@ -16,8 +16,6 @@ interface MenuProps
     transitionDuration: number;
 }
 
-// TODO: пофиксить во вложенном Select переключение на стрелки
-// Нужно вынести все что не MenuItem из под MenuList.
 export const Menu: React.FC<MenuProps> = ({
     id,
     anchorRef,
@@ -99,17 +97,20 @@ export const Menu: React.FC<MenuProps> = ({
 interface MenuListProps
 {
     open: boolean;
+    disableAutoFocusItem?: boolean;
     children: ReactNode;
 }
 
 export const MenuList: React.FC<MenuListProps> = ({
     open,
+    disableAutoFocusItem = false,
     children
 }) =>
 {
     return (
         <MuiMenuList
-            autoFocusItem={open}
+            autoFocusItem={open && !disableAutoFocusItem}
+            autoFocus={open && disableAutoFocusItem}
             className="menu-list small-text"
             onClick={doNotHandleEvent}
         >
