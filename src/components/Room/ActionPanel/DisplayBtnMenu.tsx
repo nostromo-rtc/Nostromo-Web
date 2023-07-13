@@ -100,6 +100,7 @@ export const DisplayBtnMenu: React.FC<DisplayBtnMenuProps> = ({ anchorRef, open,
             open={open}
             onClose={() => { setOpen(false); }}
             transitionDuration={transitionDuration}
+            popperPlacement="top"
         >
             <Tooltip id="tooltip-select-display-resolution" title={"Разрешение изображения в пикселях"} offset={2} placement="right">
                 <div className="inline"><MenuSectionLabel text="Настройка качества" withTooltip /></div>

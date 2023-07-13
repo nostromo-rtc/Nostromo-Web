@@ -58,6 +58,7 @@ export const MicBtnMenu: React.FC<MicBtnMenuProps> = ({
             open={open}
             onClose={handleClose}
             transitionDuration={transitionDuration}
+            popperPlacement="top"
         >
             <MenuSectionLabel text="Выбор микрофона" />
             <MenuList open={open}>

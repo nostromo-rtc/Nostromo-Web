@@ -1,4 +1,4 @@
-import { MenuItem, MenuItemProps } from "@mui/material";
+import { MenuItem, MenuItemProps, Slider } from "@mui/material";
 import { ReactElement } from "react";
 
 import { MdCheckBox, MdCheckBoxOutlineBlank, MdInfoOutline, MdRadioButtonChecked, MdRadioButtonUnchecked } from "react-icons/md";
@@ -95,5 +95,29 @@ export const MenuItemCheckbox: React.FC<MenuItemCheckboxProps> = ({ isChecked, t
             onClick={onClick}
             aria-checked={isChecked}
         />
+    );
+};
+
+interface MenuItemSliderProps extends MenuItemProps
+{
+    text: string;
+    value: number;
+    setValue: (val: number) => void;
+}
+export const MenuItemSlider: React.FC<MenuItemSliderProps> = ({ text, value, setValue, ...props }) =>
+{
+    const handleChange = (event: Event, newValue: number[] | number): void =>
+    {
+        // Поскольку это не range slider, то тип для value number, а не number[].
+        setValue(newValue as number);
+    };
+
+    return (
+        <MenuItem {...props} className={`${props.className ?? ''} menu-item-slider menu-item`}>
+            <p className="menu-item-label text-wrap">{text}</p>
+            <div className="menu-item-slider-container">
+                <Slider value={value} onChange={handleChange} valueLabelDisplay="auto" role="slider" />
+            </div>
+        </MenuItem>
     );
 };

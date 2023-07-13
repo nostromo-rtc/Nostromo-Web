@@ -2,10 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import "./UserList.css";
 
 import { UserInfo } from "nostromo-shared/types/RoomTypes";
-import { Avatar, Divider, MenuItem, Slider } from "@mui/material";
-import { MenuItemCheckbox, MenuSectionLabel } from "../Menu/MenuItems";
+import { Avatar, Divider } from "@mui/material";
+import { MenuItemCheckbox, MenuItemSlider, MenuItemWithIcon, MenuSectionLabel } from "../Menu/MenuItems";
 import { getToggleFunc } from "../../Utils";
 import { Menu, MenuList } from "../Menu/Menu";
+import { HiHashtag, HiIdentification } from "react-icons/hi";
 
 type DivKeyboardEventHandler = React.KeyboardEventHandler<HTMLDivElement>;
 
@@ -37,9 +38,12 @@ export const UserList: React.FC<UserListProps> = ({
 
     const UserListItem: React.FC<UserListItemProps> = ({ user }) =>
     {
+        const DEFAULT_VOLUME_VALUE = 100;
+
         const anchorRef = useRef<HTMLDivElement>(null);
         const [open, setOpen] = useState<boolean>(false);
         const [userMuted, setUserMuted] = useState<boolean>(false);
+        const [volume, setVolume] = useState<number>(DEFAULT_VOLUME_VALUE);
 
         const handleClose = (): void =>
         {
@@ -67,19 +71,32 @@ export const UserList: React.FC<UserListProps> = ({
                 open={open}
                 onClose={handleClose}
                 transitionDuration={transitionDuration}
+                popperPlacement="left-start"
             >
                 <MenuList open={open} disableAutoFocusItem>
                     <MenuItemCheckbox
-                        isChecked={userMuted}
                         text="Приглушить звук"
+                        isChecked={userMuted}
                         onClick={getToggleFunc(setUserMuted)}
                     />
-                    {/* TODO: сделать MenuItemSlider  */}
                     <Divider className="menu-divider" />
-                    <MenuItem>
-                        <span>Громкость звука</span>
-                        <Slider defaultValue={100} aria-label="Default" valueLabelDisplay="auto" />
-                    </MenuItem>
+                    <MenuItemSlider
+                        text="Громкость звука"
+                        value={volume}
+                        setValue={setVolume}
+                    />
+                    <Divider className="menu-divider" />
+                    {/* TODO: Реализовать копирование имени и ID при нажатии на пункты меню. */}
+                    <MenuItemWithIcon
+                        text="Скопировать имя пользователя"
+                        icon={<HiIdentification />}
+                        endIcon
+                    />
+                    <MenuItemWithIcon
+                        text="Скопировать ID пользователя"
+                        icon={<HiHashtag />}
+                        endIcon
+                    />
                 </MenuList>
             </Menu>
         </>

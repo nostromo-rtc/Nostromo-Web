@@ -131,6 +131,7 @@ export const CamBtnMenu: React.FC<CamBtnMenuProps> = ({ anchorRef, open, setOpen
             open={open}
             onClose={handleClose}
             transitionDuration={transitionDuration}
+            popperPlacement="top"
         >
             <MenuSectionLabel text="Выбор камеры" />
             <CamMenuList />

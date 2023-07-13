@@ -1,5 +1,6 @@
 import { ClickAwayListener, Grow, MenuList as MuiMenuList, Paper, Popper } from "@mui/material";
 import React, { ReactNode } from "react";
+import { PopperPlacementType } from "@mui/material";
 
 import { doNotHandleEvent } from "../../Utils";
 import "./Menu.css";
@@ -14,6 +15,7 @@ interface MenuProps
     onClose: () => void;
     children: ReactNode;
     transitionDuration: number;
+    popperPlacement?: PopperPlacementType;
 }
 
 export const Menu: React.FC<MenuProps> = ({
@@ -22,7 +24,8 @@ export const Menu: React.FC<MenuProps> = ({
     open,
     onClose,
     children,
-    transitionDuration
+    transitionDuration,
+    popperPlacement = "auto"
 }) =>
 {
     const POPPER_OFFSET_SKIDDING = 0;
@@ -55,8 +58,9 @@ export const Menu: React.FC<MenuProps> = ({
             id={id}
             open={open}
             onKeyDown={handleListKeyDown}
-            placement="top"
+            placement={popperPlacement}
             transition
+            className="menu-popper"
             popperOptions={{
                 modifiers: [
                     {
@@ -64,7 +68,20 @@ export const Menu: React.FC<MenuProps> = ({
                         options: {
                             offset: [POPPER_OFFSET_SKIDDING, POPPER_OFFSET_DISTANCE]
                         },
-                    }
+                    },
+                    {
+                        name: "flip",
+                        options: {
+                            fallbackPlacements: ["bottom", "top", "left", "right"],
+                            padding: 0
+                        }
+                    },
+                    {
+                        name: 'preventOverflow',
+                        options: {
+                            padding: 8,
+                        },
+                    },
                 ],
             }}
         >

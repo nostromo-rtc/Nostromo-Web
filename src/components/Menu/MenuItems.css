@@ -77,3 +77,19 @@
     padding-top: 8px;
     padding-bottom: 8px;
 }
+
+.menu-item-slider.menu-item
+{
+    display: flex;
+    flex-direction: column;
+    align-items: baseline;
+    min-width: 250px;
+}
+
+.menu-item-slider-container
+{
+    display: inline-flex;
+    padding-right: 8px;
+    box-sizing: border-box;
+    width: 100%;
+}

@@ -30,7 +30,13 @@ export const Tooltip: React.FC<ModTooltipProps> = (props) =>
                                 fallbackPlacements: ["bottom", "top", "left", "right"],
                                 padding: 0,
                             }
-                        }
+                        },
+                        {
+                            name: 'preventOverflow',
+                            options: {
+                                padding: 8,
+                            },
+                        },
                     ],
                 },
             }} classes={{ tooltip: "tooltip", arrow: "tooltip-arrow" }} />
