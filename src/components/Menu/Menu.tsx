@@ -7,10 +7,23 @@ import "./Menu.css";
 
 type DivKeyboardEventHandler = React.KeyboardEventHandler<HTMLDivElement>;
 
+export type AnchorPosition = {
+    left: number;
+    top: number;
+};
+
+const ZERO_COORDINATE_VALUE = 0;
+
+function generateGetBoundingClientRect(x = ZERO_COORDINATE_VALUE, y = ZERO_COORDINATE_VALUE): () => DOMRect
+{
+    return () => { return new DOMRect(x, y, ZERO_COORDINATE_VALUE, ZERO_COORDINATE_VALUE); };
+}
+
 interface MenuProps
 {
     id?: string;
-    anchorRef: React.RefObject<HTMLDivElement>;
+    anchorRef?: React.RefObject<HTMLDivElement>;
+    anchorPosition?: AnchorPosition;
     open: boolean;
     onClose: () => void;
     children: ReactNode;
@@ -21,6 +34,7 @@ interface MenuProps
 export const Menu: React.FC<MenuProps> = ({
     id,
     anchorRef,
+    anchorPosition,
     open,
     onClose,
     children,
@@ -36,7 +50,7 @@ export const Menu: React.FC<MenuProps> = ({
         // Не закрывать меню при нажатии на область, к которой привязано контекстное меню.
         // Например, это позволит захватывать веб-камеру при нажатии на кнопку захвата,
         // не закрывая при этом контекстное меню веб-камеры.
-        if ((anchorRef.current?.contains(ev.target as HTMLElement)) === true)
+        if ((anchorRef?.current?.contains(ev.target as HTMLElement)) === true)
         {
             return;
         }
@@ -52,9 +66,20 @@ export const Menu: React.FC<MenuProps> = ({
         }
     };
 
+    // Если указан anchorPosition - то от него будет строится меню,
+    // иначе позиция будет браться от anchorRef.
+    // Если и его нет, то в anchorEl пойдет undefined,
+    // а popper.js сообщит об ошибке и отрисует меню с координатами x=0; y=0.
+    const anchorEl = anchorPosition ? {
+        getBoundingClientRect: generateGetBoundingClientRect(
+            anchorPosition.left,
+            anchorPosition.top
+        )
+    } : anchorRef?.current;
+
     return (
         <Popper
-            anchorEl={anchorRef.current}
+            anchorEl={anchorEl}
             id={id}
             open={open}
             onKeyDown={handleListKeyDown}

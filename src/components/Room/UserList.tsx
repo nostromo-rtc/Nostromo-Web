@@ -1,14 +1,15 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import "./UserList.css";
 
-import { UserInfo } from "nostromo-shared/types/RoomTypes";
 import { Avatar, Divider } from "@mui/material";
-import { MenuItemCheckbox, MenuItemSlider, MenuItemWithIcon, MenuSectionLabel } from "../Menu/MenuItems";
-import { getToggleFunc } from "../../Utils";
-import { Menu, MenuList } from "../Menu/Menu";
+import { UserInfo } from "nostromo-shared/types/RoomTypes";
 import { HiHashtag, HiIdentification } from "react-icons/hi";
+import { getToggleFunc } from "../../Utils";
+import { AnchorPosition, Menu, MenuList } from "../Menu/Menu";
+import { MenuItemCheckbox, MenuItemSlider, MenuItemWithIcon, MenuSectionLabel } from "../Menu/MenuItems";
 
 type DivKeyboardEventHandler = React.KeyboardEventHandler<HTMLDivElement>;
+type DivClickEventHandler = React.MouseEventHandler<HTMLDivElement>;
 
 interface UserListProps
 {
@@ -40,7 +41,7 @@ export const UserList: React.FC<UserListProps> = ({
     {
         const DEFAULT_VOLUME_VALUE = 100;
 
-        const anchorRef = useRef<HTMLDivElement>(null);
+        const [menuPosition, setMenuPosition] = useState<AnchorPosition | null>(null);
         const [open, setOpen] = useState<boolean>(false);
         const [userMuted, setUserMuted] = useState<boolean>(false);
         const [volume, setVolume] = useState<number>(DEFAULT_VOLUME_VALUE);
@@ -48,6 +49,14 @@ export const UserList: React.FC<UserListProps> = ({
         const handleClose = (): void =>
         {
             setOpen(false);
+            setMenuPosition(null);
+        };
+
+        const handleContextMenu: DivClickEventHandler = (ev) =>
+        {
+            ev.preventDefault();
+            setMenuPosition({ left: ev.clientX, top: ev.clientY });
+            setOpen(true);
         };
 
         return (<>
@@ -57,8 +66,7 @@ export const UserList: React.FC<UserListProps> = ({
                 tabIndex={-1}
                 role="listitem"
                 aria-expanded={open}
-                ref={anchorRef}
-                onClick={getToggleFunc(setOpen)}
+                onContextMenu={handleContextMenu}
             >
                 <Avatar className="user-list-item-avatar" children={user.name[INDEX_OF_FIRST_SYMBOL]} />
                 <div className="user-list-item-info">
@@ -67,7 +75,7 @@ export const UserList: React.FC<UserListProps> = ({
                 </div>
             </div>
             <Menu
-                anchorRef={anchorRef}
+                anchorPosition={menuPosition ?? undefined}
                 open={open}
                 onClose={handleClose}
                 transitionDuration={transitionDuration}

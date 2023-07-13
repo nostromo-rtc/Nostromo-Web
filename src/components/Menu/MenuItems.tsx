@@ -106,6 +106,8 @@ interface MenuItemSliderProps extends MenuItemProps
 }
 export const MenuItemSlider: React.FC<MenuItemSliderProps> = ({ text, value, setValue, ...props }) =>
 {
+    // TODO: попробовать прокинуть фокус с этого Item на сам слайдер.
+
     const handleChange = (event: Event, newValue: number[] | number): void =>
     {
         // Поскольку это не range slider, то тип для value number, а не number[].
