@@ -94,16 +94,25 @@ export const UserList: React.FC<UserListProps> = ({
                         setValue={setVolume}
                     />
                     <Divider className="menu-divider" />
-                    {/* TODO: Реализовать копирование имени и ID при нажатии на пункты меню. */}
                     <MenuItemWithIcon
                         text="Скопировать имя пользователя"
                         icon={<HiIdentification />}
                         endIcon
+                        onClick={async () =>
+                        {
+                            await navigator.clipboard.writeText(user.name);
+                            handleClose();
+                        }}
                     />
                     <MenuItemWithIcon
                         text="Скопировать ID пользователя"
                         icon={<HiHashtag />}
                         endIcon
+                        onClick={async () =>
+                        {
+                            await navigator.clipboard.writeText(user.id);
+                            handleClose();
+                        }}
                     />
                 </MenuList>
             </Menu>
