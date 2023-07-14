@@ -1,8 +1,42 @@
 import { MenuItem, MenuItemProps, Slider } from "@mui/material";
-import { ReactElement } from "react";
+import { ReactElement, useRef } from "react";
 
 import { MdCheckBox, MdCheckBoxOutlineBlank, MdInfoOutline, MdRadioButtonChecked, MdRadioButtonUnchecked } from "react-icons/md";
 import "./MenuItems.css";
+
+type LiFocusHandler = React.FocusEventHandler<HTMLLIElement>;
+type LiKeyboardEventHandler = React.KeyboardEventHandler<HTMLLIElement>;
+
+/**
+ * Переместить фокус от `currentFocus` к другому соседнему элементу.
+ * У элемента `focusTarget`, к которому перемещают фокус, должен быть аттрибут `tabindex`.
+ * @param currentFocus исходный элемент владеющий фокусом.
+ * @param next если `true`, то фокус будет перемещен к *следующему* элементу, иначе к *предыдущему*.
+ */
+function moveFocus(currentFocus: Element | null, next: boolean): void
+{
+    if (!currentFocus)
+    {
+        return;
+    }
+
+    let focusTarget = next
+        ? currentFocus.nextElementSibling
+        : currentFocus.previousElementSibling;
+
+    while (focusTarget !== null
+        && !focusTarget.hasAttribute('tabindex'))
+    {
+        focusTarget = next
+            ? focusTarget.nextElementSibling
+            : focusTarget.previousElementSibling;
+    }
+
+    if (focusTarget)
+    {
+        (focusTarget as HTMLElement).focus();
+    }
+}
 
 interface MenuItemWithIconProps extends MenuItemProps
 {
@@ -106,7 +140,10 @@ interface MenuItemSliderProps extends MenuItemProps
 }
 export const MenuItemSlider: React.FC<MenuItemSliderProps> = ({ text, value, setValue, ...props }) =>
 {
-    // TODO: попробовать прокинуть фокус с этого Item на сам слайдер.
+    // TODO: попробовать реализовать самодельный Slider, чтобы легче было получать ref на input в слайдере.
+
+    const itemRef = useRef<HTMLLIElement>(null);
+    const sliderRef = useRef<HTMLSpanElement>(null);
 
     const handleChange = (event: Event, newValue: number[] | number): void =>
     {
@@ -114,11 +151,58 @@ export const MenuItemSlider: React.FC<MenuItemSliderProps> = ({ text, value, set
         setValue(newValue as number);
     };
 
+    // Пробрасываем фокус на input внутри слайдера, при попадании фокуса на этот элемент меню.
+    const handleFocus: LiFocusHandler = (ev) =>
+    {
+        if (!sliderRef.current)
+        {
+            return;
+        }
+
+        ev.preventDefault();
+        const input = sliderRef.current.querySelector("input");
+        input?.focus();
+    };
+
+    // Переопределение клавиш для SliderItem.
+    // Стрелки влево-вправо - регулируют значение слайдера (это дефолтное поведение).
+    // Кнопка Escape - закрыть меню (путем автоматической передачи события выше к меню).
+    // Стрелки вверх-вниз - переход к следующему/предыдущему элементу в списке MenuList (вручную).
+    const handleKeyDown: LiKeyboardEventHandler = (ev) =>
+    {
+        if (ev.key !== "ArrowLeft" && ev.key !== "ArrowRight" && ev.key !== "Escape")
+        {
+            ev.preventDefault();
+            ev.stopPropagation();
+        }
+
+        if (ev.key === "ArrowDown" && itemRef.current)
+        {
+            moveFocus(itemRef.current, true);
+        }
+        else if (ev.key === "ArrowUp" && itemRef.current)
+        {
+            moveFocus(itemRef.current, false);
+        }
+    };
+
     return (
-        <MenuItem {...props} className={`${props.className ?? ''} menu-item-slider menu-item`}>
+        <MenuItem
+            {...props}
+            className={`${props.className ?? ''} menu-item-slider menu-item`}
+            onFocus={handleFocus}
+            ref={itemRef}
+            onKeyDown={handleKeyDown}
+        >
             <p className="menu-item-label text-wrap">{text}</p>
             <div className="menu-item-slider-container">
-                <Slider value={value} onChange={handleChange} valueLabelDisplay="auto" role="slider" />
+                <Slider
+                    value={value}
+                    onChange={handleChange}
+                    valueLabelDisplay="auto"
+                    role="slider"
+                    ref={sliderRef}
+                />
             </div>
         </MenuItem>
     );

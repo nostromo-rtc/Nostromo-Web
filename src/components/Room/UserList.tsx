@@ -62,7 +62,7 @@ export const UserList: React.FC<UserListProps> = ({
         return (<>
             {/* aria-expanded является допустимым свойствои для role=listitem */}
             {/* eslint-disable-next-line jsx-a11y/role-supports-aria-props */}
-            <div className="user-list-item clickable"
+            <div className="user-list-item non-selectable"
                 tabIndex={-1}
                 role="listitem"
                 aria-expanded={open}
