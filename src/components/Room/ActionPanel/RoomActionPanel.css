@@ -118,16 +118,6 @@
     color: #000;
 }
 
-.action-btn-on:hover .action-btn-icon-off
-{
-    opacity: 1;
-}
-
-.action-btn-on:hover .action-btn-icon-on
-{
-    opacity: 0;
-}
-
 .action-btn-off
 {
     background-color: #c73335;
@@ -148,16 +138,6 @@
 {
     background-color: #e6595b;
     color: #fff;
-}
-
-.action-btn-off:hover .action-btn-icon-on
-{
-    opacity: 1;
-}
-
-.action-btn-off:hover .action-btn-icon-off
-{
-    opacity: 0;
 }
 
 .action-btn-optional.action-btn-off
