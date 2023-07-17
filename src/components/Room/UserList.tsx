@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./UserList.css";
 
 import { Avatar, Divider } from "@mui/material";
 import { UserInfo } from "nostromo-shared/types/RoomTypes";
 import { HiHashtag, HiIdentification } from "react-icons/hi";
-import { getToggleFunc } from "../../Utils";
+import { getToggleFunc, moveFocus, moveFocusToListBoundary } from "../../Utils";
 import { AnchorPosition, Menu, MenuList } from "../Menu/Menu";
 import { MenuItemCheckbox, MenuItemSlider, MenuItemWithIcon, MenuSectionLabel } from "../Menu/MenuItems";
 
@@ -22,11 +22,53 @@ export const UserList: React.FC<UserListProps> = ({
 {
     const [onlineUserList, setOnlineUserList] = useState<UserInfo[]>([]);
     const [offlineUserList, setOfflineUserList] = useState<UserInfo[]>([]);
+    const listRef = useRef<HTMLDivElement>(null);
 
     const handleListKeyDown: DivKeyboardEventHandler = (ev) =>
     {
-        // TODO: Сделать переключение на стрелки.
-        console.log(ev.key);
+        const list = listRef.current;
+
+        if (!list)
+        {
+            return;
+        }
+
+        const currentFocus = document.activeElement;
+
+        if (ev.key === "ArrowDown")
+        {
+            ev.preventDefault();
+            if (currentFocus === list)
+            {
+                moveFocusToListBoundary(list, true);
+            }
+            else
+            {
+                moveFocus(currentFocus, true);
+            }
+        }
+        else if (ev.key === "ArrowUp")
+        {
+            ev.preventDefault();
+            if (currentFocus === list)
+            {
+                moveFocusToListBoundary(list, false);
+            }
+            else
+            {
+                moveFocus(currentFocus, false);
+            }
+        }
+        else if (ev.key === "Home")
+        {
+            ev.preventDefault();
+            moveFocusToListBoundary(list, true);
+        }
+        else if (ev.key === "End")
+        {
+            ev.preventDefault();
+            moveFocusToListBoundary(list, false);
+        }
     };
 
     useEffect(() =>
@@ -44,6 +86,7 @@ export const UserList: React.FC<UserListProps> = ({
             tabIndex={0}
             onKeyDown={handleListKeyDown}
             role="list"
+            ref={listRef}
         >
             <UserListSection sectionLabel="В сети" list={onlineUserList} transitionDuration={transitionDuration} />
             <UserListSection sectionLabel="Не в сети" list={offlineUserList} transitionDuration={transitionDuration} />

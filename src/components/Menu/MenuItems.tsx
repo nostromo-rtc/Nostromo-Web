@@ -1,42 +1,12 @@
 import { MenuItem, MenuItemProps, Slider } from "@mui/material";
 import { ReactElement, useRef } from "react";
+import { moveFocus } from "../../Utils";
 
 import { MdCheckBox, MdCheckBoxOutlineBlank, MdInfoOutline, MdRadioButtonChecked, MdRadioButtonUnchecked } from "react-icons/md";
 import "./MenuItems.css";
 
 type LiFocusHandler = React.FocusEventHandler<HTMLLIElement>;
 type LiKeyboardEventHandler = React.KeyboardEventHandler<HTMLLIElement>;
-
-/**
- * Переместить фокус от `currentFocus` к другому соседнему элементу.
- * У элемента `focusTarget`, к которому перемещают фокус, должен быть аттрибут `tabindex`.
- * @param currentFocus исходный элемент владеющий фокусом.
- * @param next если `true`, то фокус будет перемещен к *следующему* элементу, иначе к *предыдущему*.
- */
-function moveFocus(currentFocus: Element | null, next: boolean): void
-{
-    if (!currentFocus)
-    {
-        return;
-    }
-
-    let focusTarget = next
-        ? currentFocus.nextElementSibling
-        : currentFocus.previousElementSibling;
-
-    while (focusTarget !== null
-        && !focusTarget.hasAttribute('tabindex'))
-    {
-        focusTarget = next
-            ? focusTarget.nextElementSibling
-            : focusTarget.previousElementSibling;
-    }
-
-    if (focusTarget)
-    {
-        (focusTarget as HTMLElement).focus();
-    }
-}
 
 interface MenuItemWithIconProps extends MenuItemProps
 {

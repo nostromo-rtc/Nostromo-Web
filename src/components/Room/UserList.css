@@ -19,6 +19,17 @@
     border-radius: 6px;
 }
 
+.user-list-item:focus
+{
+    background-color: #3b3f41;
+}
+
+.user-list-item:focus-visible
+{
+    background-color: #3b3f41;
+    outline: none;
+}
+
 .user-list-item:active
 {
     background-color: #3b3f41;
