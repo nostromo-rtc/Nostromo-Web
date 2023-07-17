@@ -1,5 +1,5 @@
 import { ClickAwayListener, Grow, MenuList as MuiMenuList, Paper, Popper } from "@mui/material";
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect, useRef } from "react";
 import { PopperPlacementType } from "@mui/material";
 
 import { doNotHandleEvent } from "../../Utils";
@@ -45,7 +45,15 @@ export const Menu: React.FC<MenuProps> = ({
     const POPPER_OFFSET_SKIDDING = 0;
     const POPPER_OFFSET_DISTANCE = 8;
 
-    const handleClose = (ev: Event | React.SyntheticEvent): void =>
+    const initialFocusRef = useRef<HTMLElement | null>(null);
+
+    const handleClose = (): void =>
+    {
+        onClose();
+        initialFocusRef.current?.focus();
+    };
+
+    const handleCloseByMouse = (ev: Event | React.SyntheticEvent): void =>
     {
         // Не закрывать меню при нажатии на область, к которой привязано контекстное меню.
         // Например, это позволит захватывать веб-камеру при нажатии на кнопку захвата,
@@ -55,14 +63,20 @@ export const Menu: React.FC<MenuProps> = ({
             return;
         }
 
-        onClose();
+        handleClose();
     };
 
     const handleListKeyDown: DivKeyboardEventHandler = (ev) =>
     {
         if (ev.key === "Escape")
         {
-            onClose();
+            handleClose();
+        }
+
+        if (ev.key === "ArrowDown" || ev.key === "ArrowUp"
+            || ev.key === "Home" || ev.key === "End")
+        {
+            ev.stopPropagation();
         }
     };
 
@@ -76,6 +90,14 @@ export const Menu: React.FC<MenuProps> = ({
             anchorPosition.top
         )
     } : anchorRef?.current;
+
+    useEffect(() =>
+    {
+        if (open)
+        {
+            initialFocusRef.current = document.activeElement as HTMLElement | null;
+        }
+    }, [open]);
 
     return (
         <Popper
@@ -113,7 +135,7 @@ export const Menu: React.FC<MenuProps> = ({
             {   // eslint-disable-next-line @typescript-eslint/naming-convention
                 ({ TransitionProps, placement }) => (
                     <ClickAwayListener
-                        onClickAway={handleClose}
+                        onClickAway={handleCloseByMouse}
                         mouseEvent="onPointerDown"
                         touchEvent={false}
                     >
@@ -155,6 +177,7 @@ export const MenuList: React.FC<MenuListProps> = ({
             autoFocus={open && disableAutoFocusItem}
             className="menu-list small-text"
             onClick={doNotHandleEvent}
+            tabIndex={0}
         >
             {children}
         </MuiMenuList>
