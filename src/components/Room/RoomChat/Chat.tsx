@@ -30,10 +30,10 @@ export const Chat: React.FC = () =>
 {
     /* Хук для перехвата сообщения */
     const [textMsg, setTextMsg] = useState("");
-    /* Хук для drag-n-drop */
+    /* Хук взятия пути для скачивания файла после вставки */
+    const [pathFile, setPathFile] = useState("");
     /* Хук для перехвата изменения длины строки ввода (placeholder)*/
     const [checkPlaceH, setCheckPlaceH] = useState(true);
-    const [info, setInfo] = useState("");
     const [msgs, setMsgs] = useState<ChatMessage[]>([
         {userId: "155sadjofdgknsdfk3", type: "text", datetime: (new Date().getTime())/2, content: "Hello, colleagues! "
         +"I think that everything will be fine with us, life is getting better, work is in full swing, the kettle is in the kitchen too." },
@@ -223,13 +223,13 @@ export const Chat: React.FC = () =>
     }
     // Вставка файла через ctrl+v
     const pasteFile =(e : React.ClipboardEvent<HTMLDivElement>)=>{
+        setPathFile(e.clipboardData.getData("text"));
+        files = [e.clipboardData.items];
+        formData.append('file', e.clipboardData.items[1].getAsFile()!);
+        console.log("size: " + (e.clipboardData.items[0].getAsFile()!.size/1000).toString() + "KB");
+        console.log("name: " + e.clipboardData.items[1].getAsFile()!.name);
+        console.log("type: " + e.clipboardData.items[1].getAsFile()!.type);
         e.preventDefault();
-        //console.log(e.clipboardData.getData("image"));
-        files = [...e.clipboardData.files];
-        console.log(files);
-        formData.append('file', files[0]);
-        setInfo(files[0].name + " " + String(files[0].size/1000) + "KB");
-        console.log(info);
     }
     const loadFileBoxRef = useRef<HTMLDivElement>(null);
     const loadFile = (<>
@@ -251,7 +251,6 @@ export const Chat: React.FC = () =>
             </TooltipTopBottom>
         </div>
     </>);
-    const flagDnd = useContext(DndContext);
     return (
             <><div id="chat" aria-readonly>
                 {msgs.map(m=>{
@@ -272,7 +271,7 @@ export const Chat: React.FC = () =>
                     onKeyDown={e=>{InputHandler(e)}}
                     aria-multiline="true"
                     contentEditable="true"
-                    title='dasdsasda'
+                    title='Поле ввода сообщения'
                     onBlur={e=>checkPlaceholder(e.currentTarget.textContent as string)}
                     onPaste={e=>pasteFile(e)}
                     onInput={e=>{const tmp : HTMLDivElement = e.currentTarget; 
