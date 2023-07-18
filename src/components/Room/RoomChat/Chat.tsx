@@ -1,24 +1,20 @@
-import React, { useContext, useEffect, useRef, useState} from 'react';
-import {ImAttachment} from 'react-icons/im';
-import {MdSend} from 'react-icons/md';
-import {BsFileEarmarkMedical} from 'react-icons/bs';
-import {FcFile} from 'react-icons/fc';
+import React, {useEffect, useRef, useState } from 'react';
+import { ImAttachment } from 'react-icons/im';
+import { MdSend } from 'react-icons/md';
+import { FcFile } from 'react-icons/fc';
 import "./Chat.css";
 import { Message } from './Message';
 import { TooltipTopBottom } from '../../Tooltip';
 import { Button } from '@mui/material';
-import {DndContext } from '../../../App';
 
 /** Информация о файле в чате. */
-interface ChatFileInfo
-{
+interface ChatFileInfo {
     fileId: string;
     name: string;
     size: number;
 }
 /** Информация о сообщении в чате. */
-interface ChatMessage
-{
+interface ChatMessage {
     userId: string;
     type: "text" | "file";
     datetime: number;
@@ -28,8 +24,7 @@ const temp: ChatMessage[] = [];
 /* для передачи на сервер */
 const formData = new FormData();
 let files = [];
-export const Chat: React.FC = () =>
-{
+export const Chat: React.FC= () => {
     /* Хук для перехвата сообщения */
     const [textMsg, setTextMsg] = useState("");
     /* Хук взятия пути для скачивания файла после вставки */
@@ -38,33 +33,38 @@ export const Chat: React.FC = () =>
     const [checkPlaceH, setCheckPlaceH] = useState(true);
     /* Хук для отображения загружаемых файлов */
     const [isLoadFile, setFlagLF] = useState(false);
+    
     /* Хук-контейнер для тестовых сообщений */
     const [msgs, setMsgs] = useState<ChatMessage[]>([
-        {userId: "155sadjofdgknsdfk3", type: "text", datetime: (new Date().getTime())/2, content: "Hello, colleagues! "
-        +"I think that everything will be fine with us, life is getting better, work is in full swing, the kettle is in the kitchen too." },
-        {userId: "12hnjofgl33154", type: "text", datetime: new Date().getTime() - 20000, content: "Hello everyone! Yes! "
-        + "Time goes by, nothing stands still. I am very glad that everything around is developing. I hope everything continues at the same pace." },
-        {userId: "1bvcbjofg23fxcvds", type: "text", datetime: new Date().getTime() - 15000, content: "Hi all!" },
-        {userId: "12hnjofgl33154", type: "text", datetime: new Date().getTime() - 10000, content: "Check this: https://bugs.documentfoundation.org/4р4рекарекрке456орпороен56оар5646666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666епопропаркепрке54н5445р4р45р5р45р54р4р6керкер " },
-        {userId: "155sadjofdgknsdfk3", type: "file", datetime: new Date().getTime() - 5000, content: {fileId: "cxzvzx23", name: "Master_and_Margo.txt", size: 412428}},
-        {userId: "12hnjofgl33154", type: "file", datetime: new Date().getTime(), content: {fileId: "jghjghj2", name: "About_IT.txt", size: 4212428}}
+        {
+            userId: "155sadjofdgknsdfk3", type: "text", datetime: (new Date().getTime()) / 2, content: "Hello, colleagues! "
+                + "I think that everything will be fine with us, life is getting better, work is in full swing, the kettle is in the kitchen too."
+        },
+        {
+            userId: "12hnjofgl33154", type: "text", datetime: new Date().getTime() - 20000, content: "Hello everyone! Yes! "
+                + "Time goes by, nothing stands still. I am very glad that everything around is developing. I hope everything continues at the same pace."
+        },
+        { userId: "1bvcbjofg23fxcvds", type: "text", datetime: new Date().getTime() - 15000, content: "Hi all!" },
+        { userId: "12hnjofgl33154", type: "text", datetime: new Date().getTime() - 10000, content: "Check this: https://bugs.documentfoundation.org/4р4рекарекрке456орпороен56оар5646666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666епопропаркепрке54н5445р4р45р5р45р54р4р6керкер " },
+        { userId: "155sadjofdgknsdfk3", type: "file", datetime: new Date().getTime() - 5000, content: { fileId: "cxzvzx23", name: "Master_and_Margo.txt", size: 412428 } },
+        { userId: "12hnjofgl33154", type: "file", datetime: new Date().getTime(), content: { fileId: "jghjghj2", name: "About_IT.txt", size: 4212428 } }
     ]);
     /* Хук-контейнер для тестовых файлов */
     const [testFiles, setFiles] = useState<ChatFileInfo[]>([
-        {fileId : "hfg123", name: "Mr_Booble", size: 55500555},
-        {fileId : "jhg312", name: "Ms_Cringe", size: 55500555},
-        {fileId : "kjh366", name: "Book_Coolgfgkhkghghkhtoiktk", size: 55500555},
-        {fileId : "loi785", name: "Merge_N2", size: 55500555},
-        {fileId : "nbv890", name: "Fix_Price", size: 55500555},
-        {fileId : "xcv519", name: "Jujutsu_C", size: 55500555},
-        {fileId : "hfg123", name: "Mr_Booble", size: 55500555},
-        {fileId : "jhg312", name: "Ms_Cringe", size: 55500555},
-        {fileId : "kjh366", name: "Book_Coolgfgkhkghghkhtoiktk", size: 55500555},
-        {fileId : "loi785", name: "Merge_N2", size: 55500555},
-        {fileId : "nbv890", name: "Fix_Price", size: 55500555}
+        { fileId: "hfg123", name: "Mr_Booble", size: 55500555 },
+        { fileId: "jhg312", name: "Ms_Cringe", size: 55500555 },
+        { fileId: "kjh366", name: "Book_Coolgfgkhkghghkhtoiktk", size: 55500555 },
+        { fileId: "loi785", name: "Merge_N2", size: 55500555 },
+        { fileId: "nbv890", name: "Fix_Price", size: 55500555 },
+        { fileId: "xcv519", name: "Jujutsu_C", size: 55500555 },
+        { fileId: "hfg123", name: "Mr_Booble", size: 55500555 },
+        { fileId: "jhg312", name: "Ms_Cringe", size: 55500555 },
+        { fileId: "kjh366", name: "Book_Coolgfgkhkghghkhtoiktk", size: 55500555 },
+        { fileId: "loi785", name: "Merge_N2", size: 55500555 },
+        { fileId: "nbv890", name: "Fix_Price", size: 55500555 }
     ]);
 
-    useEffect(() => {   
+    useEffect(() => {
         // TODO: Добавить вывод смс;
     }, [textMsg]);
 
@@ -193,13 +193,29 @@ export const Chat: React.FC = () =>
         this.chat.append(messageDiv);
         this.chat.scrollTop = this.chat.scrollHeight;
     });*/
-    const sendMsgOnClick = (() =>
-    {
+    /* Хук для отображения загружаемых файлов при сворачивании */
+    /*const [isCollapseCards, setStateCC] = useState(false);
+    const componentSize = useRef<HTMLDivElement>(null);
+    useEffect(() => {
+        console.log("Start");
+        const observer = new ResizeObserver(e => {console.log("Middle");
+            if (componentSize && componentSize.current && componentSize.current.clientHeight < 260){
+                setStateCC(true);
+                console.log("IF");
+            }else if(componentSize && componentSize.current){
+                setStateCC(false);
+                console.log("Else");
+            }
+        });
+        if (componentSize && componentSize.current)
+            observer.observe(componentSize.current);
+    }, [])*/
+    const sendMsgOnClick = (() => {
         const date = new Date().toLocaleString() + "";
-        const chatElement : HTMLElement = document.getElementById("chat") as HTMLElement;
+        const chatElement: HTMLElement = document.getElementById("chat") as HTMLElement;
         chatElement.scrollTop = chatElement.scrollHeight;
-        
-        temp.push({userId: "1bvcbjofg23fxcvds", type: "text", datetime: new Date().getTime(), content: textMsg.trim()});
+
+        temp.push({ userId: "1bvcbjofg23fxcvds", type: "text", datetime: new Date().getTime(), content: textMsg.trim() });
         setMsgs(temp);
         setFlagLF(false);
     });
@@ -214,7 +230,7 @@ export const Chat: React.FC = () =>
                         className='chat-btn-width'
                         accessKey='enter'
                     >
-                        <MdSend className='btn-icon'/>
+                        <MdSend className='btn-icon' />
                     </Button>
                     <div className="chat-btn-clickable-area non-selectable" onClick={sendMsgOnClick}></div>
                 </div>
@@ -224,18 +240,21 @@ export const Chat: React.FC = () =>
     /*** Кнопка отправки файлов ***/
     const fileComponent = useRef<HTMLInputElement>(null);
     // Тестовый прогресс бар
-    const [data, setData ] = useState(0);
-    useEffect(()=>{setTimeout(function () {
-        setData(data+100000);
-    }, 1000)},[data])
-
+    const [data, setData] = useState(0);
+    useEffect(() => {
+        setTimeout(function () {
+            setData(data + 100000);
+        }, 1000)
+    }, [data])
+    
     const loadFileOnClick = (e: React.FormEvent<HTMLInputElement>) => {
         e.preventDefault();
         setFlagLF(true);
         const filesToUpload = fileComponent.current!.files;
+        console.log(filesToUpload);
         const formSent = new FormData();
-        if (filesToUpload!.length > 0){
-            for(const item in filesToUpload){
+        if (filesToUpload!.length > 0) {
+            for (const item in filesToUpload) {
                 formSent.append('file-input-btn', item);
                 console.log(item);
             }
@@ -244,33 +263,33 @@ export const Chat: React.FC = () =>
         }
         return false;
     }
-    const removeCard = (fileId : string)=>{
-        testFiles.map(f=>{
-            if(f.fileId == fileId){
-                testFiles.splice(testFiles.findIndex(t=>t.fileId==fileId), 1);
+    const removeCard = (fileId: string) => {
+        testFiles.map(f => {
+            if (f.fileId == fileId) {
+                testFiles.splice(testFiles.findIndex(t => t.fileId == fileId), 1);
             }
         })
     }
     const InputHandler = (e: React.KeyboardEvent<HTMLDivElement>) => {
-        if (!e.shiftKey && e.code == 'Enter'){
+        if (!e.shiftKey && e.code == 'Enter') {
             e.preventDefault();
             sendMsgOnClick();
         }
     }
     // проверка на выставление placeholder-а для поля ввода
-    const checkPlaceholder = (text : string) => {
-        if(!text.length)
+    const checkPlaceholder = (text: string) => {
+        if (!text.length)
             setCheckPlaceH(true);
         else
             setCheckPlaceH(false);
     }
     // Вставка файла через ctrl+v
-    const pasteFile =(e : React.ClipboardEvent<HTMLDivElement>)=>{
+    const pasteFile = (e: React.ClipboardEvent<HTMLDivElement>) => {
         setFlagLF(true);
         setPathFile(e.clipboardData.getData("text"));
         files = [e.clipboardData.items];
         formData.append('file', e.clipboardData.items[1].getAsFile()!);
-        console.log("size: " + (e.clipboardData.items[0].getAsFile()!.size/1000).toString() + "KB");
+        console.log("size: " + (e.clipboardData.items[0].getAsFile()!.size / 1000).toString() + "KB");
         console.log("name: " + e.clipboardData.items[1].getAsFile()!.name);
         console.log("type: " + e.clipboardData.items[1].getAsFile()!.type);
         e.preventDefault();
@@ -284,64 +303,66 @@ export const Chat: React.FC = () =>
                         component='label'
                         className='chat-btn-width'>
                         <label>
-                            <ImAttachment className='btn-icon'/>
-                            <input type="file" id="file-input-btn" ref={fileComponent} onChange={e=>loadFileOnClick(e)} name="file" multiple hidden />
+                            <ImAttachment className='btn-icon' />
+                            <input type="file" id="file-input-btn" ref={fileComponent} onChange={e => loadFileOnClick(e)} name="file" multiple hidden />
                         </label>
                     </Button>
                     <label className="chat-btn-clickable-area non-selectable" >
-                        <input type="file" id="file-input-btn-area" ref={fileComponent} onChange={e=>loadFileOnClick(e)} name="file" multiple hidden />
+                        <input type="file" id="file-input-btn-area" ref={fileComponent} onChange={e => loadFileOnClick(e)} name="file" multiple hidden />
                     </label>
                 </div>
             </TooltipTopBottom>
         </div>
     </>);
     return (
-            <><div id="chat" aria-readonly>
-                {msgs.map(m=>{
-                    return <Message key={m.userId + m.datetime.toString()} message={m}/>})
+        <>  <div id="chat" aria-readonly>
+                {msgs.map(m => {
+                    return <Message key={m.userId + m.datetime.toString()} message={m} />
+                })
                 }
             </div>
-            
-            <div className="input-area">
-                {isLoadFile?
-                    <div className='view-file-cards-area'> 
-                    {testFiles.map(f=>{
+            {isLoadFile?
+                <div className='view-file-cards-area'>
+                    {testFiles.map(f => {
                         return <div className='file-cards'>
-                                <div className='remove-file-btn'
-                                    onClick={e=>removeCard(f.fileId)}>Х</div>
-                                <div className='file-cards-icon'><FcFile className='file-icon'/></div>
-                                <div className='file-cards-icon'>{f.name.substring(0,16)}</div>
-                                <progress id="progressBar" value={data} max={55500555}></progress>
-                                <div className="progress-load">{(data/(1024 * 1024)).toFixed(3)}MB из {(f.size/(1024 * 1024)).toFixed(3)}MB</div>
-                            </div>
+                            <div className='remove-file-btn'
+                                onClick={e => removeCard(f.fileId)}>Х</div>
+                            <div className='file-cards-icon'><FcFile className='file-icon' /></div>
+                            <div className='file-cards-icon'>{f.name.substring(0, 16)}</div>
+                            <progress id="progressBar" value={data} max={55500555}></progress>
+                            <div className="progress-load">{(data / (1024 * 1024)).toFixed(3)}MB из {(f.size / (1024 * 1024)).toFixed(3)}MB</div>
+                        </div>
                     })}
-                    </div>
-                :<></>
-                }
-                <div className='msg-input-area' style={{maxHeight: isLoadFile? 'calc(100% - 170px)' : 'calc(100% - 80px)'}}>
-                    <div className="btn-container btn-upload-file-container">
-                        {loadFile}
-                    </div>
-                    <div className='up-placeholder' 
-                        onClick={e=>{setCheckPlaceH(false);
+                </div>
+            :   <></>
+            }
+            <div className='msg-input-area'>
+                <div className="btn-container btn-upload-file-container">
+                    {loadFile}
+                </div>
+                <div className='up-placeholder'
+                    onClick={e => {
+                        setCheckPlaceH(false);
                         const element = document.getElementById("message-textarea") as HTMLElement;
-                        element.focus()}}>
-                    <div id="message-textarea"   
-                        role="textbox" 
-                        onKeyDown={e=>{InputHandler(e)}}
+                        element.focus()
+                    }}>
+                    <div id="message-textarea"
+                        role="textbox"
+                        onKeyDown={e => { InputHandler(e) }}
                         aria-multiline="true"
                         contentEditable="true"
                         title='Поле ввода сообщения'
-                        onBlur={e=>checkPlaceholder(e.currentTarget.textContent as string)}
-                        onPaste={e=>pasteFile(e)}
-                        onInput={e=>{const tmp : HTMLDivElement = e.currentTarget; 
-                                    const text : string = tmp.innerText;
-                                    setTextMsg(text) }}>
-                    </div>{checkPlaceH? <div className='down-placeholder'>Напишите сообщение...</div> : <></> }
-                    </div>
-                    <div className="btn-container btn-send-message-container">
-                        {sendMsg}
-                    </div>
+                        onBlur={e => checkPlaceholder(e.currentTarget.textContent as string)}
+                        onPaste={e => pasteFile(e)}
+                        onInput={e => {
+                            const tmp: HTMLDivElement = e.currentTarget;
+                            const text: string = tmp.innerText;
+                            setTextMsg(text)
+                        }}>
+                    </div>{checkPlaceH ? <div className='down-placeholder'>Напишите сообщение...</div> : <></>}
+                </div>
+                <div className="btn-container btn-send-message-container">
+                    {sendMsg}
                 </div>
             </div>
         </>

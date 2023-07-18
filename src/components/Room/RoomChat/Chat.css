@@ -293,16 +293,11 @@
     -webkit-user-select: none;
     background-color: #ebebeb;
 }
-.input-area{
-    display: contents;
-    flex: auto;
-    max-height:  50%;
-    margin-bottom: 10px;
-}
 .msg-input-area{
     display: flex;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     align-items: end;
+    max-height: calc(100% - 97px);
 }
 .view-file-cards-area{
     display: flex;
