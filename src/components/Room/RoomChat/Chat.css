@@ -317,10 +317,13 @@
     text-align: right;
 }
 .file-cards{
-    display: inline-block;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     word-wrap: break-word;
     padding: 5px 8px 10px 8px;
-    margin-left: 10px;
+    margin-left: 5px;
+    margin-right: 5px;
     min-width: 10%;
     border-radius: 5px;
     box-shadow:inset -1px -1px 1px 0 #152025, 
@@ -342,7 +345,6 @@
 }
 /* Прогресс бар для загрузки файлов */
 progress {
-    display: inline-block;
     text-align: center;
     width: 100%;
     height: 2px;

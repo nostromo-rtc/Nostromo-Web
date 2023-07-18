@@ -210,11 +210,12 @@ export const Chat: React.FC= () => {
         if (componentSize && componentSize.current)
             observer.observe(componentSize.current);
     }, [])*/
+    const chatElement = useRef<HTMLDivElement>(null);
     const sendMsgOnClick = (() => {
         const date = new Date().toLocaleString() + "";
-        const chatElement: HTMLElement = document.getElementById("chat") as HTMLElement;
-        chatElement.scrollTop = chatElement.scrollHeight;
-
+        if(chatElement && chatElement.current){
+            chatElement.current.scrollTop = chatElement.current.scrollHeight;
+        }
         temp.push({ userId: "1bvcbjofg23fxcvds", type: "text", datetime: new Date().getTime(), content: textMsg.trim() });
         setMsgs(temp);
         setFlagLF(false);
@@ -269,6 +270,8 @@ export const Chat: React.FC= () => {
                 testFiles.splice(testFiles.findIndex(t => t.fileId == fileId), 1);
             }
         })
+        if(!testFiles.length)
+            setFlagLF(false);
     }
     const InputHandler = (e: React.KeyboardEvent<HTMLDivElement>) => {
         if (!e.shiftKey && e.code == 'Enter') {
@@ -315,13 +318,13 @@ export const Chat: React.FC= () => {
         </div>
     </>);
     return (
-        <>  <div id="chat" aria-readonly>
+        <>  <div id="chat" ref={chatElement} aria-readonly>
                 {msgs.map(m => {
                     return <Message key={m.userId + m.datetime.toString()} message={m} />
                 })
                 }
             </div>
-            {isLoadFile?
+            {isLoadFile && testFiles.length?
                 <div className='view-file-cards-area'>
                     {testFiles.map(f => {
                         return <div className='file-cards'>
@@ -329,8 +332,10 @@ export const Chat: React.FC= () => {
                                 onClick={e => removeCard(f.fileId)}>Х</div>
                             <div className='file-cards-icon'><FcFile className='file-icon' /></div>
                             <div className='file-cards-icon'>{f.name.substring(0, 16)}</div>
-                            <progress id="progressBar" value={data} max={55500555}></progress>
-                            <div className="progress-load">{(data / (1024 * 1024)).toFixed(3)}MB из {(f.size / (1024 * 1024)).toFixed(3)}MB</div>
+                            <div>
+                                <progress id="progressBar" value={data} max={55500555}></progress>
+                                <div className="progress-load">{(data / (1024 * 1024)).toFixed(3)}MB из {(f.size / (1024 * 1024)).toFixed(3)}MB</div>
+                            </div>
                         </div>
                     })}
                 </div>
