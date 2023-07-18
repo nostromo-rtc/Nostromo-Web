@@ -13,7 +13,7 @@ export const RoomListPage: React.FC = () =>
     }, []);
 
     return (
-        <div id="base">
+        <>
             <Header title="Список комнат" />
             <div id="main">
                 <div id="room-list">
@@ -24,6 +24,6 @@ export const RoomListPage: React.FC = () =>
                     </NavLink>
                 </div>
             </div>
-        </div>
+        </>
     );
 };

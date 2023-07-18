@@ -1,17 +1,19 @@
-/* оформление для меню навигации */
+/* Оформление для меню навигации. */
 .nav
 {
     position: relative;
     display: flex;
     flex-direction: column;
-    min-width: 72px;
+    min-width: 64px;
+    max-width: 64px;
     background-color: #202225;
     height: 100%;
 }
 
-.nav a
+.nav-btn
 {
     display: flex;
+    position: relative;
     text-decoration: none;
     color: var(--secondary-text-color);
     margin-bottom: 2px;
@@ -22,50 +24,67 @@
     justify-content: center;
 }
 
-.nav a:hover
+.nav-btn:hover
 {
-    border-right: 2px solid #00BFFF;
+    background-color: inherit;
+    color: white;
 }
 
-.nav a:hover img
+.nav-btn:focus-visible
 {
-    margin-right: -2px;
+    outline: none;
 }
 
-.navbutton-active
+.nav-btn:hover .nav-btn-selector,
+.nav-btn:focus .nav-btn-selector,
+.nav-btn:focus-visible .nav-btn-selector
 {
-    border-right: 2px solid #00BFFF;
+    height: 30%;
 }
 
-.navbutton-active img
+.nav-btn-active.nav-btn .nav-btn-selector
 {
-    margin-right: -2px;
+    height: 50%;
 }
 
-.navbutton-icon
+.nav-btn-selector
+{
+    position: absolute;
+    left: 0;
+    width: 3px;
+    height: 0%;
+    background-color: white;
+    border-radius: 0 4px 4px 0;
+    transition: height 100ms;
+    box-shadow: 0px 0px 12px 2px rgba(0, 0, 0, 0.5);
+}
+
+.nav-btn-icon
 {
     border-radius: 10px;
-    background-color: #05516a;
-    padding: 6px;
-    box-shadow: 0px 2px 10px -1px rgba(0, 0, 0, 0.2);
-    width: 48px;
-    height: 48px;
+    padding: 4px;
+    width: 42px;
+    height: 42px;
     box-sizing: border-box;
 }
 
-.navbutton-icon:hover
+.nav-btn-underline
 {
-    background-color: #0b799d;
-}
-
-.navbutton-underline
-{
-    width: 45%;
+    width: 40%;
     background-color: #9e9797;
-    height: 3px;
+    height: 2px;
     margin-left: auto;
     margin-right: auto;
-    margin-top: 4px;
-    margin-bottom: 4px;
     border-radius: 5px;
+}
+
+#nav-btn-home
+{
+    background-color: #05516a;
+    box-shadow: 0px 2px 10px -1px rgba(0, 0, 0, 0.2);
+}
+
+#nav-btn-home:hover
+{
+    background-color: #0b799d;
 }

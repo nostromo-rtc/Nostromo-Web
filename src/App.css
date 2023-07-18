@@ -136,6 +136,13 @@
     display: inline;
 }
 
+.vertical-expander
+{
+    flex: auto;
+    width: 100%;
+    display: inline;
+}
+
 .v-align-default
 {
     vertical-align: baseline;
@@ -144,4 +151,32 @@
 .v-align-middle
 {
     vertical-align: middle;
+}
+
+.overflow-container
+{
+    display: flex;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.layer
+{
+    display: flex;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+}
+
+#layer-settings
+{
+    background-color: #282f39;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
 }

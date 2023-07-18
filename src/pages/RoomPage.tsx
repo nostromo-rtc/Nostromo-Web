@@ -37,6 +37,7 @@ export interface DeviceListItem
 
 export const RoomPage: React.FC = () =>
 {
+    // TODO: наверное стоит поместить это в контекст, так как много где применяется.
     const transitionDuration = 100;
 
     const roomName = "Тестовая";
@@ -141,7 +142,7 @@ export const RoomPage: React.FC = () =>
     }, []);
 
     return (
-        <div id="base">
+        <>
             <Header title={roomName} roomToolbarProps={roomToolbarProps} />
             <div id="main">
                 {isChatHidden
@@ -152,6 +153,6 @@ export const RoomPage: React.FC = () =>
                         upperMinHeight="200px" />}
                 {isUserListHidden ? <></> : <UserList transitionDuration={transitionDuration} />}
             </div>
-        </div>
+        </>
     );
 };

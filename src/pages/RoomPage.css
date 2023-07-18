@@ -27,10 +27,3 @@
     border-width: 0px;
     border-bottom: 3px #2b4b5a solid;
 }
-
-.overflow-container
-{
-    display: flex;
-    flex: auto;
-    overflow: hidden;
-}

@@ -37,7 +37,7 @@ export const RoomAuthPage: React.FC<Params> = ({ setAuth }) =>
     }, []);
 
     return (
-        <div id="base">
+        <>
             <Header title="Авторизация в комнате" />
             <div id="main">
                 <form id="auth" autoComplete="on" onSubmit={onSubmit}>
@@ -59,6 +59,6 @@ export const RoomAuthPage: React.FC<Params> = ({ setAuth }) =>
                     <input id="btn-join" type="submit" value="Войти" />
                 </form>
             </div>
-        </div>
+        </>
     );
 };
