@@ -6,13 +6,8 @@ import "./Chat.css";
 import { Message } from './Message';
 import { TooltipTopBottom } from '../../Tooltip';
 import { Button } from '@mui/material';
+import { ChatFileInfo, FileLoadingCard } from './FileLoadingCard';
 
-/** Информация о файле в чате. */
-interface ChatFileInfo {
-    fileId: string;
-    name: string;
-    size: number;
-}
 /** Информация о сообщении в чате. */
 interface ChatMessage {
     userId: string;
@@ -327,16 +322,7 @@ export const Chat: React.FC= () => {
             {isLoadFile && testFiles.length?
                 <div className='view-file-cards-area'>
                     {testFiles.map(f => {
-                        return <div className='file-cards'>
-                            <div className='remove-file-btn'
-                                onClick={e => removeCard(f.fileId)}>Х</div>
-                            <div className='file-cards-icon'><FcFile className='file-icon' /></div>
-                            <div className='file-cards-icon'>{f.name.substring(0, 16)}</div>
-                            <div>
-                                <progress id="progressBar" value={data} max={55500555}></progress>
-                                <div className="progress-load">{(data / (1024 * 1024)).toFixed(3)}MB из {(f.size / (1024 * 1024)).toFixed(3)}MB</div>
-                            </div>
-                        </div>
+                        return <FileLoadingCard file={f} onRemove={() => removeCard(f.fileId)} progress={data} />
                     })}
                 </div>
             :   <></>
