@@ -1,7 +1,6 @@
 import React, {useEffect, useRef, useState } from 'react';
 import { ImAttachment } from 'react-icons/im';
 import { MdSend } from 'react-icons/md';
-import { FcFile } from 'react-icons/fc';
 import "./Chat.css";
 import { Message } from './Message';
 import { TooltipTopBottom } from '../../Tooltip';
@@ -39,24 +38,24 @@ export const Chat: React.FC= () => {
             userId: "12hnjofgl33154", type: "text", datetime: new Date().getTime() - 20000, content: "Hello everyone! Yes! "
                 + "Time goes by, nothing stands still. I am very glad that everything around is developing. I hope everything continues at the same pace."
         },
-        { userId: "1bvcbjofg23fxcvds", type: "text", datetime: new Date().getTime() - 15000, content: "Hi all!" },
+        { userId: "1bvcbjofg23fxcvds", type: "text", datetime: new Date().getTime() - 15000, content: "Do you see this new file uploading panel? Looks cool!" },
         { userId: "12hnjofgl33154", type: "text", datetime: new Date().getTime() - 10000, content: "Check this: https://bugs.documentfoundation.org/4р4рекарекрке456орпороен56оар5646666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666епопропаркепрке54н5445р4р45р5р45р54р4р6керкер " },
         { userId: "155sadjofdgknsdfk3", type: "file", datetime: new Date().getTime() - 5000, content: { fileId: "cxzvzx23", name: "Master_and_Margo.txt", size: 412428 } },
         { userId: "12hnjofgl33154", type: "file", datetime: new Date().getTime(), content: { fileId: "jghjghj2", name: "About_IT.txt", size: 4212428 } }
     ]);
     /* Хук-контейнер для тестовых файлов */
     const [testFiles, setFiles] = useState<ChatFileInfo[]>([
-        { fileId: "hfg123", name: "Mr_Booble", size: 55500555 },
-        { fileId: "jhg312", name: "Ms_Cringe", size: 55500555 },
-        { fileId: "kjh366", name: "Book_Coolgfgkhkghghkhtoiktk", size: 55500555 },
-        { fileId: "loi785", name: "Merge_N2", size: 55500555 },
-        { fileId: "nbv890", name: "Fix_Price", size: 55500555 },
-        { fileId: "xcv519", name: "Jujutsu_C", size: 55500555 },
-        { fileId: "hfg123", name: "Mr_Booble", size: 55500555 },
-        { fileId: "jhg312", name: "Ms_Cringe", size: 55500555 },
-        { fileId: "kjh366", name: "Book_Coolgfgkhkghghkhtoiktk", size: 55500555 },
-        { fileId: "loi785", name: "Merge_N2", size: 55500555 },
-        { fileId: "nbv890", name: "Fix_Price", size: 55500555 }
+        { fileId: "hfg123", name: "Язык программирования C++", size: 16188070 },
+        { fileId: "jhg312", name: "C++ лекции и упражнения", size: 150537513 },
+        { fileId: "kjh366", name: "Современные операционные системы", size: 14280633 },
+        { fileId: "loi785", name: "Т.1. Искусство программирования", size: 83673366 },
+        { fileId: "nbv890", name: "Автоматное программирование", size: 1785979 },
+        { fileId: "xcv519", name: "Паттерны проектирования", size: 68368155 },
+        { fileId: "hfg123", name: "Некрономикон", size: 9999999999 },
+        { fileId: "jhg312", name: "QT 5.10 Профессиональное программирование на C++", size: 103919024 },
+        { fileId: "kjh366", name: "Т.2. Искусство программирования", size: 7235716 },
+        { fileId: "loi785", name: "Т.3. Искусство программирования", size: 8612462 },
+        { fileId: "nbv890", name: "Т.4. Искусство программирования", size: 99124812 }
     ]);
 
     useEffect(() => {
@@ -322,7 +321,7 @@ export const Chat: React.FC= () => {
             {isLoadFile && testFiles.length?
                 <div className='view-file-cards-area'>
                     {testFiles.map(f => {
-                        return <FileLoadingCard file={f} onRemove={() => removeCard(f.fileId)} progress={data} />
+                        return <FileLoadingCard file={f} onRemove={() => removeCard(f.fileId)} progress={data > f.size ? f.size : data /* TODO: Убрать эту проверку после реализации нормальной очереди */} />
                     })}
                 </div>
             :   <></>

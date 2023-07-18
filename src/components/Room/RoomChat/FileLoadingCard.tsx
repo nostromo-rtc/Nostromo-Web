@@ -19,9 +19,9 @@ export const FileLoadingCard: React.FC<fileProps> = (props) => {
             <div className='remove-file-btn'
                 onClick={() => {if (props.onRemove) props.onRemove(props.file.fileId)}}>Х</div>
             <div className='file-cards-icon'><FcFile className='file-icon' /></div>
-            <div className='file-cards-icon'>{props.file.name.substring(0, 16)}</div>
+            <div className='file-cards-icon'>{props.file.name}</div>
             <div>
-                <progress id="progressBar" value={props.progress} max={55500555}></progress>
+                <progress id="progressBar" value={props.progress} max={props.file.size}></progress>
                 <div className="progress-load">{(props.progress / (1024 * 1024)).toFixed(3)}MB из {(props.file.size / (1024 * 1024)).toFixed(3)}MB</div>
             </div>
         </div>
