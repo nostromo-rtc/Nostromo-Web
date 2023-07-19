@@ -5,7 +5,10 @@
     background-color: #1b282e;
     border-radius: 7px;
     border-top: 1px rgb(34, 33, 33, 0.6) solid;
-    flex: auto;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
 }
 
 #call-container
@@ -31,7 +34,8 @@
 }
 
 /******** Dnd *********/
-.vertical-center {
+.vertical-center
+{
     width: 100%;
     height: 100%;
     display: flex;
@@ -39,7 +43,9 @@
     justify-content: center;
     text-align: center;
 }
-.horizontal-center {
+
+.horizontal-center
+{
     width: 100%;
     height: 100%;
     display: flex;
@@ -48,16 +54,22 @@
     text-align: center;
     height: 150px;
 }
-.drop-area{
+
+.drop-area
+{
     position: absolute;
     z-index: 10;
     background-color: #00000099;
 }
-.drop-area-panel {
+
+.drop-area-panel
+{
     position: relative;
     z-index: 1;
 }
-.drop-area-border{
+
+.drop-area-border
+{
     background-color: #22485e;
     border: 2px dashed lightblue;
     border-radius: 10px;
@@ -70,7 +82,9 @@
     text-align: center;
     filter: drop-shadow(0px 0px 12px rgb(170, 170, 210, 0.5));
 }
-.drop-area-icon {
+
+.drop-area-icon
+{
     position: absolute;
     left: 0px;
     top: -37px;
@@ -79,7 +93,9 @@
     text-align: center;
     color: lightblue;
 }
-.drop-area-icon-sizes {
+
+.drop-area-icon-sizes
+{
     height: 100px;
     width: 100px;
     position: relative;
