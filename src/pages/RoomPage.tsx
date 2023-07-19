@@ -141,7 +141,7 @@ export const RoomPage: React.FC = () =>
             <hr id="call-container-divider" />
             <RoomActionPanel {...roomActionPanelProps} />
         </div>;
-
+ 
     useEffect(() =>
     {
         document.title = `Nostromo - Комната "${roomName}"`;
@@ -157,11 +157,11 @@ export const RoomPage: React.FC = () =>
 
     const flagDnd = useContext(DndContext);
     return (
-        <>
+        <>  
             <Header title={roomName} roomToolbarProps={roomToolbarProps} />
             <div id="main">
                 {flagDnd
-                    ? <div className="drop-area vertical-center" onDrop={(e) => onDropHandler(e)}>
+                    ? <div className="drop-area vertical-center" onDrop={(e) => {onDropHandler(e)}}>
                         <div className='horizontal-center'>
                             <div className='drop-area-panel'>
                                 <div className='drop-area-icon'><GiFiles className='drop-area-icon-sizes' /></div>

@@ -11,9 +11,9 @@ import { ChatFileInfo, FileLoadingCard } from './FileLoadingCard';
 interface ChatMessage
 {
     userId: string;
-    type: "text" | "file";
+    type: "file" | "text";
     datetime: number;
-    content: string | ChatFileInfo;
+    content: ChatFileInfo | string;
 }
 const temp: ChatMessage[] = [];
 /* для передачи на сервер */
@@ -26,7 +26,7 @@ export const Chat: React.FC = () =>
     /* Хук взятия пути для скачивания файла после вставки */
     const [pathFile, setPathFile] = useState("");
     /* Хук для перехвата изменения длины строки ввода (placeholder)*/
-    const [checkPlaceH, setCheckPlaceH] = useState(true);
+    const [isHiddenPH, setStateHiddenPH] = useState(false);
     /* Хук для отображения загружаемых файлов */
     const [isLoadFile, setFlagLF] = useState(false);
 
@@ -212,11 +212,7 @@ export const Chat: React.FC = () =>
     const chatElement = useRef<HTMLDivElement>(null);
     const sendMsgOnClick = (() =>
     {
-        const date = new Date().toLocaleString() + "";
-        if (chatElement && chatElement.current)
-        {
-            chatElement.current.scrollTop = chatElement.current.scrollHeight;
-        }
+        chatElement.current!.scrollTop = chatElement.current!.scrollHeight;
         temp.push({ userId: "1bvcbjofg23fxcvds", type: "text", datetime: new Date().getTime(), content: textMsg.trim() });
         setMsgs(temp);
         setFlagLF(false);
@@ -287,12 +283,18 @@ export const Chat: React.FC = () =>
         }
     };
     // проверка на выставление placeholder-а для поля ввода
+    // Ссылка на компонент ввода сообщения (чтобы избежать выставления <br> для PH)
+    const text_area = useRef<HTMLDivElement>(null);
     const checkPlaceholder = (text: string) =>
     {
-        if (!text.length)
-            setCheckPlaceH(true);
-        else
-            setCheckPlaceH(false);
+        if(text_area.current!.innerHTML != "<br>"){
+            if (!text.length)
+                setStateHiddenPH(false);
+            else
+                setStateHiddenPH(true);
+        }else{
+            setStateHiddenPH(false);
+        }
     };
     // Вставка файла через ctrl+v
     const pasteFile = (e: React.ClipboardEvent<HTMLDivElement>) =>
@@ -345,35 +347,35 @@ export const Chat: React.FC = () =>
                 <div className='view-file-cards-area' ref={fileCardsRef} onWheel={fileCardsWheelHandler}>
                     {testFiles.map(f =>
                     {
-                        return <FileLoadingCard file={f} onRemove={() => removeCard(f.fileId)} progress={data > f.size ? f.size : data /* TODO: Убрать эту проверку после реализации нормальной очереди */} />;
+                        return <FileLoadingCard file={f} onRemove={() => {removeCard(f.fileId)}} progress={data > f.size ? f.size : data /* TODO: Убрать эту проверку после реализации нормальной очереди */} />;
                     })}
                 </div>
                 : <></>
             }
             <div className='msg-input-area'>
                 {loadFileBtn}
-                <div id="message-textarea-wrapper"
-                    onClick={e =>
-                    {
-                        setCheckPlaceH(false);
-                        const element = document.getElementById("message-textarea") as HTMLElement;
-                        element.focus();
-                    }}>
+                <div id="message-textarea-wrapper">
                     <div id="message-textarea"
                         role="textbox"
+                        ref={text_area}
                         onKeyDown={e => { InputHandler(e); }}
                         aria-multiline="true"
                         contentEditable="true"
                         title='Поле ввода сообщения'
-                        onBlur={e => checkPlaceholder(e.currentTarget.textContent as string)}
-                        onPaste={e => pasteFile(e)}
+                        onPaste={e => {pasteFile(e)}}
                         onInput={e =>
                         {
                             const tmp: HTMLDivElement = e.currentTarget;
                             const text: string = tmp.innerText;
                             setTextMsg(text);
+                            checkPlaceholder(text);
                         }}>
-                    </div>{checkPlaceH ? <div id="message-textarea-placeholder">Напишите сообщение...</div> : <></>}
+                    </div>
+                    {!isHiddenPH? 
+                        <div id="message-textarea-placeholder" 
+                            onClick={e=>{text_area.current!.focus()}}
+                        >Напишите сообщение...</div> 
+                    : <></>}
                 </div>
                 {sendMsgBtn}
             </div>
