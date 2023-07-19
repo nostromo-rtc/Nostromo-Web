@@ -1,117 +1,90 @@
-/* чат */
-#chat-section {
+/* Чат */
+
+#chat
+{
     display: flex;
     flex-direction: column;
-    background-color: #1b282e;
-    border-radius: 10px 10px 10px 10px;
-    min-height: 100px;
-}
-
-#chat {
     flex: auto;
+    flex-basis: 0;
     font-size: 0.8125rem;
-    border: 1px solid #1f2022;
     border-radius: 10px 10px 0px 0px;
-    padding: 0.8rem;
     background-color: #152025;
     overflow-y: auto;
     box-shadow: inset 0 2rem 2rem -2rem rgba(0, 0, 0, 0.05), inset 0 -2rem 2rem -2rem rgba(0, 0, 0, 0.05);
     font-family: Rubik, Arial, Helvetica, sans-serif;
     font-weight: 400;
-    height: 100%;
 }
-.chat-con{
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    background-color: #1b282e;
-}
-
-#chat .message {
-    position: relative;
-    box-sizing: border-box;
-    padding: 0.5rem 1rem;
-    margin: 0.6rem;
-    border-radius: 0.75rem 0.75rem 0.75rem 0;
-    min-height: 2.25rem;
-    max-width: 66%;
-    box-shadow: 0 0 2rem rgba(0, 0, 0, 0.075), 0rem 1rem 1rem -1rem rgba(0, 0, 0, 0.1);
-    border-width: 1px;
-    width: fit-content;
-}
-.message-text {
-    overflow-wrap: anywhere;
-    margin-top: 4px;
-}
-
 
 /************** Строка ввода сообщения **************/
 
-#message-textarea {
-    height:100%;
-    width:100%;
+#message-textarea
+{
+    height: 100%;
+    width: 100%;
+    max-height: 200px;
 }
-.up-placeholder{
+
+#message-textarea-wrapper
+{
     position: relative;
-    flex: 1 1 95%;
-    resize: vertical;
-    background-color:  #1b282e;
+    background-color: #1b282e;
     border-radius: 10px;
     border: 1px solid #5b5b5b;
     color: #fafafa;
-    min-height: 20px;
-    padding: 10px;
-    max-height: 75px;
+    padding: 12px;
     overflow: scroll;
-    justify-content: center;
+    box-sizing: border-box;
+    font-size: 0.8125rem;
+    min-height: 42px;
+    max-height: 100%;
+    flex: auto;
 }
-.down-placeholder{
+
+#message-textarea-placeholder
+{
     position: absolute;
     top: 0;
-    left: 1%;
-    width: 99%;
+    left: 12px;
     height: 100%;
     display: flex;
     align-items: center;
 }
-#message-textarea:empty:before {
-    content:attr(data-text);
+
+#message-textarea:empty:before
+{
+    content: attr(data-text);
 }
-#message-textarea:focus{
+
+#message-textarea:focus
+{
     outline: none;
 }
 
 /************** Кнопки **************/
 
 /* Общий стиль для контейнеров кнопок */
-.btn-container {
-    flex-grow: 1;
+.btn-container
+{
     display: flex;
-    flex-direction: column;
     justify-content: center;
 }
-/* Контейнер для кнопки отправки сообщения*/
-.btn-send-message-container{
-    max-height: 150px;
-}
-/* Контейнер для кнопки загрузки файла */
-.btn-upload-file-container{
-    max-height: 47px;
-}
 
-.btn-send-message {
+.btn-send-message
+{
     background-color: #1b282e;
     color: #fafafa;
     min-height: 40px;
     border: none;
     margin: 10px 2px 2px 2px;
     max-width: 45px;
-    
+
 }
+
 .tooltip-send-btn
 {
     width: 115px;
 }
+
 .chat-btn-clickable-area
 {
     position: absolute;
@@ -120,23 +93,22 @@
     left: 0;
     top: 0;
 }
-.chat-btn-width{
-    max-width: 40px;
-    min-width: 40px;
-}
+
 .chat-btn-box
 {
-    max-width: 45px;
     position: relative;
-    box-sizing: border-box;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    padding: 0;
-    justify-content: center;
-    align-items: center;
 }
-.btn-icon{
+
+.chat-btn-box button
+{
+    max-height: 42px;
+    min-height: 42px;
+    min-width: 56px;
+    max-width: 56px;
+}
+
+.btn-icon
+{
     width: 25px;
     height: 25px;
     color: #656565;
@@ -145,28 +117,33 @@
 /************** Блоки сообщений в чате **************/
 
 /* Собственное смс (справа) */
-.self-msg-area{
+.self-msg-area
+{
     display: flex;
-    width: 100%;
     justify-content: right;
-    margin: 0.6rem 0 0.6rem 0;
+    margin: 0.6rem 0.8rem 0.6rem 0.8rem;
 }
+
 /* Сообщение собеседника (слева) */
-.msg-area{
+.msg-area
+{
     display: flex;
-    width: 100%;
     justify-content: left;
-    margin: 0.6rem 0 0.6rem 0;
+    margin: 0.6rem 0.8rem 0.6rem 0.8rem;
 }
+
 /* Контейнер для сообщений */
-.msg-container{
+.msg-container
+{
     padding: 10px;
     min-width: 10%;
     max-width: 60%;
     position: relative;
     overflow-wrap: anywhere;
 }
-.message-body{
+
+.message-body
+{
     margin-top: 4px;
     white-space: pre-line;
 }
@@ -174,33 +151,42 @@
 /* Стили блоков сообщений */
 
 /* Общий стиль всех сообщений */
-.msg-content {
+.msg-content
+{
     text-align: left;
     border-width: 2px;
     border-style: solid;
     margin-top: 4px;
 }
+
 /* Стиль сообщений других участников */
-.members-msg-content {
+.members-msg-content
+{
     border-color: #363f47;
     background-color: #363f47;
     border-radius: 0.75rem 0.75rem 0.75rem 0;
 }
+
 /* Стиль собственных сообщений */
-.self-msg-content {
+.self-msg-content
+{
     border-color: #1d3034;
     background-color: #1d3034;
     border-radius: 0.75rem 0.75rem 0 0.75rem;
 }
+
 /* Стиль имени отправителя смс */
-.user-name{
+.user-name
+{
     font-weight: 600;
     color: dodgerblue;
     z-index: 2;
     position: relative;
 }
+
 /* Стиль id отправителя смс */
-.user-id{
+.user-id
+{
     font-size: 0.75rem;
     margin-top: 0.0625rem;
     margin-left: 5px;
@@ -209,8 +195,10 @@
     z-index: 2;
     position: relative;
 }
+
 /* Стиль даты отправки смс */
-.date-msg-right{
+.date-msg-right
+{
     position: relative;
     text-align: right;
     width: 100%;
@@ -218,8 +206,10 @@
     color: #8999a0;
     z-index: 2;
 }
+
 /* Стиль кликабельного контейнера над сообщением (для обработки скачивания файла) */
-.msg-placeholder{
+.msg-placeholder
+{
     z-index: 1;
     position: absolute;
     width: 100%;
@@ -229,7 +219,8 @@
 }
 
 
-.video-label {
+.video-label
+{
     position: absolute;
     right: 0;
     border-left: 1px solid black;
@@ -248,7 +239,8 @@
     z-index: 1;
 }
 
-.center-video-label {
+.center-video-label
+{
     position: absolute;
     margin: 0;
     top: 50%;
@@ -265,7 +257,8 @@
     max-width: 60%;
 }
 
-.video-item {
+.video-item
+{
     flex-grow: 1;
     flex-shrink: 1;
     position: relative;
@@ -275,14 +268,15 @@
     border: 1px solid grey;
 }
 
-.video-container {
+.video-container
+{
     width: 100%;
     position: relative;
 }
 
 .btn
 {
-    border: 1px solid rgba(27,31,35,0.25);
+    border: 1px solid rgba(27, 31, 35, 0.25);
     box-shadow: rgba(27, 31, 35, 0.04) 0 1px 0, rgba(255, 255, 255, 0.25) 0 1px 0 inset;
     cursor: pointer;
     outline: none;
@@ -292,102 +286,153 @@
     -webkit-user-select: none;
     background-color: #ebebeb;
 }
-.msg-input-area{
+
+.msg-input-area
+{
     display: flex;
-    margin-bottom: 8px;
-    margin-top: 4px;
     align-items: end;
-    max-height: 97px;
+    border-top: 1px solid #1f2022;
+    max-height: 60%;
+    padding-top: 8px;
+    padding-bottom: 8px;
 }
-.view-file-cards-area{
+
+.view-file-cards-area
+{
     display: flex;
-    height: 100%;
-    max-width: 100%;
-    margin: 8px 5px 8px 5px;
+    flex: 5 1 auto;
+    flex-basis: 0;
+    width: 100%;
     overflow-x: auto;
+    max-height: 150px;
 }
-.progress-load{
+
+.progress-load
+{
     text-align: center;
     font-size: 8pt;
     color: #8999a0;
     margin-top: 4px;
 }
-.remove-file-btn{
+
+.remove-file-btn
+{
     z-index: 10;
     text-align: right;
 }
-.file-cards{
+
+.file-cards
+{
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     word-wrap: break-word;
-    padding: 5px 8px 10px 8px;
-    margin-left: 5px;
-    margin-right: 5px;
+    padding: 5px 8px 5px 8px;
+    margin: 8px 0 8px 5px;
     min-width: 10%;
     border-radius: 5px;
-    box-shadow:inset -1px -1px 1px 0 #152025, 
-             inset 1px 1px 1px 0 #1b282e;
+    box-shadow: inset -1px -1px 1px 0 #152025,
+        inset 1px 1px 1px 0 #1b282e;
     font-size: 6pt;
     background-color: #1f2022;
+    box-sizing: border-box;
+    overflow: hidden;
 }
-.file-icon{
+
+.file-icon
+{
     width: 45px;
     height: 45px;
 }
-.file-cards-icon{
+
+.file-cards-icon
+{
+    text-align: center;
+    width: 100%;
+    font-size: 7pt;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.file-cards-desc
+{
     text-align: center;
     width: 100%;
     font-size: 7pt;
 }
-.align-end{
+
+.file-cards-progress
+{
+    margin-bottom: 5px;
+}
+
+.align-end
+{
     text-align: end;
 }
+
 /* Прогресс бар для загрузки файлов */
-progress {
+progress
+{
     text-align: center;
     width: 100%;
     height: 2px;
     border: none;
     background-color: #286C2D;
 }
+
 /* Для одинакового отображения прогресс бара 
    в Firefox, Chrome , Safari используем префиксы -moz, -webkit */
-progress::-webkit-progress-bar {
+progress::-webkit-progress-bar
+{
     border: none;
     background-color: #286C2D;
 }
-progress::-webkit-progress-value {
+
+progress::-webkit-progress-value
+{
     background-color: #41E847;
 }
-progress::-moz-progress-bar {
+
+progress::-moz-progress-bar
+{
     border: none;
     background-color: #41E847;
 }
 
 
-.frame{
+.frame
+{
     display: flex;
     flex-direction: column;
     margin-bottom: 10px;
     margin-top: 2px;
 }
-.message-file-size {
+
+.message-file-size
+{
     font-size: 8pt;
     color: #8999a0;
     margin-top: 4px;
 }
-.color-darkviolet{
+
+.color-darkviolet
+{
     color: rgb(192, 125, 223);
 }
-.color-customgray{
+
+.color-customgray
+{
     color: rgb(134, 163, 177);
 }
 
 /******** Ссылки ********/
-.message-link {
+.message-link
+{
     color: dodgerblue;
 }
-.message-link:visited {
+
+.message-link:visited
+{
     color: rgb(192, 125, 223);
 }

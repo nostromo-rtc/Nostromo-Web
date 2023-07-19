@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ImAttachment } from 'react-icons/im';
 import { MdSend } from 'react-icons/md';
 import "./Chat.css";
@@ -8,7 +8,8 @@ import { Button } from '@mui/material';
 import { ChatFileInfo, FileLoadingCard } from './FileLoadingCard';
 
 /** Информация о сообщении в чате. */
-interface ChatMessage {
+interface ChatMessage
+{
     userId: string;
     type: "text" | "file";
     datetime: number;
@@ -18,7 +19,8 @@ const temp: ChatMessage[] = [];
 /* для передачи на сервер */
 const formData = new FormData();
 let files = [];
-export const Chat: React.FC= () => {
+export const Chat: React.FC = () =>
+{
     /* Хук для перехвата сообщения */
     const [textMsg, setTextMsg] = useState("");
     /* Хук взятия пути для скачивания файла после вставки */
@@ -27,7 +29,7 @@ export const Chat: React.FC= () => {
     const [checkPlaceH, setCheckPlaceH] = useState(true);
     /* Хук для отображения загружаемых файлов */
     const [isLoadFile, setFlagLF] = useState(false);
-    
+
     /* Хук-контейнер для тестовых сообщений */
     const [msgs, setMsgs] = useState<ChatMessage[]>([
         {
@@ -58,7 +60,10 @@ export const Chat: React.FC= () => {
         { fileId: "nbv890", name: "Т.4. Искусство программирования", size: 99124812 }
     ]);
 
-    useEffect(() => {
+    const fileCardsRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() =>
+    {
         // TODO: Добавить вывод смс;
     }, [textMsg]);
 
@@ -205,9 +210,11 @@ export const Chat: React.FC= () => {
             observer.observe(componentSize.current);
     }, [])*/
     const chatElement = useRef<HTMLDivElement>(null);
-    const sendMsgOnClick = (() => {
+    const sendMsgOnClick = (() =>
+    {
         const date = new Date().toLocaleString() + "";
-        if(chatElement && chatElement.current){
+        if (chatElement && chatElement.current)
+        {
             chatElement.current.scrollTop = chatElement.current.scrollHeight;
         }
         temp.push({ userId: "1bvcbjofg23fxcvds", type: "text", datetime: new Date().getTime(), content: textMsg.trim() });
@@ -215,73 +222,81 @@ export const Chat: React.FC= () => {
         setFlagLF(false);
     });
 
-    const sendMsgBoxRef = useRef<HTMLDivElement>(null);
-    const sendMsg = (<>
-        <div className="chat-btn-box non-selectable" ref={sendMsgBoxRef}>
-            <TooltipTopBottom className="tooltip-send-btn" title="Отправить">
-                <div className="btn-send-message">
-                    <Button aria-label='Отправить'
-                        onClick={sendMsgOnClick}
-                        className='chat-btn-width'
-                        accessKey='enter'
-                    >
-                        <MdSend className='btn-icon' />
-                    </Button>
-                    <div className="chat-btn-clickable-area non-selectable" onClick={sendMsgOnClick}></div>
-                </div>
-            </TooltipTopBottom>
-        </div>
-    </>);
+    const sendMsgBtn = (
+        <TooltipTopBottom title="Отправить">
+            <div className="chat-btn-box">
+                <Button aria-label='Отправить'
+                    onClick={sendMsgOnClick}
+                >
+                    <MdSend className='btn-icon' />
+                </Button>
+                <div className="chat-btn-clickable-area non-selectable" onClick={sendMsgOnClick}></div>
+            </div>
+        </TooltipTopBottom>
+    );
     /*** Кнопка отправки файлов ***/
     const fileComponent = useRef<HTMLInputElement>(null);
     // Тестовый прогресс бар
     const [data, setData] = useState(0);
-    useEffect(() => {
-        setTimeout(function () {
+    useEffect(() =>
+    {
+        setTimeout(function ()
+        {
             setData(data + 100000);
-        }, 1000)
-    }, [data])
-    
-    const loadFileOnClick = (e: React.FormEvent<HTMLInputElement>) => {
+        }, 1000);
+    }, [data]);
+
+    const loadFileOnClick = (e: React.FormEvent<HTMLInputElement>) =>
+    {
         e.preventDefault();
         setFlagLF(true);
         const filesToUpload = fileComponent.current!.files;
         console.log(filesToUpload);
         const formSent = new FormData();
-        if (filesToUpload!.length > 0) {
-            for (const item in filesToUpload) {
+        if (filesToUpload!.length > 0)
+        {
+            for (const item in filesToUpload)
+            {
                 formSent.append('file-input-btn', item);
                 console.log(item);
             }
-        } else {
+        } else
+        {
             alert('Сначала выберите файл');
         }
         return false;
-    }
-    const removeCard = (fileId: string) => {
-        testFiles.map(f => {
-            if (f.fileId == fileId) {
+    };
+    const removeCard = (fileId: string) =>
+    {
+        testFiles.map(f =>
+        {
+            if (f.fileId == fileId)
+            {
                 testFiles.splice(testFiles.findIndex(t => t.fileId == fileId), 1);
             }
-        })
-        if(!testFiles.length)
+        });
+        if (!testFiles.length)
             setFlagLF(false);
-    }
-    const InputHandler = (e: React.KeyboardEvent<HTMLDivElement>) => {
-        if (!e.shiftKey && e.code == 'Enter') {
+    };
+    const InputHandler = (e: React.KeyboardEvent<HTMLDivElement>) =>
+    {
+        if (!e.shiftKey && e.code == 'Enter')
+        {
             e.preventDefault();
             sendMsgOnClick();
         }
-    }
+    };
     // проверка на выставление placeholder-а для поля ввода
-    const checkPlaceholder = (text: string) => {
+    const checkPlaceholder = (text: string) =>
+    {
         if (!text.length)
             setCheckPlaceH(true);
         else
             setCheckPlaceH(false);
-    }
+    };
     // Вставка файла через ctrl+v
-    const pasteFile = (e: React.ClipboardEvent<HTMLDivElement>) => {
+    const pasteFile = (e: React.ClipboardEvent<HTMLDivElement>) =>
+    {
         setFlagLF(true);
         setPathFile(e.clipboardData.getData("text"));
         files = [e.clipboardData.items];
@@ -290,70 +305,77 @@ export const Chat: React.FC= () => {
         console.log("name: " + e.clipboardData.items[1].getAsFile()!.name);
         console.log("type: " + e.clipboardData.items[1].getAsFile()!.type);
         e.preventDefault();
-    }
-    const loadFileBoxRef = useRef<HTMLDivElement>(null);
-    const loadFile = (<>
-        <div className="chat-btn-box non-selectable" ref={loadFileBoxRef}>
-            <TooltipTopBottom className="tooltip-send-btn" title="Загрузить">
-                <div className="btn-send-message">
-                    <Button aria-label='Загрузить'
-                        component='label'
-                        className='chat-btn-width'>
-                        <label>
-                            <ImAttachment className='btn-icon' />
-                            <input type="file" id="file-input-btn" ref={fileComponent} onChange={e => loadFileOnClick(e)} name="file" multiple hidden />
-                        </label>
-                    </Button>
-                    <label className="chat-btn-clickable-area non-selectable" >
-                        <input type="file" id="file-input-btn-area" ref={fileComponent} onChange={e => loadFileOnClick(e)} name="file" multiple hidden />
-                    </label>
-                </div>
-            </TooltipTopBottom>
-        </div>
-    </>);
+    };
+    const loadFileBtn = (
+        <TooltipTopBottom title="Загрузить">
+            <div className="chat-btn-box">
+                <Button aria-label='Загрузить'>
+                    <ImAttachment className='btn-icon' />
+                    <input type="file" id="file-input-btn" ref={fileComponent} onChange={e => loadFileOnClick(e)} name="file" multiple hidden />
+                </Button>
+                <label className="chat-btn-clickable-area non-selectable" >
+                    <input type="file" id="file-input-btn-area" ref={fileComponent} onChange={e => loadFileOnClick(e)} name="file" multiple hidden />
+                </label>
+            </div>
+        </TooltipTopBottom>
+    );
+
+    const fileCardsWheelHandler: React.WheelEventHandler<HTMLDivElement> = (ev) =>
+    {
+        if (ev.shiftKey || !fileCardsRef.current)
+        {
+            return;
+        }
+
+        ev.preventDefault();
+        const SCROLL_OFFSET = 100;
+        const ZERO_SCROLL_OFFSET = 0;
+        fileCardsRef.current.scrollBy({ left: ev.deltaY > ZERO_SCROLL_OFFSET ? SCROLL_OFFSET : -SCROLL_OFFSET });
+    };
+
     return (
         <>  <div id="chat" ref={chatElement} aria-readonly>
-                {msgs.map(m => {
-                    return <Message key={m.userId + m.datetime.toString()} message={m} />
-                })
-                }
-            </div>
-            {isLoadFile && testFiles.length?
-                <div className='view-file-cards-area'>
-                    {testFiles.map(f => {
-                        return <FileLoadingCard file={f} onRemove={() => removeCard(f.fileId)} progress={data > f.size ? f.size : data /* TODO: Убрать эту проверку после реализации нормальной очереди */} />
+            {msgs.map(m =>
+            {
+                return <Message key={m.userId + m.datetime.toString()} message={m} />;
+            })
+            }
+        </div>
+            {isLoadFile && testFiles.length ?
+                <div className='view-file-cards-area' ref={fileCardsRef} onWheel={fileCardsWheelHandler}>
+                    {testFiles.map(f =>
+                    {
+                        return <FileLoadingCard file={f} onRemove={() => removeCard(f.fileId)} progress={data > f.size ? f.size : data /* TODO: Убрать эту проверку после реализации нормальной очереди */} />;
                     })}
                 </div>
-            :   <></>
+                : <></>
             }
             <div className='msg-input-area'>
-                <div className="btn-container btn-upload-file-container">
-                    {loadFile}
-                </div>
-                <div className='up-placeholder'
-                    onClick={e => {
+                {loadFileBtn}
+                <div id="message-textarea-wrapper"
+                    onClick={e =>
+                    {
                         setCheckPlaceH(false);
                         const element = document.getElementById("message-textarea") as HTMLElement;
-                        element.focus()
+                        element.focus();
                     }}>
                     <div id="message-textarea"
                         role="textbox"
-                        onKeyDown={e => { InputHandler(e) }}
+                        onKeyDown={e => { InputHandler(e); }}
                         aria-multiline="true"
                         contentEditable="true"
                         title='Поле ввода сообщения'
                         onBlur={e => checkPlaceholder(e.currentTarget.textContent as string)}
                         onPaste={e => pasteFile(e)}
-                        onInput={e => {
+                        onInput={e =>
+                        {
                             const tmp: HTMLDivElement = e.currentTarget;
                             const text: string = tmp.innerText;
-                            setTextMsg(text)
+                            setTextMsg(text);
                         }}>
-                    </div>{checkPlaceH ? <div className='down-placeholder'>Напишите сообщение...</div> : <></>}
+                    </div>{checkPlaceH ? <div id="message-textarea-placeholder">Напишите сообщение...</div> : <></>}
                 </div>
-                <div className="btn-container btn-send-message-container">
-                    {sendMsg}
-                </div>
+                {sendMsgBtn}
             </div>
         </>
     );
