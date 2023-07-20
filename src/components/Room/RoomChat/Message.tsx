@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import "./Chat.css";
 
 /** Информация о файле в чате. */
@@ -7,40 +8,45 @@ interface ChatFileInfo
     name: string;
     size: number;
 }
-interface FileInfoProps{
-    fileInfo : ChatFileInfo
-} 
-export const FileMessage = (props : FileInfoProps) =>
+interface FileInfoProps
+{
+    fileInfo: ChatFileInfo;
+}
+export const FileMessage = (props: FileInfoProps) =>
 {
     return (
-        <> 
+        <>
             <div className='message-text'>
-                <div className='placeholder' onClick={()=>{console.log("File loaded")}}></div>
+                <div className='placeholder' onClick={() => { console.log("File loaded"); }}></div>
                 <span className='color-customgray'>Файл: </span>
                 <span className='color-darkviolet'>{props.fileInfo.name}</span>
-                <div className='message-file-size bold'>{(props.fileInfo.size/(1024 * 1024)).toFixed(3)}MB</div>
+                <div className='message-file-size bold'>{(props.fileInfo.size / (1024 * 1024)).toFixed(3)}MB</div>
             </div>
         </>
     );
-    
+
 };
 
-interface contentProps{
-    content : string
+interface contentProps
+{
+    content: string;
 }
 const urlRe = /^[^\s.]+\.\S{2,}$/;
-export const TextMessage = (props : contentProps) =>
+export const TextMessage = (props: contentProps) =>
 {
     const words = props.content.split(' ');
     return (
         <>
-            {words.map(w=>{
-                if (urlRe.test(w)){
+            {words.map((w, index) =>
+            {
+                if (urlRe.test(w))
+                {
                     const ref = w.startsWith("http") ? w : `http://${w}`;
-                    return <a className="message-link" href={ref} target="_blank" rel="noopener noreferrer">{w}</a>
+                    return <a className="message-link" href={ref} target="_blank" rel="noopener noreferrer" key={index}>{w}</a>;
                 }
-                else{
-                    return <>{w} </>
+                else
+                {
+                    return <Fragment key={index}>{w} </Fragment>;
                 }
             })}
         </>
@@ -55,26 +61,31 @@ interface ChatMessage
     datetime: number;
     content: ChatFileInfo | string;
 }
-interface messageProps{
-    message : ChatMessage
+interface messageProps
+{
+    message: ChatMessage;
 }
 
-export const Message = (props : messageProps) =>
+export const Message = (props: messageProps) =>
 {
-    const getUserName = (id : string)=>{
-        if(id == "12hnjofgl33154"){
+    const getUserName = (id: string) =>
+    {
+        if (id == "12hnjofgl33154")
+        {
             return "Sergey";
         }
-        else if(id == "155sadjofdgknsdfk3"){
+        else if (id == "155sadjofdgknsdfk3")
+        {
             return "Vladislav";
         }
-        else if(id == "1bvcbjofg23fxcvds"){
+        else if (id == "1bvcbjofg23fxcvds")
+        {
             return "Amin";
         }
-    }
+    };
 
     /** Получить время в формате 00:00:00 (24 часа). */
-    const getTimestamp=(datetime: number): string =>
+    const getTimestamp = (datetime: number): string =>
     {
         const date = new Date(datetime);
         const current_date = new Date();
@@ -109,21 +120,21 @@ export const Message = (props : messageProps) =>
         }
 
         return timestamp;
-    }
+    };
     const isSelfMsg = props.message.userId == "12hnjofgl33154";
     const userName = getUserName(props.message.userId);
     return (
         <>
-            <div className={isSelfMsg? 'self-msg-area' : 'msg-area'}>
-                <div className={ 'msg-container msg-content ' + (isSelfMsg ? 'self-msg-content' : 'members-msg-content')}>
+            <div className={isSelfMsg ? 'self-msg-area' : 'msg-area'}>
+                <div className={'msg-container msg-content ' + (isSelfMsg ? 'self-msg-content' : 'members-msg-content')}>
                     <span className='user-name' title={userName}>{userName}</span>&nbsp;
-                    <span className='user-id' title={'#'+props.message.userId}>#{props.message.userId.substring(0, 4)}</span><br></br>
+                    <span className='user-id' title={'#' + props.message.userId}>#{props.message.userId.substring(0, 4)}</span><br></br>
                     <div className='message-body'>
-                    {props.message.type == "text"?
-                        <TextMessage content={props.message.content as string}/>
-                    :
-                        <FileMessage fileInfo={props.message.content as ChatFileInfo}/>
-                    }</div>
+                        {props.message.type == "text" ?
+                            <TextMessage content={props.message.content as string} />
+                            :
+                            <FileMessage fileInfo={props.message.content as ChatFileInfo} />
+                        }</div>
                     <div className='date-msg-right'>{getTimestamp(props.message.datetime)}</div>
                 </div>
             </div>

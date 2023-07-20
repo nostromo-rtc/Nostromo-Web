@@ -6,6 +6,7 @@ import { Message } from './Message';
 import { TooltipTopBottom } from '../../Tooltip';
 import { Button } from '@mui/material';
 import { ChatFileInfo, FileLoadingCard } from './FileLoadingCard';
+import { isEmptyString } from "../../../Utils";
 
 /** Информация о сообщении в чате. */
 interface ChatMessage
@@ -15,23 +16,21 @@ interface ChatMessage
     datetime: number;
     content: ChatFileInfo | string;
 }
-const temp: ChatMessage[] = [];
+
 /* для передачи на сервер */
 const formData = new FormData();
 let files = [];
 export const Chat: React.FC = () =>
 {
-    /* Хук для перехвата сообщения */
-    const [textMsg, setTextMsg] = useState("");
     /* Хук взятия пути для скачивания файла после вставки */
     const [pathFile, setPathFile] = useState("");
-    /* Хук для перехвата изменения длины строки ввода (placeholder)*/
-    const [isHiddenPH, setStateHiddenPH] = useState(false);
+    /* Показывать ли placeholder в поле для ввода. */
+    const [showPlaceholder, setShowPlaceholder] = useState(true);
     /* Хук для отображения загружаемых файлов */
-    const [isLoadFile, setFlagLF] = useState(true);
+    const [showFileCards, setShowFileCards] = useState(false);
 
     /* Хук-контейнер для тестовых сообщений */
-    const [msgs, setMsgs] = useState<ChatMessage[]>([
+    const [messages, setMessages] = useState<ChatMessage[]>([
         {
             userId: "155sadjofdgknsdfk3", type: "text", datetime: (new Date().getTime()) / 2, content: "Hello, colleagues! "
                 + "I think that everything will be fine with us, life is getting better, work is in full swing, the kettle is in the kitchen too."
@@ -62,19 +61,50 @@ export const Chat: React.FC = () =>
 
     const fileCardsRef = useRef<HTMLDivElement>(null);
 
+    // Ссылка на компонент с полем для ввода сообщения.
+    const textAreaRef = useRef<HTMLDivElement>(null);
+
     useEffect(() =>
     {
         // TODO: Добавить вывод смс;
-    }, [textMsg]);
+    }, []);
 
-    const chatElement = useRef<HTMLDivElement>(null);
-    const sendMsgOnClick = () : void =>
+    useEffect(() =>
     {
         if (chatElement.current)
+        {
             chatElement.current.scrollTop = chatElement.current.scrollHeight;
-        temp.push({ userId: "1bvcbjofg23fxcvds", type: "text", datetime: new Date().getTime(), content: textMsg.trim() });
-        setMsgs(temp);
-        setFlagLF(false);
+        }
+    }, [messages]);
+
+    const chatElement = useRef<HTMLDivElement>(null);
+    const sendMsgOnClick = (): void =>
+    {
+        if (!chatElement.current || !textAreaRef.current)
+        {
+            return;
+        }
+
+        const newMessage = textAreaRef.current.innerText.trim();
+
+        if (isEmptyString(newMessage))
+        {
+            return;
+        }
+
+        const message: ChatMessage =
+        {
+            userId: "1bvcbjofg23fxcvds",
+            type: "text",
+            datetime: new Date().getTime(),
+            content: newMessage
+        };
+
+        // FIXME: возможно concat не самый лучший способ в React так объединять старое и новое состояние.
+        // Это просто пока заглушка, но когда будет настоящий код, 
+        // следует подобрать наилучший метод для этого действия.
+        setMessages((prev) => prev.concat(message));
+        setShowFileCards(false);
     };
 
     const sendMsgBtn = (
@@ -101,11 +131,12 @@ export const Chat: React.FC = () =>
         }, 1000);
     }, [data]);
 
-    const loadFileOnClick = (e: React.FormEvent<HTMLInputElement>) : boolean =>
+    const loadFileOnClick = (e: React.FormEvent<HTMLInputElement>): boolean =>
     {
         e.preventDefault();
-        setFlagLF(true);
-        if (fileComponent.current) {
+        setShowFileCards(true);
+        if (fileComponent.current)
+        {
             const filesToUpload = fileComponent.current.files;
             console.log(filesToUpload);
             const formSent = new FormData();
@@ -123,49 +154,42 @@ export const Chat: React.FC = () =>
         }
         return false;
     };
-    const removeCard = (fileId: string) : void =>
+    const removeCard = (fileId: string): void =>
     {
         const fileIdx = testFiles.findIndex(t => t.fileId === fileId);
         if (fileIdx !== -1)
-            testFiles.splice(fileIdx, 1);
-        if (!testFiles.length)
-            setFlagLF(false);
-    };
-    const InputHandler = (e: React.KeyboardEvent<HTMLDivElement>) : void =>
-    {
-        if (!e.shiftKey && e.code === 'Enter')
         {
-            e.preventDefault();
+            testFiles.splice(fileIdx, 1);
+        }
+        if (!testFiles.length)
+        {
+            setShowFileCards(false);
+        }
+    };
+    const inputHandler: React.KeyboardEventHandler<HTMLDivElement> = (ev) =>
+    {
+        if (!ev.shiftKey && ev.code === 'Enter')
+        {
+            ev.preventDefault();
             sendMsgOnClick();
         }
     };
-    // проверка на выставление placeholder-а для поля ввода
-    // Ссылка на компонент ввода сообщения (чтобы избежать выставления <br> для PH)
-    const textArea = useRef<HTMLDivElement>(null);
-    const checkPlaceholder = (text: string) : void =>
-    {
-        if(textArea.current && textArea.current.innerHTML !== "<br>"){
-            if (!text.length)
-                setStateHiddenPH(false);
-            else
-                setStateHiddenPH(true);
-        }else{
-            setStateHiddenPH(false);
-        }
-    };
+
     // Вставка файла через ctrl+v
-    const pasteFile = (e: React.ClipboardEvent<HTMLDivElement>) : void =>
+    const pasteFile = (e: React.ClipboardEvent<HTMLDivElement>): void =>
     {
-        setFlagLF(true);
+        setShowFileCards(true);
         setPathFile(e.clipboardData.getData("text"));
         files = [e.clipboardData.items];
         // TODO: Надо будет как-то на 100% удостовериться, что файл после ctrl+v всегда будет с индексом 1
-        if (e.clipboardData.items.length > 1) {
+        if (e.clipboardData.items.length > 1)
+        {
             const fileData = e.clipboardData.items[1].getAsFile();
-            if (fileData) {
+            if (fileData)
+            {
                 // TODO: Убрать после тестов
                 const filesCopy = [...testFiles];
-                filesCopy.push({fileId: new Date().getMilliseconds().toString(), name: fileData.name, size: fileData.size});
+                filesCopy.push({ fileId: new Date().getMilliseconds().toString(), name: fileData.name, size: fileData.size });
                 setFiles(filesCopy);
 
                 formData.append('file', fileData);
@@ -203,19 +227,25 @@ export const Chat: React.FC = () =>
         fileCardsRef.current.scrollBy({ left: ev.deltaY > ZERO_SCROLL_OFFSET ? SCROLL_OFFSET : -SCROLL_OFFSET });
     };
 
+    const placeholderElem = <div
+        id="message-textarea-placeholder"
+    >
+        Напишите сообщение...
+    </div>;
+
     return (
         <>  <div id="chat" ref={chatElement} aria-readonly>
-            {msgs.map(m =>
+            {messages.map(m =>
             {
                 return <Message key={m.userId + m.datetime.toString()} message={m} />;
             })
             }
         </div>
-            {isLoadFile && testFiles.length ?
+            {showFileCards && testFiles.length ?
                 <div className='view-file-cards-area' ref={fileCardsRef} onWheel={fileCardsWheelHandler}>
                     {testFiles.map(f =>
                     {
-                        return <FileLoadingCard file={f} onRemove={() => {removeCard(f.fileId)}} progress={data > f.size ? f.size : data /* TODO: Убрать эту проверку после реализации нормальной очереди */} />;
+                        return <FileLoadingCard file={f} onRemove={() => { removeCard(f.fileId); }} progress={data > f.size ? f.size : data /* TODO: Убрать эту проверку после реализации нормальной очереди */} />;
                     })}
                 </div>
                 : <></>
@@ -225,25 +255,20 @@ export const Chat: React.FC = () =>
                 <div id="message-textarea-wrapper">
                     <div id="message-textarea"
                         role="textbox"
-                        ref={textArea}
-                        onKeyDown={e => { InputHandler(e); }}
+                        ref={textAreaRef}
+                        onKeyDown={inputHandler}
                         aria-multiline="true"
                         contentEditable="true"
                         title='Поле ввода сообщения'
-                        onPaste={e => {pasteFile(e)}}
-                        onInput={e =>
+                        onPaste={e => { pasteFile(e); }}
+                        onInput={ev =>
                         {
-                            const tmp: HTMLDivElement = e.currentTarget;
-                            const text: string = tmp.innerText;
-                            setTextMsg(text);
-                            checkPlaceholder(text);
+                            const str = ev.currentTarget.innerText;
+                            const emptyOrOnlyNewLine = (isEmptyString(str) || str === "\n");
+                            setShowPlaceholder(emptyOrOnlyNewLine);
                         }}>
                     </div>
-                    {!isHiddenPH? 
-                        <div id="message-textarea-placeholder" 
-                            onClick={()=>{if (textArea.current) textArea.current.focus()}}
-                        >Напишите сообщение...</div> 
-                    : <></>}
+                    {showPlaceholder ? placeholderElem : <></>}
                 </div>
                 {sendMsgBtn}
             </div>
