@@ -1,4 +1,3 @@
-import React, { useCallback, useEffect, useState} from 'react';
 import "./Chat.css";
 
 /** Информация о файле в чате. */
@@ -83,9 +82,9 @@ export const Message = (props : messageProps) =>
         let timestamp = "";
 
         // Если это тот же день.
-        if (date.getDate() == current_date.getDate()
-            && date.getMonth() == current_date.getMonth()
-            && date.getFullYear() == current_date.getFullYear())
+        if (date.getDate() === current_date.getDate()
+            && date.getMonth() === current_date.getMonth()
+            && date.getFullYear() === current_date.getFullYear())
         {
             timestamp = date.toLocaleString("en-GB", {
                 hour: "2-digit",

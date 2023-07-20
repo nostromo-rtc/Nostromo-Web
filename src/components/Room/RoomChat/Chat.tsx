@@ -28,7 +28,7 @@ export const Chat: React.FC = () =>
     /* Хук для перехвата изменения длины строки ввода (placeholder)*/
     const [isHiddenPH, setStateHiddenPH] = useState(false);
     /* Хук для отображения загружаемых файлов */
-    const [isLoadFile, setFlagLF] = useState(false);
+    const [isLoadFile, setFlagLF] = useState(true);
 
     /* Хук-контейнер для тестовых сообщений */
     const [msgs, setMsgs] = useState<ChatMessage[]>([
@@ -67,156 +67,15 @@ export const Chat: React.FC = () =>
         // TODO: Добавить вывод смс;
     }, [textMsg]);
 
-    /*const displayChatMessage = (() =>
-    {
-        const userId : string = "local"; 
-        const datetime = new Date().toLocaleString() + "";
-        const content = textMsg;
-
-        const messageDiv = document.createElement("div");
-        messageDiv.dataset.userId = userId;
-        messageDiv.classList.add("message");
-
-        if (userId == "local")
-        {
-            messageDiv.classList.add("background-lightgreen");
-        }
-        else
-        {
-            messageDiv.classList.add("background-white");
-        }
-
-        const messageSenderDiv = document.createElement("div");
-        messageSenderDiv.classList.add("d-flex");
-
-        const messageSenderName = document.createElement("span");
-        messageSenderName.className = "message-sender-name color-dodgerblue bold";
-        messageSenderName.innerText = "testname";//this.usernames.get(userId)!;
-        messageSenderName.title = "testname";//this.usernames.get(userId)!;
-        messageSenderDiv.appendChild(messageSenderName);
-
-        if (userId != "local")
-        {
-            const messageSenderId = document.createElement("span");
-            messageSenderId.className = "message-sender-id";
-            messageSenderId.innerText = `#${userId.substring(0, 4)}`;
-            messageSenderId.title = `#${userId}`;
-            messageSenderDiv.appendChild(messageSenderId);
-        }
-
-        const messageTextDiv = document.createElement("div");
-        messageTextDiv.classList.add("message-text");
-        //messageTextDiv.innerHTML = wrapLinksInText(escapeHtmlTags(textMsg as string));
-
-        const messageDateDiv = document.createElement("div");
-        messageDateDiv.classList.add("message-date");
-        messageDateDiv.innerText = datetime;//this.getTimestamp(datetime);
-
-        messageDiv.appendChild(messageSenderDiv);
-        messageDiv.appendChild(messageTextDiv);
-        messageDiv.appendChild(messageDateDiv);
-
-        //this.chat.append(messageDiv);
-        //this.chat.scrollTop = this.chat.scrollHeight;
-    });*/
-    /*const displayChatLink=((message: ChatMessage)=>
-    {
-        const { userId, datetime } = message;
-
-        const fileInfo = message.content as ChatFileInfo;
-
-        const messageDiv = document.createElement('div');
-        messageDiv.dataset.userId = userId;
-        messageDiv.classList.add("message");
-
-        if (userId == "local")
-        {
-            messageDiv.classList.add("background-lightgreen");
-        }
-        else
-        {
-            messageDiv.classList.add("background-white");
-        }
-
-        const messageSenderDiv = document.createElement("div");
-        messageSenderDiv.classList.add("d-flex");
-
-        const messageSenderName = document.createElement("span");
-        messageSenderName.className = "message-sender-name color-dodgerblue bold";
-        messageSenderName.innerText = this.usernames.get(userId)!;
-        messageSenderName.title = this.usernames.get(userId)!;
-        messageSenderDiv.appendChild(messageSenderName);
-
-        if (userId != "local")
-        {
-            const messageSenderId = document.createElement("span");
-            messageSenderId.className = "message-sender-id";
-            messageSenderId.innerText = `#${userId.substring(0, 4)}`;
-            messageSenderId.title = `#${userId}`;
-            messageSenderDiv.appendChild(messageSenderId);
-        }
-
-        const messageTextDiv = document.createElement('div');
-        messageTextDiv.classList.add("message-text");
-
-        const messageFileLabelSpan = document.createElement('span');
-        messageFileLabelSpan.classList.add("color-customgray");
-        messageFileLabelSpan.innerText = "Файл: ";
-
-        const messageFileNameSpan = document.createElement('span');
-        messageFileNameSpan.className = "color-darkviolet bold";
-        messageFileNameSpan.innerText = fileInfo.name;
-
-        const messageFileSizeDiv = document.createElement('div');
-        messageFileSizeDiv.className = "message-file-size bold";
-        messageFileSizeDiv.innerText = `${(fileInfo.size / (1024 * 1024)).toFixed(3)} MB`;
-
-        messageTextDiv.appendChild(messageFileLabelSpan);
-        messageTextDiv.appendChild(messageFileNameSpan);
-        messageTextDiv.appendChild(messageFileSizeDiv);
-
-        const messageDateDiv = document.createElement('div');
-        messageDateDiv.classList.add("message-date");
-        messageDateDiv.innerText = this.getTimestamp(datetime);
-
-        const messageLink = document.createElement('a');
-        messageLink.classList.add("message-link");
-        messageLink.href = `${window.location.origin}/files/${fileInfo.fileId}`;
-        messageLink.target = "_blank";
-
-        messageDiv.appendChild(messageSenderDiv);
-        messageDiv.appendChild(messageTextDiv);
-        messageDiv.appendChild(messageDateDiv);
-        messageDiv.appendChild(messageLink);
-
-        this.chat.append(messageDiv);
-        this.chat.scrollTop = this.chat.scrollHeight;
-    });*/
-    /* Хук для отображения загружаемых файлов при сворачивании */
-    /*const [isCollapseCards, setStateCC] = useState(false);
-    const componentSize = useRef<HTMLDivElement>(null);
-    useEffect(() => {
-        console.log("Start");
-        const observer = new ResizeObserver(e => {console.log("Middle");
-            if (componentSize && componentSize.current && componentSize.current.clientHeight < 260){
-                setStateCC(true);
-                console.log("IF");
-            }else if(componentSize && componentSize.current){
-                setStateCC(false);
-                console.log("Else");
-            }
-        });
-        if (componentSize && componentSize.current)
-            observer.observe(componentSize.current);
-    }, [])*/
     const chatElement = useRef<HTMLDivElement>(null);
-    const sendMsgOnClick = (() =>
+    const sendMsgOnClick = () : void =>
     {
-        chatElement.current!.scrollTop = chatElement.current!.scrollHeight;
+        if (chatElement.current)
+            chatElement.current.scrollTop = chatElement.current.scrollHeight;
         temp.push({ userId: "1bvcbjofg23fxcvds", type: "text", datetime: new Date().getTime(), content: textMsg.trim() });
         setMsgs(temp);
         setFlagLF(false);
-    });
+    };
 
     const sendMsgBtn = (
         <TooltipTopBottom title="Отправить">
@@ -242,41 +101,39 @@ export const Chat: React.FC = () =>
         }, 1000);
     }, [data]);
 
-    const loadFileOnClick = (e: React.FormEvent<HTMLInputElement>) =>
+    const loadFileOnClick = (e: React.FormEvent<HTMLInputElement>) : boolean =>
     {
         e.preventDefault();
         setFlagLF(true);
-        const filesToUpload = fileComponent.current!.files;
-        console.log(filesToUpload);
-        const formSent = new FormData();
-        if (filesToUpload!.length > 0)
-        {
-            for (const item in filesToUpload)
+        if (fileComponent.current) {
+            const filesToUpload = fileComponent.current.files;
+            console.log(filesToUpload);
+            const formSent = new FormData();
+            if (filesToUpload && filesToUpload.length > 0)
             {
-                formSent.append('file-input-btn', item);
-                console.log(item);
+                for (const item in filesToUpload)
+                {
+                    formSent.append('file-input-btn', item);
+                    console.log(item);
+                }
+            } else
+            {
+                alert('Сначала выберите файл');
             }
-        } else
-        {
-            alert('Сначала выберите файл');
         }
         return false;
     };
-    const removeCard = (fileId: string) =>
+    const removeCard = (fileId: string) : void =>
     {
-        testFiles.map(f =>
-        {
-            if (f.fileId == fileId)
-            {
-                testFiles.splice(testFiles.findIndex(t => t.fileId == fileId), 1);
-            }
-        });
+        const fileIdx = testFiles.findIndex(t => t.fileId === fileId);
+        if (fileIdx !== -1)
+            testFiles.splice(fileIdx, 1);
         if (!testFiles.length)
             setFlagLF(false);
     };
-    const InputHandler = (e: React.KeyboardEvent<HTMLDivElement>) =>
+    const InputHandler = (e: React.KeyboardEvent<HTMLDivElement>) : void =>
     {
-        if (!e.shiftKey && e.code == 'Enter')
+        if (!e.shiftKey && e.code === 'Enter')
         {
             e.preventDefault();
             sendMsgOnClick();
@@ -284,10 +141,10 @@ export const Chat: React.FC = () =>
     };
     // проверка на выставление placeholder-а для поля ввода
     // Ссылка на компонент ввода сообщения (чтобы избежать выставления <br> для PH)
-    const text_area = useRef<HTMLDivElement>(null);
-    const checkPlaceholder = (text: string) =>
+    const textArea = useRef<HTMLDivElement>(null);
+    const checkPlaceholder = (text: string) : void =>
     {
-        if(text_area.current!.innerHTML != "<br>"){
+        if(textArea.current && textArea.current.innerHTML !== "<br>"){
             if (!text.length)
                 setStateHiddenPH(false);
             else
@@ -297,15 +154,26 @@ export const Chat: React.FC = () =>
         }
     };
     // Вставка файла через ctrl+v
-    const pasteFile = (e: React.ClipboardEvent<HTMLDivElement>) =>
+    const pasteFile = (e: React.ClipboardEvent<HTMLDivElement>) : void =>
     {
         setFlagLF(true);
         setPathFile(e.clipboardData.getData("text"));
         files = [e.clipboardData.items];
-        formData.append('file', e.clipboardData.items[1].getAsFile()!);
-        console.log("size: " + (e.clipboardData.items[0].getAsFile()!.size / 1000).toString() + "KB");
-        console.log("name: " + e.clipboardData.items[1].getAsFile()!.name);
-        console.log("type: " + e.clipboardData.items[1].getAsFile()!.type);
+        // TODO: Надо будет как-то на 100% удостовериться, что файл после ctrl+v всегда будет с индексом 1
+        if (e.clipboardData.items.length > 1) {
+            const fileData = e.clipboardData.items[1].getAsFile();
+            if (fileData) {
+                // TODO: Убрать после тестов
+                const filesCopy = [...testFiles];
+                filesCopy.push({fileId: new Date().getMilliseconds().toString(), name: fileData.name, size: fileData.size});
+                setFiles(filesCopy);
+
+                formData.append('file', fileData);
+                console.log("size: " + (fileData.size / 1000).toString() + "KB");
+                console.log("name: " + fileData.name);
+                console.log("type: " + fileData.type);
+            }
+        }
         e.preventDefault();
     };
     const loadFileBtn = (
@@ -357,7 +225,7 @@ export const Chat: React.FC = () =>
                 <div id="message-textarea-wrapper">
                     <div id="message-textarea"
                         role="textbox"
-                        ref={text_area}
+                        ref={textArea}
                         onKeyDown={e => { InputHandler(e); }}
                         aria-multiline="true"
                         contentEditable="true"
@@ -373,7 +241,7 @@ export const Chat: React.FC = () =>
                     </div>
                     {!isHiddenPH? 
                         <div id="message-textarea-placeholder" 
-                            onClick={e=>{text_area.current!.focus()}}
+                            onClick={()=>{if (textArea.current) textArea.current.focus()}}
                         >Напишите сообщение...</div> 
                     : <></>}
                 </div>

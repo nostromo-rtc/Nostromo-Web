@@ -5,7 +5,7 @@ import "./App.css";
 // Мои компоненты
 import { Navbar } from "./components/Navbar";
 import { PageRouter } from "./components/PageRouter";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useState } from "react";
 
 const theme = createTheme({
     typography: {
