@@ -105,19 +105,24 @@
     position: relative;
 }
 
+.chat-btn-box:hover button
+{
+    color: #fff;
+}
+
 .chat-btn-box button
 {
     max-height: 42px;
     min-height: 42px;
     min-width: 56px;
     max-width: 56px;
+    color: #656565;
 }
 
 .btn-icon
 {
     width: 25px;
     height: 25px;
-    color: #656565;
 }
 
 /************** Блоки сообщений в чате **************/
