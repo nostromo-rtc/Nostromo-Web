@@ -250,25 +250,27 @@ export const Chat: React.FC = () =>
                 </div>
                 : <></>
             }
-            <div className='msg-input-area'>
+            <div className='message-input-area'>
                 {loadFileBtn}
-                <div id="message-textarea-wrapper">
-                    <div id="message-textarea"
-                        role="textbox"
-                        ref={textAreaRef}
-                        onKeyDown={inputHandler}
-                        aria-multiline="true"
-                        contentEditable="true"
-                        title='Поле ввода сообщения'
-                        onPaste={e => { pasteFile(e); }}
-                        onInput={ev =>
-                        {
-                            const str = ev.currentTarget.innerText;
-                            const emptyOrOnlyNewLine = (isEmptyString(str) || str === "\n");
-                            setShowPlaceholder(emptyOrOnlyNewLine);
-                        }}>
+                <div id="message-textarea-container">
+                    <div id="message-textarea-wrapper">
+                        <div id="message-textarea"
+                            role="textbox"
+                            ref={textAreaRef}
+                            onKeyDown={inputHandler}
+                            aria-multiline="true"
+                            contentEditable="true"
+                            title='Поле ввода сообщения'
+                            onPaste={e => { pasteFile(e); }}
+                            onInput={ev =>
+                            {
+                                const str = ev.currentTarget.innerText;
+                                const emptyOrOnlyNewLine = (isEmptyString(str) || str === "\n");
+                                setShowPlaceholder(emptyOrOnlyNewLine);
+                            }}>
+                        </div>
+                        {showPlaceholder ? placeholderElem : <></>}
                     </div>
-                    {showPlaceholder ? placeholderElem : <></>}
                 </div>
                 {sendMsgBtn}
             </div>
