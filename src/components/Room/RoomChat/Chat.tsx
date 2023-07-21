@@ -5,7 +5,7 @@ import "./Chat.css";
 import { Message } from './Message';
 import { TooltipTopBottom } from '../../Tooltip';
 import { Button } from '@mui/material';
-import { ChatFileInfo, FileLoadingCard } from './FileLoadingCard';
+import { ChatFileInfo, FileLoadingCard, LoadFileInfo } from './FileLoadingCard';
 import { isEmptyString } from "../../../Utils";
 
 /** Информация о сообщении в чате. */
@@ -45,18 +45,18 @@ export const Chat: React.FC = () =>
         { userId: "12hnjofgl33154", type: "file", datetime: new Date().getTime(), content: { fileId: "jghjghj2", name: "About_IT.txt", size: 4212428 } }
     ]);
     /* Хук-контейнер для тестовых файлов */
-    const [testFiles, setFiles] = useState<ChatFileInfo[]>([
-        { fileId: "hfg123", name: "Язык программирования C++", size: 16188070 },
-        { fileId: "jhg312", name: "C++ лекции и упражнения", size: 150537513 },
-        { fileId: "kjh366", name: "Современные операционные системы", size: 14280633 },
-        { fileId: "loi785", name: "Т.1. Искусство программирования", size: 83673366 },
-        { fileId: "nbv890", name: "Автоматное программирование", size: 1785979 },
-        { fileId: "xcv519", name: "Паттерны проектирования", size: 68368155 },
-        { fileId: "hfg123", name: "Некрономикон", size: 9999999999 },
-        { fileId: "jhg312", name: "QT 5.10 Профессиональное программирование на C++", size: 103919024 },
-        { fileId: "kjh366", name: "Т.2. Искусство программирования", size: 7235716 },
-        { fileId: "loi785", name: "Т.3. Искусство программирования", size: 8612462 },
-        { fileId: "nbv890", name: "Т.4. Искусство программирования", size: 99124812 }
+    const [testFiles, setFiles] = useState<LoadFileInfo[]>([
+        { file: {fileId: "hfg123", name: "Язык программирования C++", size: 16188070}, progress: 0},
+        { file: {fileId: "jhg812", name: "C++ лекции и упражнения", size: 150537513}, progress: 0},
+        { file: {fileId: "kjh306", name: "Современные операционные системы", size: 14280633}, progress: 0},
+        { file: {fileId: "lou785", name: "Т.1. Искусство программирования", size: 83673366}, progress: 0},
+        { file: {fileId: "nbo890", name: "Автоматное программирование", size: 1785979}, progress: 0},
+        { file: {fileId: "xcv519", name: "Паттерны проектирования", size: 68368155}, progress: 0},
+        { file: {fileId: "hfg623", name: "Некрономикон", size: 9999999999}, progress: 0},
+        { file: {fileId: "jhg312", name: "QT 5.10 Профессиональное программирование на C++", size: 103919024}, progress: 0},
+        { file: {fileId: "kjh366", name: "Т.2. Искусство программирования", size: 7235716}, progress: 0},
+        { file: {fileId: "loi785", name: "Т.3. Искусство программирования", size: 8612462}, progress: 0},
+        { file: {fileId: "nbv890", name: "Т.4. Искусство программирования", size: 99124812}, progress: 0}
     ]);
 
     const fileCardsRef = useRef<HTMLDivElement>(null);
@@ -134,6 +134,13 @@ export const Chat: React.FC = () =>
     {
         setTimeout(function ()
         {
+            const idx = testFiles.findIndex(f=>f.progress < f.file.size);
+            if(idx !== -1){
+                testFiles[idx].progress += 1000000;
+                if(testFiles[idx].progress >= testFiles[idx].file.size){
+                    testFiles[idx].progress = testFiles[idx].file.size;
+                }
+            }
             setData(data + 100000);
         }, 1000);
     }, [data]);
@@ -163,7 +170,7 @@ export const Chat: React.FC = () =>
     };
     const removeCard = (fileId: string): void =>
     {
-        const fileIdx = testFiles.findIndex(t => t.fileId === fileId);
+        const fileIdx = testFiles.findIndex(t => t.file.fileId === fileId);
         if (fileIdx !== -1)
         {
             testFiles.splice(fileIdx, 1);
@@ -171,6 +178,26 @@ export const Chat: React.FC = () =>
         if (!testFiles.length)
         {
             setShowFileCards(false);
+        }
+    };
+    const moveLeft = (fileId: string): void =>
+    {
+        const fileIdx = testFiles.findIndex(t => t.file.fileId === fileId);
+        if (fileIdx !== -1 && fileIdx !== 0)
+        {
+            const tmp: LoadFileInfo = testFiles[fileIdx];
+            testFiles[fileIdx] = testFiles[fileIdx - 1];
+            testFiles[fileIdx - 1] = tmp;
+        }
+    };
+    const moveRight = (fileId: string): void =>
+    {
+        const fileIdx = testFiles.findIndex(t => t.file.fileId === fileId);
+        if (fileIdx !== -1 && fileIdx !== (testFiles.length - 1))
+        {
+            const tmp: LoadFileInfo = testFiles[fileIdx];
+            testFiles[fileIdx] = testFiles[fileIdx + 1];
+            testFiles[fileIdx + 1] = tmp;
         }
     };
 
@@ -204,7 +231,7 @@ export const Chat: React.FC = () =>
                 if (fileData)
                 {
                     const filesCopy = [...testFiles];
-                    filesCopy.push({ fileId: new Date().getMilliseconds().toString(), name: fileData.name, size: fileData.size });
+                    filesCopy.push({file: {fileId: new Date().getMilliseconds().toString(), name: fileData.name, size: fileData.size}, progress: 0 });
                     setFiles(filesCopy);
 
                     formData.append('file', fileData);
@@ -261,7 +288,10 @@ export const Chat: React.FC = () =>
                 <div className='view-file-cards-area' ref={fileCardsRef} onWheel={fileCardsWheelHandler}>
                     {testFiles.map(f =>
                     {
-                        return <FileLoadingCard file={f} onRemove={() => { removeCard(f.fileId); }} progress={data > f.size ? f.size : data /* TODO: Убрать эту проверку после реализации нормальной очереди */} />;
+                        return <FileLoadingCard loading={f} 
+                            onRemove={() => { removeCard(f.file.fileId); }} 
+                            onMoveLeft={() => { moveLeft(f.file.fileId); }}
+                            onMoveRight={() => { moveRight(f.file.fileId); }}/>;
                     })}
                 </div>
                 : <></>

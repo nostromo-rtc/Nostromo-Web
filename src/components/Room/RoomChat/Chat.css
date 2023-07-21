@@ -327,19 +327,22 @@
     margin-top: 4px;
 }
 
-.remove-file-btn
+.card-file-btn
 {
-    float: right;
+    margin: 3px;
     max-width: 20px;
     font-size: 8pt;
     min-width: 20px;
     text-align: center;
     border-radius: 5px;
 }
-.remove-file-btn:hover
+.card-file-btn:hover
 {
     background: rgba(255,255,255,0.3);
 	transition: all 0.5s ease;
+}
+.right{
+    float: right;
 }
 
 .file-cards
@@ -355,9 +358,17 @@
     box-shadow: inset -1px -1px 1px 0 #152025,
         inset 1px 1px 1px 0 #1b282e;
     font-size: 6pt;
-    background-color: #1f2022;
     box-sizing: border-box;
     overflow: hidden;
+}
+.loading{
+    background-color: #3b484e;
+}
+.waiting{
+    background-color: #27343a;
+}
+.loaded{
+    background-color: #1c2224;
 }
 
 .file-icon
