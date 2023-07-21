@@ -22,8 +22,8 @@ export const FileLoadingCard: React.FC<FileProps> = (props) =>
 {
     return <>
         <div className='file-cards'>
-            <div className='remove-file-btn'
-                onClick={() => { if (props.onRemove) props.onRemove(props.file.fileId); }}>Х</div>
+            <div><div className='remove-file-btn'
+                onClick={() => { if (props.onRemove) props.onRemove(props.file.fileId); }}>Х</div></div>
             <div className='file-cards-icon'><FcFile className='file-icon' /></div>
             <div className='file-cards-desc-wrapper'>
                 <div className="vertical-expander" />
