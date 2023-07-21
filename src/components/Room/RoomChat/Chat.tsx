@@ -191,29 +191,30 @@ export const Chat: React.FC = () =>
     };
 
     // Вставка файла через ctrl+v
-    const pasteFile = (e: React.ClipboardEvent<HTMLDivElement>): void =>
+    const handleClipboardEvent : React.ClipboardEventHandler<HTMLDivElement> = (ev) =>
     {
         setShowFileCards(true);
-        setPathFile(e.clipboardData.getData("text"));
-        files = [e.clipboardData.items];
-        // TODO: Надо будет как-то на 100% удостовериться, что файл после ctrl+v всегда будет с индексом 1
-        if (e.clipboardData.items.length > 1)
+        setPathFile(ev.clipboardData.getData("text"));
+        files = [...ev.clipboardData.items];
+        for (const f of files)
         {
-            const fileData = e.clipboardData.items[1].getAsFile();
-            if (fileData)
+            if (f.kind === "file")
             {
-                // TODO: Убрать после тестов
-                const filesCopy = [...testFiles];
-                filesCopy.push({ fileId: new Date().getMilliseconds().toString(), name: fileData.name, size: fileData.size });
-                setFiles(filesCopy);
+                const fileData = f.getAsFile();
+                if (fileData)
+                {
+                    const filesCopy = [...testFiles];
+                    filesCopy.push({ fileId: new Date().getMilliseconds().toString(), name: fileData.name, size: fileData.size });
+                    setFiles(filesCopy);
 
-                formData.append('file', fileData);
-                console.log("size: " + (fileData.size / 1000).toString() + "KB");
-                console.log("name: " + fileData.name);
-                console.log("type: " + fileData.type);
+                    formData.append('file', fileData);
+                    console.log("size: " + (fileData.size / 1000).toString() + "KB");
+                    console.log("name: " + fileData.name);
+                    console.log("type: " + fileData.type);
+                }
             }
         }
-        e.preventDefault();
+        ev.preventDefault();
     };
     const loadFileBtn = (
         <TooltipTopBottom title="Загрузить">
@@ -276,7 +277,7 @@ export const Chat: React.FC = () =>
                             aria-multiline="true"
                             contentEditable="true"
                             title='Поле ввода сообщения'
-                            onPaste={e => { pasteFile(e); }}
+                            onPaste={handleClipboardEvent}
                             onInput={handleTextAreaInput}>
                         </div>
                         {showPlaceholder ? placeholderElem : <></>}
