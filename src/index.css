@@ -54,7 +54,7 @@ select
     height: 6px;
 }
 
-*::-webkit-scrollbar-track
+*::-webkit-scrollbar-track:active
 {
     background: rgb(45, 41, 41);
 }

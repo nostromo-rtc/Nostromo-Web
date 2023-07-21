@@ -29,18 +29,20 @@
 {
     display: flex;
     flex: auto;
-    overflow: scroll;
     max-height: 100%;
+    border-radius: 10px;
+    overflow: hidden;
 }
 
 #message-textarea-wrapper
 {
     position: relative;
     background-color: #1b282e;
-    border-radius: 10px;
+    border-radius: inherit;
     border: 1px solid #5b5b5b;
     color: #fafafa;
-    overflow: scroll;
+    overflow-y: scroll;
+    overflow-x: hidden;
     box-sizing: border-box;
     font-size: 0.8125rem;
     min-height: 42px;
@@ -338,9 +340,9 @@
 }
 .card-file-btn:hover
 {
-    background: rgba(255,255,255,0.3);
-	transition: all 0.5s ease;
+    background-color: #4f4545;
 }
+
 .right{
     float: right;
 }
@@ -354,6 +356,7 @@
     padding: 5px 8px 5px 8px;
     margin: 8px 0 8px 5px;
     min-width: 150px;
+    max-width: 150px;
     border-radius: 5px;
     box-shadow: inset -1px -1px 1px 0 #152025,
         inset 1px 1px 1px 0 #1b282e;
