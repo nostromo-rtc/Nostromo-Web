@@ -104,6 +104,13 @@ export const Chat: React.FC = () =>
         // Это просто пока заглушка, но когда будет настоящий код, 
         // следует подобрать наилучший метод для этого действия.
         setMessages((prev) => prev.concat(message));
+
+        // Очищаем поле для ввода после отправки сообщения.
+        textAreaRef.current.innerText = "";
+        // Очистка выше не вызывает событий "input" или "event" для textArea.
+        // Поэтому включаем placeholder вручную.
+        setShowPlaceholder(true);
+
         setShowFileCards(false);
     };
 
@@ -166,13 +173,21 @@ export const Chat: React.FC = () =>
             setShowFileCards(false);
         }
     };
-    const inputHandler: React.KeyboardEventHandler<HTMLDivElement> = (ev) =>
+
+    const handleTextAreaKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (ev) =>
     {
         if (!ev.shiftKey && ev.code === 'Enter')
         {
             ev.preventDefault();
             sendMsgOnClick();
         }
+    };
+
+    const handleTextAreaInput: React.FormEventHandler<HTMLDivElement> = (ev) =>
+    {
+        const str = ev.currentTarget.innerText;
+        const emptyOrOnlyNewLine = (isEmptyString(str) || str === "\n");
+        setShowPlaceholder(emptyOrOnlyNewLine);
     };
 
     // Вставка файла через ctrl+v
@@ -257,17 +272,12 @@ export const Chat: React.FC = () =>
                         <div id="message-textarea"
                             role="textbox"
                             ref={textAreaRef}
-                            onKeyDown={inputHandler}
+                            onKeyDown={handleTextAreaKeyDown}
                             aria-multiline="true"
                             contentEditable="true"
                             title='Поле ввода сообщения'
                             onPaste={e => { pasteFile(e); }}
-                            onInput={ev =>
-                            {
-                                const str = ev.currentTarget.innerText;
-                                const emptyOrOnlyNewLine = (isEmptyString(str) || str === "\n");
-                                setShowPlaceholder(emptyOrOnlyNewLine);
-                            }}>
+                            onInput={handleTextAreaInput}>
                         </div>
                         {showPlaceholder ? placeholderElem : <></>}
                     </div>
