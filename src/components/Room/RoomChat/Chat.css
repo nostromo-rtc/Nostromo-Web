@@ -328,7 +328,9 @@
     color: #8999a0;
     margin-top: 4px;
 }
-
+.card-btn-area{
+    margin-top: 0.85rem;
+}
 .card-file-btn
 {
     position: absolute;
@@ -387,7 +389,9 @@
 .file-cards-icon
 {
     text-align: center;
-    font-size: 7pt;
+    width: 100%;
+    min-height: 0;
+    overflow: hidden;
     margin-top: 4px;
 }
 
