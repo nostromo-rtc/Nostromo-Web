@@ -27,13 +27,13 @@ interface FileProps
 export const FileLoadingCard: React.FC<FileProps> = (props) =>
 {
     return <>
-        <div className={'file-cards ' + (props.loading.progress === 0? 'waiting' :props.loading.progress < props.loading.file.size? 'loading' : 'loaded')}>
-            <div style={{display: "ruby"}}>
-                <div className="card-file-btn"
+        <div className={'file-cards ' + (props.loading.progress === 0? 'waiting' :props.loading.progress < props.loading.file.size? 'loading' : "")}>
+            <div>
+                <div className="card-file-btn left-btn"
                 onClick={() => { if (props.onMoveLeft) props.onMoveLeft(props.loading.file.fileId); }}>{"<"}</div>
-                <div className="card-file-btn"
+                <div className="card-file-btn right-btn"
                 onClick={() => { if (props.onMoveRight) props.onMoveRight(props.loading.file.fileId); }}>{">"}</div>
-                <div className='card-file-btn right'
+                <div className='card-file-btn'
                 onClick={() => { if (props.onRemove) props.onRemove(props.loading.file.fileId); }}>Х</div>
             </div>
             <div className='file-cards-icon'><FcFile className='file-icon' /></div>

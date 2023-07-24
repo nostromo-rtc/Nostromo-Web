@@ -331,24 +331,31 @@
 
 .card-file-btn
 {
-    margin: 3px;
-    max-width: 20px;
-    font-size: 8pt;
-    min-width: 20px;
+    position: absolute;
+    right: 4px;
+    width: 20px;
+    height: 20px;
+    font-size: 0.85rem;
     text-align: center;
-    border-radius: 5px;
+    top: 4px;
 }
 .card-file-btn:hover
 {
     background-color: #4f4545;
+    color: white;
+    border-radius: 5px;
+}
+.left-btn{
+    left: 4px;
 }
 
-.right{
-    float: right;
+.right-btn{
+    left: 25px;
 }
 
 .file-cards
 {
+    position: relative;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -365,13 +372,10 @@
     overflow: hidden;
 }
 .loading{
-    background-color: #3b484e;
+    background-color: #1c2224;
 }
 .waiting{
     background-color: #27343a;
-}
-.loaded{
-    background-color: #1c2224;
 }
 
 .file-icon
@@ -383,9 +387,8 @@
 .file-cards-icon
 {
     text-align: center;
-    width: 100%;
-    min-height: 0;
-    overflow: hidden;
+    font-size: 7pt;
+    margin-top: 4px;
 }
 
 .file-cards-desc
