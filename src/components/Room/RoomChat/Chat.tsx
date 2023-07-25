@@ -178,19 +178,24 @@ export const Chat: React.FC = () =>
     const loadFileOnClick = (e: React.FormEvent<HTMLInputElement>): boolean =>
     {
         e.preventDefault();
+        if (isLoading)
+            return false;
         setShowFileCards(true);
         if (fileComponent.current)
         {
             const filesToUpload = fileComponent.current.files;
-            console.log(filesToUpload);
             const formSent = new FormData();
             if (filesToUpload && filesToUpload.length > 0)
             {
-                for (const item in filesToUpload)
+                const newFiles: LoadFileInfo[] = filesArr.slice();
+                let count = 0;
+                for (const item of filesToUpload)
                 {
+                    newFiles.push({file: {fileId: "test" + count.toString(), name: item.name, size: item.size}, progress: 0});
+                    count++;
                     formSent.append('file-input-btn', item);
-                    console.log(item);
                 }
+                setFiles(newFiles);
             } else
             {
                 alert('Сначала выберите файл');

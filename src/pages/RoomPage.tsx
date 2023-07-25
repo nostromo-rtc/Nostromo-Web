@@ -151,8 +151,31 @@ export const RoomPage: React.FC = () =>
     const onDropHandler = (e: React.DragEvent<HTMLDivElement>) =>
     {
         e.preventDefault();
-        const files = [...e.dataTransfer.files];
-        console.log(files[0].name + " " + (files[0].size / 1000).toString() + "KB");
+        
+        for (let i = 0; i < e.dataTransfer.types.length; i++) {
+            const type = e.dataTransfer.types[i];
+            console.log(type, e.dataTransfer.getData(type));
+            const files = [...e.dataTransfer.files];
+            console.log(files[0].name + " " + (files[0].size / 1000).toString() + "KB");
+        }
+    };
+    // FIXME ???
+    const onDragStart = (e: React.DragEvent<HTMLDivElement>) =>
+    {
+        e.preventDefault();
+        e.dataTransfer.setData("application/x-bzip", "1");
+        e.dataTransfer.setData("application/x-bzip2", "2");
+        e.dataTransfer.setData("text/css", "3");
+        e.dataTransfer.setData("text/csv", "4");
+        e.dataTransfer.setData("application/msword", "5");
+        e.dataTransfer.setData("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "6");
+        e.dataTransfer.setData("application/gzip", "7");
+        e.dataTransfer.setData("image/gif", "8");
+        e.dataTransfer.setData("text/html", "9");
+        e.dataTransfer.setData("image/vnd.microsoft.icon", "10");
+        e.dataTransfer.setData("image/jpeg", "11");
+        e.dataTransfer.setData("audio/mpeg", "12");
+        console.log("Types: ", e.dataTransfer.types);
     };
 
     const flagDnd = useContext(DndContext);
@@ -161,7 +184,9 @@ export const RoomPage: React.FC = () =>
             <Header title={roomName} roomToolbarProps={roomToolbarProps} />
             <div id="main">
                 {flagDnd
-                    ? <div className="drop-area vertical-center" onDrop={(e) => {onDropHandler(e)}}>
+                    ? <div className="drop-area vertical-center" 
+                            onDrop={(e) => {onDropHandler(e)}}
+                            onDragOver={(e) => {onDragStart(e)}}>
                         <div className='horizontal-center'>
                             <div className='drop-area-panel'>
                                 <div className='drop-area-icon'><GiFiles className='drop-area-icon-sizes' /></div>
