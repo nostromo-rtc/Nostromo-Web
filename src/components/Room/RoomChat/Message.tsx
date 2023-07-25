@@ -31,26 +31,112 @@ interface contentProps
 {
     content: string;
 }
-const urlRe = /^[^\s.]+\.\S{2,}$/;
+const URL_RE = /[^\s.]+\.\S{1,}[^\W|$]/g;            //!< Ссылки
+const INLINE_CODE_OPEN_TAG_RE =  /(\s|^)+`[^`]/;     //!< Метка начала блока отображения кода в пределах 1 строки
+const INLINE_CODE_CLOSE_TAG_RE = /[^`]`(\s|$)+/;     //!< Метка завершения блока отображения кода в пределах 1 строки
+const BLOCK_CODE_OPEN_TAG_RE  =  /(\s|^)+```[^`]/;   //!< Метка начала блока отображения кода на нескольких строках
+const BLOCK_CODE_CLOSE_TAG_RE  = /[^`]```(\s|$)+/;   //!< Метка завершения блока отображения кода на нескольких строках
+const INLINE_BOLD_OPEN_TAG_RE =  /(\s|^)+\*\*[^*]/;  //!< Метка начала блока жирного выделения в пределах 1 строки
+const INLINE_BOLD_CLOSE_TAG_RE = /[^*]\*\*(\s|$)+/;  //!< Метка завершения блока жирного выделения в пределах 1 строки
+
+enum BlockType { INLINE_CODE, BLOCK_CODE, BOLD, TEXT }
+class Block
+{
+    startPos : number;
+    endPos   : number;
+    type     : BlockType;
+
+    constructor(startPos : number, endPos : number, type : BlockType)
+    {
+        this.startPos = startPos;
+        this.endPos = endPos;
+        this.type = type;
+    }
+}
+
+const getFirstSubblock = (text : string) : Block | null =>
+{
+    const inlineCodeStart = text.match(INLINE_CODE_OPEN_TAG_RE);
+    const inlineCodeEnd = text.match(INLINE_CODE_CLOSE_TAG_RE);
+    const blockCodeStart = text.match(BLOCK_CODE_OPEN_TAG_RE);
+    const blockCodeEnd = text.match(BLOCK_CODE_CLOSE_TAG_RE);
+    const inlineBoldStart = text.match(INLINE_BOLD_OPEN_TAG_RE);
+    const inlineBoldEnd = text.match(INLINE_BOLD_CLOSE_TAG_RE);
+    const blocks : Block[] = [];
+    if (inlineCodeStart && inlineCodeEnd && inlineCodeStart.index != undefined && inlineCodeEnd.index != undefined)
+        blocks.push(new Block(inlineCodeStart.index + inlineCodeStart[0].indexOf('`'), inlineCodeEnd.index + 2, BlockType.INLINE_CODE));
+    if (blockCodeStart && blockCodeEnd && blockCodeStart.index != undefined && blockCodeEnd.index != undefined)
+        blocks.push(new Block(blockCodeStart.index + blockCodeStart[0].indexOf('`'), blockCodeEnd.index + 4, BlockType.BLOCK_CODE));
+    if (inlineBoldStart && inlineBoldEnd && inlineBoldStart.index != undefined && inlineBoldEnd.index != undefined)
+        blocks.push(new Block(inlineBoldStart.index + inlineBoldStart[0].indexOf('*'), inlineBoldEnd.index + 3, BlockType.BOLD));
+    if (blocks.length)
+    {
+        blocks.sort((l, r) => l.startPos - r.startPos);
+    }
+    return blocks.length ? blocks[0] : null;
+}
+
+const UrlToLinks = (words: string) : JSX.Element =>
+{
+    const blocks : JSX.Element[] = [];
+    let textBlockStartIdx = 0;
+    const urls = words.matchAll(URL_RE);
+    Array.from(urls).forEach(l => {
+        if (l.index !== undefined)
+        {
+            const displacement = l[1] ? l[1].length : 0;
+            const linkLen = l[0].length - displacement;
+            if (textBlockStartIdx !== l.index)
+                blocks.push(<Fragment key={0}>{words.substring(textBlockStartIdx, l.index + displacement)}</Fragment>)
+            const linkText = words.substring(l.index + displacement, l.index + linkLen);
+            const ref = linkText.startsWith("http") ? linkText : `http://${linkText}`;
+            blocks.push(<a className="message-link" href={ref} target="_blank" rel="noopener noreferrer" key={l.index}>{linkText}</a>)
+            textBlockStartIdx = l.index + l[0].length;
+        }
+    })
+    if (textBlockStartIdx != words.length)
+        blocks.push(<Fragment key={0}>{words.substring(textBlockStartIdx)}</Fragment>)
+    return <>{blocks}</>;
+}
+
+const analyzeBlock = (words: string): JSX.Element =>
+{
+    let subblock = getFirstSubblock(words);
+    const blocks : JSX.Element[] = [];
+    while(subblock)
+    {
+        const tagSize = subblock.type === BlockType.INLINE_CODE ? 1 : subblock.type === BlockType.BLOCK_CODE ? 3 : subblock.type === BlockType.BOLD ? 2 : 0;
+        const lPart = words.substring(0, subblock.startPos)
+        const mPart = words.substring(subblock.startPos + tagSize, subblock.endPos - tagSize)
+        const rPart = words.substring(subblock.endPos, words.length);
+        if (lPart.length)
+            blocks.push(UrlToLinks(lPart));
+        if (mPart.length)
+        {
+            switch (subblock.type)
+            {
+                case BlockType.INLINE_CODE:
+                case BlockType.BLOCK_CODE:
+                    blocks.push(<code className="msg-code-area">{mPart}</code>)
+                    break;
+                case BlockType.BOLD:
+                    blocks.push(<strong>{analyzeBlock(mPart)}</strong>)
+                    break;
+                default:
+                    blocks.push(UrlToLinks(mPart))
+            }
+        }
+        words = rPart;
+        subblock = getFirstSubblock(rPart);
+    }
+    if (words.length)
+        blocks.push(UrlToLinks(words))
+    return <>{blocks}</>;
+}
+
 export const TextMessage = (props: contentProps) =>
 {
-    const words = props.content.split(' ');
-    return (
-        <>
-            {words.map((w, index) =>
-            {
-                if (urlRe.test(w))
-                {
-                    const ref = w.startsWith("http") ? w : `http://${w}`;
-                    return <a className="message-link" href={ref} target="_blank" rel="noopener noreferrer" key={index}>{w}</a>;
-                }
-                else
-                {
-                    return <Fragment key={index}>{w} </Fragment>;
-                }
-            })}
-        </>
-    );
+    return analyzeBlock(props.content);
 };
 
 /** Информация о сообщении в чате. */

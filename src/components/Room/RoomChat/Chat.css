@@ -491,3 +491,10 @@ progress::-moz-progress-bar
 {
     color: rgb(192, 125, 223);
 }
+
+/******** Эффекты текста ********/
+.msg-code-area
+{
+    white-space: pre-wrap;
+    background-color: #555555;
+}
