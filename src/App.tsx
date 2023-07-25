@@ -27,13 +27,34 @@ const App: React.FC = () =>
         </div>
     );
 
+    const handleDrop : React.DragEventHandler<HTMLDivElement> = (e: React.DragEvent<HTMLDivElement>) =>
+    {
+        e.preventDefault();
+        setContext(false);
+    };
+    const handleDragOver : React.DragEventHandler<HTMLDivElement> = (e: React.DragEvent<HTMLDivElement>) =>
+    {
+        e.preventDefault();
+    };
+    const handleDragEnter : React.DragEventHandler<HTMLDivElement> = (e: React.DragEvent<HTMLDivElement>) =>
+    {
+        setContext(true);
+    };
+    const handleDragExit : React.DragEventHandler<HTMLDivElement> = (e: React.DragEvent<HTMLDivElement>) =>
+    {
+        setContext(false);
+    };
+
     const [context, setContext] = useState(false);
     return (
         <DndContext.Provider value={context}>
             <BrowserRouter>
                 <ThemeProvider theme={theme}>
                     <StyledEngineProvider injectFirst>
-                        <div onDragEnter={() => { setContext(true); }} onDragExit={() => { setContext(false); }} id="app">
+                        <div onDragEnter={handleDragEnter}
+                             onDragExit={handleDragExit}
+                             onDragOver={handleDragOver}
+                             onDrop={handleDrop} id="app">
                             <div id="layer-main" className="overflow-container">
                                 <Navbar openSettings={() => { setShowSettings(true); }} />
                                 <div id="base">

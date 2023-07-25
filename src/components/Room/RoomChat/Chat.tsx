@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, Dispatch, SetStateAction } from 'react';
 import { ImAttachment } from 'react-icons/im';
 import { MdSend } from 'react-icons/md';
 import "./Chat.css";
@@ -17,19 +17,23 @@ interface ChatMessage
     content: ChatFileInfo | string;
 }
 
+interface ChatProps
+{
+    uploadingFilesQueue : LoadFileInfo[];
+    setUploadingFilesQueue : Dispatch<SetStateAction<LoadFileInfo[]>>;
+    isFileUploading : boolean;
+    setIsFileUploading : Dispatch<SetStateAction<boolean>>;
+}
+
 /* для передачи на сервер */
 const formData = new FormData();
 let files = [];
-export const Chat: React.FC = () =>
+export const Chat: React.FC<ChatProps> = (props : ChatProps) =>
 {
     /* Хук взятия пути для скачивания файла после вставки */
     const [pathFile, setPathFile] = useState("");
     /* Показывать ли placeholder в поле для ввода. */
     const [showPlaceholder, setShowPlaceholder] = useState(true);
-    /* Хук для отображения загружаемых файлов */
-    const [showFileCards, setShowFileCards] = useState(false);
-    /* Хук для загрузки файлов */
-    const [isLoading, setIsLoading] = useState(false);
 
     /* Хук-контейнер для тестовых сообщений */
     const [messages, setMessages] = useState<ChatMessage[]>([
@@ -47,21 +51,7 @@ export const Chat: React.FC = () =>
         { userId: "155sadjofdgknsdfk3", type: "file", datetime: new Date().getTime() - 5000, content: { fileId: "cxzvzx23", name: "Master_and_Margo.txt", size: 412428 } },
         { userId: "12hnjofgl33154", type: "file", datetime: new Date().getTime(), content: { fileId: "jghjghj2", name: "About_IT.txt", size: 4212428 } }
     ]);
-    /* Хук-контейнер для тестовых файлов */
-    const [filesArr, setFiles] = useState<LoadFileInfo[]>([
-        { file: {fileId: "hfg123", name: "Язык программирования C++", size: 16188070}, progress: 0},
-        { file: {fileId: "jhg812", name: "C++ лекции и упражнения", size: 150537513}, progress: 0},
-        { file: {fileId: "kjh306", name: "Современные операционные системы", size: 14280633}, progress: 0},
-        { file: {fileId: "lou785", name: "Т.1. Искусство программирования", size: 83673366}, progress: 0},
-        { file: {fileId: "nbo890", name: "Автоматное программирование", size: 1785979}, progress: 0},
-        { file: {fileId: "xcv519", name: "Паттерны проектирования", size: 68368155}, progress: 0},
-        { file: {fileId: "hfg623", name: "Некрономикон", size: 9999999999}, progress: 0},
-        { file: {fileId: "jhg312", name: "QT 5.10 Профессиональное программирование на C++", size: 103919024}, progress: 0},
-        { file: {fileId: "kjh366", name: "Т.2. Искусство программирования", size: 7235716}, progress: 0},
-        { file: {fileId: "loi785", name: "Т.3. Искусство программирования", size: 8612462}, progress: 0},
-        { file: {fileId: "nbv890", name: "Т.4. Искусство программирования", size: 99124812}, progress: 0}
-    ]);
-
+    
     const fileCardsRef = useRef<HTMLDivElement>(null);
 
     // Ссылка на компонент с полем для ввода сообщения.
@@ -90,7 +80,7 @@ export const Chat: React.FC = () =>
 
         const newMessage = textAreaRef.current.innerText.trim();
 
-        if (isEmptyString(newMessage) && !filesArr.length)
+        if (isEmptyString(newMessage) && !props.uploadingFilesQueue.length)
         {
             return;
         }
@@ -114,51 +104,43 @@ export const Chat: React.FC = () =>
             // Поэтому включаем placeholder вручную.
             setShowPlaceholder(true);
         }
-        if(filesArr.length)
+        if(props.uploadingFilesQueue.length > 0)
         {
-            setIsLoading(true);  
+            props.setIsFileUploading(true);  
         }
         else{
-            setIsLoading(false);
-            setShowFileCards(false);
-        }    
+            props.setIsFileUploading(false);
+        }  
     };
-    // Тестовый прогресс бар
+    // Иммитация загрузки файла на сервер
     const [data, setData] = useState(1);
     useEffect(() =>
     {
-        if(isLoading){
-            
-            setTimeout(function ()
+        setTimeout(function ()
+        {
+            if (props.isFileUploading && props.uploadingFilesQueue.length)
             {
-                const idx = filesArr.findIndex(f=>f.progress < f.file.size);
-                if(idx !== -1){
-                    filesArr[idx].progress += 1000000;
-                    if(filesArr[idx].progress >= filesArr[idx].file.size){
-                        filesArr[idx].progress = filesArr[idx].file.size;
-                        const message: ChatMessage =
-                        {
-                            userId: "1bvcbjofg23fxcvds",
-                            type: "file",
-                            datetime: new Date().getTime(),
-                            content: {fileId: filesArr[idx].file.fileId, name: filesArr[idx].file.name, size: filesArr[idx].file.size}
-                        };
-                        setMessages((prev) => prev.concat(message));
-                        const newFiles: LoadFileInfo[] = filesArr.filter(r => r.file.fileId !== filesArr[idx].file.fileId);
-                        setFiles(newFiles);
-                    }
+                props.uploadingFilesQueue[0].progress += 1000000;
+                if (props.uploadingFilesQueue[0].progress >= props.uploadingFilesQueue[0].file.size)
+                {
+                    props.uploadingFilesQueue[0].progress = props.uploadingFilesQueue[0].file.size;
+                    const message: ChatMessage =
+                    {
+                        userId: "1bvcbjofg23fxcvds",
+                        type: "file",
+                        datetime: new Date().getTime(),
+                        content: { fileId: props.uploadingFilesQueue[0].file.fileId, name: props.uploadingFilesQueue[0].file.name, size: props.uploadingFilesQueue[0].file.size }
+                    };
+                    setMessages((prev) => prev.concat(message));
+                    const newFiles: LoadFileInfo[] = props.uploadingFilesQueue.splice(1);
+                    props.setUploadingFilesQueue(newFiles);
                 }
-                if(!filesArr.length)
-                    setIsLoading(false);
-                setData(data + 100000);
-            }, 1000);
-        }
+            }
+            if (props.uploadingFilesQueue.length === 0)
+                props.setIsFileUploading(false);
+            setData(data + 1);
+        }, 1000);
     }, [data]);
-    useEffect(() =>{
-        if(isLoading){
-            setData(0);
-        }
-    }, [isLoading]);
     const sendMsgBtn = (
         <TooltipTopBottom title="Отправить">
             <div className="chat-btn-box">
@@ -174,20 +156,19 @@ export const Chat: React.FC = () =>
     /*** Кнопка отправки файлов ***/
     const fileComponent = useRef<HTMLInputElement>(null);
     
-
+    
     const loadFileOnClick = (e: React.FormEvent<HTMLInputElement>): boolean =>
     {
         e.preventDefault();
-        if (isLoading)
+        if (props.isFileUploading)
             return false;
-        setShowFileCards(true);
         if (fileComponent.current)
         {
             const filesToUpload = fileComponent.current.files;
             const formSent = new FormData();
             if (filesToUpload && filesToUpload.length > 0)
             {
-                const newFiles: LoadFileInfo[] = filesArr.slice();
+                const newFiles: LoadFileInfo[] = props.uploadingFilesQueue.slice();
                 let count = 0;
                 for (const item of filesToUpload)
                 {
@@ -195,7 +176,7 @@ export const Chat: React.FC = () =>
                     count++;
                     formSent.append('file-input-btn', item);
                 }
-                setFiles(newFiles);
+                props.setUploadingFilesQueue(newFiles);
             } else
             {
                 alert('Сначала выберите файл');
@@ -206,36 +187,32 @@ export const Chat: React.FC = () =>
     // Удаление карточки
     const removeHandler = (fileId: string): void =>
     {
-        const newFiles: LoadFileInfo[] = filesArr.filter(f => f.file.fileId !== fileId);
-        setFiles(newFiles);
-        if (!newFiles.length)
-        {
-            setShowFileCards(false);
-        }
+        const newFiles: LoadFileInfo[] = props.uploadingFilesQueue.filter(f => f.file.fileId !== fileId);
+        props.setUploadingFilesQueue(newFiles);
     };
     // Перемещение карточки влево
     const moveLeftHandler = (fileId: string): void =>
     {
-        const newFiles: LoadFileInfo[] = filesArr.slice();
+        const newFiles: LoadFileInfo[] = props.uploadingFilesQueue.slice();
         const fileIdx = newFiles.findIndex(а => а.file.fileId === fileId);
         if (fileIdx !== 0 && newFiles[fileIdx].progress === 0 && newFiles[fileIdx - 1].progress === 0){
             const tmp: LoadFileInfo = newFiles[fileIdx];
             newFiles[fileIdx] = newFiles[fileIdx - 1];
             newFiles[fileIdx - 1] = tmp;
         }
-        setFiles(newFiles);
+        props.setUploadingFilesQueue(newFiles);
     }
     // Перемещение карточки вправо
     const moveRightHandler = (fileId: string): void =>
     {  
-        const newFiles: LoadFileInfo[] = filesArr.slice();
+        const newFiles: LoadFileInfo[] = props.uploadingFilesQueue.slice();
         const fileIdx = newFiles.findIndex(f => f.file.fileId === fileId);
         if (fileIdx !== (newFiles.length - 1) && newFiles[fileIdx].progress === 0){
             const tmp: LoadFileInfo = newFiles[fileIdx];
             newFiles[fileIdx] = newFiles[fileIdx + 1];
             newFiles[fileIdx + 1] = tmp;
         }
-        setFiles(newFiles);
+        props.setUploadingFilesQueue(newFiles);
     };
 
     const handleTextAreaKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (ev) =>
@@ -258,9 +235,8 @@ export const Chat: React.FC = () =>
     const handleClipboardEvent : React.ClipboardEventHandler<HTMLDivElement> = (ev) =>
     {
         ev.preventDefault();
-        if(isLoading)
+        if(props.isFileUploading)
             return;
-        setShowFileCards(true);
         setPathFile(ev.clipboardData.getData("text"));
         files = [...ev.clipboardData.items];
         for (const f of files)
@@ -270,9 +246,9 @@ export const Chat: React.FC = () =>
                 const fileData = f.getAsFile();
                 if (fileData)
                 {
-                    const filesCopy = [...filesArr];
+                    const filesCopy = [...props.uploadingFilesQueue];
                     filesCopy.push({file: {fileId: new Date().getMilliseconds().toString(), name: fileData.name, size: fileData.size}, progress: 0 });
-                    setFiles(filesCopy);
+                    props.setUploadingFilesQueue(filesCopy);
 
                     formData.append('file', fileData);
                     console.log("size: " + (fileData.size / 1000).toString() + "KB");
@@ -324,9 +300,9 @@ export const Chat: React.FC = () =>
             })
             }
         </div>
-            {showFileCards && filesArr.length ?
+            {props.uploadingFilesQueue.length ?
                 <div className='view-file-cards-area' ref={fileCardsRef} onWheel={fileCardsWheelHandler}>
-                    {filesArr.map(f =>
+                    {props.uploadingFilesQueue.map(f =>
                     {
                         return <FileLoadingCard loading={f} 
                             onRemove={() => { removeHandler(f.file.fileId); }} 

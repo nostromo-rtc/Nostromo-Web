@@ -15,6 +15,7 @@ import { UserList } from "../components/Room/UserList";
 import { Chat } from "../components/Room/RoomChat/Chat";
 import { DndContext } from "../App";
 import { GiFiles } from "react-icons/gi";
+import { LoadFileInfo } from "../components/Room/RoomChat/FileLoadingCard";
 
 export enum SoundState
 {
@@ -69,6 +70,22 @@ export const RoomPage: React.FC = () =>
         { name: "Веб-камера 2", deviceId: "testCamDeviceId2", groupId: "testCamGroupId2", kind: "video" },
         { name: "Веб-камера 3", deviceId: "testCamDeviceId3", groupId: "testCamGroupId3", kind: "video" }]
     );
+
+    const [isFileUploading, setIsFileUploading] = useState<boolean>(false);
+    const [uploadingFilesQueue, setUploadingFilesQueue] = useState<LoadFileInfo[]>([
+        { file: {fileId: "hfg123", name: "Язык программирования C++", size: 16188070}, progress: 0},
+        { file: {fileId: "jhg812", name: "C++ лекции и упражнения", size: 150537513}, progress: 0},
+        { file: {fileId: "kjh306", name: "Современные операционные системы", size: 14280633}, progress: 0},
+        { file: {fileId: "lou785", name: "Т.1. Искусство программирования", size: 83673366}, progress: 0},
+        { file: {fileId: "nbo890", name: "Автоматное программирование", size: 1785979}, progress: 0},
+        { file: {fileId: "xcv519", name: "Паттерны проектирования", size: 68368155}, progress: 0},
+        { file: {fileId: "hfg623", name: "Некрономикон", size: 9999999999}, progress: 0},
+        { file: {fileId: "jhg312", name: "QT 5.10 Профессиональное программирование на C++", size: 103919024}, progress: 0},
+        { file: {fileId: "kjh366", name: "Т.2. Искусство программирования", size: 7235716}, progress: 0},
+        { file: {fileId: "loi785", name: "Т.3. Искусство программирования", size: 8612462}, progress: 0},
+        { file: {fileId: "nbv890", name: "Т.4. Искусство программирования", size: 99124812}, progress: 0}
+    ]);
+
 
     const roomActionPanelProps: RoomActionPanelProps =
     {
@@ -132,7 +149,7 @@ export const RoomPage: React.FC = () =>
 
     const chatContainer =
         <div id="chat-container">
-            <Chat />
+            <Chat uploadingFilesQueue={uploadingFilesQueue} setUploadingFilesQueue={setUploadingFilesQueue} isFileUploading={isFileUploading} setIsFileUploading={setIsFileUploading} />
         </div>;
     const callContainer =
         <div id="call-container">
@@ -146,36 +163,21 @@ export const RoomPage: React.FC = () =>
     {
         document.title = `Nostromo - Комната "${roomName}"`;
     }, []);
-
+    
     /* После того, как отпустили файл в область */
-    const onDropHandler = (e: React.DragEvent<HTMLDivElement>) =>
+    const handleDrop : React.DragEventHandler<HTMLDivElement> = (e: React.DragEvent<HTMLDivElement>) =>
     {
         e.preventDefault();
-        
-        for (let i = 0; i < e.dataTransfer.types.length; i++) {
-            const type = e.dataTransfer.types[i];
-            console.log(type, e.dataTransfer.getData(type));
-            const files = [...e.dataTransfer.files];
-            console.log(files[0].name + " " + (files[0].size / 1000).toString() + "KB");
+        const filesCopy = [...uploadingFilesQueue];
+        for (const file of e.dataTransfer.files)
+        {
+            filesCopy.push({file: {fileId: new Date().getMilliseconds().toString(), name: file.name, size: file.size}, progress: 0 });
         }
+        setUploadingFilesQueue(filesCopy);
     };
-    // FIXME ???
-    const onDragStart = (e: React.DragEvent<HTMLDivElement>) =>
+    const handleDragOver : React.DragEventHandler<HTMLDivElement> = (e: React.DragEvent<HTMLDivElement>) =>
     {
         e.preventDefault();
-        e.dataTransfer.setData("application/x-bzip", "1");
-        e.dataTransfer.setData("application/x-bzip2", "2");
-        e.dataTransfer.setData("text/css", "3");
-        e.dataTransfer.setData("text/csv", "4");
-        e.dataTransfer.setData("application/msword", "5");
-        e.dataTransfer.setData("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "6");
-        e.dataTransfer.setData("application/gzip", "7");
-        e.dataTransfer.setData("image/gif", "8");
-        e.dataTransfer.setData("text/html", "9");
-        e.dataTransfer.setData("image/vnd.microsoft.icon", "10");
-        e.dataTransfer.setData("image/jpeg", "11");
-        e.dataTransfer.setData("audio/mpeg", "12");
-        console.log("Types: ", e.dataTransfer.types);
     };
 
     const flagDnd = useContext(DndContext);
@@ -183,10 +185,10 @@ export const RoomPage: React.FC = () =>
         <>  
             <Header title={roomName} roomToolbarProps={roomToolbarProps} />
             <div id="main">
-                {flagDnd
-                    ? <div className="drop-area vertical-center" 
-                            onDrop={(e) => {onDropHandler(e)}}
-                            onDragOver={(e) => {onDragStart(e)}}>
+                {flagDnd && !isFileUploading
+                    ? <div className="drop-area vertical-center"
+                        onDrop={(e) => {handleDrop(e)}}
+                        onDragOver={(e) => {handleDragOver(e)}}>
                         <div className='horizontal-center'>
                             <div className='drop-area-panel'>
                                 <div className='drop-area-icon'><GiFiles className='drop-area-icon-sizes' /></div>
