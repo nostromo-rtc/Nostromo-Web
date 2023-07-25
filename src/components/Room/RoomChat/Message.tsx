@@ -31,7 +31,7 @@ interface contentProps
 {
     content: string;
 }
-const URL_RE = /[^\s.]+\.\S{1,}[^\W|$]/g;            //!< Ссылки
+const URL_RE = /[\S.]+\.\S{1,}[\w|/|#]/g;           //!< Ссылки
 const INLINE_CODE_OPEN_TAG_RE =  /(\s|^)+`[^`]/;     //!< Метка начала блока отображения кода в пределах 1 строки
 const INLINE_CODE_CLOSE_TAG_RE = /[^`]`(\s|$)+/;     //!< Метка завершения блока отображения кода в пределах 1 строки
 const BLOCK_CODE_OPEN_TAG_RE  =  /(\s|^)+```[^`]/;   //!< Метка начала блока отображения кода на нескольких строках
@@ -77,27 +77,34 @@ const getFirstSubblock = (text : string) : Block | null =>
 
 const UrlToLinks = (words: string) : JSX.Element =>
 {
+    let subblockNumber = 0;
     const blocks : JSX.Element[] = [];
     let textBlockStartIdx = 0;
     const urls = words.matchAll(URL_RE);
-    Array.from(urls).forEach(l => {
-        if (l.index !== undefined)
+    for (const url of urls)
+    {
+        if (url.index !== undefined)
         {
-            if (textBlockStartIdx !== l.index)
-                blocks.push(<Fragment key={0}>{words.substring(textBlockStartIdx, l.index)}</Fragment>)
-            const linkText = words.substring(l.index, l.index + l[0].length);
+            if (textBlockStartIdx !== url.index)
+            {
+                blocks.push(<Fragment key={subblockNumber}>{words.substring(textBlockStartIdx, url.index)}</Fragment>)
+                subblockNumber++;
+            }
+            const linkText = words.substring(url.index, url.index + url[0].length);
             const ref = linkText.startsWith("http") ? linkText : `http://${linkText}`;
-            blocks.push(<a className="message-link" href={ref} target="_blank" rel="noopener noreferrer" key={l.index}>{linkText}</a>)
-            textBlockStartIdx = l.index + l[0].length;
+            blocks.push(<a key={subblockNumber} className="message-link" href={ref} target="_blank" rel="noopener noreferrer">{linkText}</a>)
+            subblockNumber++;
+            textBlockStartIdx = url.index + url[0].length;
         }
-    })
+    }
     if (textBlockStartIdx != words.length)
-        blocks.push(<Fragment key={0}>{words.substring(textBlockStartIdx)}</Fragment>)
+        blocks.push(<Fragment key={subblockNumber}>{words.substring(textBlockStartIdx)}</Fragment>)
     return <>{blocks}</>;
 }
 
 const analyzeBlock = (words: string): JSX.Element =>
 {
+    let subblockNumber = 0;
     let subblock = getFirstSubblock(words);
     const blocks : JSX.Element[] = [];
     while(subblock)
@@ -107,27 +114,31 @@ const analyzeBlock = (words: string): JSX.Element =>
         const mPart = words.substring(subblock.startPos + tagSize, subblock.endPos - tagSize)
         const rPart = words.substring(subblock.endPos, words.length);
         if (lPart.length)
-            blocks.push(UrlToLinks(lPart));
+        {
+            blocks.push(<Fragment key={subblockNumber}>{UrlToLinks(lPart)}</Fragment>);
+            subblockNumber++;
+        }
         if (mPart.length)
         {
             switch (subblock.type)
             {
                 case BlockType.INLINE_CODE:
                 case BlockType.BLOCK_CODE:
-                    blocks.push(<code className="msg-code-area">{mPart}</code>)
+                    blocks.push(<code key={subblockNumber} className="msg-code-area">{mPart}</code>)
                     break;
                 case BlockType.BOLD:
-                    blocks.push(<strong>{analyzeBlock(mPart)}</strong>)
+                    blocks.push(<strong key={subblockNumber}>{analyzeBlock(mPart)}</strong>)
                     break;
                 default:
-                    blocks.push(UrlToLinks(mPart))
+                    blocks.push(<Fragment key={subblockNumber}>{UrlToLinks(mPart)}</Fragment>)
             }
+            subblockNumber++;
         }
         words = rPart;
         subblock = getFirstSubblock(rPart);
     }
     if (words.length)
-        blocks.push(UrlToLinks(words))
+        blocks.push(<Fragment key={subblockNumber}>{UrlToLinks(words)}</Fragment>)
     return <>{blocks}</>;
 }
 

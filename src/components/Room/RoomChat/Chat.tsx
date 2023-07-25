@@ -46,7 +46,7 @@ export const Chat: React.FC<ChatProps> = (props : ChatProps) =>
                 + "\n```HAI 1.0\n\tI HAS A NAME\n\tVISIBLE \"Wat is yo name7\"\n\tGIMMEH NAME\n\tVISIBLE \"Hai \" NAME \"!!1\"\nKTHXBYE```"
         },
         { userId: "1bvcbjofg23fxcvds", type: "text", datetime: new Date().getTime() - 15000, content: "Do you see this new file uploading panel? Looks cool!" },
-        { userId: "12hnjofgl33154", type: "text", datetime: new Date().getTime() - 10000, content: "Работа идёт полным ходом: https://gitlab.com/nostromo-rtc/nostromo-web/-/issues/13\nУже почти закончили чат"
+        { userId: "12hnjofgl33154", type: "text", datetime: new Date().getTime() - 10000, content: "Работа идёт полным ходом: https://gitlab.com/nostromo-rtc/nostromo-web/-/issues/13.\nУже почти закончили чат."
                 + "\nИз свежих изменений: https://gitlab.com/nostromo-rtc/nostromo-web/-/commit/49167e06573bb13ef9c5ba95261cfb00100e8662, https://gitlab.com/nostromo-rtc/nostromo-web/-/commit/934d5d7f00af08dd724eae7efee44d0f31ab6b9e и https://gitlab.com/nostromo-rtc/nostromo-web/-/commit/31818b68f40dd739ff257da0f585d1092319f773" },
         { userId: "155sadjofdgknsdfk3", type: "file", datetime: new Date().getTime() - 5000, content: { fileId: "cxzvzx23", name: "Master_and_Margo.txt", size: 412428 } },
         { userId: "12hnjofgl33154", type: "file", datetime: new Date().getTime(), content: { fileId: "jghjghj2", name: "About_IT.txt", size: 4212428 } }
@@ -293,21 +293,22 @@ export const Chat: React.FC<ChatProps> = (props : ChatProps) =>
     </div>;
 
     return (
-        <>  <div id="chat" ref={chatElement} aria-readonly>
-            {messages.map(m =>
-            {
-                return <Message key={m.userId + m.datetime.toString()} message={m} />;
-            })
-            }
-        </div>
+        <>
+            <div id="chat" key="test?" ref={chatElement} aria-readonly>
+                {messages.map(m =>
+                {
+                    return <Message key={m.userId + m.datetime.toString()} message={m} />;
+                })
+                }
+            </div>
             {props.uploadingFilesQueue.length ?
                 <div className='view-file-cards-area' ref={fileCardsRef} onWheel={fileCardsWheelHandler}>
-                    {props.uploadingFilesQueue.map(f =>
+                    {props.uploadingFilesQueue.map((f, i) =>
                     {
-                        return <FileLoadingCard loading={f} 
-                            onRemove={() => { removeHandler(f.file.fileId); }} 
+                        return <FileLoadingCard key={i} loading={f}
+                            onRemove={() => { removeHandler(f.file.fileId); }}
                             onMoveLeft={() => { moveLeftHandler(f.file.fileId); }}
-                            onMoveRight={() => { moveRightHandler(f.file.fileId); }}/>;
+                            onMoveRight={() => { moveRightHandler(f.file.fileId); }} />;
                     })}
                 </div>
                 : <></>
