@@ -28,6 +28,8 @@ export const Chat: React.FC = () =>
     const [showPlaceholder, setShowPlaceholder] = useState(true);
     /* Хук для отображения загружаемых файлов */
     const [showFileCards, setShowFileCards] = useState(false);
+    /* Хук для загрузки файлов */
+    const [isLoading, setIsLoading] = useState(false);
 
     /* Хук-контейнер для тестовых сообщений */
     const [messages, setMessages] = useState<ChatMessage[]>([
@@ -46,7 +48,7 @@ export const Chat: React.FC = () =>
         { userId: "12hnjofgl33154", type: "file", datetime: new Date().getTime(), content: { fileId: "jghjghj2", name: "About_IT.txt", size: 4212428 } }
     ]);
     /* Хук-контейнер для тестовых файлов */
-    const [testFiles, setFiles] = useState<LoadFileInfo[]>([
+    const [filesArr, setFiles] = useState<LoadFileInfo[]>([
         { file: {fileId: "hfg123", name: "Язык программирования C++", size: 16188070}, progress: 0},
         { file: {fileId: "jhg812", name: "C++ лекции и упражнения", size: 150537513}, progress: 0},
         { file: {fileId: "kjh306", name: "Современные операционные системы", size: 14280633}, progress: 0},
@@ -88,33 +90,75 @@ export const Chat: React.FC = () =>
 
         const newMessage = textAreaRef.current.innerText.trim();
 
-        if (isEmptyString(newMessage))
+        if (isEmptyString(newMessage) && !filesArr.length)
         {
             return;
         }
-
-        const message: ChatMessage =
+        if(!isEmptyString(newMessage))
         {
-            userId: "1bvcbjofg23fxcvds",
-            type: "text",
-            datetime: new Date().getTime(),
-            content: newMessage
-        };
+            const message: ChatMessage =
+            {
+                userId: "1bvcbjofg23fxcvds",
+                type: "text",
+                datetime: new Date().getTime(),
+                content: newMessage
+            };
+            // FIXME: возможно concat не самый лучший способ в React так объединять старое и новое состояние.
+            // Это просто пока заглушка, но когда будет настоящий код, 
+            // следует подобрать наилучший метод для этого действия.
+            setMessages((prev) => prev.concat(message));
 
-        // FIXME: возможно concat не самый лучший способ в React так объединять старое и новое состояние.
-        // Это просто пока заглушка, но когда будет настоящий код, 
-        // следует подобрать наилучший метод для этого действия.
-        setMessages((prev) => prev.concat(message));
-
-        // Очищаем поле для ввода после отправки сообщения.
-        textAreaRef.current.innerText = "";
-        // Очистка выше не вызывает событий "input" или "event" для textArea.
-        // Поэтому включаем placeholder вручную.
-        setShowPlaceholder(true);
-
-        setShowFileCards(false);
+            // Очищаем поле для ввода после отправки сообщения.
+            textAreaRef.current.innerText = "";
+            // Очистка выше не вызывает событий "input" или "event" для textArea.
+            // Поэтому включаем placeholder вручную.
+            setShowPlaceholder(true);
+        }
+        if(filesArr.length)
+        {
+            setIsLoading(true);  
+        }
+        else{
+            setIsLoading(false);
+            setShowFileCards(false);
+        }    
     };
-
+    // Тестовый прогресс бар
+    const [data, setData] = useState(1);
+    useEffect(() =>
+    {
+        if(isLoading){
+            
+            setTimeout(function ()
+            {
+                const idx = filesArr.findIndex(f=>f.progress < f.file.size);
+                if(idx !== -1){
+                    filesArr[idx].progress += 1000000;
+                    if(filesArr[idx].progress >= filesArr[idx].file.size){
+                        filesArr[idx].progress = filesArr[idx].file.size;
+                        const message: ChatMessage =
+                        {
+                            userId: "1bvcbjofg23fxcvds",
+                            type: "file",
+                            datetime: new Date().getTime(),
+                            content: {fileId: filesArr[idx].file.fileId, name: filesArr[idx].file.name, size: filesArr[idx].file.size}
+                        };
+                        setMessages((prev) => prev.concat(message));
+                        const newFiles: LoadFileInfo[] = filesArr.filter(r => r.file.fileId !== filesArr[idx].file.fileId);
+                        setFiles(newFiles);
+                    }
+                }
+                if(!filesArr.length)
+                    setIsLoading(false);
+                setData(data + 100000);
+            }, 1000);
+        }
+    }, [data]);
+    useEffect(() =>{
+        if(isLoading){
+            setData(0);
+        }
+    }, [isLoading]);
     const sendMsgBtn = (
         <TooltipTopBottom title="Отправить">
             <div className="chat-btn-box">
@@ -129,22 +173,7 @@ export const Chat: React.FC = () =>
     );
     /*** Кнопка отправки файлов ***/
     const fileComponent = useRef<HTMLInputElement>(null);
-    // Тестовый прогресс бар
-    const [data, setData] = useState(0);
-    useEffect(() =>
-    {
-        setTimeout(function ()
-        {
-            const idx = testFiles.findIndex(f=>f.progress < f.file.size);
-            if(idx !== -1){
-                testFiles[idx].progress += 1000000;
-                if(testFiles[idx].progress >= testFiles[idx].file.size){
-                    testFiles[idx].progress = testFiles[idx].file.size;
-                }
-            }
-            setData(data + 100000);
-        }, 1000);
-    }, [data]);
+    
 
     const loadFileOnClick = (e: React.FormEvent<HTMLInputElement>): boolean =>
     {
@@ -169,37 +198,39 @@ export const Chat: React.FC = () =>
         }
         return false;
     };
-    const removeCard = (fileId: string): void =>
+    // Удаление карточки
+    const removeHandler = (fileId: string): void =>
     {
-        const fileIdx = testFiles.findIndex(t => t.file.fileId === fileId);
-        if (fileIdx !== -1)
-        {
-            testFiles.splice(fileIdx, 1);
-        }
-        if (!testFiles.length)
+        const newFiles: LoadFileInfo[] = filesArr.filter(f => f.file.fileId !== fileId);
+        setFiles(newFiles);
+        if (!newFiles.length)
         {
             setShowFileCards(false);
         }
     };
-    const moveLeft = (fileId: string): void =>
+    // Перемещение карточки влево
+    const moveLeftHandler = (fileId: string): void =>
     {
-        const fileIdx = testFiles.findIndex(t => t.file.fileId === fileId);
-        if (fileIdx !== -1 && fileIdx !== 0)
-        {
-            const tmp: LoadFileInfo = testFiles[fileIdx];
-            testFiles[fileIdx] = testFiles[fileIdx - 1];
-            testFiles[fileIdx - 1] = tmp;
+        const newFiles: LoadFileInfo[] = filesArr.slice();
+        const fileIdx = newFiles.findIndex(а => а.file.fileId === fileId);
+        if (fileIdx !== 0 && newFiles[fileIdx].progress === 0 && newFiles[fileIdx - 1].progress === 0){
+            const tmp: LoadFileInfo = newFiles[fileIdx];
+            newFiles[fileIdx] = newFiles[fileIdx - 1];
+            newFiles[fileIdx - 1] = tmp;
         }
-    };
-    const moveRight = (fileId: string): void =>
-    {
-        const fileIdx = testFiles.findIndex(t => t.file.fileId === fileId);
-        if (fileIdx !== -1 && fileIdx !== (testFiles.length - 1))
-        {
-            const tmp: LoadFileInfo = testFiles[fileIdx];
-            testFiles[fileIdx] = testFiles[fileIdx + 1];
-            testFiles[fileIdx + 1] = tmp;
+        setFiles(newFiles);
+    }
+    // Перемещение карточки вправо
+    const moveRightHandler = (fileId: string): void =>
+    {  
+        const newFiles: LoadFileInfo[] = filesArr.slice();
+        const fileIdx = newFiles.findIndex(f => f.file.fileId === fileId);
+        if (fileIdx !== (newFiles.length - 1) && newFiles[fileIdx].progress === 0){
+            const tmp: LoadFileInfo = newFiles[fileIdx];
+            newFiles[fileIdx] = newFiles[fileIdx + 1];
+            newFiles[fileIdx + 1] = tmp;
         }
+        setFiles(newFiles);
     };
 
     const handleTextAreaKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (ev) =>
@@ -221,6 +252,9 @@ export const Chat: React.FC = () =>
     // Вставка файла через ctrl+v
     const handleClipboardEvent : React.ClipboardEventHandler<HTMLDivElement> = (ev) =>
     {
+        ev.preventDefault();
+        if(isLoading)
+            return;
         setShowFileCards(true);
         setPathFile(ev.clipboardData.getData("text"));
         files = [...ev.clipboardData.items];
@@ -231,7 +265,7 @@ export const Chat: React.FC = () =>
                 const fileData = f.getAsFile();
                 if (fileData)
                 {
-                    const filesCopy = [...testFiles];
+                    const filesCopy = [...filesArr];
                     filesCopy.push({file: {fileId: new Date().getMilliseconds().toString(), name: fileData.name, size: fileData.size}, progress: 0 });
                     setFiles(filesCopy);
 
@@ -242,7 +276,7 @@ export const Chat: React.FC = () =>
                 }
             }
         }
-        ev.preventDefault();
+        
     };
     const loadFileBtn = (
         <TooltipTopBottom title="Загрузить">
@@ -285,14 +319,14 @@ export const Chat: React.FC = () =>
             })
             }
         </div>
-            {showFileCards && testFiles.length ?
+            {showFileCards && filesArr.length ?
                 <div className='view-file-cards-area' ref={fileCardsRef} onWheel={fileCardsWheelHandler}>
-                    {testFiles.map(f =>
+                    {filesArr.map(f =>
                     {
                         return <FileLoadingCard loading={f} 
-                            onRemove={() => { removeCard(f.file.fileId); }} 
-                            onMoveLeft={() => { moveLeft(f.file.fileId); }}
-                            onMoveRight={() => { moveRight(f.file.fileId); }}/>;
+                            onRemove={() => { removeHandler(f.file.fileId); }} 
+                            onMoveLeft={() => { moveLeftHandler(f.file.fileId); }}
+                            onMoveRight={() => { moveRightHandler(f.file.fileId); }}/>;
                     })}
                 </div>
                 : <></>

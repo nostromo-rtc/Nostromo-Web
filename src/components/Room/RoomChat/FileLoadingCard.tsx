@@ -29,9 +29,9 @@ export const FileLoadingCard: React.FC<FileProps> = (props) =>
     return <>
         <div className={'file-cards ' + (props.loading.progress === 0? 'waiting' :props.loading.progress < props.loading.file.size? 'loading' : "")}>
             <div className="card-btn-area">
-                <div className="card-file-btn left-btn"
+                <div className="card-file-btn left-btn" style={props.loading.progress !== 0? {visibility: 'hidden'} : {}}
                 onClick={() => { if (props.onMoveLeft) props.onMoveLeft(props.loading.file.fileId); }}>{"<"}</div>
-                <div className="card-file-btn right-btn"
+                <div className="card-file-btn right-btn" style={props.loading.progress !== 0? {visibility: 'hidden'} : {}}
                 onClick={() => { if (props.onMoveRight) props.onMoveRight(props.loading.file.fileId); }}>{">"}</div>
                 <div className='card-file-btn'
                 onClick={() => { if (props.onRemove) props.onRemove(props.loading.file.fileId); }}>Х</div>
