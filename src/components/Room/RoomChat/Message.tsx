@@ -84,11 +84,9 @@ const UrlToLinks = (words: string) : JSX.Element =>
     Array.from(urls).forEach(l => {
         if (l.index !== undefined)
         {
-            const displacement = l[1] ? l[1].length : 0;
-            const linkLen = l[0].length - displacement;
             if (textBlockStartIdx !== l.index)
-                blocks.push(<Fragment key={0}>{words.substring(textBlockStartIdx, l.index + displacement)}</Fragment>)
-            const linkText = words.substring(l.index + displacement, l.index + linkLen);
+                blocks.push(<Fragment key={0}>{words.substring(textBlockStartIdx, l.index)}</Fragment>)
+            const linkText = words.substring(l.index, l.index + l[0].length);
             const ref = linkText.startsWith("http") ? linkText : `http://${linkText}`;
             blocks.push(<a className="message-link" href={ref} target="_blank" rel="noopener noreferrer" key={l.index}>{linkText}</a>)
             textBlockStartIdx = l.index + l[0].length;
