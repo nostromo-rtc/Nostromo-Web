@@ -40,18 +40,11 @@ const INLINE_BOLD_OPEN_TAG_RE =  /(\s|^)+\*\*[^*]/;  //!< Метка начал�
 const INLINE_BOLD_CLOSE_TAG_RE = /[^*]\*\*(\s|$)+/;  //!< Метка завершения блока жирного выделения в пределах 1 строки
 
 enum BlockType { INLINE_CODE, BLOCK_CODE, BOLD, TEXT }
-class Block
+interface Block
 {
     startPos : number;
     endPos   : number;
     type     : BlockType;
-
-    constructor(startPos : number, endPos : number, type : BlockType)
-    {
-        this.startPos = startPos;
-        this.endPos = endPos;
-        this.type = type;
-    }
 }
 
 const getFirstSubblock = (text : string) : Block | null =>
@@ -64,11 +57,17 @@ const getFirstSubblock = (text : string) : Block | null =>
     const inlineBoldEnd = text.match(INLINE_BOLD_CLOSE_TAG_RE);
     const blocks : Block[] = [];
     if (inlineCodeStart && inlineCodeEnd && inlineCodeStart.index != undefined && inlineCodeEnd.index != undefined)
-        blocks.push(new Block(inlineCodeStart.index + inlineCodeStart[0].indexOf('`'), inlineCodeEnd.index + 2, BlockType.INLINE_CODE));
+    {
+        blocks.push({startPos: inlineCodeStart.index + inlineCodeStart[0].indexOf('`'), endPos: inlineCodeEnd.index + 2, type: BlockType.INLINE_CODE});
+    }
     if (blockCodeStart && blockCodeEnd && blockCodeStart.index != undefined && blockCodeEnd.index != undefined)
-        blocks.push(new Block(blockCodeStart.index + blockCodeStart[0].indexOf('`'), blockCodeEnd.index + 4, BlockType.BLOCK_CODE));
+    {
+        blocks.push({startPos: blockCodeStart.index + blockCodeStart[0].indexOf('`'), endPos: blockCodeEnd.index + 4, type: BlockType.BLOCK_CODE});
+    }
     if (inlineBoldStart && inlineBoldEnd && inlineBoldStart.index != undefined && inlineBoldEnd.index != undefined)
-        blocks.push(new Block(inlineBoldStart.index + inlineBoldStart[0].indexOf('*'), inlineBoldEnd.index + 3, BlockType.BOLD));
+    {
+        blocks.push({startPos: inlineBoldStart.index + inlineBoldStart[0].indexOf('*'), endPos: inlineBoldEnd.index + 3, type: BlockType.BOLD});
+    }
     if (blocks.length)
     {
         blocks.sort((l, r) => l.startPos - r.startPos);
