@@ -83,19 +83,18 @@ const UrlToLinks = (words: string) : JSX.Element =>
     const urls = words.matchAll(URL_RE);
     for (const url of urls)
     {
-        if (url.index !== undefined)
+        if (url.index === undefined)
+            continue;
+        if (textBlockStartIdx !== url.index)
         {
-            if (textBlockStartIdx !== url.index)
-            {
-                blocks.push(<Fragment key={subblockNumber}>{words.substring(textBlockStartIdx, url.index)}</Fragment>)
-                subblockNumber++;
-            }
-            const linkText = words.substring(url.index, url.index + url[0].length);
-            const ref = linkText.startsWith("http") ? linkText : `http://${linkText}`;
-            blocks.push(<a key={subblockNumber} className="message-link" href={ref} target="_blank" rel="noopener noreferrer">{linkText}</a>)
+            blocks.push(<Fragment key={subblockNumber}>{words.substring(textBlockStartIdx, url.index)}</Fragment>);
             subblockNumber++;
-            textBlockStartIdx = url.index + url[0].length;
         }
+        const linkText = words.substring(url.index, url.index + url[0].length);
+        const ref = linkText.startsWith("http") ? linkText : `http://${linkText}`;
+        blocks.push(<a key={subblockNumber} className="message-link" href={ref} target="_blank" rel="noopener noreferrer">{linkText}</a>);
+        subblockNumber++;
+        textBlockStartIdx = url.index + url[0].length;
     }
     if (textBlockStartIdx != words.length)
         blocks.push(<Fragment key={subblockNumber}>{words.substring(textBlockStartIdx)}</Fragment>)

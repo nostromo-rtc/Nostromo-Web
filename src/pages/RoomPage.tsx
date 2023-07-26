@@ -13,7 +13,7 @@ import { getToggleFunc } from "../Utils";
 import { VideoLayout } from "../components/Room/VideoLayout";
 import { UserList } from "../components/Room/UserList";
 import { Chat } from "../components/Room/RoomChat/Chat";
-import { DndContext } from "../App";
+import { DndVisibleContext } from "./MainLayer";
 import { GiFiles } from "react-icons/gi";
 import { LoadFileInfo } from "../components/Room/RoomChat/FileLoadingCard";
 
@@ -149,7 +149,12 @@ export const RoomPage: React.FC = () =>
 
     const chatContainer =
         <div id="chat-container">
-            <Chat uploadingFilesQueue={uploadingFilesQueue} setUploadingFilesQueue={setUploadingFilesQueue} isFileUploading={isFileUploading} setIsFileUploading={setIsFileUploading} />
+            <Chat
+                uploadingFilesQueue={uploadingFilesQueue}
+                setUploadingFilesQueue={setUploadingFilesQueue}
+                isFileUploading={isFileUploading}
+                setIsFileUploading={setIsFileUploading}
+            />
         </div>;
     const callContainer =
         <div id="call-container">
@@ -171,7 +176,7 @@ export const RoomPage: React.FC = () =>
         const filesCopy = [...uploadingFilesQueue];
         for (const file of e.dataTransfer.files)
         {
-            filesCopy.push({file: {fileId: new Date().getMilliseconds().toString(), name: file.name, size: file.size}, progress: 0 });
+            filesCopy.push({file: {fileId: filesCopy.length.toString() + "-" + new Date().getMilliseconds().toString(), name: file.name, size: file.size}, progress: 0 });
         }
         setUploadingFilesQueue(filesCopy);
     };
@@ -180,15 +185,15 @@ export const RoomPage: React.FC = () =>
         e.preventDefault();
     };
 
-    const flagDnd = useContext(DndContext);
+    const flagDnd = useContext(DndVisibleContext);
     return (
         <>  
             <Header title={roomName} roomToolbarProps={roomToolbarProps} />
             <div id="main">
                 {flagDnd && !isFileUploading
                     ? <div className="drop-area vertical-center"
-                        onDrop={(e) => {handleDrop(e)}}
-                        onDragOver={(e) => {handleDragOver(e)}}>
+                        onDrop={handleDrop}
+                        onDragOver={handleDragOver}>
                         <div className='horizontal-center'>
                             <div className='drop-area-panel'>
                                 <div className='drop-area-icon'><GiFiles className='drop-area-icon-sizes' /></div>

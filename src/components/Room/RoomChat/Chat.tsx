@@ -28,7 +28,7 @@ interface ChatProps
 /* для передачи на сервер */
 const formData = new FormData();
 let files = [];
-export const Chat: React.FC<ChatProps> = (props : ChatProps) =>
+export const Chat: React.FC<ChatProps> = ({uploadingFilesQueue, setUploadingFilesQueue, isFileUploading, setIsFileUploading}) =>
 {
     /* Хук взятия пути для скачивания файла после вставки */
     const [pathFile, setPathFile] = useState("");
@@ -80,7 +80,7 @@ export const Chat: React.FC<ChatProps> = (props : ChatProps) =>
 
         const newMessage = textAreaRef.current.innerText.trim();
 
-        if (isEmptyString(newMessage) && !props.uploadingFilesQueue.length)
+        if (isEmptyString(newMessage) && !uploadingFilesQueue.length)
         {
             return;
         }
@@ -104,12 +104,12 @@ export const Chat: React.FC<ChatProps> = (props : ChatProps) =>
             // Поэтому включаем placeholder вручную.
             setShowPlaceholder(true);
         }
-        if(props.uploadingFilesQueue.length > 0)
+        if(uploadingFilesQueue.length > 0)
         {
-            props.setIsFileUploading(true);  
+            setIsFileUploading(true);  
         }
         else{
-            props.setIsFileUploading(false);
+            setIsFileUploading(false);
         }  
     };
     // Иммитация загрузки файла на сервер
@@ -118,26 +118,26 @@ export const Chat: React.FC<ChatProps> = (props : ChatProps) =>
     {
         setTimeout(function ()
         {
-            if (props.isFileUploading && props.uploadingFilesQueue.length)
+            if (isFileUploading && uploadingFilesQueue.length)
             {
-                props.uploadingFilesQueue[0].progress += 1000000;
-                if (props.uploadingFilesQueue[0].progress >= props.uploadingFilesQueue[0].file.size)
+                uploadingFilesQueue[0].progress += 1000000;
+                if (uploadingFilesQueue[0].progress >= uploadingFilesQueue[0].file.size)
                 {
-                    props.uploadingFilesQueue[0].progress = props.uploadingFilesQueue[0].file.size;
+                    uploadingFilesQueue[0].progress = uploadingFilesQueue[0].file.size;
                     const message: ChatMessage =
                     {
                         userId: "1bvcbjofg23fxcvds",
                         type: "file",
                         datetime: new Date().getTime(),
-                        content: { fileId: props.uploadingFilesQueue[0].file.fileId, name: props.uploadingFilesQueue[0].file.name, size: props.uploadingFilesQueue[0].file.size }
+                        content: { fileId: uploadingFilesQueue[0].file.fileId, name: uploadingFilesQueue[0].file.name, size: uploadingFilesQueue[0].file.size }
                     };
                     setMessages((prev) => prev.concat(message));
-                    const newFiles: LoadFileInfo[] = props.uploadingFilesQueue.splice(1);
-                    props.setUploadingFilesQueue(newFiles);
+                    const newFiles: LoadFileInfo[] = uploadingFilesQueue.splice(1);
+                    setUploadingFilesQueue(newFiles);
                 }
             }
-            if (props.uploadingFilesQueue.length === 0)
-                props.setIsFileUploading(false);
+            if (uploadingFilesQueue.length === 0)
+                setIsFileUploading(false);
             setData(data + 1);
         }, 1000);
     }, [data]);
@@ -160,7 +160,7 @@ export const Chat: React.FC<ChatProps> = (props : ChatProps) =>
     const loadFileOnClick = (e: React.FormEvent<HTMLInputElement>): boolean =>
     {
         e.preventDefault();
-        if (props.isFileUploading)
+        if (isFileUploading)
             return false;
         if (fileComponent.current)
         {
@@ -168,7 +168,7 @@ export const Chat: React.FC<ChatProps> = (props : ChatProps) =>
             const formSent = new FormData();
             if (filesToUpload && filesToUpload.length > 0)
             {
-                const newFiles: LoadFileInfo[] = props.uploadingFilesQueue.slice();
+                const newFiles: LoadFileInfo[] = uploadingFilesQueue.slice();
                 let count = 0;
                 for (const item of filesToUpload)
                 {
@@ -176,7 +176,7 @@ export const Chat: React.FC<ChatProps> = (props : ChatProps) =>
                     count++;
                     formSent.append('file-input-btn', item);
                 }
-                props.setUploadingFilesQueue(newFiles);
+                setUploadingFilesQueue(newFiles);
             } else
             {
                 alert('Сначала выберите файл');
@@ -187,32 +187,32 @@ export const Chat: React.FC<ChatProps> = (props : ChatProps) =>
     // Удаление карточки
     const removeHandler = (fileId: string): void =>
     {
-        const newFiles: LoadFileInfo[] = props.uploadingFilesQueue.filter(f => f.file.fileId !== fileId);
-        props.setUploadingFilesQueue(newFiles);
+        const newFiles: LoadFileInfo[] = uploadingFilesQueue.filter(f => f.file.fileId !== fileId);
+        setUploadingFilesQueue(newFiles);
     };
     // Перемещение карточки влево
     const moveLeftHandler = (fileId: string): void =>
     {
-        const newFiles: LoadFileInfo[] = props.uploadingFilesQueue.slice();
+        const newFiles: LoadFileInfo[] = uploadingFilesQueue.slice();
         const fileIdx = newFiles.findIndex(а => а.file.fileId === fileId);
         if (fileIdx !== 0 && newFiles[fileIdx].progress === 0 && newFiles[fileIdx - 1].progress === 0){
             const tmp: LoadFileInfo = newFiles[fileIdx];
             newFiles[fileIdx] = newFiles[fileIdx - 1];
             newFiles[fileIdx - 1] = tmp;
         }
-        props.setUploadingFilesQueue(newFiles);
+        setUploadingFilesQueue(newFiles);
     }
     // Перемещение карточки вправо
     const moveRightHandler = (fileId: string): void =>
     {  
-        const newFiles: LoadFileInfo[] = props.uploadingFilesQueue.slice();
+        const newFiles: LoadFileInfo[] = uploadingFilesQueue.slice();
         const fileIdx = newFiles.findIndex(f => f.file.fileId === fileId);
         if (fileIdx !== (newFiles.length - 1) && newFiles[fileIdx].progress === 0){
             const tmp: LoadFileInfo = newFiles[fileIdx];
             newFiles[fileIdx] = newFiles[fileIdx + 1];
             newFiles[fileIdx + 1] = tmp;
         }
-        props.setUploadingFilesQueue(newFiles);
+        setUploadingFilesQueue(newFiles);
     };
 
     const handleTextAreaKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (ev) =>
@@ -235,7 +235,7 @@ export const Chat: React.FC<ChatProps> = (props : ChatProps) =>
     const handleClipboardEvent : React.ClipboardEventHandler<HTMLDivElement> = (ev) =>
     {
         ev.preventDefault();
-        if(props.isFileUploading)
+        if(isFileUploading)
             return;
         setPathFile(ev.clipboardData.getData("text"));
         files = [...ev.clipboardData.items];
@@ -246,9 +246,9 @@ export const Chat: React.FC<ChatProps> = (props : ChatProps) =>
                 const fileData = f.getAsFile();
                 if (fileData)
                 {
-                    const filesCopy = [...props.uploadingFilesQueue];
+                    const filesCopy = [...uploadingFilesQueue];
                     filesCopy.push({file: {fileId: new Date().getMilliseconds().toString(), name: fileData.name, size: fileData.size}, progress: 0 });
-                    props.setUploadingFilesQueue(filesCopy);
+                    setUploadingFilesQueue(filesCopy);
 
                     formData.append('file', fileData);
                     console.log("size: " + (fileData.size / 1000).toString() + "KB");
@@ -294,16 +294,16 @@ export const Chat: React.FC<ChatProps> = (props : ChatProps) =>
 
     return (
         <>
-            <div id="chat" key="test?" ref={chatElement} aria-readonly>
+            <div id="chat" ref={chatElement} aria-readonly>
                 {messages.map(m =>
                 {
                     return <Message key={m.userId + m.datetime.toString()} message={m} />;
                 })
                 }
             </div>
-            {props.uploadingFilesQueue.length ?
+            {uploadingFilesQueue.length ?
                 <div className='view-file-cards-area' ref={fileCardsRef} onWheel={fileCardsWheelHandler}>
-                    {props.uploadingFilesQueue.map((f, i) =>
+                    {uploadingFilesQueue.map((f, i) =>
                     {
                         return <FileLoadingCard key={i} loading={f}
                             onRemove={() => { removeHandler(f.file.fileId); }}
