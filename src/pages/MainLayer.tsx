@@ -4,6 +4,8 @@ import { PageRouter } from "../components/PageRouter";
 
 export const DndVisibleContext = createContext<boolean>(false);
 
+type DivDragEventHandler = React.DragEventHandler<HTMLDivElement>;
+
 interface MainLayerProps
 {
     setShowSettings : Dispatch<SetStateAction<boolean>>;
@@ -16,20 +18,27 @@ export const MainLayer: React.FC<MainLayerProps> = ({setShowSettings}) =>
 
     /*** ОБРАБОТЧИКИ ***/
 
-    const handleDrop : React.DragEventHandler<HTMLDivElement> = (e: React.DragEvent<HTMLDivElement>) =>
+    const handleDrop: DivDragEventHandler = (ev) =>
     {
-        e.preventDefault();
+        ev.preventDefault();
         setDndVisible(false);
     };
-    const handleDragOver : React.DragEventHandler<HTMLDivElement> = (e: React.DragEvent<HTMLDivElement>) =>
+
+    const handleDragOver: DivDragEventHandler = (ev) =>
     {
-        e.preventDefault();
+        ev.preventDefault();
+        ev.dataTransfer.dropEffect = "none";
     };
-    const handleDragEnter : React.DragEventHandler<HTMLDivElement> = (e: React.DragEvent<HTMLDivElement>) =>
+
+    const handleDragEnter: DivDragEventHandler = (ev) =>
     {
-        setDndVisible(true);
+        if (ev.dataTransfer.types.includes("Files"))
+        {
+            setDndVisible(true);
+        }
     };
-    const handleDragExit : React.DragEventHandler<HTMLDivElement> = (e: React.DragEvent<HTMLDivElement>) =>
+
+    const handleDragExit: DivDragEventHandler = (ev) =>
     {
         setDndVisible(false);
     };

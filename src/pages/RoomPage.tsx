@@ -39,6 +39,8 @@ export interface DeviceListItem
     kind: "audio" | "video";
 }
 
+type DivDragEventHandler = React.DragEventHandler<HTMLDivElement>;
+
 export const RoomPage: React.FC = () =>
 {
     // TODO: наверное стоит поместить это в контекст, так как много где применяется.
@@ -170,11 +172,11 @@ export const RoomPage: React.FC = () =>
     }, []);
     
     /* После того, как отпустили файл в область */
-    const handleDrop : React.DragEventHandler<HTMLDivElement> = (e: React.DragEvent<HTMLDivElement>) =>
+    const handleDrop: DivDragEventHandler = (ev) =>
     {
-        e.preventDefault();
+        ev.preventDefault();
         const filesCopy = [...uploadingFilesQueue];
-        for (const file of e.dataTransfer.files)
+        for (const file of ev.dataTransfer.files)
         {
             if(file.type !== "application/x-desktop" && !isEmptyString(file.type))
                 filesCopy.push({file: {fileId: filesCopy.length.toString() + "-" + new Date().getMilliseconds().toString(), name: file.name, size: file.size}, progress: 0 });
@@ -183,9 +185,12 @@ export const RoomPage: React.FC = () =>
         }
         setUploadingFilesQueue(filesCopy);
     };
-    const handleDragOver : React.DragEventHandler<HTMLDivElement> = (e: React.DragEvent<HTMLDivElement>) =>
+
+    const handleDragOver: DivDragEventHandler = (ev) =>
     {
-        e.preventDefault();
+        ev.preventDefault();
+        ev.stopPropagation();
+        ev.dataTransfer.dropEffect = "copy";
     };
 
     const flagDnd = useContext(DndVisibleContext);
