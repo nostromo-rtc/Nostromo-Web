@@ -280,7 +280,6 @@ export const Chat: React.FC<ChatProps> = ({uploadingFilesQueue, setUploadingFile
             return;
         }
 
-        ev.preventDefault();
         const SCROLL_OFFSET = 100;
         const ZERO_SCROLL_OFFSET = 0;
         fileCardsRef.current.scrollBy({ left: ev.deltaY > ZERO_SCROLL_OFFSET ? SCROLL_OFFSET : -SCROLL_OFFSET });
