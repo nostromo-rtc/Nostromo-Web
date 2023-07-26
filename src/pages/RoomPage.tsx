@@ -2,20 +2,28 @@ import React, { useContext, useEffect, useState } from "react";
 import { Header } from "../components/Header";
 
 import "../App.css";
-import { VerticalLayout } from "../components/VerticalLayout";
 import { RoomActionPanel, RoomActionPanelProps } from "../components/Room/ActionPanel/RoomActionPanel";
+import { VerticalLayout } from "../components/VerticalLayout";
 
-import "./RoomPage.css";
-import { RoomHeaderToolbarProps } from "../components/Room/RoomHeaderToolbar";
-import { RoomAlert } from "../components/Room/RoomAlert";
 import { Link } from "@mui/material";
-import { getToggleFunc, isEmptyString } from "../Utils";
-import { VideoLayout } from "../components/Room/VideoLayout";
-import { UserList } from "../components/Room/UserList";
-import { Chat } from "../components/Room/RoomChat/Chat";
-import { DndVisibleContext } from "./MainLayer";
 import { GiFiles } from "react-icons/gi";
+import { getToggleFunc } from "../Utils";
+import { RoomAlert } from "../components/Room/RoomAlert";
+import { Chat } from "../components/Room/RoomChat/Chat";
 import { LoadFileInfo } from "../components/Room/RoomChat/FileLoadingCard";
+import { RoomHeaderToolbarProps } from "../components/Room/RoomHeaderToolbar";
+import { UserList } from "../components/Room/UserList";
+import { VideoLayout } from "../components/Room/VideoLayout";
+import { DndVisibleContext } from "./MainLayer";
+import "./RoomPage.css";
+
+declare global
+{
+    interface DataTransferItem
+    {
+        getAsEntry?: () => FileSystemEntry | null;
+    }
+}
 
 export enum SoundState
 {
@@ -75,17 +83,17 @@ export const RoomPage: React.FC = () =>
 
     const [isFileUploading, setIsFileUploading] = useState<boolean>(false);
     const [uploadingFilesQueue, setUploadingFilesQueue] = useState<LoadFileInfo[]>([
-        { file: {fileId: "hfg123", name: "Язык программирования C++", size: 16188070}, progress: 0},
-        { file: {fileId: "jhg812", name: "C++ лекции и упражнения", size: 150537513}, progress: 0},
-        { file: {fileId: "kjh306", name: "Современные операционные системы", size: 14280633}, progress: 0},
-        { file: {fileId: "lou785", name: "Т.1. Искусство программирования", size: 83673366}, progress: 0},
-        { file: {fileId: "nbo890", name: "Автоматное программирование", size: 1785979}, progress: 0},
-        { file: {fileId: "xcv519", name: "Паттерны проектирования", size: 68368155}, progress: 0},
-        { file: {fileId: "hfg623", name: "Некрономикон", size: 9999999999}, progress: 0},
-        { file: {fileId: "jhg312", name: "QT 5.10 Профессиональное программирование на C++", size: 103919024}, progress: 0},
-        { file: {fileId: "kjh366", name: "Т.2. Искусство программирования", size: 7235716}, progress: 0},
-        { file: {fileId: "loi785", name: "Т.3. Искусство программирования", size: 8612462}, progress: 0},
-        { file: {fileId: "nbv890", name: "Т.4. Искусство программирования", size: 99124812}, progress: 0}
+        { file: { fileId: "hfg123", name: "Язык программирования C++", size: 16188070 }, progress: 0 },
+        { file: { fileId: "jhg812", name: "C++ лекции и упражнения", size: 150537513 }, progress: 0 },
+        { file: { fileId: "kjh306", name: "Современные операционные системы", size: 14280633 }, progress: 0 },
+        { file: { fileId: "lou785", name: "Т.1. Искусство программирования", size: 83673366 }, progress: 0 },
+        { file: { fileId: "nbo890", name: "Автоматное программирование", size: 1785979 }, progress: 0 },
+        { file: { fileId: "xcv519", name: "Паттерны проектирования", size: 68368155 }, progress: 0 },
+        { file: { fileId: "hfg623", name: "Некрономикон", size: 9999999999 }, progress: 0 },
+        { file: { fileId: "jhg312", name: "QT 5.10 Профессиональное программирование на C++", size: 103919024 }, progress: 0 },
+        { file: { fileId: "kjh366", name: "Т.2. Искусство программирования", size: 7235716 }, progress: 0 },
+        { file: { fileId: "loi785", name: "Т.3. Искусство программирования", size: 8612462 }, progress: 0 },
+        { file: { fileId: "nbv890", name: "Т.4. Искусство программирования", size: 99124812 }, progress: 0 }
     ]);
 
 
@@ -165,24 +173,48 @@ export const RoomPage: React.FC = () =>
             <hr id="call-container-divider" />
             <RoomActionPanel {...roomActionPanelProps} />
         </div>;
- 
+
     useEffect(() =>
     {
         document.title = `Nostromo - Комната "${roomName}"`;
     }, []);
-    
+
     /* После того, как отпустили файл в область */
     const handleDrop: DivDragEventHandler = (ev) =>
     {
         ev.preventDefault();
+
         const filesCopy = [...uploadingFilesQueue];
-        for (const file of ev.dataTransfer.files)
+        for (const item of ev.dataTransfer.items)
         {
-            if(file.type !== "application/x-desktop" && !isEmptyString(file.type))
-                filesCopy.push({file: {fileId: filesCopy.length.toString() + "-" + new Date().getMilliseconds().toString(), name: file.name, size: file.size}, progress: 0 });
+            const entry = (item.getAsEntry !== undefined)
+                ? item.getAsEntry()
+                : item.webkitGetAsEntry();
+
+            if (entry && (entry.isFile && !entry.isDirectory))
+            {
+                const file = item.getAsFile();
+
+                if (!file)
+                {
+                    return;
+                }
+
+                filesCopy.push({
+                    file: {
+                        fileId: filesCopy.length.toString() + "-" + new Date().getMilliseconds().toString(),
+                        name: file.name,
+                        size: file.size
+                    },
+                    progress: 0
+                });
+            }
             else
-                console.log("type is bad");    
+            {
+                console.log("File type is bad.");
+            }
         }
+
         setUploadingFilesQueue(filesCopy);
     };
 
@@ -195,7 +227,7 @@ export const RoomPage: React.FC = () =>
 
     const flagDnd = useContext(DndVisibleContext);
     return (
-        <>  
+        <>
             <Header title={roomName} roomToolbarProps={roomToolbarProps} />
             <div id="main">
                 {flagDnd && !isFileUploading
