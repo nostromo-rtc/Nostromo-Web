@@ -234,11 +234,12 @@ export const Chat: React.FC<ChatProps> = ({uploadingFilesQueue, setUploadingFile
     // Вставка файла через ctrl+v
     const handleClipboardEvent : React.ClipboardEventHandler<HTMLDivElement> = (ev) =>
     {
-        ev.preventDefault();
-        if(isFileUploading)
-            return;
         setPathFile(ev.clipboardData.getData("text"));
         files = [...ev.clipboardData.items];
+        if(files.find(f => f.kind === "file"))
+            ev.preventDefault();
+        if(isFileUploading)
+            return;
         for (const f of files)
         {
             if (f.kind === "file")
@@ -257,7 +258,6 @@ export const Chat: React.FC<ChatProps> = ({uploadingFilesQueue, setUploadingFile
                 }
             }
         }
-        
     };
     const loadFileBtn = (
         <TooltipTopBottom title="Загрузить">

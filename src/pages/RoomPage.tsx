@@ -9,7 +9,7 @@ import "./RoomPage.css";
 import { RoomHeaderToolbarProps } from "../components/Room/RoomHeaderToolbar";
 import { RoomAlert } from "../components/Room/RoomAlert";
 import { Link } from "@mui/material";
-import { getToggleFunc } from "../Utils";
+import { getToggleFunc, isEmptyString } from "../Utils";
 import { VideoLayout } from "../components/Room/VideoLayout";
 import { UserList } from "../components/Room/UserList";
 import { Chat } from "../components/Room/RoomChat/Chat";
@@ -176,7 +176,10 @@ export const RoomPage: React.FC = () =>
         const filesCopy = [...uploadingFilesQueue];
         for (const file of e.dataTransfer.files)
         {
-            filesCopy.push({file: {fileId: filesCopy.length.toString() + "-" + new Date().getMilliseconds().toString(), name: file.name, size: file.size}, progress: 0 });
+            if(file.type !== "application/x-desktop" && !isEmptyString(file.type))
+                filesCopy.push({file: {fileId: filesCopy.length.toString() + "-" + new Date().getMilliseconds().toString(), name: file.name, size: file.size}, progress: 0 });
+            else
+                console.log("type is bad");    
         }
         setUploadingFilesQueue(filesCopy);
     };
