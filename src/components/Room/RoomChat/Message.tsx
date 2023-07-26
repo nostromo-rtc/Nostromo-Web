@@ -31,7 +31,7 @@ interface contentProps
 {
     content: string;
 }
-const URL_RE = /[\S.]+\.\S{1,}[\w|/|#]/g;           //!< Ссылки
+const URL_RE = /[\S.]+\.\S{1,}[\w|/|#]/g;            //!< Ссылки
 const INLINE_CODE_OPEN_TAG_RE =  /(\s|^)+`[^`]/;     //!< Метка начала блока отображения кода в пределах 1 строки
 const INLINE_CODE_CLOSE_TAG_RE = /[^`]`(\s|$)+/;     //!< Метка завершения блока отображения кода в пределах 1 строки
 const BLOCK_CODE_OPEN_TAG_RE  =  /(\s|^)+```[^`]/;   //!< Метка начала блока отображения кода на нескольких строках
@@ -54,7 +54,8 @@ const getFirstSubblock = (text : string) : Block | null =>
     const blockCodeStart = text.match(BLOCK_CODE_OPEN_TAG_RE);
     const blockCodeEnd = text.match(BLOCK_CODE_CLOSE_TAG_RE);
     const inlineBoldStart = text.match(INLINE_BOLD_OPEN_TAG_RE);
-    const inlineBoldEnd = text.match(INLINE_BOLD_CLOSE_TAG_RE);
+    let   inlineBoldEnd = text.match(INLINE_BOLD_CLOSE_TAG_RE);
+
     const blocks : Block[] = [];
     if (inlineCodeStart && inlineCodeEnd && inlineCodeStart.index != undefined && inlineCodeEnd.index != undefined)
     {
@@ -64,9 +65,30 @@ const getFirstSubblock = (text : string) : Block | null =>
     {
         blocks.push({startPos: blockCodeStart.index + blockCodeStart[0].indexOf('`'), endPos: blockCodeEnd.index + 4, type: BlockType.BLOCK_CODE});
     }
+    if (blocks.length)
+    {
+        blocks.sort((l, r) => l.startPos - r.startPos);
+    }
     if (inlineBoldStart && inlineBoldEnd && inlineBoldStart.index != undefined && inlineBoldEnd.index != undefined)
     {
-        blocks.push({startPos: inlineBoldStart.index + inlineBoldStart[0].indexOf('*'), endPos: inlineBoldEnd.index + 3, type: BlockType.BOLD});
+        let prevIdx = 0;
+        let substr = text;
+        for (const block of blocks)
+        {
+            const boldEndIdx = prevIdx + inlineBoldEnd.index;
+            if (boldEndIdx > block.startPos && boldEndIdx < block.endPos)
+            {
+                substr = substr.substring(block.endPos);
+                prevIdx = block.endPos;
+                inlineBoldEnd = substr.match(INLINE_BOLD_CLOSE_TAG_RE)
+            }
+            if (!inlineBoldEnd || inlineBoldEnd.index === undefined)
+                break;
+        }
+        if (inlineBoldEnd && inlineBoldEnd.index !== undefined)
+        {
+            blocks.push({startPos: inlineBoldStart.index + inlineBoldStart[0].indexOf('*'), endPos: prevIdx + inlineBoldEnd.index + 3, type: BlockType.BOLD});
+        }
     }
     if (blocks.length)
     {
