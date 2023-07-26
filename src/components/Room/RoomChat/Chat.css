@@ -193,8 +193,6 @@
 {
     font-weight: 600;
     color: dodgerblue;
-    z-index: 2;
-    position: relative;
 }
 
 /* Стиль id отправителя смс */
@@ -205,18 +203,21 @@
     margin-left: 5px;
     font-weight: 300;
     color: #8999a0;
-    z-index: 2;
-    position: relative;
 }
 
 /* Стиль даты отправки смс */
-.date-msg-right
+.msg-date-container
 {
-    position: relative;
     text-align: right;
-    width: 100%;
+}
+.msg-date
+{
     font-size: 8pt;
     color: #8999a0;
+}
+.z-2
+{
+    position: relative;
     z-index: 2;
 }
 
@@ -230,7 +231,6 @@
     left: 0;
     top: 0;
 }
-
 
 .video-label
 {
@@ -493,8 +493,13 @@ progress::-moz-progress-bar
 }
 
 /******** Эффекты текста ********/
-.msg-code-area
+.msg-inline-code-area
 {
     white-space: pre-wrap;
+    background-color: #555555;
+}
+.msg-code-area
+{
+    margin: 0;
     background-color: #555555;
 }

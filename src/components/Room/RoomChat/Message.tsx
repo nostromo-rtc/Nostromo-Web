@@ -1,5 +1,6 @@
-import { Fragment } from "react";
+import { Fragment, FC } from "react";
 import "./Chat.css";
+import { Link } from "react-router-dom";
 
 /** Информация о файле в чате. */
 interface ChatFileInfo
@@ -12,15 +13,15 @@ interface FileInfoProps
 {
     fileInfo: ChatFileInfo;
 }
-export const FileMessage = (props: FileInfoProps) =>
+export const FileMessage : FC<FileInfoProps> = ({fileInfo}) =>
 {
     return (
         <>
             <div className='message-text'>
-                <div className='placeholder' onClick={() => { console.log("File loaded"); }}></div>
+                <Link className='msg-placeholder' target="_blank" to={"http://localhost:3000/file/load/" + fileInfo.fileId} />
                 <span className='color-customgray'>Файл: </span>
-                <span className='color-darkviolet'>{props.fileInfo.name}</span>
-                <div className='message-file-size bold'>{(props.fileInfo.size / (1024 * 1024)).toFixed(3)}MB</div>
+                <span className='color-darkviolet'>{fileInfo.name}</span>
+                <div className='message-file-size bold'>{(fileInfo.size / (1024 * 1024)).toFixed(3)}MB</div>
             </div>
         </>
     );
@@ -39,6 +40,10 @@ const BLOCK_CODE_CLOSE_TAG_RE  = /[^`]```(\s|$)+/;   //!< Метка завер�
 const INLINE_BOLD_OPEN_TAG_RE =  /(\s|^)+\*\*[^*]/;  //!< Метка начала блока жирного выделения в пределах 1 строки
 const INLINE_BOLD_CLOSE_TAG_RE = /[^*]\*\*(\s|$)+/;  //!< Метка завершения блока жирного выделения в пределах 1 строки
 
+const INLINE_CODE_TAG_DISPLACEMENT = 2; //!< Начало подблока после тега блока отображения кода в пределах 1 строки   : 1(длина тега) + 1 = 2
+const BLOCK_CODE_TAG_DISPLACEMENT  = 4; //!< Начало подблока после тега блока отображения кода на нескольких строках : 3(длина тега) + 1 = 4
+const INLINE_BOLD_TAG_DISPLACEMENT = 3; //!< Начало подблока после тега блока жирного выделения в пределах 1 строки  : 2(длина тега) + 1 = 3
+
 enum BlockType { INLINE_CODE, BLOCK_CODE, BOLD, TEXT }
 interface Block
 {
@@ -47,23 +52,33 @@ interface Block
     type     : BlockType;
 }
 
+const matchAfterIdx = (text : string, regExp : RegExp, idx : number) =>
+{
+    const match = text.substring(idx).match(regExp);
+    if (match && match.index !== undefined)
+    {
+        match.index += idx;
+    }
+    return match;
+}
+
 const getFirstSubblock = (text : string) : Block | null =>
 {
     const inlineCodeStart = text.match(INLINE_CODE_OPEN_TAG_RE);
-    const inlineCodeEnd = text.match(INLINE_CODE_CLOSE_TAG_RE);
+    const inlineCodeEnd = inlineCodeStart && inlineCodeStart.index !== undefined ? matchAfterIdx(text, INLINE_CODE_CLOSE_TAG_RE, inlineCodeStart.index + INLINE_CODE_TAG_DISPLACEMENT) : undefined;
     const blockCodeStart = text.match(BLOCK_CODE_OPEN_TAG_RE);
-    const blockCodeEnd = text.match(BLOCK_CODE_CLOSE_TAG_RE);
+    const blockCodeEnd = blockCodeStart && blockCodeStart.index !== undefined ? matchAfterIdx(text, BLOCK_CODE_CLOSE_TAG_RE, blockCodeStart.index + BLOCK_CODE_TAG_DISPLACEMENT) : undefined;
     const inlineBoldStart = text.match(INLINE_BOLD_OPEN_TAG_RE);
-    let   inlineBoldEnd = text.match(INLINE_BOLD_CLOSE_TAG_RE);
+    let   inlineBoldEnd = inlineBoldStart && inlineBoldStart.index !== undefined ? matchAfterIdx(text, INLINE_BOLD_CLOSE_TAG_RE, inlineBoldStart.index + INLINE_BOLD_TAG_DISPLACEMENT) : undefined;
 
     const blocks : Block[] = [];
     if (inlineCodeStart && inlineCodeEnd && inlineCodeStart.index != undefined && inlineCodeEnd.index != undefined)
     {
-        blocks.push({startPos: inlineCodeStart.index + inlineCodeStart[0].indexOf('`'), endPos: inlineCodeEnd.index + 2, type: BlockType.INLINE_CODE});
+        blocks.push({startPos: inlineCodeStart.index + inlineCodeStart[0].indexOf('`'), endPos: inlineCodeEnd.index + INLINE_CODE_TAG_DISPLACEMENT, type: BlockType.INLINE_CODE});
     }
     if (blockCodeStart && blockCodeEnd && blockCodeStart.index != undefined && blockCodeEnd.index != undefined)
     {
-        blocks.push({startPos: blockCodeStart.index + blockCodeStart[0].indexOf('`'), endPos: blockCodeEnd.index + 4, type: BlockType.BLOCK_CODE});
+        blocks.push({startPos: blockCodeStart.index + blockCodeStart[0].indexOf('`'), endPos: blockCodeEnd.index + BLOCK_CODE_TAG_DISPLACEMENT, type: BlockType.BLOCK_CODE});
     }
     if (blocks.length)
     {
@@ -87,7 +102,7 @@ const getFirstSubblock = (text : string) : Block | null =>
         }
         if (inlineBoldEnd && inlineBoldEnd.index !== undefined)
         {
-            blocks.push({startPos: inlineBoldStart.index + inlineBoldStart[0].indexOf('*'), endPos: prevIdx + inlineBoldEnd.index + 3, type: BlockType.BOLD});
+            blocks.push({startPos: inlineBoldStart.index + inlineBoldStart[0].indexOf('*'), endPos: prevIdx + inlineBoldEnd.index + INLINE_BOLD_TAG_DISPLACEMENT, type: BlockType.BOLD});
         }
     }
     if (blocks.length)
@@ -144,8 +159,10 @@ const analyzeBlock = (words: string): JSX.Element =>
             switch (subblock.type)
             {
                 case BlockType.INLINE_CODE:
+                    blocks.push(<code key={subblockNumber} className="msg-inline-code-area">{mPart}</code>)
+                    break;
                 case BlockType.BLOCK_CODE:
-                    blocks.push(<code key={subblockNumber} className="msg-code-area">{mPart}</code>)
+                    blocks.push(<pre className="msg-code-area" key={subblockNumber}>{mPart}</pre>)
                     break;
                 case BlockType.BOLD:
                     blocks.push(<strong key={subblockNumber}>{analyzeBlock(mPart)}</strong>)
@@ -176,12 +193,12 @@ interface ChatMessage
     datetime: number;
     content: ChatFileInfo | string;
 }
-interface messageProps
+interface MessageProps
 {
     message: ChatMessage;
 }
 
-export const Message = (props: messageProps) =>
+export const Message : FC<MessageProps> = ({message}) =>
 {
     const getUserName = (id: string) =>
     {
@@ -236,21 +253,26 @@ export const Message = (props: messageProps) =>
 
         return timestamp;
     };
-    const isSelfMsg = props.message.userId == "12hnjofgl33154";
-    const userName = getUserName(props.message.userId);
+    const isSelfMsg = message.userId == "12hnjofgl33154";
+    const userName = getUserName(message.userId);
     return (
         <>
             <div className={isSelfMsg ? 'self-msg-area' : 'msg-area'}>
                 <div className={'msg-container msg-content ' + (isSelfMsg ? 'self-msg-content' : 'members-msg-content')}>
-                    <span className='user-name' title={userName}>{userName}</span>&nbsp;
-                    <span className='user-id' title={'#' + props.message.userId}>#{props.message.userId.substring(0, 4)}</span><br></br>
+                    <span className="z-2">
+                        <span className='user-name' title={userName}>{userName}</span>&nbsp;
+                        <span className='user-id' title={'#' + message.userId}>#{message.userId.substring(0, 4)}</span><br></br>
+                    </span>
                     <div className='message-body'>
-                        {props.message.type == "text" ?
-                            <TextMessage content={props.message.content as string} />
+                        {message.type == "text" ?
+                            <TextMessage content={message.content as string} />
                             :
-                            <FileMessage fileInfo={props.message.content as ChatFileInfo} />
-                        }</div>
-                    <div className='date-msg-right'>{getTimestamp(props.message.datetime)}</div>
+                            <FileMessage fileInfo={message.content as ChatFileInfo} />
+                        }
+                    </div>
+                    <div className='msg-date-container'>
+                        <span className="msg-date z-2">{getTimestamp(message.datetime)}</span>
+                    </div>
                 </div>
             </div>
         </>
