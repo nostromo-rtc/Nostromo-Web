@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, Dispatch, SetStateAction } from 're
 import { ImAttachment } from 'react-icons/im';
 import { MdSend } from 'react-icons/md';
 import "./Chat.css";
-import { Message } from './Message';
+import { Message } from './Message/Message';
 import { TooltipTopBottom } from '../../Tooltip';
 import { Button } from '@mui/material';
 import { ChatFileInfo, LoadFileInfo, UploadingFilesQueue } from './UploadingFilesQueue';

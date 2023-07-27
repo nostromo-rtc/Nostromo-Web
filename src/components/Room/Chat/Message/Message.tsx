@@ -1,43 +1,15 @@
-import { Fragment, FC } from "react";
-import "./Chat.css";
-import { Link } from "react-router-dom";
-import {analyzeBlock} from "./StyledMessage";
+import { FC } from "react";
+import "../Chat.css";
+import { StyledMessageContent } from "./StyledMessageContent";
+import { FileMessageContent } from "./FileMessageContent";
 
 /** Информация о файле в чате. */
-interface ChatFileInfo
+export interface ChatFileInfo
 {
     fileId: string;
     name: string;
     size: number;
 }
-interface FileInfoProps
-{
-    fileInfo: ChatFileInfo;
-}
-export const FileMessage : FC<FileInfoProps> = ({fileInfo}) =>
-{
-    return (
-        <>
-            <div className='message-text'>
-                <Link className='msg-placeholder' target="_blank" to={"http://localhost:3000/file/load/" + fileInfo.fileId} />
-                <span className='color-customgray'>Файл: </span>
-                <span className='color-darkviolet'>{fileInfo.name}</span>
-                <div className='message-file-size bold'>{(fileInfo.size / (1024 * 1024)).toFixed(3)}MB</div>
-            </div>
-        </>
-    );
-
-};
-
-interface contentProps
-{
-    content: string;
-}
-
-export const TextMessage = (props: contentProps) =>
-{
-    return analyzeBlock(props.content);
-};
 
 /** Информация о сообщении в чате. */
 interface ChatMessage
@@ -119,9 +91,9 @@ export const Message : FC<MessageProps> = ({message}) =>
                     </span>
                     <div className='message-body'>
                         {message.type == "text" ?
-                            <TextMessage content={message.content as string} />
+                            <StyledMessageContent content={message.content as string} />
                             :
-                            <FileMessage fileInfo={message.content as ChatFileInfo} />
+                            <FileMessageContent fileInfo={message.content as ChatFileInfo} />
                         }
                     </div>
                     <div className='msg-date-container'>
