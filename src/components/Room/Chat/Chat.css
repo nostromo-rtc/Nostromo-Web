@@ -24,6 +24,10 @@
     padding: 12px;
     cursor: text;
 }
+#message-textarea:focus
+{
+    outline: none;
+}
 
 #message-textarea-container
 {
@@ -63,35 +67,7 @@
     pointer-events: none;
 }
 
-#message-textarea:focus
-{
-    outline: none;
-}
-
 /************** Кнопки **************/
-
-/* Общий стиль для контейнеров кнопок */
-.btn-container
-{
-    display: flex;
-    justify-content: center;
-}
-
-.btn-send-message
-{
-    background-color: #1b282e;
-    color: #fafafa;
-    min-height: 40px;
-    border: none;
-    margin: 10px 2px 2px 2px;
-    max-width: 45px;
-
-}
-
-.tooltip-send-btn
-{
-    width: 115px;
-}
 
 .chat-btn-clickable-area
 {
@@ -232,72 +208,10 @@
     top: 0;
 }
 
-.video-label
-{
-    position: absolute;
-    right: 0;
-    border-left: 1px solid black;
-    border-bottom: 1px solid black;
-    background-color: lightgrey;
-    padding-top: 0.5%;
-    padding-bottom: 0.5%;
-    padding-left: 1%;
-    padding-right: 1%;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    font-size: 1.2vw;
-    opacity: 85%;
-    max-width: 95%;
-    z-index: 1;
-}
-
-.center-video-label
-{
-    position: absolute;
-    margin: 0;
-    top: 50%;
-    left: 50%;
-    margin-right: -50%;
-    transform: translate(-50%, -50%);
-    font-size: 1.2vw;
-    z-index: 1;
-    color: white;
-    text-shadow: 0 0 2px #000;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    max-width: 60%;
-}
-
-.video-item
-{
-    flex-grow: 1;
-    flex-shrink: 1;
-    position: relative;
-    display: inline-flex;
-    margin: 5px;
-    box-sizing: border-box;
-    border: 1px solid grey;
-}
-
 .video-container
 {
     width: 100%;
     position: relative;
-}
-
-.btn
-{
-    border: 1px solid rgba(27, 31, 35, 0.25);
-    box-shadow: rgba(27, 31, 35, 0.04) 0 1px 0, rgba(255, 255, 255, 0.25) 0 1px 0 inset;
-    cursor: pointer;
-    outline: none;
-    appearance: none;
-    touch-action: manipulation;
-    user-select: none;
-    -webkit-user-select: none;
-    background-color: #ebebeb;
 }
 
 .message-input-area
@@ -321,14 +235,8 @@
     max-height: 150px;
 }
 
-.progress-load
+.card-btn-area
 {
-    text-align: center;
-    font-size: 8pt;
-    color: #8999a0;
-    margin-top: 4px;
-}
-.card-btn-area{
     margin-top: 0.85rem;
 }
 .card-file-btn
@@ -347,11 +255,13 @@
     color: white;
     border-radius: 5px;
 }
-.left-btn{
+.left-btn
+{
     left: 4px;
 }
 
-.right-btn{
+.right-btn
+{
     left: 25px;
 }
 
@@ -373,10 +283,12 @@
     box-sizing: border-box;
     overflow: hidden;
 }
-.loading{
+.loading
+{
     background-color: #1c2224;
 }
-.waiting{
+.waiting
+{
     background-color: #27343a;
 }
 
@@ -421,11 +333,6 @@
     margin-bottom: 5px;
 }
 
-.align-end
-{
-    text-align: end;
-}
-
 /* Прогресс бар для загрузки файлов */
 progress
 {
@@ -455,13 +362,12 @@ progress::-moz-progress-bar
     background-color: #41E847;
 }
 
-
-.frame
+.progress-load
 {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 10px;
-    margin-top: 2px;
+    text-align: center;
+    font-size: 8pt;
+    color: #8999a0;
+    margin-top: 4px;
 }
 
 .message-file-size
