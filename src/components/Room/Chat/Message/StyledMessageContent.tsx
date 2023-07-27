@@ -1,64 +1,121 @@
 import { FC, Fragment } from "react";
 import "./StyledMessageContent.css";
 
-const URL_RE = /[\S.]+\.\S{1,}[\w|/|#]/g;            //!< Ссылки
-const INLINE_CODE_OPEN_TAG_RE =  /(\s|^)+`[^`]/;     //!< Метка начала блока отображения кода в пределах 1 строки
-const INLINE_CODE_CLOSE_TAG_RE = /[^`]`(\s|$)+/;     //!< Метка завершения блока отображения кода в пределах 1 строки
-const BLOCK_CODE_OPEN_TAG_RE  =  /(\s|^)(```\n?)/;   //!< Метка начала блока отображения кода на нескольких строках
-const BLOCK_CODE_CLOSE_TAG_RE  = /[^`](\n?```(\s|$))/;   //!< Метка завершения блока отображения кода на нескольких строках
-const INLINE_BOLD_OPEN_TAG_RE =  /(\s|^)+\*\*[^*]/;  //!< Метка начала блока жирного выделения в пределах 1 строки
-const INLINE_BOLD_CLOSE_TAG_RE = /[^*](\*\*)(\s|$)/;  //!< Метка завершения блока жирного выделения в пределах 1 строки
+const URL_RE                   = /[\S.]+\.\S{1,}[\w|/|#]/g;        //!< Ссылки
+const INLINE_CODE_OPEN_TAG_RE  = /(\s|^)(`\n?)/;                   //!< Метка начала блока отображения кода в пределах 1 строки
+const INLINE_CODE_CLOSE_TAG_RE = /([^`])(\n?`)(\s|$)/;             //!< Метка завершения блока отображения кода в пределах 1 строки
+const BLOCK_CODE_OPEN_TAG_RE   = /(\s|^)(```\n?)/;                 //!< Метка начала блока отображения кода на нескольких строках
+const BLOCK_CODE_CLOSE_TAG_RE  = /([^`])(((?<!\s)\n)?```)(\s|$)/;  //!< Метка завершения блока отображения кода на нескольких строках
+const INLINE_BOLD_OPEN_TAG_RE  = /(\s|^)(\*\*\n?)/;                //!< Метка начала блока жирного выделения в пределах 1 строки
+const INLINE_BOLD_CLOSE_TAG_RE = /([^*])(((?<!\s)\n)?\*\*)(\s|$)/; //!< Метка завершения блока жирного выделения в пределах 1 строки
 
-const RE_PREF_GROUP = 1;
-const RE_OPEN_TAG_GROUP = 2;
-const RE_END_TAG_GROUP = 1;
 
-const INLINE_CODE_TAG_DISPLACEMENT = 2; //!< Начало подблока после тега блока отображения кода в пределах 1 строки   : 1(длина тега) + 1 = 2
-const INLINE_BOLD_TAG_DISPLACEMENT = 3; //!< Начало подблока после тега блока жирного выделения в пределах 1 строки  : 2(длина тега) + 1 = 3
-
+const RE_PREFIX_GROUP = 1;
+const RE_TAG_GROUP    = 2;
 enum BlockType { INLINE_CODE, BLOCK_CODE, BOLD, TEXT }
-interface Block
+class Block
 {
-    startPos : number;
-    startLen : number;
-    endPos   : number;
-    endLen   : number;
-    type     : BlockType;
+    startPos = 0;               //!< Индекс начала открывающего тега (после предшествующих переносов строк и т.п.)
+    startLen = 0;               //!< Длина индекса начала тега
+    endPos   = 0;               //!< Индекс начала закрывающего тега (после предшествующих переносов строк и т.п.)
+    endLen   = 0;               //!< Длина закрывающего тега
+    type     = BlockType.TEXT;  //!< Тип блока
+
+    init(startMatch : RegExpMatchArray | null | undefined, endMatch : RegExpMatchArray | null | undefined, type : BlockType) : boolean
+    {
+        if (startMatch?.index !== undefined && endMatch?.index !== undefined)
+        {
+            this.startPos = startMatch.index + startMatch[RE_PREFIX_GROUP].length;
+            this.startLen = startMatch[RE_TAG_GROUP].length;
+            this.endPos = endMatch.index + endMatch[RE_PREFIX_GROUP].length;
+            this.endLen = endMatch[RE_TAG_GROUP].length;
+            this.type = type;
+            return true;
+        }
+        return false;
+    }
 }
 
+/**
+ * Обработка символов \n при использовании многострочного тега
+ * @param block Обновляемый блок
+ * @param text Строка, в которой выделен блок
+ * 
+ * В многострочных блоках требуется удалять первый \n за открывающим тегом и первый \n за
+ * последним тегом, так как они добавляют лишние пустые строки в сообщение.
+ * Данное 
+ */
+const updateToMultiline = (block : Block, text : string) =>
+{
+    if (
+        block.endPos + block.endLen < text.length
+        && text[block.endPos + block.endLen] === "\n"
+        && (
+            block.startPos - 1 < 0
+            || text[block.startPos - 1] === "\n" 
+        )
+        && text.substring(block.startPos, block.endPos).indexOf("\n") !== -1
+    )
+    {
+        block.endLen += 1;
+    }
+}
+
+/**
+ * Поиск совпадения с заданным регулярным выражением в тексте с указанного индекса
+ * @param text Текст, в котором ведётся поиск
+ * @param regExp Регулярное выражение
+ * @param idx Индекс, с которого начинается поиск
+ * @returns Индекс найденного совпадения в исходной строке или null, если нет совпадений
+ */
 const matchAfterIdx = (text : string, regExp : RegExp, idx : number) =>
 {
     const match = text.substring(idx).match(regExp);
-    if (match && match.index !== undefined)
+    if (match?.index !== undefined)
     {
         match.index += idx;
     }
     return match;
 }
 
+/**
+ * Поиск первого подблока стиля в указанном тексте
+ * @param text Текст, в котором ведётся поиск
+ * @returns Данные первого подблока стиля в тексте или null, если в тексте не найдено подблоков
+ */
 const getFirstSubblock = (text : string) : Block | null =>
 {
-    const inlineCodeStart = text.match(INLINE_CODE_OPEN_TAG_RE);
-    const inlineCodeEnd = inlineCodeStart && inlineCodeStart.index !== undefined ? matchAfterIdx(text, INLINE_CODE_CLOSE_TAG_RE, inlineCodeStart.index + INLINE_CODE_TAG_DISPLACEMENT) : undefined;
+    let inlineCodeStart = text.match(INLINE_CODE_OPEN_TAG_RE);
+    let inlineCodeEnd = inlineCodeStart?.index !== undefined ? matchAfterIdx(text, INLINE_CODE_CLOSE_TAG_RE, inlineCodeStart.index + inlineCodeStart.length) : undefined;
     const blockCodeStart = text.match(BLOCK_CODE_OPEN_TAG_RE);
-    const blockCodeEnd = blockCodeStart && blockCodeStart.index !== undefined ? matchAfterIdx(text, BLOCK_CODE_CLOSE_TAG_RE, blockCodeStart.index + blockCodeStart[RE_OPEN_TAG_GROUP].length) : undefined;
+    const blockCodeEnd = blockCodeStart?.index !== undefined ? matchAfterIdx(text, BLOCK_CODE_CLOSE_TAG_RE, blockCodeStart.index + blockCodeStart.length) : undefined;
     const inlineBoldStart = text.match(INLINE_BOLD_OPEN_TAG_RE);
-    let   inlineBoldEnd = inlineBoldStart && inlineBoldStart.index !== undefined ? matchAfterIdx(text, INLINE_BOLD_CLOSE_TAG_RE, inlineBoldStart.index + INLINE_BOLD_TAG_DISPLACEMENT) : undefined;
+    let   inlineBoldEnd = inlineBoldStart?.index !== undefined ? matchAfterIdx(text, INLINE_BOLD_CLOSE_TAG_RE, inlineBoldStart.index + inlineBoldStart.length) : undefined;
 
     const blocks : Block[] = [];
-    if (inlineCodeStart && inlineCodeEnd && inlineCodeStart.index != undefined && inlineCodeEnd.index != undefined)
+    // Поиск открывающего и закрывающего блока однострочного кода, не содержащего новых строк
+    while (
+        inlineCodeStart?.index !== undefined
+        && inlineCodeEnd?.index !== undefined
+        && text.substring(inlineCodeStart.index, inlineCodeEnd.index).indexOf("\n") !== -1
+    )
     {
-        blocks.push({startPos: inlineCodeStart.index + inlineCodeStart[1].length, startLen: 0, endPos: inlineCodeEnd.index + INLINE_CODE_TAG_DISPLACEMENT, endLen:0, type: BlockType.INLINE_CODE});
+        inlineCodeStart = matchAfterIdx(text, INLINE_CODE_OPEN_TAG_RE, inlineCodeStart.index + inlineCodeStart.length);
+        inlineCodeEnd = inlineCodeStart?.index !== undefined ? matchAfterIdx(text, INLINE_CODE_CLOSE_TAG_RE, inlineCodeStart.index + inlineCodeStart.length) : undefined;
     }
-    if (blockCodeStart && blockCodeEnd && blockCodeStart.index != undefined && blockCodeEnd.index != undefined)
+    const inlineCodeBlock = new Block();
+    if (inlineCodeBlock.init(inlineCodeStart, inlineCodeEnd, BlockType.INLINE_CODE))
     {
-        blocks.push({
-            startPos: blockCodeStart.index + blockCodeStart[RE_PREF_GROUP].length,
-            startLen: blockCodeStart[RE_OPEN_TAG_GROUP].length,
-            endPos: blockCodeEnd.index + blockCodeEnd[RE_END_TAG_GROUP].length + 1,
-            endLen: blockCodeEnd[RE_END_TAG_GROUP].length,
-            type: BlockType.BLOCK_CODE
-        });
+        blocks.push(inlineCodeBlock);       
+    }
+    if (blockCodeStart?.index != undefined && blockCodeEnd?.index != undefined)
+    {
+        const multilineCodeBlock : Block = new Block();
+        if (multilineCodeBlock.init(blockCodeStart, blockCodeEnd, BlockType.BLOCK_CODE))
+        {
+            updateToMultiline(multilineCodeBlock, text);
+            blocks.push(multilineCodeBlock);
+        }
     }
     if (blocks.length)
     {
@@ -66,31 +123,25 @@ const getFirstSubblock = (text : string) : Block | null =>
     }
     if (inlineBoldStart && inlineBoldEnd && inlineBoldStart.index != undefined && inlineBoldEnd.index != undefined)
     {
-        let prevIdx = 0;
         let substr = text;
+        // Поиск закрывающего тега жирного текста, расположенного вне блока кода
         for (const block of blocks)
         {
-            const boldEndIdx = prevIdx + inlineBoldEnd.index;
-            if (boldEndIdx > block.startPos && boldEndIdx < block.endPos)
+            if (inlineBoldEnd.index > block.startPos && inlineBoldEnd.index < block.endPos)
             {
                 substr = substr.substring(block.endPos);
-                prevIdx = block.endPos;
-                inlineBoldEnd = substr.match(INLINE_BOLD_CLOSE_TAG_RE)
+                inlineBoldEnd = matchAfterIdx(text, INLINE_BOLD_CLOSE_TAG_RE, block.endPos)
             }
             if (!inlineBoldEnd || inlineBoldEnd.index === undefined)
             {
                 break;
             }
         }
-        if (inlineBoldEnd && inlineBoldEnd.index !== undefined)
-        {
-            blocks.push({
-                startPos: inlineBoldStart.index + inlineBoldStart[0].indexOf('*'),
-                startLen: 0,
-                endPos: prevIdx + inlineBoldEnd.index + INLINE_BOLD_TAG_DISPLACEMENT,
-                endLen: 0,
-                type: BlockType.BOLD
-            });
+        const boldBlock = new Block();
+        if (boldBlock.init(inlineBoldStart, inlineBoldEnd, BlockType.BOLD))
+        {   
+            updateToMultiline(boldBlock, text);
+            blocks.push(boldBlock);
         }
     }
     if (blocks.length)
@@ -137,11 +188,9 @@ const analyzeBlock = (words: string): JSX.Element =>
     const blocks : JSX.Element[] = [];
     while(subblock)
     {
-        const tagStartSize = subblock.type === BlockType.INLINE_CODE ? 1 : subblock.type === BlockType.BLOCK_CODE ? subblock.startLen : subblock.type === BlockType.BOLD ? 2 : 0;
-        const tagEndSize = subblock.type === BlockType.INLINE_CODE ? 1 : subblock.type === BlockType.BLOCK_CODE ? subblock.endLen : subblock.type === BlockType.BOLD ? 2 : 0;
         const lPart = words.substring(0, subblock.startPos)
-        const mPart = words.substring(subblock.startPos + tagStartSize, subblock.endPos - tagEndSize)
-        const rPart = words.substring(subblock.endPos, words.length);
+        const mPart = words.substring(subblock.startPos + subblock.startLen, subblock.endPos)
+        const rPart = words.substring(subblock.endPos + subblock.endLen, words.length);
         if (lPart.length)
         {
             blocks.push(<Fragment key={subblockNumber}>{UrlToLinks(lPart)}</Fragment>);
