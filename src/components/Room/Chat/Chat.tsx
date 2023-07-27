@@ -133,7 +133,9 @@ export const Chat: React.FC<ChatProps> = ({ uploadingFilesQueue, setUploadingFil
                 }
             }
             if (uploadingFilesQueue.length === 0)
+            {
                 setIsFileUploading(false);
+            }
             setData(data + 1);
         }, 1000);
     }, [data]);
@@ -172,7 +174,8 @@ export const Chat: React.FC<ChatProps> = ({ uploadingFilesQueue, setUploadingFil
                     formSent.append('file-input-btn', item);
                 }
                 setUploadingFilesQueue(newFiles);
-            } else
+            }
+            else
             {
                 alert('Сначала выберите файл');
             }

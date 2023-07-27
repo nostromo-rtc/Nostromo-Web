@@ -55,7 +55,8 @@ export const UploadingFilesQueue: React.FC<QueueProps> = ({uploadingFilesQueue, 
     {
         const newFiles: LoadFileInfo[] = uploadingFilesQueue.slice();
         const fileIdx = newFiles.findIndex(а => а.file.fileId === fileId);
-        if (fileIdx !== 0 && newFiles[fileIdx].progress === 0 && newFiles[fileIdx - 1].progress === 0){
+        if (fileIdx !== 0 && newFiles[fileIdx].progress === 0 && newFiles[fileIdx - 1].progress === 0)
+        {
             const tmp: LoadFileInfo = newFiles[fileIdx];
             newFiles[fileIdx] = newFiles[fileIdx - 1];
             newFiles[fileIdx - 1] = tmp;
@@ -68,7 +69,8 @@ export const UploadingFilesQueue: React.FC<QueueProps> = ({uploadingFilesQueue, 
     {  
         const newFiles: LoadFileInfo[] = uploadingFilesQueue.slice();
         const fileIdx = newFiles.findIndex(f => f.file.fileId === fileId);
-        if (fileIdx !== (newFiles.length - 1) && newFiles[fileIdx].progress === 0){
+        if (fileIdx !== (newFiles.length - 1) && newFiles[fileIdx].progress === 0)
+        {
             const tmp: LoadFileInfo = newFiles[fileIdx];
             newFiles[fileIdx] = newFiles[fileIdx + 1];
             newFiles[fileIdx + 1] = tmp;
