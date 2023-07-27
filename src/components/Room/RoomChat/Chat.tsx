@@ -229,10 +229,10 @@ export const Chat: React.FC<ChatProps> = ({uploadingFilesQueue, setUploadingFile
             <div className="chat-btn-box">
                 <Button aria-label='Загрузить'>
                     <ImAttachment className='btn-icon' />
-                    <input type="file" id="file-input-btn" {...isFileUploading? {disabled: true} : {disabled: false}} ref={fileComponent} onChange={e => loadFileOnClick(e)} name="file" multiple hidden />
+                    <input type="file" id="file-input-btn" disabled={isFileUploading? true : undefined} ref={fileComponent} onChange={e => loadFileOnClick(e)} name="file" multiple hidden />
                 </Button>
                 <label className="chat-btn-clickable-area non-selectable">
-                    <input type="file" id="file-input-btn-area" {...isFileUploading? {disabled: true} : {disabled: false}} ref={fileComponent} onChange={e => loadFileOnClick(e)} name="file" multiple hidden />
+                    <input type="file" id="file-input-btn-area" disabled={isFileUploading? true : undefined} ref={fileComponent} onChange={e => loadFileOnClick(e)} name="file" multiple hidden />
                 </label>
             </div>
         </TooltipTopBottom>
