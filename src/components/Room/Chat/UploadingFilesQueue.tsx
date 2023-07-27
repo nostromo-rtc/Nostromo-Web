@@ -26,8 +26,11 @@ interface QueueProps
 
 export const UploadingFilesQueue: React.FC<QueueProps> = ({uploadingFilesQueue, setUploadingFilesQueue}) =>
 {
+    // Ссылка на карточки файлов
     const fileCardsRef = useRef<HTMLDivElement>(null);
-    const fileCardsWheelHandler: React.WheelEventHandler<HTMLDivElement> = (ev) =>
+
+    // Обработчик для диагонального скролла карточек
+    const handlefileCardsWheel: React.WheelEventHandler<HTMLDivElement> = (ev) =>
     {
         if (ev.shiftKey || !fileCardsRef.current)
         {
@@ -38,14 +41,16 @@ export const UploadingFilesQueue: React.FC<QueueProps> = ({uploadingFilesQueue, 
         const ZERO_SCROLL_OFFSET = 0;
         fileCardsRef.current.scrollBy({ left: ev.deltaY > ZERO_SCROLL_OFFSET ? SCROLL_OFFSET : -SCROLL_OFFSET });
     };
-    // Удаление карточки
-    const removeHandler = (fileId: string): void =>
+
+    // Обработчик нажатия на кнопку удаления карточки
+    const handleRemove = (fileId: string): void =>
     {
         const newFiles: LoadFileInfo[] = uploadingFilesQueue.filter(f => f.file.fileId !== fileId);
         setUploadingFilesQueue(newFiles);
     };
-    // Перемещение карточки влево
-    const moveLeftHandler = (fileId: string): void =>
+
+    // Обработчик нажатия на кнопку перемещения карточки влево
+    const handleMoveLeft = (fileId: string): void =>
     {
         const newFiles: LoadFileInfo[] = uploadingFilesQueue.slice();
         const fileIdx = newFiles.findIndex(а => а.file.fileId === fileId);
@@ -56,8 +61,9 @@ export const UploadingFilesQueue: React.FC<QueueProps> = ({uploadingFilesQueue, 
         }
         setUploadingFilesQueue(newFiles);
     }
-    // Перемещение карточки вправо
-    const moveRightHandler = (fileId: string): void =>
+
+    // Обработчик нажатия на кнопку перемещения карточки вправо
+    const handleMoveRight = (fileId: string): void =>
     {  
         const newFiles: LoadFileInfo[] = uploadingFilesQueue.slice();
         const fileIdx = newFiles.findIndex(f => f.file.fileId === fileId);
@@ -70,13 +76,13 @@ export const UploadingFilesQueue: React.FC<QueueProps> = ({uploadingFilesQueue, 
     };
     return <>
         {uploadingFilesQueue.length ?
-            <div className='view-file-cards-area' ref={fileCardsRef} onWheel={fileCardsWheelHandler}>
+            <div className='view-file-cards-area' ref={fileCardsRef} onWheel={handlefileCardsWheel}>
                 {uploadingFilesQueue.map((f, i) =>
                 {
                     return <UploadingFileCard key={i} loading={f}
-                        onRemove={() => { removeHandler(f.file.fileId); }}
-                        onMoveLeft={() => { moveLeftHandler(f.file.fileId); }}
-                        onMoveRight={() => { moveRightHandler(f.file.fileId); }} />;
+                        onRemove={() => { handleRemove(f.file.fileId); }}
+                        onMoveLeft={() => { handleMoveLeft(f.file.fileId); }}
+                        onMoveRight={() => { handleMoveRight(f.file.fileId); }} />;
                 })}
             </div>
             : <></>
@@ -92,27 +98,28 @@ interface FileProps
     onMoveRight?: (id: string) => void; //!< Обратный вызов при нажатии на кнопку переместить файл вправо
 }
 
-const UploadingFileCard: React.FC<FileProps> = (props) =>
+/** Компонент для вывода карточек файлов */
+const UploadingFileCard: React.FC<FileProps> = ({loading, onRemove, onMoveLeft, onMoveRight}) =>
 {
     return <>
-        <div className={'file-cards ' + (props.loading.progress === 0? 'waiting' :props.loading.progress < props.loading.file.size? 'loading' : "")}>
+        <div className={'file-cards ' + (loading.progress === 0? 'waiting' :loading.progress < loading.file.size? 'loading' : "")}>
             <div className="card-btn-area">
-                <div className="card-file-btn left-btn" style={props.loading.progress !== 0? {visibility: 'hidden'} : {}}
-                onClick={() => { if (props.onMoveLeft) props.onMoveLeft(props.loading.file.fileId); }}>{"<"}</div>
-                <div className="card-file-btn right-btn" style={props.loading.progress !== 0? {visibility: 'hidden'} : {}}
-                onClick={() => { if (props.onMoveRight) props.onMoveRight(props.loading.file.fileId); }}>{">"}</div>
+                <div className="card-file-btn left-btn" style={loading.progress !== 0? {visibility: 'hidden'} : {}}
+                onClick={() => { if (onMoveLeft) onMoveLeft(loading.file.fileId); }}>{"<"}</div>
+                <div className="card-file-btn right-btn" style={loading.progress !== 0? {visibility: 'hidden'} : {}}
+                onClick={() => { if (onMoveRight) onMoveRight(loading.file.fileId); }}>{">"}</div>
                 <div className='card-file-btn'
-                onClick={() => { if (props.onRemove) props.onRemove(props.loading.file.fileId); }}>Х</div>
+                onClick={() => { if (onRemove) onRemove(loading.file.fileId); }}>Х</div>
             </div>
             <div className='file-cards-icon'><FcFile className='file-icon' /></div>
             <div className='file-cards-desc-wrapper'>
                 <div className="vertical-expander" />
-                <div className='file-cards-desc' title={props.loading.file.name}>{props.loading.file.name}</div>
+                <div className='file-cards-desc' title={loading.file.name}>{loading.file.name}</div>
                 <div className="vertical-expander" />
             </div>
             <div className="file-cards-progress">
-                <progress id="progressBar" value={props.loading.progress} max={props.loading.file.size}></progress>
-                <div className="progress-load">{(props.loading.progress / MB_VAL).toFixed(FILE_SIZE_PRESCISSION)}MB из {(props.loading.file.size / MB_VAL).toFixed(FILE_SIZE_PRESCISSION)}MB</div>
+                <progress id="progressBar" value={loading.progress} max={loading.file.size}></progress>
+                <div className="progress-load">{(loading.progress / MB_VAL).toFixed(FILE_SIZE_PRESCISSION)}MB из {(loading.file.size / MB_VAL).toFixed(FILE_SIZE_PRESCISSION)}MB</div>
             </div>
         </div>
     </>;

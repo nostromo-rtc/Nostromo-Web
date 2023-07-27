@@ -26,20 +26,23 @@ interface MessageProps
 
 export const Message : FC<MessageProps> = ({message}) =>
 {
-    const getUserName = (id: string) =>
+    /** FIXME: Пока что на уровне проверки
+     *  Получение имени по id */ 
+    const getUserName = (id: string) : string =>
     {
-        if (id == "12hnjofgl33154")
+        if (id === "12hnjofgl33154")
         {
             return "Sergey";
         }
-        else if (id == "155sadjofdgknsdfk3")
+        else if (id === "155sadjofdgknsdfk3")
         {
             return "Vladislav";
         }
-        else if (id == "1bvcbjofg23fxcvds")
+        else if (id === "1bvcbjofg23fxcvds")
         {
             return "Amin";
         }
+        return "";
     };
 
     /** Получить время в формате 00:00:00 (24 часа). */
@@ -79,8 +82,12 @@ export const Message : FC<MessageProps> = ({message}) =>
 
         return timestamp;
     };
-    const isSelfMsg = message.userId == "12hnjofgl33154";
+    /** FIXME: На тестовой уровне
+     *  isSelfMsg: тру - если ты отправляешь сообщение, фолс - если собеседник
+     *  userName:  имя отправителя сообщения */
+    const isSelfMsg = message.userId === "12hnjofgl33154";
     const userName = getUserName(message.userId);
+
     return (
         <>
             <div className={isSelfMsg ? 'self-msg-area' : 'msg-area'}>
@@ -90,7 +97,7 @@ export const Message : FC<MessageProps> = ({message}) =>
                         <span className='user-id' title={'#' + message.userId}>#{message.userId.substring(0, 4)}</span><br></br>
                     </span>
                     <div className='message-body'>
-                        {message.type == "text" ?
+                        {message.type === "text" ?
                             <StyledMessageContent content={message.content as string} />
                             :
                             <FileMessageContent fileInfo={message.content as ChatFileInfo} />

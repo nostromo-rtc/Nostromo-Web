@@ -25,17 +25,12 @@ interface ChatProps
     setIsFileUploading : Dispatch<SetStateAction<boolean>>;
 }
 
-/* для передачи на сервер */
-const formData = new FormData();
-let files = [];
 export const Chat: React.FC<ChatProps> = ({uploadingFilesQueue, setUploadingFilesQueue, isFileUploading, setIsFileUploading}) =>
 {
-    /* Хук взятия пути для скачивания файла после вставки */
-    const [pathFile, setPathFile] = useState("");
-    /* Показывать ли placeholder в поле для ввода. */
+    /** Показывать ли placeholder в поле для ввода. */
     const [showPlaceholder, setShowPlaceholder] = useState(true);
 
-    /* Хук-контейнер для тестовых сообщений */
+    /** Хук-контейнер для тестовых сообщений */
     const [messages, setMessages] = useState<ChatMessage[]>([
         {
             userId: "155sadjofdgknsdfk3", type: "text", datetime: (new Date().getTime()) / 2, content: "Приветствую, коллеги! "
@@ -60,18 +55,21 @@ export const Chat: React.FC<ChatProps> = ({uploadingFilesQueue, setUploadingFile
         // TODO: Добавить вывод смс;
     }, []);
 
+    // Ссылка на историю чата
+    const historyChatRef = useRef<HTMLDivElement>(null);
+    // Для прокрутки после отправки нового сообщения
     useEffect(() =>
     {
-        if (chatElement.current)
+        if (historyChatRef.current)
         {
-            chatElement.current.scrollTop = chatElement.current.scrollHeight;
+            historyChatRef.current.scrollTop = historyChatRef.current.scrollHeight;
         }
     }, [messages]);
 
-    const chatElement = useRef<HTMLDivElement>(null);
+    // Обработчик нажатия на кнопку отправить сообщение
     const sendMsgOnClick = (): void =>
     {
-        if (!chatElement.current || !textAreaRef.current)
+        if (!historyChatRef.current || !textAreaRef.current)
         {
             return;
         }
@@ -110,6 +108,7 @@ export const Chat: React.FC<ChatProps> = ({uploadingFilesQueue, setUploadingFile
             setIsFileUploading(false);
         }  
     };
+
     // Иммитация загрузки файла на сервер
     const [data, setData] = useState(1);
     useEffect(() =>
@@ -139,6 +138,8 @@ export const Chat: React.FC<ChatProps> = ({uploadingFilesQueue, setUploadingFile
             setData(data + 1);
         }, 1000);
     }, [data]);
+
+    // Кнопка для отправки сообщения
     const sendMsgBtn = (
         <TooltipTopBottom title="Отправить">
             <div className="chat-btn-box">
@@ -151,16 +152,15 @@ export const Chat: React.FC<ChatProps> = ({uploadingFilesQueue, setUploadingFile
             </div>
         </TooltipTopBottom>
     );
-    /*** Кнопка отправки файлов ***/
-    const fileComponent = useRef<HTMLInputElement>(null);
-    
-    
+    // Ссылка на кнопку для выбора файлов (скрепка)
+    const inputFileRef = useRef<HTMLInputElement>(null);
+    // Обработчик нажатия на кнопку выбора/загрузки файлов (скрепка)
     const loadFileOnClick = (e: React.FormEvent<HTMLInputElement>): boolean =>
     {
         e.preventDefault();
-        if (fileComponent.current)
+        if (inputFileRef.current)
         {
-            const filesToUpload = fileComponent.current.files;
+            const filesToUpload = inputFileRef.current.files;
             const formSent = new FormData();
             if (filesToUpload && filesToUpload.length > 0)
             {
@@ -180,6 +180,8 @@ export const Chat: React.FC<ChatProps> = ({uploadingFilesQueue, setUploadingFile
         }
         return false;
     };
+
+    // Обработчик нажатия на клавиши для отправки сообщения (enter)
     const handleTextAreaKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (ev) =>
     {
         if (!ev.shiftKey && ev.code === 'Enter')
@@ -189,6 +191,9 @@ export const Chat: React.FC<ChatProps> = ({uploadingFilesQueue, setUploadingFile
         }
     };
 
+    /** Обработчик ввода текста в msg-area 
+    *  Если строка пустая или в ней есть один только тег \n
+    *  то считать, что строка пустая и отображать placeholder */
     const handleTextAreaInput: React.FormEventHandler<HTMLDivElement> = (ev) =>
     {
         const str = ev.currentTarget.innerText;
@@ -199,8 +204,7 @@ export const Chat: React.FC<ChatProps> = ({uploadingFilesQueue, setUploadingFile
     // Вставка файла через ctrl+v
     const handleClipboardEvent : React.ClipboardEventHandler<HTMLDivElement> = (ev) =>
     {
-        setPathFile(ev.clipboardData.getData("text"));
-        files = [...ev.clipboardData.items];
+        const files = [...ev.clipboardData.items];
         if(files.find(f => f.kind === "file"))
             ev.preventDefault();
         if(isFileUploading)
@@ -216,7 +220,6 @@ export const Chat: React.FC<ChatProps> = ({uploadingFilesQueue, setUploadingFile
                     filesCopy.push({file: {fileId: new Date().getMilliseconds().toString(), name: fileData.name, size: fileData.size}, progress: 0 });
                     setUploadingFilesQueue(filesCopy);
 
-                    formData.append('file', fileData);
                     console.log("size: " + (fileData.size / 1000).toString() + "KB");
                     console.log("name: " + fileData.name);
                     console.log("type: " + fileData.type);
@@ -224,20 +227,23 @@ export const Chat: React.FC<ChatProps> = ({uploadingFilesQueue, setUploadingFile
             }
         }
     };
+
+    // Кнопка для выбора и загрузки файлов (скрепка)
     const loadFileBtn = (
         <TooltipTopBottom title={isFileUploading? "Загрузка недоступна" : "Загрузить"}>
             <div className="chat-btn-box">
                 <Button aria-label='Загрузить'>
                     <ImAttachment className='btn-icon' />
-                    <input type="file" id="file-input-btn" disabled={isFileUploading? true : undefined} ref={fileComponent} onChange={e => loadFileOnClick(e)} name="file" multiple hidden />
+                    <input type="file" id="file-input-btn" disabled={isFileUploading? true : undefined} ref={inputFileRef} onChange={e => loadFileOnClick(e)} name="file" multiple hidden />
                 </Button>
                 <label className="chat-btn-clickable-area non-selectable">
-                    <input type="file" id="file-input-btn-area" disabled={isFileUploading? true : undefined} ref={fileComponent} onChange={e => loadFileOnClick(e)} name="file" multiple hidden />
+                    <input type="file" id="file-input-btn-area" disabled={isFileUploading? true : undefined} ref={inputFileRef} onChange={e => loadFileOnClick(e)} name="file" multiple hidden />
                 </label>
             </div>
         </TooltipTopBottom>
     );
 
+    // Placeholder
     const placeholderElem = <div
         id="message-textarea-placeholder"
     >
@@ -246,7 +252,7 @@ export const Chat: React.FC<ChatProps> = ({uploadingFilesQueue, setUploadingFile
 
     return (
         <>
-            <div id="chat" ref={chatElement} aria-readonly>
+            <div id="chat" ref={historyChatRef} aria-readonly>
                 {messages.map(m =>
                 {
                     return <Message key={m.userId + m.datetime.toString()} message={m} />;
