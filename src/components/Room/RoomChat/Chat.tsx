@@ -5,7 +5,7 @@ import "./Chat.css";
 import { Message } from './Message';
 import { TooltipTopBottom } from '../../Tooltip';
 import { Button } from '@mui/material';
-import { ChatFileInfo, FileLoadingCard, LoadFileInfo } from './FileLoadingCard';
+import { ChatFileInfo, LoadFileInfo, UploadingFilesQueue } from './UploadingFilesQueue';
 import { isEmptyString } from "../../../Utils";
 
 /** Информация о сообщении в чате. */
@@ -51,8 +51,6 @@ export const Chat: React.FC<ChatProps> = ({uploadingFilesQueue, setUploadingFile
         { userId: "155sadjofdgknsdfk3", type: "file", datetime: new Date().getTime() - 5000, content: { fileId: "cxzvzx23", name: "Master_and_Margo.txt", size: 412428 } },
         { userId: "12hnjofgl33154", type: "file", datetime: new Date().getTime(), content: { fileId: "jghjghj2", name: "About_IT.txt", size: 4212428 } }
     ]);
-    
-    const fileCardsRef = useRef<HTMLDivElement>(null);
 
     // Ссылка на компонент с полем для ввода сообщения.
     const textAreaRef = useRef<HTMLDivElement>(null);
@@ -160,8 +158,6 @@ export const Chat: React.FC<ChatProps> = ({uploadingFilesQueue, setUploadingFile
     const loadFileOnClick = (e: React.FormEvent<HTMLInputElement>): boolean =>
     {
         e.preventDefault();
-        if (isFileUploading)
-            return false;
         if (fileComponent.current)
         {
             const filesToUpload = fileComponent.current.files;
@@ -184,37 +180,6 @@ export const Chat: React.FC<ChatProps> = ({uploadingFilesQueue, setUploadingFile
         }
         return false;
     };
-    // Удаление карточки
-    const removeHandler = (fileId: string): void =>
-    {
-        const newFiles: LoadFileInfo[] = uploadingFilesQueue.filter(f => f.file.fileId !== fileId);
-        setUploadingFilesQueue(newFiles);
-    };
-    // Перемещение карточки влево
-    const moveLeftHandler = (fileId: string): void =>
-    {
-        const newFiles: LoadFileInfo[] = uploadingFilesQueue.slice();
-        const fileIdx = newFiles.findIndex(а => а.file.fileId === fileId);
-        if (fileIdx !== 0 && newFiles[fileIdx].progress === 0 && newFiles[fileIdx - 1].progress === 0){
-            const tmp: LoadFileInfo = newFiles[fileIdx];
-            newFiles[fileIdx] = newFiles[fileIdx - 1];
-            newFiles[fileIdx - 1] = tmp;
-        }
-        setUploadingFilesQueue(newFiles);
-    }
-    // Перемещение карточки вправо
-    const moveRightHandler = (fileId: string): void =>
-    {  
-        const newFiles: LoadFileInfo[] = uploadingFilesQueue.slice();
-        const fileIdx = newFiles.findIndex(f => f.file.fileId === fileId);
-        if (fileIdx !== (newFiles.length - 1) && newFiles[fileIdx].progress === 0){
-            const tmp: LoadFileInfo = newFiles[fileIdx];
-            newFiles[fileIdx] = newFiles[fileIdx + 1];
-            newFiles[fileIdx + 1] = tmp;
-        }
-        setUploadingFilesQueue(newFiles);
-    };
-
     const handleTextAreaKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (ev) =>
     {
         if (!ev.shiftKey && ev.code === 'Enter')
@@ -260,30 +225,18 @@ export const Chat: React.FC<ChatProps> = ({uploadingFilesQueue, setUploadingFile
         }
     };
     const loadFileBtn = (
-        <TooltipTopBottom title="Загрузить">
+        <TooltipTopBottom title={isFileUploading? "Загрузка недоступна" : "Загрузить"}>
             <div className="chat-btn-box">
                 <Button aria-label='Загрузить'>
                     <ImAttachment className='btn-icon' />
-                    <input type="file" id="file-input-btn" ref={fileComponent} onChange={e => loadFileOnClick(e)} name="file" multiple hidden />
+                    <input type="file" id="file-input-btn" {...isFileUploading? {disabled: true} : {disabled: false}} ref={fileComponent} onChange={e => loadFileOnClick(e)} name="file" multiple hidden />
                 </Button>
-                <label className="chat-btn-clickable-area non-selectable" >
-                    <input type="file" id="file-input-btn-area" ref={fileComponent} onChange={e => loadFileOnClick(e)} name="file" multiple hidden />
+                <label className="chat-btn-clickable-area non-selectable">
+                    <input type="file" id="file-input-btn-area" {...isFileUploading? {disabled: true} : {disabled: false}} ref={fileComponent} onChange={e => loadFileOnClick(e)} name="file" multiple hidden />
                 </label>
             </div>
         </TooltipTopBottom>
     );
-
-    const fileCardsWheelHandler: React.WheelEventHandler<HTMLDivElement> = (ev) =>
-    {
-        if (ev.shiftKey || !fileCardsRef.current)
-        {
-            return;
-        }
-
-        const SCROLL_OFFSET = 100;
-        const ZERO_SCROLL_OFFSET = 0;
-        fileCardsRef.current.scrollBy({ left: ev.deltaY > ZERO_SCROLL_OFFSET ? SCROLL_OFFSET : -SCROLL_OFFSET });
-    };
 
     const placeholderElem = <div
         id="message-textarea-placeholder"
@@ -300,18 +253,9 @@ export const Chat: React.FC<ChatProps> = ({uploadingFilesQueue, setUploadingFile
                 })
                 }
             </div>
-            {uploadingFilesQueue.length ?
-                <div className='view-file-cards-area' ref={fileCardsRef} onWheel={fileCardsWheelHandler}>
-                    {uploadingFilesQueue.map((f, i) =>
-                    {
-                        return <FileLoadingCard key={i} loading={f}
-                            onRemove={() => { removeHandler(f.file.fileId); }}
-                            onMoveLeft={() => { moveLeftHandler(f.file.fileId); }}
-                            onMoveRight={() => { moveRightHandler(f.file.fileId); }} />;
-                    })}
-                </div>
-                : <></>
-            }
+            <UploadingFilesQueue 
+                uploadingFilesQueue={uploadingFilesQueue} 
+                setUploadingFilesQueue={setUploadingFilesQueue}/>
             <div className='message-input-area'>
                 {loadFileBtn}
                 <div id="message-textarea-container">

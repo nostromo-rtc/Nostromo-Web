@@ -10,7 +10,7 @@ import { GiFiles } from "react-icons/gi";
 import { getToggleFunc } from "../Utils";
 import { RoomAlert } from "../components/Room/RoomAlert";
 import { Chat } from "../components/Room/RoomChat/Chat";
-import { LoadFileInfo } from "../components/Room/RoomChat/FileLoadingCard";
+import { LoadFileInfo } from "../components/Room/RoomChat/UploadingFilesQueue";
 import { RoomHeaderToolbarProps } from "../components/Room/RoomHeaderToolbar";
 import { UserList } from "../components/Room/UserList";
 import { VideoLayout } from "../components/Room/VideoLayout";
