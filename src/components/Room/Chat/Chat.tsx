@@ -206,29 +206,26 @@ export const Chat: React.FC<ChatProps> = ({ uploadingFilesQueue, setUploadingFil
     /** Вставка файла из буфера через CTRL+V. */
     const handlePasteEvent: React.ClipboardEventHandler<HTMLDivElement> = (ev) =>
     {
-        const items = Array.from(ev.clipboardData.items);
+        const types = ev.clipboardData.types;
 
-        if (items.find(item =>
-            (item.kind === "file" || item.type === "text/x-moz-url")
-        ))
+        if (types.includes("Files"))
         {
             ev.preventDefault();
-        }
 
-        if (isFileUploading)
-        {
-            return;
-        }
+            if (isFileUploading)
+            {
+                return;
+            }
 
-        for (const item of items)
-        {
-            if (item.kind === "file")
+            const items = Array.from(ev.clipboardData.items);
+
+            for (const item of items)
             {
                 const file = item.getAsFile();
 
                 if (!file)
                 {
-                    return;
+                    continue;
                 }
 
                 const fileInfo: LoadFileInfo = ({
@@ -246,6 +243,20 @@ export const Chat: React.FC<ChatProps> = ({ uploadingFilesQueue, setUploadingFil
                 console.log("name: " + file.name);
                 console.log("type: " + file.type);
             }
+        }
+        else if (types.includes("text/x-moz-url")
+            || types.includes("text/html"))
+        {
+            ev.preventDefault();
+
+            const text = ev.clipboardData.getData("text/plain");
+
+            if (isEmptyString(text))
+            {
+                return;
+            }
+
+            document.execCommand("insertText", false, text);
         }
     };
 
@@ -295,7 +306,8 @@ export const Chat: React.FC<ChatProps> = ({ uploadingFilesQueue, setUploadingFil
                             contentEditable="true"
                             title='Поле ввода сообщения'
                             onPaste={handlePasteEvent}
-                            onInput={handleTextAreaInput}>
+                            onInput={handleTextAreaInput}
+                        >
                         </div>
                         {showPlaceholder ? placeholderElem : <></>}
                     </div>

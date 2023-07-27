@@ -23,6 +23,7 @@
     resize: none;
     padding: 12px;
     cursor: text;
+    white-space: pre-wrap;
 }
 #message-textarea:focus
 {
