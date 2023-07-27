@@ -19,18 +19,18 @@ interface ChatMessage
 
 interface ChatProps
 {
-    uploadingFilesQueue : LoadFileInfo[];
-    setUploadingFilesQueue : Dispatch<SetStateAction<LoadFileInfo[]>>;
-    isFileUploading : boolean;
-    setIsFileUploading : Dispatch<SetStateAction<boolean>>;
+    uploadingFilesQueue: LoadFileInfo[];
+    setUploadingFilesQueue: Dispatch<SetStateAction<LoadFileInfo[]>>;
+    isFileUploading: boolean;
+    setIsFileUploading: Dispatch<SetStateAction<boolean>>;
 }
 
-export const Chat: React.FC<ChatProps> = ({uploadingFilesQueue, setUploadingFilesQueue, isFileUploading, setIsFileUploading}) =>
+export const Chat: React.FC<ChatProps> = ({ uploadingFilesQueue, setUploadingFilesQueue, isFileUploading, setIsFileUploading }) =>
 {
     /** Показывать ли placeholder в поле для ввода. */
     const [showPlaceholder, setShowPlaceholder] = useState(true);
 
-    /** Хук-контейнер для тестовых сообщений */
+    /** Массив тестовых сообщений. */
     const [messages, setMessages] = useState<ChatMessage[]>([
         {
             userId: "155sadjofdgknsdfk3", type: "text", datetime: (new Date().getTime()) / 2, content: "Приветствую, коллеги! "
@@ -41,23 +41,21 @@ export const Chat: React.FC<ChatProps> = ({uploadingFilesQueue, setUploadingFile
                 + "\n```HAI 1.0\n\tI HAS A NAME\n\tVISIBLE \"Wat is yo name7\"\n\tGIMMEH NAME\n\tVISIBLE \"Hai \" NAME \"!!1\"\nKTHXBYE```"
         },
         { userId: "1bvcbjofg23fxcvds", type: "text", datetime: new Date().getTime() - 15000, content: "Do you see this new file uploading panel? Looks cool!" },
-        { userId: "12hnjofgl33154", type: "text", datetime: new Date().getTime() - 10000, content: "Работа идёт полным ходом: https://gitlab.com/nostromo-rtc/nostromo-web/-/issues/13.\nУже почти закончили чат."
-                + "\nИз свежих изменений: https://gitlab.com/nostromo-rtc/nostromo-web/-/commit/49167e06573bb13ef9c5ba95261cfb00100e8662, https://gitlab.com/nostromo-rtc/nostromo-web/-/commit/934d5d7f00af08dd724eae7efee44d0f31ab6b9e и https://gitlab.com/nostromo-rtc/nostromo-web/-/commit/31818b68f40dd739ff257da0f585d1092319f773" },
+        {
+            userId: "12hnjofgl33154", type: "text", datetime: new Date().getTime() - 10000, content: "Работа идёт полным ходом: https://gitlab.com/nostromo-rtc/nostromo-web/-/issues/13.\nУже почти закончили чат."
+                + "\nИз свежих изменений: https://gitlab.com/nostromo-rtc/nostromo-web/-/commit/49167e06573bb13ef9c5ba95261cfb00100e8662, https://gitlab.com/nostromo-rtc/nostromo-web/-/commit/934d5d7f00af08dd724eae7efee44d0f31ab6b9e и https://gitlab.com/nostromo-rtc/nostromo-web/-/commit/31818b68f40dd739ff257da0f585d1092319f773"
+        },
         { userId: "155sadjofdgknsdfk3", type: "file", datetime: new Date().getTime() - 5000, content: { fileId: "cxzvzx23", name: "Master_and_Margo.txt", size: 412428 } },
         { userId: "12hnjofgl33154", type: "file", datetime: new Date().getTime(), content: { fileId: "jghjghj2", name: "About_IT.txt", size: 4212428 } }
     ]);
 
-    // Ссылка на компонент с полем для ввода сообщения.
+    /** Ссылка на компонент с полем для ввода сообщения. */
     const textAreaRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() =>
-    {
-        // TODO: Добавить вывод смс;
-    }, []);
-
-    // Ссылка на историю чата
+    /** Ссылка на историю чата. */
     const historyChatRef = useRef<HTMLDivElement>(null);
-    // Для прокрутки после отправки нового сообщения
+
+    // Для прокрутки вниз в истории сообщений после появления нового сообщения в чате.
     useEffect(() =>
     {
         if (historyChatRef.current)
@@ -80,7 +78,7 @@ export const Chat: React.FC<ChatProps> = ({uploadingFilesQueue, setUploadingFile
         {
             return;
         }
-        if(!isEmptyString(newMessage))
+        if (!isEmptyString(newMessage))
         {
             const message: ChatMessage =
             {
@@ -100,13 +98,14 @@ export const Chat: React.FC<ChatProps> = ({uploadingFilesQueue, setUploadingFile
             // Поэтому включаем placeholder вручную.
             setShowPlaceholder(true);
         }
-        if(uploadingFilesQueue.length > 0)
+        if (uploadingFilesQueue.length > 0)
         {
-            setIsFileUploading(true);  
+            setIsFileUploading(true);
         }
-        else{
+        else
+        {
             setIsFileUploading(false);
-        }  
+        }
     };
 
     // Иммитация загрузки файла на сервер
@@ -168,7 +167,7 @@ export const Chat: React.FC<ChatProps> = ({uploadingFilesQueue, setUploadingFile
                 let count = 0;
                 for (const item of filesToUpload)
                 {
-                    newFiles.push({file: {fileId: "test" + count.toString(), name: item.name, size: item.size}, progress: 0});
+                    newFiles.push({ file: { fileId: "test" + count.toString(), name: item.name, size: item.size }, progress: 0 });
                     count++;
                     formSent.append('file-input-btn', item);
                 }
@@ -201,43 +200,62 @@ export const Chat: React.FC<ChatProps> = ({uploadingFilesQueue, setUploadingFile
         setShowPlaceholder(emptyOrOnlyNewLine);
     };
 
-    // Вставка файла через ctrl+v
-    const handleClipboardEvent : React.ClipboardEventHandler<HTMLDivElement> = (ev) =>
+    /** Вставка файла из буфера через CTRL+V. */
+    const handlePasteEvent: React.ClipboardEventHandler<HTMLDivElement> = (ev) =>
     {
-        const files = [...ev.clipboardData.items];
-        if(files.find(f => f.kind === "file"))
-            ev.preventDefault();
-        if(isFileUploading)
-            return;
-        for (const f of files)
-        {
-            if (f.kind === "file")
-            {
-                const fileData = f.getAsFile();
-                if (fileData)
-                {
-                    const filesCopy = [...uploadingFilesQueue];
-                    filesCopy.push({file: {fileId: new Date().getMilliseconds().toString(), name: fileData.name, size: fileData.size}, progress: 0 });
-                    setUploadingFilesQueue(filesCopy);
+        const items = Array.from(ev.clipboardData.items);
 
-                    console.log("size: " + (fileData.size / 1000).toString() + "KB");
-                    console.log("name: " + fileData.name);
-                    console.log("type: " + fileData.type);
+        if (items.find(item =>
+            (item.kind === "file" || item.type === "text/x-moz-url")
+        ))
+        {
+            ev.preventDefault();
+        }
+
+        if (isFileUploading)
+        {
+            return;
+        }
+
+        for (const item of items)
+        {
+            if (item.kind === "file")
+            {
+                const file = item.getAsFile();
+
+                if (!file)
+                {
+                    return;
                 }
+
+                const fileInfo: LoadFileInfo = ({
+                    file: {
+                        fileId: new Date().getMilliseconds().toString(),
+                        name: file.name,
+                        size: file.size
+                    },
+                    progress: 0
+                });
+
+                setUploadingFilesQueue((prev) => prev.concat(fileInfo));
+
+                console.log("size: " + (file.size / 1000).toString() + "KB");
+                console.log("name: " + file.name);
+                console.log("type: " + file.type);
             }
         }
     };
 
     // Кнопка для выбора и загрузки файлов (скрепка)
     const loadFileBtn = (
-        <TooltipTopBottom title={isFileUploading? "Загрузка недоступна" : "Загрузить"}>
+        <TooltipTopBottom title={isFileUploading ? "Загрузка недоступна" : "Загрузить"}>
             <div className="chat-btn-box">
                 <Button aria-label='Загрузить'>
                     <ImAttachment className='btn-icon' />
-                    <input type="file" id="file-input-btn" disabled={isFileUploading? true : undefined} ref={inputFileRef} onChange={e => loadFileOnClick(e)} name="file" multiple hidden />
+                    <input type="file" id="file-input-btn" disabled={isFileUploading ? true : undefined} ref={inputFileRef} onChange={e => loadFileOnClick(e)} name="file" multiple hidden />
                 </Button>
                 <label className="chat-btn-clickable-area non-selectable">
-                    <input type="file" id="file-input-btn-area" disabled={isFileUploading? true : undefined} ref={inputFileRef} onChange={e => loadFileOnClick(e)} name="file" multiple hidden />
+                    <input type="file" id="file-input-btn-area" disabled={isFileUploading ? true : undefined} ref={inputFileRef} onChange={e => loadFileOnClick(e)} name="file" multiple hidden />
                 </label>
             </div>
         </TooltipTopBottom>
@@ -259,9 +277,9 @@ export const Chat: React.FC<ChatProps> = ({uploadingFilesQueue, setUploadingFile
                 })
                 }
             </div>
-            <UploadingFilesQueue 
-                uploadingFilesQueue={uploadingFilesQueue} 
-                setUploadingFilesQueue={setUploadingFilesQueue}/>
+            <UploadingFilesQueue
+                uploadingFilesQueue={uploadingFilesQueue}
+                setUploadingFilesQueue={setUploadingFilesQueue} />
             <div className='message-input-area'>
                 {loadFileBtn}
                 <div id="message-textarea-container">
@@ -273,7 +291,7 @@ export const Chat: React.FC<ChatProps> = ({uploadingFilesQueue, setUploadingFile
                             aria-multiline="true"
                             contentEditable="true"
                             title='Поле ввода сообщения'
-                            onPaste={handleClipboardEvent}
+                            onPaste={handlePasteEvent}
                             onInput={handleTextAreaInput}>
                         </div>
                         {showPlaceholder ? placeholderElem : <></>}
