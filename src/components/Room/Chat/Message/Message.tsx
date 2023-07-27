@@ -49,14 +49,14 @@ export const Message : FC<MessageProps> = ({message}) =>
     const getTimestamp = (datetime: number): string =>
     {
         const date = new Date(datetime);
-        const current_date = new Date();
+        const currentDate = new Date();
 
         let timestamp = "";
 
         // Если это тот же день.
-        if (date.getDate() === current_date.getDate()
-            && date.getMonth() === current_date.getMonth()
-            && date.getFullYear() === current_date.getFullYear())
+        if (date.getDate() === currentDate.getDate()
+            && date.getMonth() === currentDate.getMonth()
+            && date.getFullYear() === currentDate.getFullYear())
         {
             timestamp = date.toLocaleString("en-GB", {
                 hour: "2-digit",

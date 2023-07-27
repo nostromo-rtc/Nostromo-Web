@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useRef } from "react";
+import { Dispatch, MouseEventHandler, SetStateAction, useRef } from "react";
 import { FcFile } from "react-icons/fc";
 import "./UploadingFilesQueue.css";
 
@@ -81,9 +81,9 @@ export const UploadingFilesQueue: React.FC<QueueProps> = ({uploadingFilesQueue, 
                 {uploadingFilesQueue.map((f, i) =>
                 {
                     return <UploadingFileCard key={i} loading={f}
-                        onRemove={() => { handleRemove(f.file.fileId); }}
-                        onMoveLeft={() => { handleMoveLeft(f.file.fileId); }}
-                        onMoveRight={() => { handleMoveRight(f.file.fileId); }} />;
+                        removeCallback={handleRemove}
+                        moveLeftCallback={handleMoveLeft}
+                        moveRightCallback={handleMoveRight} />;
                 })}
             </div>
             : <></>
@@ -93,24 +93,46 @@ export const UploadingFilesQueue: React.FC<QueueProps> = ({uploadingFilesQueue, 
 
 interface FileProps
 {
-    loading: LoadFileInfo;        //!< Данные файла
-    onRemove?: (id: string) => void; //!< Обратный вызов при нажатии на кнопку закрытия
-    onMoveLeft?: (id: string) => void; //!< Обратный вызов при нажатии на кнопку переместить файл влево
-    onMoveRight?: (id: string) => void; //!< Обратный вызов при нажатии на кнопку переместить файл вправо
+    loading           : LoadFileInfo;         //!< Данные файла
+    removeCallback?   : (id: string) => void; //!< Обратный вызов при нажатии на кнопку закрытия
+    moveLeftCallback? : (id: string) => void; //!< Обратный вызов при нажатии на кнопку переместить файл влево
+    moveRightCallback?: (id: string) => void; //!< Обратный вызов при нажатии на кнопку переместить файл вправо
 }
 
 /** Компонент для вывода карточек файлов */
-const UploadingFileCard: React.FC<FileProps> = ({loading, onRemove, onMoveLeft, onMoveRight}) =>
+const UploadingFileCard: React.FC<FileProps> = ({loading, removeCallback, moveLeftCallback, moveRightCallback}) =>
 {
+    const handleClickRemove : MouseEventHandler<HTMLDivElement> = () =>
+    {
+        if (removeCallback !== undefined)
+        {
+            removeCallback(loading.file.fileId);
+        }
+    }
+    const handleClickMoveLeft : MouseEventHandler<HTMLDivElement> = () =>
+    {
+        if (moveLeftCallback !== undefined)
+        {
+            moveLeftCallback(loading.file.fileId);
+        }
+    }
+    const handleClickMoveRight : MouseEventHandler<HTMLDivElement> = () =>
+    {
+        if (moveRightCallback !== undefined)
+        {
+            moveRightCallback(loading.file.fileId);
+        }
+    }
+
     return <>
         <div className={'file-card ' + (loading.progress === 0? 'file-card-waiting' :loading.progress < loading.file.size? 'file-card-loading' : "")}>
             <div className="card-btn-area">
                 <div className="file-card-btn file-card-moveleft-btn" style={loading.progress !== 0? {visibility: 'hidden'} : {}}
-                onClick={() => { if (onMoveLeft) onMoveLeft(loading.file.fileId); }}>{"<"}</div>
+                onClick={handleClickMoveLeft}>{"<"}</div>
                 <div className="file-card-btn file-card-moveright-btn" style={loading.progress !== 0? {visibility: 'hidden'} : {}}
-                onClick={() => { if (onMoveRight) onMoveRight(loading.file.fileId); }}>{">"}</div>
+                onClick={handleClickMoveRight}>{">"}</div>
                 <div className='file-card-btn'
-                onClick={() => { if (onRemove) onRemove(loading.file.fileId); }}>Х</div>
+                onClick={handleClickRemove}>Х</div>
             </div>
             <div className='file-card-icon'><FcFile className='file-icon' /></div>
             <div className='file-card-desc-wrapper'>
