@@ -1,5 +1,5 @@
 import { FC } from "react";
-import "../Chat.css";
+import "./Message.css";
 import { StyledMessageContent } from "./StyledMessageContent";
 import { FileMessageContent } from "./FileMessageContent";
 

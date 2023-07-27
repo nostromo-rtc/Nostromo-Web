@@ -1,6 +1,7 @@
 import { FC } from "react";
 import { ChatFileInfo } from "./Message";
 import { Link } from "react-router-dom";
+import "./FileMessageContent.css";
 
 interface FileInfoProps
 {
@@ -10,7 +11,7 @@ export const FileMessageContent : FC<FileInfoProps> = ({fileInfo}) =>
 {
     return (
         <>
-            <div className='message-text'>
+            <div>
                 <Link className='msg-placeholder' target="_blank" to={"http://localhost:3000/file/load/" + fileInfo.fileId} />
                 <span className='color-customgray'>Файл: </span>
                 <span className='color-darkviolet'>{fileInfo.name}</span>

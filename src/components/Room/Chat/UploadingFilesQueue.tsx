@@ -1,5 +1,6 @@
 import { Dispatch, SetStateAction, useRef } from "react";
 import { FcFile } from "react-icons/fc";
+import "./UploadingFilesQueue.css";
 
 const MB_VAL = 1024 * 1024;
 const FILE_SIZE_PRESCISSION = 3;
@@ -102,22 +103,22 @@ interface FileProps
 const UploadingFileCard: React.FC<FileProps> = ({loading, onRemove, onMoveLeft, onMoveRight}) =>
 {
     return <>
-        <div className={'file-cards ' + (loading.progress === 0? 'waiting' :loading.progress < loading.file.size? 'loading' : "")}>
+        <div className={'file-card ' + (loading.progress === 0? 'file-card-waiting' :loading.progress < loading.file.size? 'file-card-loading' : "")}>
             <div className="card-btn-area">
-                <div className="card-file-btn left-btn" style={loading.progress !== 0? {visibility: 'hidden'} : {}}
+                <div className="file-card-btn file-card-moveleft-btn" style={loading.progress !== 0? {visibility: 'hidden'} : {}}
                 onClick={() => { if (onMoveLeft) onMoveLeft(loading.file.fileId); }}>{"<"}</div>
-                <div className="card-file-btn right-btn" style={loading.progress !== 0? {visibility: 'hidden'} : {}}
+                <div className="file-card-btn file-card-moveright-btn" style={loading.progress !== 0? {visibility: 'hidden'} : {}}
                 onClick={() => { if (onMoveRight) onMoveRight(loading.file.fileId); }}>{">"}</div>
-                <div className='card-file-btn'
+                <div className='file-card-btn'
                 onClick={() => { if (onRemove) onRemove(loading.file.fileId); }}>Х</div>
             </div>
-            <div className='file-cards-icon'><FcFile className='file-icon' /></div>
-            <div className='file-cards-desc-wrapper'>
+            <div className='file-card-icon'><FcFile className='file-icon' /></div>
+            <div className='file-card-desc-wrapper'>
                 <div className="vertical-expander" />
-                <div className='file-cards-desc' title={loading.file.name}>{loading.file.name}</div>
+                <div className='file-card-desc' title={loading.file.name}>{loading.file.name}</div>
                 <div className="vertical-expander" />
             </div>
-            <div className="file-cards-progress">
+            <div className="file-card-progress">
                 <progress id="progressBar" value={loading.progress} max={loading.file.size}></progress>
                 <div className="progress-load">{(loading.progress / MB_VAL).toFixed(FILE_SIZE_PRESCISSION)}MB из {(loading.file.size / MB_VAL).toFixed(FILE_SIZE_PRESCISSION)}MB</div>
             </div>

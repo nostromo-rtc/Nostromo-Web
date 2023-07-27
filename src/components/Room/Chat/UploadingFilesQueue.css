@@ -1,0 +1,145 @@
+
+.view-file-cards-area
+{
+    display: flex;
+    flex: 5 1 auto;
+    flex-basis: 0;
+    width: 100%;
+    overflow-x: auto;
+    max-height: 150px;
+}
+
+.card-btn-area
+{
+    margin-top: 0.85rem;
+}
+.file-card-btn
+{
+    position: absolute;
+    right: 4px;
+    width: 20px;
+    height: 20px;
+    font-size: 0.85rem;
+    text-align: center;
+    top: 4px;
+}
+.file-card-btn:hover
+{
+    background-color: #4f4545;
+    color: white;
+    border-radius: 5px;
+}
+.file-card-moveleft-btn
+{
+    left: 4px;
+}
+
+.file-card-moveright-btn
+{
+    left: 25px;
+}
+
+.file-card
+{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    word-wrap: break-word;
+    padding: 5px 8px 5px 8px;
+    margin: 8px 0 8px 5px;
+    min-width: 150px;
+    max-width: 150px;
+    border-radius: 5px;
+    box-shadow: inset -1px -1px 1px 0 #152025,
+        inset 1px 1px 1px 0 #1b282e;
+    font-size: 6pt;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+.file-card-loading
+{
+    background-color: #1c2224;
+}
+.file-card-waiting
+{
+    background-color: #27343a;
+}
+
+.file-icon
+{
+    width: 45px;
+    height: 45px;
+}
+
+.file-card-icon
+{
+    text-align: center;
+    width: 100%;
+    min-height: 0;
+    overflow: hidden;
+    margin-top: 4px;
+}
+
+.file-card-desc
+{
+    text-align: center;
+    width: 100%;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+
+.file-card-desc-wrapper
+{
+    display: flex;
+    flex-direction: column;
+    font-size: 1.125em;
+    line-height: 1.2em;
+    min-height: 1.2em;
+    max-height: 3.6em;
+    height: 3.6em;
+}
+
+.file-card-progress
+{
+    margin-bottom: 5px;
+}
+
+/* Прогресс бар для загрузки файлов */
+progress
+{
+    text-align: center;
+    width: 100%;
+    height: 2px;
+    border: none;
+    background-color: #286C2D;
+}
+
+/* Для одинакового отображения прогресс бара 
+   в Firefox, Chrome , Safari используем префиксы -moz, -webkit */
+progress::-webkit-progress-bar
+{
+    border: none;
+    background-color: #286C2D;
+}
+
+progress::-webkit-progress-value
+{
+    background-color: #41E847;
+}
+
+progress::-moz-progress-bar
+{
+    border: none;
+    background-color: #41E847;
+}
+
+.progress-load
+{
+    text-align: center;
+    font-size: 8pt;
+    color: #8999a0;
+    margin-top: 4px;
+}

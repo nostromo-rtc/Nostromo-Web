@@ -1,0 +1,23 @@
+/******** Ссылки ********/
+.message-link
+{
+    color: dodgerblue;
+}
+
+.message-link:visited
+{
+    color: rgb(192, 125, 223);
+}
+
+/******** Эффекты текста ********/
+.msg-inline-code-area
+{
+    white-space: pre-wrap;
+    background-color: #555555;
+}
+.msg-code-area
+{
+    white-space: pre-wrap;
+    margin: 0;
+    background-color: #555555;
+}

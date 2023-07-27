@@ -1,4 +1,5 @@
 import { FC, Fragment } from "react";
+import "./StyledMessageContent.css";
 
 const URL_RE = /[\S.]+\.\S{1,}[\w|/|#]/g;            //!< Ссылки
 const INLINE_CODE_OPEN_TAG_RE =  /(\s|^)+`[^`]/;     //!< Метка начала блока отображения кода в пределах 1 строки

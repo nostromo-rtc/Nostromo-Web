@@ -1,0 +1,92 @@
+/************** Блоки сообщений в чате **************/
+
+/* Собственное смс (справа) */
+.self-msg-area
+{
+    display: flex;
+    justify-content: right;
+    margin: 0.6rem 0.8rem 0.6rem 0.8rem;
+}
+
+/* Сообщение собеседника (слева) */
+.msg-area
+{
+    display: flex;
+    justify-content: left;
+    margin: 0.6rem 0.8rem 0.6rem 0.8rem;
+}
+/* Контейнер для сообщений */
+.msg-container
+{
+    padding: 10px;
+    min-width: 10%;
+    max-width: 60%;
+    position: relative;
+    overflow-wrap: anywhere;
+}
+
+.message-body
+{
+    margin-top: 4px;
+    white-space: pre-line;
+}
+
+/* Стили блоков сообщений */
+
+/* Общий стиль всех сообщений */
+.msg-content
+{
+    text-align: left;
+    border-width: 2px;
+    border-style: solid;
+    margin-top: 4px;
+}
+
+/* Стиль сообщений других участников */
+.members-msg-content
+{
+    border-color: #363f47;
+    background-color: #363f47;
+    border-radius: 0.75rem 0.75rem 0.75rem 0;
+}
+
+/* Стиль собственных сообщений */
+.self-msg-content
+{
+    border-color: #1d3034;
+    background-color: #1d3034;
+    border-radius: 0.75rem 0.75rem 0 0.75rem;
+}
+
+/* Стиль имени отправителя смс */
+.user-name
+{
+    font-weight: 600;
+    color: dodgerblue;
+}
+
+/* Стиль id отправителя смс */
+.user-id
+{
+    font-size: 0.75rem;
+    margin-top: 0.0625rem;
+    margin-left: 5px;
+    font-weight: 300;
+    color: #8999a0;
+}
+
+/* Стиль даты отправки смс */
+.msg-date-container
+{
+    text-align: right;
+}
+.msg-date
+{
+    font-size: 8pt;
+    color: #8999a0;
+}
+.z-2
+{
+    position: relative;
+    z-index: 2;
+}
