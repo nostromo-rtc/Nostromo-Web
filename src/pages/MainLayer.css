@@ -1,0 +1,8 @@
+#base
+{
+    position: relative;
+    flex-direction: column;
+    display: flex;
+    flex-grow: 1;
+    overflow: hidden;
+}

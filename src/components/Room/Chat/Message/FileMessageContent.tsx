@@ -8,7 +8,7 @@ interface FileMessageContentProps
 {
     fileInfo: ChatFileInfo;
 }
-export const FileMessageContent : FC<FileMessageContentProps> = ({fileInfo}) =>
+export const FileMessageContent: FC<FileMessageContentProps> = ({ fileInfo }) =>
 {
     return (
         <>

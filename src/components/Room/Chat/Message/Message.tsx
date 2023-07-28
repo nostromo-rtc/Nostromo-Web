@@ -25,11 +25,11 @@ interface MessageProps
     message: ChatMessage;
 }
 
-export const Message : FC<MessageProps> = ({message}) =>
+export const Message: FC<MessageProps> = ({ message }) =>
 {
     /** FIXME: Пока что на уровне проверки
-     *  Получение имени по id */ 
-    const getUserName = (id: string) : string =>
+     *  Получение имени по id */
+    const getUserName = (id: string): string =>
     {
         if (id === "12hnjofgl33154")
         {
@@ -90,26 +90,26 @@ export const Message : FC<MessageProps> = ({message}) =>
     const userName = getUserName(message.userId);
 
     return (
-        <>
-            <div className={isSelfMsg ? 'self-message-area' : 'message-area'}>
-                <div className={'message-container message-content ' + (isSelfMsg ? 'self-message-content' : 'members-message-content')}>
-                    <span className="z-2">
-                        <span className='message-user-name' title={userName}>{userName}</span>&nbsp;
-                        <span className='message-user-id' title={'#' + message.userId}>#{message.userId.substring(ZERO_IDX, USER_ID_PRESCISSION)}</span><br></br>
+        <div className={isSelfMsg ? 'self-message-area' : 'message-area'}>
+            <div className={'message-container message-content ' + (isSelfMsg ? 'self-message-content' : 'members-message-content')}>
+                <span className="z-2">
+                    <span className='message-user-name' title={userName}>
+                        {userName}
                     </span>
-                    <div className='message-body'>
-                        {message.type === "text" ?
-                            <StyledMessageContent content={message.content as string} />
-                            :
-                            <FileMessageContent fileInfo={message.content as ChatFileInfo} />
-                        }
-                    </div>
-                    <div className='message-date-container'>
-                        <span className="message-date z-2">{getTimestamp(message.datetime)}</span>
-                    </div>
+                    <span className='message-user-id' title={'#' + message.userId}>
+                        #{message.userId.substring(ZERO_IDX, USER_ID_PRESCISSION)}
+                    </span>
+                </span>
+                <div className='message-body'>
+                    {message.type === "text"
+                        ? <StyledMessageContent content={message.content as string} />
+                        : <FileMessageContent fileInfo={message.content as ChatFileInfo} />}
+                </div>
+                <div className='message-date-container'>
+                    <span className="message-date z-2">{getTimestamp(message.datetime)}</span>
                 </div>
             </div>
-        </>
+        </div>
     );
 };
 

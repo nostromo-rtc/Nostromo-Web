@@ -2,6 +2,8 @@ import { Dispatch, SetStateAction, createContext, useState } from "react";
 import { Navbar } from "../components/Navbar";
 import { PageRouter } from "../components/PageRouter";
 
+import "./MainLayer.css";
+
 // Объект React Context.
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const DndVisibleContext = createContext<boolean>(false);
@@ -10,12 +12,12 @@ type DivDragEventHandler = React.DragEventHandler<HTMLDivElement>;
 
 interface MainLayerProps
 {
-    setShowSettings : Dispatch<SetStateAction<boolean>>;
+    setShowSettings: Dispatch<SetStateAction<boolean>>;
 }
-export const MainLayer: React.FC<MainLayerProps> = ({setShowSettings}) =>
+export const MainLayer: React.FC<MainLayerProps> = ({ setShowSettings }) =>
 {
     /*** СОСТОЯНИЯ ***/
-    
+
     const [dndVisible, setDndVisible] = useState(false);
 
     /*** ОБРАБОТЧИКИ ***/
@@ -40,7 +42,7 @@ export const MainLayer: React.FC<MainLayerProps> = ({setShowSettings}) =>
         // Это условие проверяется из-за того, что в Chrome не срабатывает событие 'drop'
         // при установленном `dataTransfer.dropEffect` в значении = "none".
         const CHROME_DRAG_LEAVE_SCREEN_ZERO_VALUE = 0;
-        if (ev.screenX === CHROME_DRAG_LEAVE_SCREEN_ZERO_VALUE 
+        if (ev.screenX === CHROME_DRAG_LEAVE_SCREEN_ZERO_VALUE
             && ev.screenY === CHROME_DRAG_LEAVE_SCREEN_ZERO_VALUE)
         {
             ev.preventDefault();
@@ -62,18 +64,18 @@ export const MainLayer: React.FC<MainLayerProps> = ({setShowSettings}) =>
     };
 
     return (
-        <DndVisibleContext.Provider value={dndVisible}>
-            <div id="layer-main" className="overflow-container"
-                onDragEnter={handleDragEnter}
-                onDragExit={handleDragExit}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}>
-                <Navbar openSettings={() => { setShowSettings(true); }} />
-                <div id="base">
+        <div id="layer-main" className="overflow-container"
+            onDragEnter={handleDragEnter}
+            onDragExit={handleDragExit}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}>
+            <Navbar openSettings={() => { setShowSettings(true); }} />
+            <div id="base">
+                <DndVisibleContext.Provider value={dndVisible}>
                     <PageRouter />
-                </div>
+                </DndVisibleContext.Provider>
             </div>
-        </DndVisibleContext.Provider>
+        </div>
     );
 };

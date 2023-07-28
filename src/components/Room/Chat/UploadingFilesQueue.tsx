@@ -21,10 +21,10 @@ const ZERO_PROGRESS = 0;
 interface UploadingFilesQueueProps
 {
     uploadingFilesQueue: LoadFileInfo[];
-    setUploadingFilesQueue : Dispatch<SetStateAction<LoadFileInfo[]>>;
+    setUploadingFilesQueue: Dispatch<SetStateAction<LoadFileInfo[]>>;
 }
 
-export const UploadingFilesQueue: React.FC<UploadingFilesQueueProps> = ({uploadingFilesQueue, setUploadingFilesQueue}) =>
+export const UploadingFilesQueue: React.FC<UploadingFilesQueueProps> = ({ uploadingFilesQueue, setUploadingFilesQueue }) =>
 {
     // Ссылка на карточки файлов
     const fileCardsRef = useRef<HTMLDivElement>(null);
@@ -45,7 +45,9 @@ export const UploadingFilesQueue: React.FC<UploadingFilesQueueProps> = ({uploadi
     // Обработчик нажатия на кнопку удаления карточки
     const handleRemove = (fileId: string): void =>
     {
-        const newFiles: LoadFileInfo[] = uploadingFilesQueue.filter(f => f.file.fileId !== fileId);
+        const newFiles: LoadFileInfo[] = uploadingFilesQueue.filter(
+            f => f.file.fileId !== fileId
+        );
         setUploadingFilesQueue(newFiles);
     };
 
@@ -55,8 +57,8 @@ export const UploadingFilesQueue: React.FC<UploadingFilesQueueProps> = ({uploadi
         const newFiles: LoadFileInfo[] = uploadingFilesQueue.slice();
         const fileIdx = newFiles.findIndex(а => а.file.fileId === fileId);
         if (
-            fileIdx !== ZERO_IDX 
-            && newFiles[fileIdx].progress === ZERO_PROGRESS 
+            fileIdx !== ZERO_IDX
+            && newFiles[fileIdx].progress === ZERO_PROGRESS
             && newFiles[fileIdx - IDX_STEP].progress === ZERO_PROGRESS
         )
         {
@@ -65,15 +67,15 @@ export const UploadingFilesQueue: React.FC<UploadingFilesQueueProps> = ({uploadi
             newFiles[fileIdx - IDX_STEP] = tmp;
         }
         setUploadingFilesQueue(newFiles);
-    }
+    };
 
     // Обработчик нажатия на кнопку перемещения карточки вправо
     const handleMoveRight = (fileId: string): void =>
-    {  
+    {
         const newFiles: LoadFileInfo[] = uploadingFilesQueue.slice();
         const fileIdx = newFiles.findIndex(f => f.file.fileId === fileId);
         if (
-            fileIdx !== (newFiles.length - IDX_STEP) 
+            fileIdx !== (newFiles.length - IDX_STEP)
             && newFiles[fileIdx].progress === ZERO_PROGRESS
         )
         {
@@ -83,64 +85,81 @@ export const UploadingFilesQueue: React.FC<UploadingFilesQueueProps> = ({uploadi
         }
         setUploadingFilesQueue(newFiles);
     };
-    return <>
-        {uploadingFilesQueue.length ?
-            <div className='view-file-card-area' ref={fileCardsRef} onWheel={handlefileCardsWheel}>
-                {uploadingFilesQueue.map((f, i) =>
-                {
-                    return <UploadingFileCard key={i} loading={f}
-                        removeCallback={handleRemove}
-                        moveLeftCallback={handleMoveLeft}
-                        moveRightCallback={handleMoveRight} />;
-                })}
-            </div>
-            : <></>
-        }
-    </>;
+
+    const filesQueueToMap = (fileInfo: LoadFileInfo, index: number): JSX.Element =>
+    {
+        return (
+            <UploadingFileCard key={index} loading={fileInfo}
+                removeCallback={handleRemove}
+                moveLeftCallback={handleMoveLeft}
+                moveRightCallback={handleMoveRight} />
+        );
+    };
+
+    const viewFileCardArea = (
+        <div className='view-file-card-area' ref={fileCardsRef} onWheel={handlefileCardsWheel}>
+            {uploadingFilesQueue.map(filesQueueToMap)}
+        </div>
+    );
+
+    return uploadingFilesQueue.length ? viewFileCardArea : <></>;
 };
 
 interface UploadingFileCardProps
 {
-    loading           : LoadFileInfo;         //!< Данные файла
-    removeCallback?   : (id: string) => void; //!< Обратный вызов при нажатии на кнопку закрытия
-    moveLeftCallback? : (id: string) => void; //!< Обратный вызов при нажатии на кнопку переместить файл влево
+    loading: LoadFileInfo;         //!< Данные файла
+    removeCallback?: (id: string) => void; //!< Обратный вызов при нажатии на кнопку закрытия
+    moveLeftCallback?: (id: string) => void; //!< Обратный вызов при нажатии на кнопку переместить файл влево
     moveRightCallback?: (id: string) => void; //!< Обратный вызов при нажатии на кнопку переместить файл вправо
 }
 
 /** Компонент для вывода карточек файлов */
-const UploadingFileCard: React.FC<UploadingFileCardProps> = ({loading, removeCallback, moveLeftCallback, moveRightCallback}) =>
+const UploadingFileCard: React.FC<UploadingFileCardProps> = ({
+    loading,
+    removeCallback,
+    moveLeftCallback,
+    moveRightCallback
+}) =>
 {
-    const handleClickRemove : MouseEventHandler<HTMLDivElement> = () =>
+    const handleClickRemove: MouseEventHandler<HTMLDivElement> = () =>
     {
         if (removeCallback !== undefined)
         {
             removeCallback(loading.file.fileId);
         }
-    }
-    const handleClickMoveLeft : MouseEventHandler<HTMLDivElement> = () =>
+    };
+
+    const handleClickMoveLeft: MouseEventHandler<HTMLDivElement> = () =>
     {
         if (moveLeftCallback !== undefined)
         {
             moveLeftCallback(loading.file.fileId);
         }
-    }
-    const handleClickMoveRight : MouseEventHandler<HTMLDivElement> = () =>
+    };
+
+    const handleClickMoveRight: MouseEventHandler<HTMLDivElement> = () =>
     {
         if (moveRightCallback !== undefined)
         {
             moveRightCallback(loading.file.fileId);
         }
-    }
+    };
 
-    return <>
-        <div className={'file-card ' + (loading.progress === ZERO_PROGRESS? 'file-card-waiting' :loading.progress < loading.file.size? 'file-card-loading' : "")}>
+    return (
+        <div className={'file-card ' + (
+            loading.progress === ZERO_PROGRESS
+                ? 'file-card-waiting'
+                : loading.progress < loading.file.size
+                    ? 'file-card-loading'
+                    : ""
+        )}>
             <div className="file-card-btn-area">
-                <div className="file-card-btn file-card-moveleft-btn" style={loading.progress !== ZERO_PROGRESS? {visibility: 'hidden'} : {}}
-                onClick={handleClickMoveLeft}>{"<"}</div>
-                <div className="file-card-btn file-card-moveright-btn" style={loading.progress !== ZERO_PROGRESS? {visibility: 'hidden'} : {}}
-                onClick={handleClickMoveRight}>{">"}</div>
+                <div className="file-card-btn file-card-moveleft-btn" style={loading.progress !== ZERO_PROGRESS ? { visibility: 'hidden' } : {}}
+                    onClick={handleClickMoveLeft}>{"<"}</div>
+                <div className="file-card-btn file-card-moveright-btn" style={loading.progress !== ZERO_PROGRESS ? { visibility: 'hidden' } : {}}
+                    onClick={handleClickMoveRight}>{">"}</div>
                 <div className='file-card-btn'
-                onClick={handleClickRemove}>Х</div>
+                    onClick={handleClickRemove}>Х</div>
             </div>
             <div className='file-card-icon'><FcFile className='file-card-icon' /></div>
             <div className='file-card-desc-wrapper'>
@@ -150,8 +169,10 @@ const UploadingFileCard: React.FC<UploadingFileCardProps> = ({loading, removeCal
             </div>
             <div className="file-card-progress">
                 <progress id="progressBar" value={loading.progress} max={loading.file.size}></progress>
-                <div className="progress-load">{(loading.progress / PrefixConstants.MEGA).toFixed(FILE_SIZE_PRESCISSION)}MB из {(loading.file.size / PrefixConstants.MEGA).toFixed(FILE_SIZE_PRESCISSION)}MB</div>
+                <div className="progress-load">
+                    {(loading.progress / PrefixConstants.MEGA).toFixed(FILE_SIZE_PRESCISSION)}MB из {(loading.file.size / PrefixConstants.MEGA).toFixed(FILE_SIZE_PRESCISSION)}MB
+                </div>
             </div>
         </div>
-    </>;
+    );
 };
