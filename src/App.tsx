@@ -2,6 +2,8 @@ import { createTheme, ThemeProvider, StyledEngineProvider } from "@mui/material/
 import { BrowserRouter } from "react-router-dom";
 import "./App.css";
 import { useState } from "react";
+import { SettingsLayer } from "./pages/SettingsLayer";
+import { FocusTrap } from "./components/FocusTrap";
 import { MainLayer } from "./pages/MainLayer";
 
 const theme = createTheme({
@@ -18,10 +20,7 @@ const App: React.FC = () =>
     const [showSettings, setShowSettings] = useState<boolean>(false);
 
     const settingsLayer = (
-        <div id="layer-settings" className="layer"
-            onClick={() => { setShowSettings(false); }}>
-            settings
-        </div>
+        <SettingsLayer setShowSettings={setShowSettings} />
     );
 
     return (
@@ -29,8 +28,10 @@ const App: React.FC = () =>
             <ThemeProvider theme={theme}>
                 <StyledEngineProvider injectFirst>
                     <div id="app">
-                        <MainLayer setShowSettings={setShowSettings} />
-                        {showSettings ? settingsLayer : <></>}
+                        <FocusTrap>
+                            <MainLayer setShowSettings={setShowSettings} />
+                            {showSettings ? settingsLayer : <></>}
+                        </FocusTrap>
                     </div>
                 </StyledEngineProvider>
             </ThemeProvider>

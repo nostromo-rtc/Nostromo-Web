@@ -1,0 +1,46 @@
+#layer-settings
+{
+    background-color: #282f39;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+.sidebar-view-sidebar-panel
+{
+    display: flex;
+    justify-content: flex-end;
+    flex: 1 0 280px;
+    height: 100%;
+}
+
+.sidebar-view-main-panel
+{
+    display: flex;
+    flex: 1 1 1000px;
+    justify-content: flex-start;
+    height: 100%;
+    overflow-x: hidden;
+}
+
+.sidebar-view-sidebar
+{
+    width: 280px;
+    background-color: #2f3236;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.sidebar-view-main
+{
+    min-width: 360px;
+    max-width: 1000px;
+    background-color: #34363b;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    padding: 20px;
+    box-sizing: border-box;
+    flex: auto;
+}
