@@ -30,7 +30,7 @@
 
 /************** Строка ввода сообщения **************/
 
-#message-textarea
+#chat-message-textarea
 {
     word-wrap: break-word;
     resize: none;
@@ -39,12 +39,12 @@
     white-space: pre-wrap;
 }
 
-#message-textarea:focus
+#chat-message-textarea:focus
 {
     outline: none;
 }
 
-#message-textarea-container
+#chat-message-textarea-container
 {
     display: flex;
     flex: auto;
@@ -53,7 +53,7 @@
     overflow: hidden;
 }
 
-#message-textarea-wrapper
+#chat-message-textarea-wrapper
 {
     position: relative;
     background-color: #1b282e;
@@ -69,7 +69,7 @@
     flex: auto;
 }
 
-#message-textarea-placeholder
+#chat-message-textarea-placeholder
 {
     position: absolute;
     top: 0;
@@ -112,19 +112,13 @@
     color: #656565;
 }
 
-.btn-icon
+.chat-btn-icon
 {
     width: 25px;
     height: 25px;
 }
 
-.video-container
-{
-    width: 100%;
-    position: relative;
-}
-
-.message-input-area
+.chat-message-input-area
 {
     display: flex;
     align-items: end;

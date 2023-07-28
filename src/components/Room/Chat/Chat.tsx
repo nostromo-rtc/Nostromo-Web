@@ -147,7 +147,7 @@ export const Chat: React.FC<ChatProps> = ({ uploadingFilesQueue, setUploadingFil
                 <Button aria-label='Отправить'
                     onClick={sendMsgOnClick}
                 >
-                    <MdSend className='btn-icon' />
+                    <MdSend className='chat-btn-icon' />
                 </Button>
                 <div className="chat-btn-clickable-area non-selectable" onClick={sendMsgOnClick}></div>
             </div>
@@ -261,11 +261,11 @@ export const Chat: React.FC<ChatProps> = ({ uploadingFilesQueue, setUploadingFil
         <TooltipTopBottom title={isFileUploading ? "Загрузка недоступна" : "Загрузить"}>
             <div className="chat-btn-box">
                 <Button aria-label='Загрузить'>
-                    <ImAttachment className='btn-icon' />
-                    <input type="file" id="file-input-btn" disabled={isFileUploading ? true : undefined} ref={inputFileRef} onChange={e => loadFileOnClick(e)} name="file" multiple hidden />
+                    <ImAttachment className='chat-btn-icon' />
+                    <input type="file" id="chat-file-input-btn" disabled={isFileUploading ? true : undefined} ref={inputFileRef} onChange={e => loadFileOnClick(e)} name="file" multiple hidden />
                 </Button>
                 <label className="chat-btn-clickable-area non-selectable">
-                    <input type="file" id="file-input-btn-area" disabled={isFileUploading ? true : undefined} ref={inputFileRef} onChange={e => loadFileOnClick(e)} name="file" multiple hidden />
+                    <input type="file" id="chat-file-input-btn-area" disabled={isFileUploading ? true : undefined} ref={inputFileRef} onChange={e => loadFileOnClick(e)} name="file" multiple hidden />
                 </label>
             </div>
         </TooltipTopBottom>
@@ -273,7 +273,7 @@ export const Chat: React.FC<ChatProps> = ({ uploadingFilesQueue, setUploadingFil
 
     // Placeholder
     const placeholderElem = <div
-        id="message-textarea-placeholder"
+        id="chat-message-textarea-placeholder"
     >
         Напишите сообщение...
     </div>;
@@ -290,11 +290,11 @@ export const Chat: React.FC<ChatProps> = ({ uploadingFilesQueue, setUploadingFil
             <UploadingFilesQueue
                 uploadingFilesQueue={uploadingFilesQueue}
                 setUploadingFilesQueue={setUploadingFilesQueue} />
-            <div className='message-input-area'>
+            <div className='chat-message-input-area'>
                 {loadFileBtn}
-                <div id="message-textarea-container">
-                    <div id="message-textarea-wrapper">
-                        <div id="message-textarea"
+                <div id="chat-message-textarea-container">
+                    <div id="chat-message-textarea-wrapper">
+                        <div id="chat-message-textarea"
                             role="textbox"
                             ref={textAreaRef}
                             onKeyDown={handleTextAreaKeyDown}

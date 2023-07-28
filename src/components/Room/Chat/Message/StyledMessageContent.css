@@ -1,21 +1,21 @@
 /******** Ссылки ********/
-.msg-link
+.styled-msg-link
 {
     color: dodgerblue;
 }
 
-.msg-link:visited
+.styled-msg-link:visited
 {
     color: rgb(192, 125, 223);
 }
 
 /******** Эффекты текста ********/
-.msg-inline-code-area
+.styled-msg-inline-code-area
 {
     white-space: pre-wrap;
     background-color: #555555;
 }
-.msg-code-area
+.styled-msg-code-area
 {
     white-space: pre-wrap;
     margin: 0;

@@ -59,7 +59,7 @@ const updateToMultiline = (block : Block, text : string) : void =>
         && text.substring(block.startPos, block.endPos).includes("\n")
     )
     {
-        block.endLen += IDX_STEP;
+        ++block.endLen;
     }
 }
 
@@ -172,7 +172,7 @@ const UrlToLinks = (words: string) : JSX.Element =>
         }
         const linkText = words.substring(url.index, url.index + url[ZERO_IDX].length);
         const ref = linkText.startsWith("http") ? linkText : `http://${linkText}`;
-        blocks.push(<a key={subblockNumber} className="msg-link" href={ref} target="_blank" rel="noopener noreferrer">{linkText}</a>);
+        blocks.push(<a key={subblockNumber} className="styled-msg-link" href={ref} target="_blank" rel="noopener noreferrer">{linkText}</a>);
         subblockNumber++;
         textBlockStartIdx = url.index + url[ZERO_IDX].length;
     }
@@ -203,10 +203,10 @@ const analyzeBlock = (words: string): JSX.Element =>
             switch (subblock.type)
             {
                 case BlockType.INLINE_CODE:
-                    blocks.push(<code key={subblockNumber} className="msg-inline-code-area">{mPart}</code>)
+                    blocks.push(<code key={subblockNumber} className="styled-msg-inline-code-area">{mPart}</code>)
                     break;
                 case BlockType.BLOCK_CODE:
-                    blocks.push(<pre className="msg-code-area" key={subblockNumber}>{mPart}</pre>)
+                    blocks.push(<pre className="styled-msg-code-area" key={subblockNumber}>{mPart}</pre>)
                     break;
                 case BlockType.BOLD:
                     blocks.push(<strong key={subblockNumber}>{analyzeBlock(mPart)}</strong>)
@@ -226,11 +226,11 @@ const analyzeBlock = (words: string): JSX.Element =>
     return <>{blocks}</>;
 }
 
-interface ContentProps
+interface StyledMessageContentProps
 {
     content: string;
 }
-export const StyledMessageContent : FC<ContentProps> = ({content}) =>
+export const StyledMessageContent : FC<StyledMessageContentProps> = ({content}) =>
 {
     return analyzeBlock(content);
 };

@@ -81,10 +81,10 @@ export function moveFocusToListBoundary(list: Element | null, first: boolean): v
 
 const BINARY_THOUSAND = 1024;
 
-export const PREFIX_ENUM = {
-    kilo: BINARY_THOUSAND,
-    mega: BINARY_THOUSAND * BINARY_THOUSAND,
-    giga: BINARY_THOUSAND * BINARY_THOUSAND * BINARY_THOUSAND,
+export const PrefixConstants = {
+    KILO: BINARY_THOUSAND,
+    MEGA: BINARY_THOUSAND * BINARY_THOUSAND,
+    GIGA: BINARY_THOUSAND * BINARY_THOUSAND * BINARY_THOUSAND,
 } as const;
 
 export const ZERO_IDX = 0;

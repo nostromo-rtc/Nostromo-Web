@@ -1,11 +1,11 @@
-.message-file-size
+.file-message-size
 {
     font-size: 8pt;
     color: #8999a0;
     margin-top: 4px;
 }
 
-.msg-file-name
+.file-message-name
 {
     color: rgb(192, 125, 223);
 }
