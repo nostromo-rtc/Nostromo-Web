@@ -193,7 +193,7 @@ export const Chat: React.FC<ChatProps> = ({ uploadingFilesQueue, setUploadingFil
         }
     };
 
-    /** Обработчик ввода текста в msg-area 
+    /** Обработчик ввода текста в message-area 
     *  Если строка пустая или в ней есть один только тег \n
     *  то считать, что строка пустая и отображать placeholder */
     const handleTextAreaInput: React.FormEventHandler<HTMLDivElement> = (ev) =>

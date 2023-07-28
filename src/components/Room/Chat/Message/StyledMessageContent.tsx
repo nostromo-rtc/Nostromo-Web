@@ -172,7 +172,7 @@ const UrlToLinks = (words: string) : JSX.Element =>
         }
         const linkText = words.substring(url.index, url.index + url[ZERO_IDX].length);
         const ref = linkText.startsWith("http") ? linkText : `http://${linkText}`;
-        blocks.push(<a key={subblockNumber} className="styled-msg-link" href={ref} target="_blank" rel="noopener noreferrer">{linkText}</a>);
+        blocks.push(<a key={subblockNumber} className="styled-message-link" href={ref} target="_blank" rel="noopener noreferrer">{linkText}</a>);
         subblockNumber++;
         textBlockStartIdx = url.index + url[ZERO_IDX].length;
     }
@@ -203,10 +203,10 @@ const analyzeBlock = (words: string): JSX.Element =>
             switch (subblock.type)
             {
                 case BlockType.INLINE_CODE:
-                    blocks.push(<code key={subblockNumber} className="styled-msg-inline-code-area">{mPart}</code>)
+                    blocks.push(<code key={subblockNumber} className="styled-message-inline-code-area">{mPart}</code>)
                     break;
                 case BlockType.BLOCK_CODE:
-                    blocks.push(<pre className="styled-msg-code-area" key={subblockNumber}>{mPart}</pre>)
+                    blocks.push(<pre className="styled-message-code-area" key={subblockNumber}>{mPart}</pre>)
                     break;
                 case BlockType.BOLD:
                     blocks.push(<strong key={subblockNumber}>{analyzeBlock(mPart)}</strong>)
