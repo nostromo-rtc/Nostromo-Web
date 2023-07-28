@@ -42,6 +42,17 @@ module.exports = {
             },
             {
                 "selector": "variable",
+                "types": ["string", "number", "boolean"],
+                "modifiers": ["const", "exported"],
+                "format": ["camelCase", "UPPER_CASE"]
+            },
+            {
+                "selector": "variable",
+                "modifiers": ["const", "exported"],
+                "format": ["PascalCase"]
+            },
+            {
+                "selector": "variable",
                 "types": ["function"],
                 "modifiers": ["const"],
                 "format": ["camelCase", "PascalCase"]
@@ -59,6 +70,11 @@ module.exports = {
             {
                 "selector": "typeLike",
                 "format": ["PascalCase"]
+            },
+            {
+                "selector": "objectLiteralProperty",
+                "types": ["string", "number", "boolean"],
+                "format": ["camelCase", "UPPER_CASE"]
             }
         ],
         "@typescript-eslint/no-base-to-string": "error",
