@@ -17,14 +17,6 @@ import "./RoomPage.css";
 import { DropArea } from "../components/Room/Chat/DropArea";
 import { DndVisibleContext } from "./MainLayer";
 
-declare global
-{
-    interface DataTransferItem
-    {
-        getAsEntry?: () => FileSystemEntry | null;
-    }
-}
-
 export enum SoundState
 {
     DISABLED = 0,

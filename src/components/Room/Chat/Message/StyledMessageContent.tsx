@@ -1,5 +1,6 @@
 import { FC, Fragment } from "react";
 import "./StyledMessageContent.css";
+import { IDX_STEP, ZERO_IDX } from "../../../../Utils";
 
 const URL_RE                   = /[\S.]+\.\S{1,}[\w|/|#]/g;        //!< Ссылки
 const INLINE_CODE_OPEN_TAG_RE  = /(\s|^)(`\n?)[^`]/;               //!< Метка начала блока отображения кода в пределах 1 строки
@@ -52,13 +53,13 @@ const updateToMultiline = (block : Block, text : string) : void =>
         block.endPos + block.endLen < text.length
         && text[block.endPos + block.endLen] === "\n"
         && (
-            block.startPos - 1 < 0
-            || text[block.startPos - 1] === "\n" 
+            block.startPos - IDX_STEP < ZERO_IDX
+            || text[block.startPos - IDX_STEP] === "\n" 
         )
         && text.substring(block.startPos, block.endPos).includes("\n")
     )
     {
-        block.endLen += 1;
+        block.endLen += IDX_STEP;
     }
 }
 
@@ -149,7 +150,7 @@ const getFirstSubblock = (text : string) : Block | null =>
     {
         blocks.sort((l, r) => l.startPos - r.startPos);
     }
-    return blocks.length ? blocks[0] : null;
+    return blocks.length ? blocks[ZERO_IDX] : null;
 }
 
 const UrlToLinks = (words: string) : JSX.Element =>
@@ -169,11 +170,11 @@ const UrlToLinks = (words: string) : JSX.Element =>
             blocks.push(<Fragment key={subblockNumber}>{words.substring(textBlockStartIdx, url.index)}</Fragment>);
             subblockNumber++;
         }
-        const linkText = words.substring(url.index, url.index + url[0].length);
+        const linkText = words.substring(url.index, url.index + url[ZERO_IDX].length);
         const ref = linkText.startsWith("http") ? linkText : `http://${linkText}`;
-        blocks.push(<a key={subblockNumber} className="message-link" href={ref} target="_blank" rel="noopener noreferrer">{linkText}</a>);
+        blocks.push(<a key={subblockNumber} className="msg-link" href={ref} target="_blank" rel="noopener noreferrer">{linkText}</a>);
         subblockNumber++;
-        textBlockStartIdx = url.index + url[0].length;
+        textBlockStartIdx = url.index + url[ZERO_IDX].length;
     }
     if (textBlockStartIdx !== words.length)
     {
@@ -189,7 +190,7 @@ const analyzeBlock = (words: string): JSX.Element =>
     const blocks : JSX.Element[] = [];
     while(subblock)
     {
-        const lPart = words.substring(0, subblock.startPos)
+        const lPart = words.substring(ZERO_IDX, subblock.startPos)
         const mPart = words.substring(subblock.startPos + subblock.startLen, subblock.endPos)
         const rPart = words.substring(subblock.endPos + subblock.endLen, words.length);
         if (lPart.length)

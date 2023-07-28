@@ -25,10 +25,10 @@
     overflow-wrap: anywhere;
 }
 
-.message-body
+.msg-body
 {
     margin-top: 4px;
-    white-space: pre-line;
+    white-space: pre-wrap;
 }
 
 /* Стили блоков сообщений */
@@ -59,14 +59,14 @@
 }
 
 /* Стиль имени отправителя смс */
-.user-name
+.msg-user-name
 {
     font-weight: 600;
     color: dodgerblue;
 }
 
 /* Стиль id отправителя смс */
-.user-id
+.msg-user-id
 {
     font-size: 0.75rem;
     margin-top: 0.0625rem;

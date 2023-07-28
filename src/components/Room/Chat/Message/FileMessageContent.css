@@ -5,17 +5,13 @@
     margin-top: 4px;
 }
 
-.color-darkviolet
+.msg-file-name
 {
     color: rgb(192, 125, 223);
 }
 
-.color-customgray
-{
-    color: rgb(134, 163, 177);
-}
 /* Стиль кликабельного контейнера над сообщением (для обработки скачивания файла) */
-.msg-placeholder
+.file-message-link
 {
     z-index: 1;
     position: absolute;

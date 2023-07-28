@@ -6,6 +6,14 @@ import { LoadFileInfo } from "./UploadingFilesQueue";
 
 type DivDragEventHandler = React.DragEventHandler<HTMLDivElement>;
 
+declare global
+{
+    interface DataTransferItem
+    {
+        getAsEntry?: () => FileSystemEntry | null;
+    }
+}
+
 interface DropAreaProps
 {
     uploadingFilesQueue: LoadFileInfo[];

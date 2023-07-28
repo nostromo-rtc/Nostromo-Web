@@ -1,9 +1,7 @@
 import { Dispatch, MouseEventHandler, SetStateAction, useRef } from "react";
 import { FcFile } from "react-icons/fc";
 import "./UploadingFilesQueue.css";
-
-const MB_VAL = 1024 * 1024;
-const FILE_SIZE_PRESCISSION = 3;
+import { FILE_SIZE_PRESCISSION, IDX_STEP, PREFIX_ENUM, ZERO_IDX } from "../../../Utils";
 
 // TODO: Не забыть убрать отсюда после наладки работы с NS Shared
 export interface ChatFileInfo
@@ -18,6 +16,7 @@ export interface LoadFileInfo
     progress: number;
 }
 
+const ZERO_PROGRESS = 0;
 
 interface QueueProps
 {
@@ -55,11 +54,11 @@ export const UploadingFilesQueue: React.FC<QueueProps> = ({uploadingFilesQueue, 
     {
         const newFiles: LoadFileInfo[] = uploadingFilesQueue.slice();
         const fileIdx = newFiles.findIndex(а => а.file.fileId === fileId);
-        if (fileIdx !== 0 && newFiles[fileIdx].progress === 0 && newFiles[fileIdx - 1].progress === 0)
+        if (fileIdx !== ZERO_IDX && newFiles[fileIdx].progress === ZERO_PROGRESS && newFiles[fileIdx - IDX_STEP].progress === ZERO_PROGRESS)
         {
             const tmp: LoadFileInfo = newFiles[fileIdx];
-            newFiles[fileIdx] = newFiles[fileIdx - 1];
-            newFiles[fileIdx - 1] = tmp;
+            newFiles[fileIdx] = newFiles[fileIdx - IDX_STEP];
+            newFiles[fileIdx - IDX_STEP] = tmp;
         }
         setUploadingFilesQueue(newFiles);
     }
@@ -69,11 +68,11 @@ export const UploadingFilesQueue: React.FC<QueueProps> = ({uploadingFilesQueue, 
     {  
         const newFiles: LoadFileInfo[] = uploadingFilesQueue.slice();
         const fileIdx = newFiles.findIndex(f => f.file.fileId === fileId);
-        if (fileIdx !== (newFiles.length - 1) && newFiles[fileIdx].progress === 0)
+        if (fileIdx !== (newFiles.length - IDX_STEP) && newFiles[fileIdx].progress === ZERO_PROGRESS)
         {
             const tmp: LoadFileInfo = newFiles[fileIdx];
-            newFiles[fileIdx] = newFiles[fileIdx + 1];
-            newFiles[fileIdx + 1] = tmp;
+            newFiles[fileIdx] = newFiles[fileIdx + IDX_STEP];
+            newFiles[fileIdx + IDX_STEP] = tmp;
         }
         setUploadingFilesQueue(newFiles);
     };
@@ -127,11 +126,11 @@ const UploadingFileCard: React.FC<FileProps> = ({loading, removeCallback, moveLe
     }
 
     return <>
-        <div className={'file-card ' + (loading.progress === 0? 'file-card-waiting' :loading.progress < loading.file.size? 'file-card-loading' : "")}>
+        <div className={'file-card ' + (loading.progress === ZERO_PROGRESS? 'file-card-waiting' :loading.progress < loading.file.size? 'file-card-loading' : "")}>
             <div className="card-btn-area">
-                <div className="file-card-btn file-card-moveleft-btn" style={loading.progress !== 0? {visibility: 'hidden'} : {}}
+                <div className="file-card-btn file-card-moveleft-btn" style={loading.progress !== ZERO_PROGRESS? {visibility: 'hidden'} : {}}
                 onClick={handleClickMoveLeft}>{"<"}</div>
-                <div className="file-card-btn file-card-moveright-btn" style={loading.progress !== 0? {visibility: 'hidden'} : {}}
+                <div className="file-card-btn file-card-moveright-btn" style={loading.progress !== ZERO_PROGRESS? {visibility: 'hidden'} : {}}
                 onClick={handleClickMoveRight}>{">"}</div>
                 <div className='file-card-btn'
                 onClick={handleClickRemove}>Х</div>
@@ -144,7 +143,7 @@ const UploadingFileCard: React.FC<FileProps> = ({loading, removeCallback, moveLe
             </div>
             <div className="file-card-progress">
                 <progress id="progressBar" value={loading.progress} max={loading.file.size}></progress>
-                <div className="progress-load">{(loading.progress / MB_VAL).toFixed(FILE_SIZE_PRESCISSION)}MB из {(loading.file.size / MB_VAL).toFixed(FILE_SIZE_PRESCISSION)}MB</div>
+                <div className="progress-load">{(loading.progress / PREFIX_ENUM.mega).toFixed(FILE_SIZE_PRESCISSION)}MB из {(loading.file.size / PREFIX_ENUM.mega).toFixed(FILE_SIZE_PRESCISSION)}MB</div>
             </div>
         </div>
     </>;

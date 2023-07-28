@@ -6,7 +6,7 @@ import { Message } from './Message/Message';
 import { TooltipTopBottom } from '../../Tooltip';
 import { Button } from '@mui/material';
 import { ChatFileInfo, LoadFileInfo, UploadingFilesQueue } from './UploadingFilesQueue';
-import { isEmptyString } from "../../../Utils";
+import { ZERO_IDX, isEmptyString } from "../../../Utils";
 
 /** Информация о сообщении в чате. */
 interface ChatMessage
@@ -98,7 +98,7 @@ export const Chat: React.FC<ChatProps> = ({ uploadingFilesQueue, setUploadingFil
             // Поэтому включаем placeholder вручную.
             setShowPlaceholder(true);
         }
-        if (uploadingFilesQueue.length > 0)
+        if (uploadingFilesQueue.length > ZERO_IDX)
         {
             setIsFileUploading(true);
         }
@@ -108,7 +108,7 @@ export const Chat: React.FC<ChatProps> = ({ uploadingFilesQueue, setUploadingFil
         }
     };
 
-    // Иммитация загрузки файла на сервер
+    /* Иммитация загрузки файла на сервер
     const [data, setData] = useState(1);
     useEffect(() =>
     {
@@ -138,7 +138,7 @@ export const Chat: React.FC<ChatProps> = ({ uploadingFilesQueue, setUploadingFil
             }
             setData(data + 1);
         }, 1000);
-    }, [data]);
+    }, [data]);*/
 
     // Кнопка для отправки сообщения
     const sendMsgBtn = (
@@ -163,7 +163,7 @@ export const Chat: React.FC<ChatProps> = ({ uploadingFilesQueue, setUploadingFil
         {
             const filesToUpload = inputFileRef.current.files;
             const formSent = new FormData();
-            if (filesToUpload && filesToUpload.length > 0)
+            if (filesToUpload && filesToUpload.length > ZERO_IDX)
             {
                 const newFiles: LoadFileInfo[] = uploadingFilesQueue.slice();
                 let count = 0;
@@ -238,10 +238,6 @@ export const Chat: React.FC<ChatProps> = ({ uploadingFilesQueue, setUploadingFil
                 });
 
                 setUploadingFilesQueue((prev) => prev.concat(fileInfo));
-
-                console.log("size: " + (file.size / 1000).toString() + "KB");
-                console.log("name: " + file.name);
-                console.log("type: " + file.type);
             }
         }
         else if (types.includes("text/x-moz-url")

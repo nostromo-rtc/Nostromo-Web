@@ -2,6 +2,7 @@ import { FC } from "react";
 import "./Message.css";
 import { StyledMessageContent } from "./StyledMessageContent";
 import { FileMessageContent } from "./FileMessageContent";
+import { ZERO_IDX } from "../../../../Utils";
 
 /** Информация о файле в чате. */
 export interface ChatFileInfo
@@ -10,7 +11,7 @@ export interface ChatFileInfo
     name: string;
     size: number;
 }
-
+const USER_ID_PRESCISSION = 4;
 /** Информация о сообщении в чате. */
 interface ChatMessage
 {
@@ -93,10 +94,10 @@ export const Message : FC<MessageProps> = ({message}) =>
             <div className={isSelfMsg ? 'self-msg-area' : 'msg-area'}>
                 <div className={'msg-container msg-content ' + (isSelfMsg ? 'self-msg-content' : 'members-msg-content')}>
                     <span className="z-2">
-                        <span className='user-name' title={userName}>{userName}</span>&nbsp;
-                        <span className='user-id' title={'#' + message.userId}>#{message.userId.substring(0, 4)}</span><br></br>
+                        <span className='msg-user-name' title={userName}>{userName}</span>&nbsp;
+                        <span className='msg-user-id' title={'#' + message.userId}>#{message.userId.substring(ZERO_IDX, USER_ID_PRESCISSION)}</span><br></br>
                     </span>
-                    <div className='message-body'>
+                    <div className='msg-body'>
                         {message.type === "text" ?
                             <StyledMessageContent content={message.content as string} />
                             :

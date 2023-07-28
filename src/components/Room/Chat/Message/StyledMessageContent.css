@@ -1,10 +1,10 @@
 /******** Ссылки ********/
-.message-link
+.msg-link
 {
     color: dodgerblue;
 }
 
-.message-link:visited
+.msg-link:visited
 {
     color: rgb(192, 125, 223);
 }
