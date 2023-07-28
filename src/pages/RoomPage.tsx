@@ -6,7 +6,6 @@ import { RoomActionPanel, RoomActionPanelProps } from "../components/Room/Action
 import { VerticalLayout } from "../components/VerticalLayout";
 
 import { Link } from "@mui/material";
-import { GiFiles } from "react-icons/gi";
 import { getToggleFunc } from "../Utils";
 import { RoomAlert } from "../components/Room/RoomAlert";
 import { Chat } from "../components/Room/Chat/Chat";
@@ -14,8 +13,9 @@ import { LoadFileInfo } from "../components/Room/Chat/UploadingFilesQueue";
 import { RoomHeaderToolbarProps } from "../components/Room/RoomHeaderToolbar";
 import { UserList } from "../components/Room/UserList";
 import { VideoLayout } from "../components/Room/VideoLayout";
-import { DndVisibleContext } from "./MainLayer";
 import "./RoomPage.css";
+import { DropArea } from "../components/Room/Chat/DropArea";
+import { DndVisibleContext } from "./MainLayer";
 
 declare global
 {
@@ -46,8 +46,6 @@ export interface DeviceListItem
     groupId: string;
     kind: "audio" | "video";
 }
-
-type DivDragEventHandler = React.DragEventHandler<HTMLDivElement>;
 
 export const RoomPage: React.FC = () =>
 {
@@ -96,7 +94,6 @@ export const RoomPage: React.FC = () =>
         { file: { fileId: "nbv890", name: "Т.4. Искусство программирования", size: 99124812 }, progress: 0 }
     ]);
 
-
     const roomActionPanelProps: RoomActionPanelProps =
     {
         soundBtnInfo: { state: soundState, setState: setSoundState },
@@ -135,6 +132,8 @@ export const RoomPage: React.FC = () =>
         toggleChatBtnInfo: { isChatHidden, setIsChatHidden }
     };
 
+    const flagDnd = useContext(DndVisibleContext);
+
     const disabledAudioAlertMessage = <>
         Не слышите собеседников? В данный момент у вас <b>выключен звук</b> в приложении. {"Нажмите "}
         <Link
@@ -157,7 +156,7 @@ export const RoomPage: React.FC = () =>
             />
         </div>;
 
-    const chatContainer =
+    const chatContainer = (
         <div id="chat-container">
             <Chat
                 uploadingFilesQueue={uploadingFilesQueue}
@@ -165,83 +164,33 @@ export const RoomPage: React.FC = () =>
                 isFileUploading={isFileUploading}
                 setIsFileUploading={setIsFileUploading}
             />
-        </div>;
-    const callContainer =
+        </div>
+    );
+
+    const callContainer = (
         <div id="call-container">
             {roomAlerts}
             <VideoLayout />
             <hr id="call-container-divider" />
             <RoomActionPanel {...roomActionPanelProps} />
-        </div>;
+        </div>
+    );
+
+    const dropAreaElement = (<DropArea
+        uploadingFilesQueue={uploadingFilesQueue}
+        setUploadingFilesQueue={setUploadingFilesQueue}
+    />);
 
     useEffect(() =>
     {
         document.title = `Nostromo - Комната "${roomName}"`;
     }, []);
 
-    /* После того, как отпустили файл в область */
-    const handleDrop: DivDragEventHandler = (ev) =>
-    {
-        ev.preventDefault();
-
-        const filesCopy = [...uploadingFilesQueue];
-        for (const item of ev.dataTransfer.items)
-        {
-            const entry = (item.getAsEntry !== undefined)
-                ? item.getAsEntry()
-                : item.webkitGetAsEntry();
-
-            if (entry && (entry.isFile && !entry.isDirectory))
-            {
-                const file = item.getAsFile();
-
-                if (!file)
-                {
-                    return;
-                }
-
-                filesCopy.push({
-                    file: {
-                        fileId: filesCopy.length.toString() + "-" + new Date().getMilliseconds().toString(),
-                        name: file.name,
-                        size: file.size
-                    },
-                    progress: 0
-                });
-            }
-            else
-            {
-                console.log("File type is bad.");
-            }
-        }
-
-        setUploadingFilesQueue(filesCopy);
-    };
-
-    const handleDragOver: DivDragEventHandler = (ev) =>
-    {
-        ev.preventDefault();
-        ev.stopPropagation();
-        ev.dataTransfer.dropEffect = "copy";
-    };
-
-    const flagDnd = useContext(DndVisibleContext);
     return (
         <>
             <Header title={roomName} roomToolbarProps={roomToolbarProps} />
             <div id="main">
-                {flagDnd && !isFileUploading
-                    ? <div className="drop-area vertical-center"
-                        onDrop={handleDrop}
-                        onDragOver={handleDragOver}>
-                        <div className='horizontal-center'>
-                            <div className='drop-area-panel'>
-                                <div className='drop-area-icon'><GiFiles className='drop-area-icon-sizes' /></div>
-                                <div className='drop-area-border'>Отпустите файл для загрузки</div>
-                            </div>
-                        </div>
-                    </div>
-                    : <></>}
+                {(flagDnd && !isFileUploading) ? dropAreaElement : <></>}
                 {isChatHidden
                     ? <div className="overflow-container">{callContainer}</div>
                     : <VerticalLayout

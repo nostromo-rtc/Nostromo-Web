@@ -1,0 +1,48 @@
+
+#drop-area
+{
+    position: absolute;
+    z-index: 10;
+    background-color: #00000099;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+#drop-area-panel
+{
+    position: relative;
+    z-index: 1;
+}
+
+#drop-area-border
+{
+    background-color: #22485e;
+    border: 2px dashed lightblue;
+    border-radius: 10px;
+    height: 150px;
+    width: 250px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    filter: drop-shadow(0px 0px 12px rgb(170, 170, 210, 0.5));
+}
+
+#drop-area-icon-container
+{
+    position: absolute;
+    top: -47px;
+    width: 100%;
+    text-align: center;
+}
+
+#drop-area-icon
+{
+    height: 100px;
+    width: 100px;
+    position: relative;
+    z-index: 2;
+    color: lightblue;
+}

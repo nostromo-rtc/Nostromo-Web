@@ -2,6 +2,8 @@ import { Dispatch, SetStateAction, createContext, useState } from "react";
 import { Navbar } from "../components/Navbar";
 import { PageRouter } from "../components/PageRouter";
 
+// Объект React Context.
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export const DndVisibleContext = createContext<boolean>(false);
 
 type DivDragEventHandler = React.DragEventHandler<HTMLDivElement>;
