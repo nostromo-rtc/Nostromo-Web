@@ -283,7 +283,7 @@ export const Chat: React.FC<ChatProps> = ({ uploadingFilesQueue, setUploadingFil
     </div>;
 
     return (
-        <>
+        <div id="chat-container">
             <div id="chat" ref={historyChatRef} aria-readonly>
                 {messages.map(m =>
                 {
@@ -314,6 +314,6 @@ export const Chat: React.FC<ChatProps> = ({ uploadingFilesQueue, setUploadingFil
                 </div>
                 {sendMsgBtn}
             </div>
-        </>
+        </div>
     );
 };

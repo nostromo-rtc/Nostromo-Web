@@ -157,14 +157,12 @@ export const RoomPage: React.FC = () =>
         </div>;
 
     const chatContainer = (
-        <div id="chat-container">
-            <Chat
-                uploadingFilesQueue={uploadingFilesQueue}
-                setUploadingFilesQueue={setUploadingFilesQueue}
-                isFileUploading={isFileUploading}
-                setIsFileUploading={setIsFileUploading}
-            />
-        </div>
+        <Chat
+            uploadingFilesQueue={uploadingFilesQueue}
+            setUploadingFilesQueue={setUploadingFilesQueue}
+            isFileUploading={isFileUploading}
+            setIsFileUploading={setIsFileUploading}
+        />
     );
 
     const callContainer = (
@@ -176,10 +174,12 @@ export const RoomPage: React.FC = () =>
         </div>
     );
 
-    const dropAreaElement = (<DropArea
-        uploadingFilesQueue={uploadingFilesQueue}
-        setUploadingFilesQueue={setUploadingFilesQueue}
-    />);
+    const dropAreaElement = (
+        <DropArea
+            uploadingFilesQueue={uploadingFilesQueue}
+            setUploadingFilesQueue={setUploadingFilesQueue}
+        />
+    );
 
     useEffect(() =>
     {

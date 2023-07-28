@@ -1,5 +1,18 @@
 /* Чат */
 
+#chat-container
+{
+    display: flex;
+    flex-direction: column;
+    background-color: #1b282e;
+    border-radius: 7px;
+    border-top: 1px rgb(34, 33, 33, 0.6) solid;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
 #chat
 {
     display: flex;
@@ -25,6 +38,7 @@
     cursor: text;
     white-space: pre-wrap;
 }
+
 #message-textarea:focus
 {
     outline: none;
