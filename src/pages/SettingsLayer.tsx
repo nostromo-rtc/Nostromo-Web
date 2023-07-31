@@ -4,6 +4,8 @@ import "../App.css";
 import "./SettingsLayer.css";
 import { FocusTrap } from "../components/FocusTrap";
 import * as settingService from "../services/SettingsService";
+import { SettingsCategoryContainer } from "../components/Settings/SettingsCategoryContainer";
+import { SettingsEditor } from "../components/Settings/SettingsEditor";
 
 interface SettingsLayerProps
 {
@@ -74,22 +76,23 @@ export const SettingsLayer: React.FC<SettingsLayerProps> = ({ setShowSettings })
         }
     }, []);
 
+
     return (
         <div id="layer-settings"
             className="layer"
-            onClick={() => { setShowSettings(false); }}
+            
             tabIndex={-1}
             ref={layerRef}
         >
             <FocusTrap>
                 <div className="sidebar-view-sidebar-panel">
                     <div className="sidebar-view-sidebar">
-                        sidebar
+                        <SettingsCategoryContainer settings={settingService.settings}/>
                     </div>
                 </div>
                 <div className="sidebar-view-main-panel">
                     <div className="sidebar-view-main">
-                        main
+                        <SettingsEditor settings={settingService.settings} parametersInfoMap={settingService.parametersInfoMap}/>
                     </div>
                 </div>
             </FocusTrap>

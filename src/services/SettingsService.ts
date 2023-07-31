@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-type ParameterType = "Select" | "Slider" | "Switch";
-type ParameterValue = boolean | number | string;
+export type ParameterType = "Select" | "Slider" | "Switch";
+export type ParameterValue = boolean | number | string;
 
-interface ParameterInfo
+export interface ParameterInfo
 {
     name: string;
     description?: string;
@@ -10,17 +10,17 @@ interface ParameterInfo
     defaultValue: ParameterValue;
 }
 
-interface Group 
+export interface Group 
 {
     [key: string]: ParameterValue;
 }
 
-interface Section
+export interface Section
 {
     [key: string]: Group;
 }
 
-interface Category
+export interface Category
 {
     [key: string]: Section;
 }
@@ -47,7 +47,7 @@ interface DisplayCategory extends Category
 
 // --- Settings object --- //
 
-interface Settings
+export interface Settings
 {
     [key: string]: Category;
 
@@ -64,15 +64,76 @@ const defaultSettings: Settings =
 {
     general:
     {
-
+        generalSection_1:
+        {
+            generalGroup_1S_1:
+            {
+                Aparam: true,
+                Bparam: true
+            }
+        },
+        generalSection_2:
+        {
+            generalGroup_2S_1:
+            {
+                Cparam: false,
+                Dparam: true
+            }
+        },
+        generalSection_3:
+        {
+            generalGroup_3S_1:
+            {
+                Eparam: false,
+                Fparam: false
+            }
+        },
+        generalSection_4:
+        {
+            generalGroup_4S_1:
+            {
+                Gparam: true,
+                Hparam: false
+            }
+        }
     },
     audio:
     {
-
+        audioSection_1:
+        {
+            audioGroup_1S_1:
+            {
+                Iparam: true,
+                Jparam: true
+            }
+        },
+        audioSection_2:
+        {
+            audioGroup_2S_1:
+            {
+                Kparam: false,
+                Lparam: true
+            }
+        }
     },
     video:
     {
-
+        videoSection_1:
+        {
+            videoGroup_1S_1:
+            {
+                Mparam: true,
+                Nparam: true
+            }
+        },
+        videoSection_2:
+        {
+            videoGroup_2S_1:
+            {
+                Oparam: false,
+                Pparam: true
+            }
+        }
     },
     display:
     {
@@ -94,12 +155,32 @@ export const settings: Settings = defaultSettings;
 
 // -- Info objects -- //
 
-interface ParametersInfoMap 
+export interface ParametersInfoMap 
 {
     readonly [key: string]: ParameterInfo;
 
     "display.room.layout.displayInactiveVideos": ParameterInfo;
     "display.room.layout.displayLocalVideos": ParameterInfo;
+
+    //TODO: Тестовые значения для проверки UI
+    "general.generalSection_1.generalGroup_1S_1.Aparam": ParameterInfo;
+    "general.generalSection_1.generalGroup_1S_1.Bparam": ParameterInfo;
+    "general.generalSection_2.generalGroup_2S_1.Cparam": ParameterInfo;
+    "general.generalSection_2.generalGroup_2S_1.Dparam": ParameterInfo;
+    "general.generalSection_3.generalGroup_3S_1.Eparam": ParameterInfo;
+    "general.generalSection_3.generalGroup_3S_1.Fparam": ParameterInfo;
+    "general.generalSection_4.generalGroup_4S_1.Gparam": ParameterInfo;
+    "general.generalSection_4.generalGroup_4S_1.Hparam": ParameterInfo;
+
+    "audio.audioSection_1.audioGroup_1S_1.Iparam" : ParameterInfo;
+    "audio.audioSection_1.audioGroup_1S_1.Jparam" : ParameterInfo;
+    "audio.audioSection_2.audioGroup_2S_1.Kparam" : ParameterInfo;
+    "audio.audioSection_2.audioGroup_2S_1.Lparam" : ParameterInfo;
+
+    "video.videoSection_1.videoGroup_1S_1.Mparam" : ParameterInfo;
+    "video.videoSection_1.videoGroup_1S_1.Nparam" : ParameterInfo;
+    "video.videoSection_2.videoGroup_2S_1.Oparam" : ParameterInfo;
+    "video.videoSection_2.videoGroup_2S_1.Pparam" : ParameterInfo;
 }
 
 // TODO: такие же объекты нужно и для других видов элементов (категории, секции, группы).
@@ -117,5 +198,105 @@ export const parametersInfoMap: ParametersInfoMap = {
         name: "Отображать локальные видео",
         type: "Switch",
         defaultValue: defaultSettings.display.room.layout.displayLocalVideos
+    },
+
+    // TODO: Тестовые параметры
+    "general.generalSection_1.generalGroup_1S_1.Aparam":
+    {
+        name: "Первый тестовый параметр",
+        type: "Switch",
+        defaultValue: defaultSettings.general.generalSection_1.generalGroup_1S_1.Aparam
+    },
+    "general.generalSection_1.generalGroup_1S_1.Bparam":
+    {
+        name: "Второй тестовый параметр",
+        type: "Switch",
+        defaultValue: defaultSettings.general.generalSection_1.generalGroup_1S_1.Bparam
+    },
+    "general.generalSection_2.generalGroup_2S_1.Cparam":
+    {
+        name: "Третий тестовый параметр",
+        type: "Switch",
+        defaultValue: defaultSettings.general.generalSection_2.generalGroup_2S_1.Cparam
+    },
+    "general.generalSection_2.generalGroup_2S_1.Dparam":
+    {
+        name: "Четвертый тестовый параметр",
+        type: "Switch",
+        defaultValue: defaultSettings.general.generalSection_2.generalGroup_2S_1.Dparam
+    },
+    "general.generalSection_3.generalGroup_3S_1.Eparam":
+    {
+        name: "Пятый тестовый параметр",
+        type: "Switch",
+        defaultValue: defaultSettings.general.generalSection_3.generalGroup_3S_1.Eparam
+    },
+    "general.generalSection_3.generalGroup_3S_1.Fparam":
+    {
+        name: "Шестой тестовый параметр",
+        type: "Switch",
+        defaultValue: defaultSettings.general.generalSection_3.generalGroup_3S_1.Fparam
+    },
+    "general.generalSection_4.generalGroup_4S_1.Gparam":
+    {
+        name: "Седьмой тестовый параметр",
+        type: "Switch",
+        defaultValue: defaultSettings.general.generalSection_4.generalGroup_4S_1.Gparam
+    },
+    "general.generalSection_4.generalGroup_4S_1.Hparam":
+    {
+        name: "Восьмой тестовый параметр",
+        type: "Switch",
+        defaultValue: defaultSettings.general.generalSection_4.generalGroup_4S_1.Hparam
+    },
+
+    "audio.audioSection_1.audioGroup_1S_1.Iparam" :
+    {
+        name: "Девятый тестовый параметр",
+        type: "Switch",
+        defaultValue: defaultSettings.audio.audioSection_1.audioGroup_1S_1.Iparam
+    },
+    "audio.audioSection_1.audioGroup_1S_1.Jparam" :
+    {
+        name: "Десятый тестовый параметр",
+        type: "Switch",
+        defaultValue: defaultSettings.audio.audioSection_1.audioGroup_1S_1.Jparam
+    },
+    "audio.audioSection_2.audioGroup_2S_1.Kparam" :
+    {
+        name: "Одиннадцатый тестовый параметр",
+        type: "Switch",
+        defaultValue: defaultSettings.audio.audioSection_2.audioGroup_2S_1.Kparam
+    },
+    "audio.audioSection_2.audioGroup_2S_1.Lparam" :
+    {
+        name: "Двеннадцатый тестовый параметр",
+        type: "Switch",
+        defaultValue: defaultSettings.audio.audioSection_2.audioGroup_2S_1.Lparam
+    },
+
+    "video.videoSection_1.videoGroup_1S_1.Mparam" :
+    {
+        name: "Тринадцатый тестовый параметр",
+        type: "Switch",
+        defaultValue: defaultSettings.video.videoSection_1.videoGroup_1S_1.Mparam
+    },
+    "video.videoSection_1.videoGroup_1S_1.Nparam" :
+    {
+        name: "Четырнадцатый тестовый параметр",
+        type: "Switch",
+        defaultValue: defaultSettings.video.videoSection_1.videoGroup_1S_1.Nparam
+    },
+    "video.videoSection_2.videoGroup_2S_1.Oparam" :
+    {
+        name: "Пятнадцатый тестовый параметр",
+        type: "Switch",
+        defaultValue: defaultSettings.video.videoSection_2.videoGroup_2S_1.Oparam
+    },
+    "video.videoSection_2.videoGroup_2S_1.Pparam" :
+    {
+        name: "Шестнадцатый тестовый параметр",
+        type: "Switch",
+        defaultValue: defaultSettings.video.videoSection_2.videoGroup_2S_1.Pparam
     }
 };
