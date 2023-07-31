@@ -22,6 +22,11 @@
     height: 100%;
     overflow-x: hidden;
 }
+.sidebar-view-main-panel-without-sidebar
+{
+    flex: 1 1 1280px;
+    justify-content: center;
+}
 
 .sidebar-view-sidebar
 {
@@ -45,6 +50,11 @@
     box-sizing: border-box;
     flex: auto;
 }
+.sidebar-view-main-panel-without-sidebar .sidebar-view-main
+{
+    max-width: 1280px;
+}
+
 .sidebar-view-header
 {
     position: absolute;

@@ -123,7 +123,7 @@ export const SettingsLayer: React.FC<SettingsLayerProps> = ({ setShowSettings })
                         </div>
                     </div>
                 : <></>}
-                <div className="sidebar-view-main-panel" style={!showSidebar? {justifyContent: 'center'} : {}}>
+                <div className={showSidebar ? "sidebar-view-main-panel" : "sidebar-view-main-panel sidebar-view-main-panel-without-sidebar"}>
                     <div className="sidebar-view-main" >
                         <div className="sidebar-view-header">
                             {showSB}
