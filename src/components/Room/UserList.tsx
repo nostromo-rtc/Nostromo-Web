@@ -1,98 +1,14 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import "./UserList.css";
 
 import { Avatar, Divider } from "@mui/material";
 import { UserInfo } from "nostromo-shared/types/RoomTypes";
 import { HiHashtag, HiIdentification } from "react-icons/hi";
-import { getToggleFunc, moveFocus, moveFocusToListBoundary } from "../../Utils";
+import { getToggleFunc } from "../../Utils";
 import { AnchorPosition, Menu, MenuList } from "../Menu/Menu";
 import { MenuItemCheckbox, MenuItemSlider, MenuItemWithIcon, MenuSectionLabel } from "../Menu/MenuItems";
 
-type DivKeyboardEventHandler = React.KeyboardEventHandler<HTMLDivElement>;
 type DivClickEventHandler = React.MouseEventHandler<HTMLDivElement>;
-
-interface UserListProps
-{
-    transitionDuration: number;
-}
-
-export const UserList: React.FC<UserListProps> = ({
-    transitionDuration
-}) =>
-{
-    const [onlineUserList, setOnlineUserList] = useState<UserInfo[]>([]);
-    const [offlineUserList, setOfflineUserList] = useState<UserInfo[]>([]);
-    const listRef = useRef<HTMLDivElement>(null);
-
-    const handleListKeyDown: DivKeyboardEventHandler = (ev) =>
-    {
-        const list = listRef.current;
-
-        if (!list)
-        {
-            return;
-        }
-
-        const currentFocus = document.activeElement;
-
-        if (ev.key === "ArrowDown")
-        {
-            ev.preventDefault();
-            if (currentFocus === list)
-            {
-                moveFocusToListBoundary(list, true);
-            }
-            else
-            {
-                moveFocus(currentFocus, true);
-            }
-        }
-        else if (ev.key === "ArrowUp")
-        {
-            ev.preventDefault();
-            if (currentFocus === list)
-            {
-                moveFocusToListBoundary(list, false);
-            }
-            else
-            {
-                moveFocus(currentFocus, false);
-            }
-        }
-        else if (ev.key === "Home")
-        {
-            ev.preventDefault();
-            moveFocusToListBoundary(list, true);
-        }
-        else if (ev.key === "End")
-        {
-            ev.preventDefault();
-            moveFocusToListBoundary(list, false);
-        }
-    };
-
-    useEffect(() =>
-    {
-        const newUserList: UserInfo[] = [
-            { id: "id111", name: "a_name1" },
-            { id: "id222", name: "b_name2" },
-            { id: "id333", name: "c_name3" }
-        ];
-        setOnlineUserList(newUserList);
-    }, []);
-
-    return (
-        <div id="user-list-container"
-            tabIndex={0}
-            onKeyDown={handleListKeyDown}
-            role="list"
-            ref={listRef}
-        >
-            <UserListSection sectionLabel="В сети" list={onlineUserList} transitionDuration={transitionDuration} />
-            <UserListSection sectionLabel="Не в сети" list={offlineUserList} transitionDuration={transitionDuration} />
-        </div>
-    );
-};
 
 interface UserListSectionProps
 {
@@ -101,7 +17,7 @@ interface UserListSectionProps
     transitionDuration: number;
 }
 
-const UserListSection: React.FC<UserListSectionProps> = ({ sectionLabel, list, transitionDuration }) =>
+export const UserListSection: React.FC<UserListSectionProps> = ({ sectionLabel, list, transitionDuration }) =>
 {
     const EMPTY_LIST_LENGTH = 0;
 

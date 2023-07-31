@@ -1,6 +1,8 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import "./SettingsEditor.css";
 import { ParametersInfoMap, Settings } from "../../services/SettingsService";
+import { MenuItemCheckbox, MenuItemSlider } from "../Menu/MenuItems";
+import { getToggleFunc } from "../../Utils";
 
 interface SettingsEditorProps
 {
@@ -10,6 +12,9 @@ interface SettingsEditorProps
 
 export const SettingsEditor: FC<SettingsEditorProps> = ({settings, parametersInfoMap}) =>
 {
+    const DEFAULT_SLIDER_VALUE = 0;
+    const [valueSlider, setValueSlider] = useState<number>(DEFAULT_SLIDER_VALUE);
+    const [valueCheckbox, setValueCheckbox] = useState<boolean>(false);
     const settingsList: JSX.Element[] = [];
     for (const category in settings)
     {
@@ -35,7 +40,25 @@ export const SettingsEditor: FC<SettingsEditorProps> = ({settings, parametersInf
                     const parameterId = `${category}.${section}.${group}.${parameter}`;
                     console.log("parameter:", parameterId, groupMap[parameter]);
                     console.log("parameter render info:", parametersInfoMap[parameterId]);
-                    settingsList.push(<div>{parametersInfoMap[parameterId].name}</div>);
+                    
+                    if(parametersInfoMap[parameterId].type === "Switch")
+                    {
+                        settingsList.push(<MenuItemCheckbox
+                            text={parametersInfoMap[parameterId].name}
+                            isChecked={valueCheckbox}
+                            onClick={getToggleFunc(setValueCheckbox)}
+                        />);
+                    }
+                    else if(parametersInfoMap[parameterId].type === "Slider")
+                    {
+                        settingsList.push(<MenuItemSlider
+                            text={parametersInfoMap[parameterId].name + ": " + valueSlider.toString()}
+                            value={valueSlider}
+                            setValue={setValueSlider}
+                        />);
+                    }
+                    else
+                        settingsList.push(<div>{parametersInfoMap[parameterId].name}</div>);
                 }
             }
         }

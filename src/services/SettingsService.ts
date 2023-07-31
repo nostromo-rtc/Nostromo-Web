@@ -60,7 +60,7 @@ export interface Settings
 }
 
 /** Настройки по умолчанию. */
-const defaultSettings: Settings =
+export const defaultSettings: Settings =
 {
     general:
     {
@@ -210,7 +210,7 @@ export const parametersInfoMap: ParametersInfoMap = {
     "general.generalSection_1.generalGroup_1S_1.Bparam":
     {
         name: "Второй тестовый параметр",
-        type: "Switch",
+        type: "Slider",
         defaultValue: defaultSettings.general.generalSection_1.generalGroup_1S_1.Bparam
     },
     "general.generalSection_2.generalGroup_2S_1.Cparam":

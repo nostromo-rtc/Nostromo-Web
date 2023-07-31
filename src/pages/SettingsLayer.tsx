@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 
 import "../App.css";
 import "./SettingsLayer.css";
@@ -10,6 +10,7 @@ import { Tooltip } from '../components/Tooltip';
 import { TfiMenu } from "react-icons/tfi";
 import { IoMdClose } from "react-icons/io";
 import { Button } from "@mui/material";
+import { SettingsContext } from "../App";
 
 interface SettingsLayerProps
 {
@@ -80,7 +81,7 @@ export const SettingsLayer: React.FC<SettingsLayerProps> = ({ setShowSettings })
         }
     }, []);
 
-    /** Показывать ли placeholder в поле для ввода. */
+    /** Показать sidebar/Скрыть sidebar */
     const [showSidebar, setShowSidebar] = useState(true);
     /** Кнопка для скрытия/раскрытия sidebar */
     const showSB = (
@@ -106,6 +107,7 @@ export const SettingsLayer: React.FC<SettingsLayerProps> = ({ setShowSettings })
             </div>
         </Tooltip>
     );
+    const settingsContext = useContext(SettingsContext);
     return (
         <div id="layer-settings"
             className="layer"
@@ -114,20 +116,20 @@ export const SettingsLayer: React.FC<SettingsLayerProps> = ({ setShowSettings })
             ref={layerRef}
         >
             <FocusTrap>
-                <div className="sidebar-view-sidebar-panel">
-                    {showSidebar?
+                {showSidebar?
+                    <div className="sidebar-view-sidebar-panel">
                         <div className="sidebar-view-sidebar">
-                            <SettingsCategoryContainer settings={settingService.settings}/>
+                            <SettingsCategoryContainer settings={settingsContext}/>
                         </div>
-                    : <></>}
-                </div>
-                <div className="sidebar-view-main-panel">
-                    <div className="sidebar-view-main">
+                    </div>
+                : <></>}
+                <div className="sidebar-view-main-panel" style={!showSidebar? {justifyContent: 'center'} : {}}>
+                    <div className="sidebar-view-main" >
                         <div className="sidebar-view-header">
                             {showSB}
                             {exitSettings}
                         </div>
-                        <SettingsEditor settings={settingService.settings} parametersInfoMap={settingService.parametersInfoMap}/>
+                        <SettingsEditor settings={settingsContext} parametersInfoMap={settingService.parametersInfoMap}/>
                     </div>
                 </div>
             </FocusTrap>
