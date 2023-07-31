@@ -86,7 +86,7 @@ export const SettingsLayer: React.FC<SettingsLayerProps> = ({ setShowSettings })
     /** Кнопка для скрытия/раскрытия sidebar */
     const showSB = (
         <Tooltip title="show sidebar" fallbackPlacements={["bottom", "top"]}>
-            <div className="sidebar-btn-box left">
+            <div className="sidebar-btn-box">
                 <Button aria-label="show sidebar">
                     <TfiMenu className="sidebar-btn-icon"/>
                 </Button>
@@ -98,7 +98,7 @@ export const SettingsLayer: React.FC<SettingsLayerProps> = ({ setShowSettings })
     /** Кнопка для закрытия настроек */
     const exitSettings = (
         <Tooltip title="exit" fallbackPlacements={["bottom", "top"]}>
-            <div className="sidebar-btn-box right">
+            <div className="sidebar-btn-box">
                 <Button aria-label="exit">
                     <IoMdClose className="sidebar-btn-icon"/>
                 </Button>
@@ -127,6 +127,7 @@ export const SettingsLayer: React.FC<SettingsLayerProps> = ({ setShowSettings })
                     <div className="sidebar-view-main" >
                         <div className="sidebar-view-header">
                             {showSB}
+                            <div className="horizontal-expander"></div>
                             {exitSettings}
                         </div>
                         <SettingsEditor settings={settingsContext} parametersInfoMap={settingService.parametersInfoMap}/>
