@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import "../App.css";
 import "./SettingsLayer.css";
@@ -6,6 +6,10 @@ import { FocusTrap } from "../components/FocusTrap";
 import * as settingService from "../services/SettingsService";
 import { SettingsCategoryContainer } from "../components/Settings/SettingsCategoryContainer";
 import { SettingsEditor } from "../components/Settings/SettingsEditor";
+import { Tooltip } from '../components/Tooltip';
+import { TfiMenu } from "react-icons/tfi";
+import { IoMdClose } from "react-icons/io";
+import { Button } from "@mui/material";
 
 interface SettingsLayerProps
 {
@@ -76,7 +80,32 @@ export const SettingsLayer: React.FC<SettingsLayerProps> = ({ setShowSettings })
         }
     }, []);
 
-
+    /** Показывать ли placeholder в поле для ввода. */
+    const [showSidebar, setShowSidebar] = useState(true);
+    /** Кнопка для скрытия/раскрытия sidebar */
+    const showSB = (
+        <Tooltip title="show sidebar" fallbackPlacements={["bottom", "top"]}>
+            <div className="sidebar-btn-box left">
+                <Button aria-label="show sidebar">
+                    <TfiMenu className="sidebar-btn-icon"/>
+                </Button>
+                <div className="sidebar-btn-clickable-area non-selectable" 
+                    onClick={e => { setShowSidebar(!showSidebar) }} />
+            </div>
+        </Tooltip>
+    );
+    /** Кнопка для закрытия настроек */
+    const exitSettings = (
+        <Tooltip title="exit" fallbackPlacements={["bottom", "top"]}>
+            <div className="sidebar-btn-box right">
+                <Button aria-label="exit">
+                    <IoMdClose className="sidebar-btn-icon"/>
+                </Button>
+                <div className="sidebar-btn-clickable-area non-selectable" 
+                    onClick={e => { setShowSettings(false) }} />
+            </div>
+        </Tooltip>
+    );
     return (
         <div id="layer-settings"
             className="layer"
@@ -86,12 +115,18 @@ export const SettingsLayer: React.FC<SettingsLayerProps> = ({ setShowSettings })
         >
             <FocusTrap>
                 <div className="sidebar-view-sidebar-panel">
-                    <div className="sidebar-view-sidebar">
-                        <SettingsCategoryContainer settings={settingService.settings}/>
-                    </div>
+                    {showSidebar?
+                        <div className="sidebar-view-sidebar">
+                            <SettingsCategoryContainer settings={settingService.settings}/>
+                        </div>
+                    : <></>}
                 </div>
                 <div className="sidebar-view-main-panel">
                     <div className="sidebar-view-main">
+                        <div className="sidebar-view-header">
+                            {showSB}
+                            {exitSettings}
+                        </div>
                         <SettingsEditor settings={settingService.settings} parametersInfoMap={settingService.parametersInfoMap}/>
                     </div>
                 </div>
