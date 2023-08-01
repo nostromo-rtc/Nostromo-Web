@@ -5,7 +5,7 @@ import { moveFocus } from "../../Utils";
 import { MdCheckBox, MdCheckBoxOutlineBlank, MdInfoOutline, MdRadioButtonChecked, MdRadioButtonUnchecked } from "react-icons/md";
 import "./MenuItems.css";
 
-export type LiFocusHandler = React.FocusEventHandler<HTMLLIElement>;
+type LiFocusHandler = React.FocusEventHandler<HTMLLIElement>;
 type LiKeyboardEventHandler = React.KeyboardEventHandler<HTMLLIElement>;
 
 interface MenuItemWithIconProps extends MenuItemProps

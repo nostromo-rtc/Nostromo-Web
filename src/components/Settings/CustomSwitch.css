@@ -1,11 +1,6 @@
 /** Область для свитча (вместе с текстом) 
     TODO: Для текста свитча можно будет что-нибудь тут написать
     Если не нужен - можно удалить*/
-#custom-switch-area
-{
-    display: flex;
-    justify-content: center;
-}
 /* Основной контейнер для свитча */
 #custom-switch-container
 {
@@ -89,6 +84,26 @@
 .custom-switch-off .custom-switch-icon-off
 {
     opacity: 1;
+}
+
+.custom-switch-area
+{
+    display: flex;
+    line-height: normal;
+    align-items: baseline;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+.custom-switch-label
+{
+    display: inline-flex;
+    flex: auto;
+    padding: 0;
+    margin: 0;
+}
+.custom-switch-area:hover
+{
+    box-shadow: 0 0 2px white;
 }
 
 
