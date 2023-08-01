@@ -153,7 +153,7 @@ const UploadingFileCard: React.FC<UploadingFileCardProps> = ({
                     ? 'file-card-loading'
                     : ""
         )}>
-            <div className="file-card-btn-area">
+            <div className="file-card-btn-area non-selectable">
                 <div className="file-card-btn file-card-moveleft-btn" style={loading.progress !== ZERO_PROGRESS ? { visibility: 'hidden' } : {}}
                     onClick={handleClickMoveLeft}>{"<"}</div>
                 <div className="file-card-btn file-card-moveright-btn" style={loading.progress !== ZERO_PROGRESS ? { visibility: 'hidden' } : {}}
