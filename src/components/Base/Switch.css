@@ -2,7 +2,7 @@
     TODO: Для текста свитча можно будет что-нибудь тут написать
     Если не нужен - можно удалить*/
 /* Основной контейнер для свитча */
-#custom-switch-container
+.switch-container
 {
     display: inline-block;
     position: relative;
@@ -12,7 +12,7 @@
 }
 
 /* Скрыть checkbox */
-.custom-switch-input
+.switch-input
 {
     height: 0;
     width: 0;
@@ -20,7 +20,7 @@
 }
 
 /* Слайдер */
-.custom-switch-slider
+.switch-slider
 {
     position: absolute;
     cursor: pointer;
@@ -32,13 +32,13 @@
     background-color: #a39e9e;
 }
 /* Стиль для фокуса (небольшое свечение) */
-.custom-switch-input:focus + .custom-switch-slider
+.switch-input:focus + .switch-slider
 {
     box-shadow: 0 0 2px white;
 }
 
 /* Иконки */
-.custom-switch-icon
+.switch-icon
 {
     cursor: pointer;
     position: absolute;
@@ -52,41 +52,32 @@
     -webkit-transition: 0.3s;
     -moz-transition: 0.3s;
 }
-.custom-switch-icon-on
+.switch-icon-on
 {
     left: 22px;
 }
-.custom-switch-icon-off
+.switch-icon-off
 {
     left: 3px;
 }
-.custom-switch-on
+.switch-on
 {
     background-color: #10a84a;
 }
-.custom-switch-off
+.switch-off
 {
     background-color: #a39e9e;
 }
-.custom-switch-on .custom-switch-icon-off
+.switch-on .switch-icon-off
 {
     opacity: 0;
 }
-.custom-switch-on .custom-switch-icon-on
-{
-    opacity: 1;
-}
-.custom-switch-off .custom-switch-icon-on
+.switch-off .switch-icon-on
 {
     opacity: 0;
 }
 
-.custom-switch-off .custom-switch-icon-off
-{
-    opacity: 1;
-}
-
-.custom-switch-area
+.switch-area
 {
     display: flex;
     line-height: normal;
@@ -94,14 +85,14 @@
     padding-top: 8px;
     padding-bottom: 8px;
 }
-.custom-switch-label
+.switch-label
 {
     display: inline-flex;
     flex: auto;
     padding: 0;
     margin: 0;
 }
-.custom-switch-area:hover
+.switch-area:hover
 {
     box-shadow: 0 0 2px white;
 }

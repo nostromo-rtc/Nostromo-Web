@@ -1,18 +1,18 @@
 import { FC, useRef, useState } from "react";
-import "./CustomSwitch.css";
+import "./Switch.css";
 import { HiOutlineCheckCircle } from "react-icons/hi";
 import {RxCrossCircled} from "react-icons/rx"
 import { getToggleFunc, moveFocus } from "../../Utils";
 
 /* TODO: Доделать с пропсами */
-interface CustomSwitchProps
+interface SwitchProps
 {
     text: string;
     isChecked: boolean;
     onChange: (e: boolean) => void;
 }
 
-export const CustomSwitch: FC = () =>
+export const Switch: FC = () =>
 {
     const [value, setValue] = useState<boolean>(false);
     const switchRef = useRef<HTMLInputElement>(null);
@@ -55,19 +55,19 @@ export const CustomSwitch: FC = () =>
         }
     };
     return (
-        <div className="custom-switch-area"
+        <div className="switch-area"
             ref={itemRef}
             onFocus={handleFocus}
             onKeyDown={handleKeyDown}>
-            <p className="custom-switch-label text-wrap">Текст</p>
-            <label id="custom-switch-container">
-                <input className="custom-switch-input"
+            <p className="switch-label text-wrap">Текст</p>
+            <label className="switch-container">
+                <input className="switch-input"
                     type="checkbox"
                     onChange={getToggleFunc(setValue)}
                     ref={switchRef} />
-                <span className={"custom-switch-slider" + ( value? " custom-switch-on" : " custom-switch-off" )}>
-                    <HiOutlineCheckCircle className="custom-switch-icon custom-switch-icon-on" />
-                    <RxCrossCircled className="custom-switch-icon custom-switch-icon-off" />
+                <span className={"switch-slider" + ( value? " switch-on" : " switch-off" )}>
+                    <HiOutlineCheckCircle className="switch-icon switch-icon-on" />
+                    <RxCrossCircled className="switch-icon switch-icon-off" />
                 </span>
             </label>
         </div>
