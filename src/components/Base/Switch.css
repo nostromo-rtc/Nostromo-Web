@@ -1,3 +1,12 @@
+.switch-area
+{
+    cursor: pointer;
+    display: flex;
+    line-height: normal;
+    align-items: center;
+    justify-content: center;
+}
+
 /** Область для свитча (вместе с текстом) 
     TODO: Для текста свитча можно будет что-нибудь тут написать
     Если не нужен - можно удалить*/
@@ -40,7 +49,6 @@
 /* Иконки */
 .switch-icon
 {
-    cursor: pointer;
     position: absolute;
     width: 20px;
     height: 20px;
@@ -77,14 +85,6 @@
     opacity: 0;
 }
 
-.switch-area
-{
-    display: flex;
-    line-height: normal;
-    align-items: baseline;
-    padding-top: 8px;
-    padding-bottom: 8px;
-}
 .switch-label
 {
     display: inline-flex;
@@ -92,9 +92,3 @@
     padding: 0;
     margin: 0;
 }
-.switch-area:hover
-{
-    box-shadow: 0 0 2px white;
-}
-
-

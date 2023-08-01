@@ -1,65 +1,61 @@
-import { FC, useRef, useState } from "react";
+import { forwardRef, KeyboardEventHandler, MouseEventHandler, useImperativeHandle, useRef, useState } from "react";
 import "./Switch.css";
 import { HiOutlineCheckCircle } from "react-icons/hi";
 import {RxCrossCircled} from "react-icons/rx"
-import { getToggleFunc, moveFocus } from "../../Utils";
+import { getToggleFunc } from "../../Utils";
+
+export interface SwitchHandlers
+{
+    handleKeyDown: KeyboardEventHandler<HTMLDivElement>;
+}
 
 /* TODO: Доделать с пропсами */
 interface SwitchProps
 {
-    text: string;
-    isChecked: boolean;
-    onChange: (e: boolean) => void;
+    label?: string;
+    isChecked?: boolean;
 }
 
-export const Switch: FC = () =>
+export const Switch = forwardRef<SwitchHandlers, SwitchProps>((props, ref) =>
 {
     const [value, setValue] = useState<boolean>(false);
     const switchRef = useRef<HTMLInputElement>(null);
     const itemRef = useRef<HTMLDivElement>(null);
-    const handleChange = (event: Event, newValue: boolean): void =>
-    {
-        //onChange(newValue);
-    };
-    // Пробрасываем фокус на input внутри слайдера, при попадании фокуса на этот элемент меню.
-    const handleFocus: React.FocusEventHandler<HTMLDivElement> = (ev) =>
-    {
-        if (!switchRef.current)
-        {
-            return;
-        }
-
-        ev.preventDefault();
-        const input = switchRef.current.querySelector("input");
-        input?.focus();
-    };
-    // Переопределение клавиш для SliderItem.
-    // Стрелки влево-вправо - регулируют значение слайдера (это дефолтное поведение).
-    // Кнопка Escape - закрыть меню (путем автоматической передачи события выше к меню).
-    // Стрелки вверх-вниз - переход к следующему/предыдущему элементу в списке MenuList (вручную).
-    const handleKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (ev) =>
-    {
-        if (ev.key !== "ArrowLeft" && ev.key !== "ArrowRight" && ev.key !== "Escape")
+    
+    useImperativeHandle(ref, () => ({
+        handleKeyDown(ev)
         {
             ev.preventDefault();
             ev.stopPropagation();
+            if (itemRef.current)
+            {
+                if (ev.key === "ArrowLeft")
+                {
+                    setValue(false)
+                }
+                else if (ev.key === "ArrowRight")
+                {
+                    setValue(true)
+                }
+                else if (ev.key === " " || ev.key === "Enter")
+                {
+                    setValue(!value)
+                }
+            }
         }
+    }));
 
-        if (ev.key === "ArrowDown" && itemRef.current)
-        {
-            moveFocus(itemRef.current, true);
-        }
-        else if (ev.key === "ArrowUp" && itemRef.current)
-        {
-            moveFocus(itemRef.current, false);
-        }
-    };
+    const handleClick : React.MouseEventHandler<HTMLDivElement> = () =>
+    {
+        setValue(!value)
+    }
+
     return (
         <div className="switch-area"
+            tabIndex={0}
             ref={itemRef}
-            onFocus={handleFocus}
-            onKeyDown={handleKeyDown}>
-            <p className="switch-label text-wrap">Текст</p>
+            onClick={handleClick}>
+            <div className="switch-label text-wrap">{props.label !== undefined ? props.label : "test"}</div>
             <label className="switch-container">
                 <input className="switch-input"
                     type="checkbox"
@@ -73,4 +69,4 @@ export const Switch: FC = () =>
         </div>
         
     );
-};
+});

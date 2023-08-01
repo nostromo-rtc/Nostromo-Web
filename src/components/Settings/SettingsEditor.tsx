@@ -4,6 +4,7 @@ import { Group, ParametersInfoMap, Settings } from "../../services/SettingsServi
 import { MenuItemCheckbox, MenuItemSlider } from "../Menu/MenuItems";
 import { getToggleFunc } from "../../Utils";
 import { Switch } from "../Base/Switch";
+import { ListItemSwitch } from "../Base/ListItems";
 
 /* TODO: Переделать под сеттер */
 interface SettingsEditorProps
@@ -47,7 +48,7 @@ export const SettingsEditor: FC<SettingsEditorProps> = ({settings, parametersInf
                     
                     if(parametersInfoMap[parameterId].type === "Switch")
                     {
-                        settingsList.push(<Switch />);
+                        settingsList.push(<ListItemSwitch label={parametersInfoMap[parameterId].name} />);
                         /*settingsList.push(<MenuItemCheckbox
                             text={parametersInfoMap[parameterId].name}
                             isChecked={groupMap[parameter] === true? true : false}
