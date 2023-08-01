@@ -222,7 +222,7 @@ export const parametersInfoMap: ParametersInfoMap = {
     "general.generalSection_2.generalGroup_2S_1.Dparam":
     {
         name: "Четвертый тестовый параметр",
-        type: "Switch",
+        type: "Slider",
         defaultValue: defaultSettings.general.generalSection_2.generalGroup_2S_1.Dparam
     },
     "general.generalSection_3.generalGroup_3S_1.Eparam":
