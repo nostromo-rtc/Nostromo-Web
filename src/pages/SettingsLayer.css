@@ -21,6 +21,7 @@
     justify-content: flex-start;
     height: 100%;
     overflow-x: hidden;
+    overflow-y: auto;
 }
 .sidebar-view-main-panel-without-sidebar
 {
@@ -49,6 +50,7 @@
     padding: 20px;
     box-sizing: border-box;
     flex: auto;
+    height: max-content;
 }
 .sidebar-view-main-panel-without-sidebar .sidebar-view-main
 {
