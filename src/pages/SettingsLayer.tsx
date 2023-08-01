@@ -81,56 +81,59 @@ export const SettingsLayer: React.FC<SettingsLayerProps> = ({ setShowSettings })
         }
     }, []);
 
-    /** Показать sidebar/Скрыть sidebar */
+    /** Показать/скрыть sidebar */
     const [showSidebar, setShowSidebar] = useState(true);
     /** Кнопка для скрытия/раскрытия sidebar */
-    const showSB = (
-        <Tooltip title="show sidebar" fallbackPlacements={["bottom", "top"]}>
-            <div className="sidebar-btn-box">
-                <Button aria-label="show sidebar">
-                    <TfiMenu className="sidebar-btn-icon"/>
-                </Button>
-                <div className="sidebar-btn-clickable-area non-selectable" 
-                    onClick={e => { setShowSidebar(!showSidebar) }} />
-            </div>
+    const showSidebarBtn = (
+        <Tooltip title={showSidebar ? "Скрыть боковую панель" : "Показать боковую панель"}>
+            <Button
+                className="sidebar-btn"
+                aria-label="Show/hide sidebar"
+                onClick={ev => { setShowSidebar(prev => !prev); }}
+            >
+                <TfiMenu className="sidebar-btn-icon" />
+            </Button>
         </Tooltip>
     );
     /** Кнопка для закрытия настроек */
-    const exitSettings = (
-        <Tooltip title="exit" fallbackPlacements={["bottom", "top"]}>
-            <div className="sidebar-btn-box">
-                <Button aria-label="exit">
-                    <IoMdClose className="sidebar-btn-icon"/>
-                </Button>
-                <div className="sidebar-btn-clickable-area non-selectable" 
-                    onClick={e => { setShowSettings(false) }} />
-            </div>
+    const exitSettingsBtn = (
+        <Tooltip title="Закрыть настройки">
+            <Button
+                className="sidebar-btn"
+                aria-label="Exit settings"
+                onClick={ev => { setShowSettings(false); }}
+            >
+                <IoMdClose className="sidebar-btn-icon" />
+            </Button>
         </Tooltip>
     );
+
     const settingsContext = useContext(SettingsContext);
+
     return (
         <div id="layer-settings"
             className="layer"
-            
             tabIndex={-1}
             ref={layerRef}
         >
             <FocusTrap>
-                {showSidebar?
+                {showSidebar ?
                     <div className="sidebar-view-sidebar-panel">
                         <div className="sidebar-view-sidebar">
-                            <SettingsCategoryContainer settings={settingsContext}/>
+                            <SettingsCategoryContainer settings={settingsContext} />
                         </div>
                     </div>
-                : <></>}
+                    : <></>}
                 <div className={showSidebar ? "sidebar-view-main-panel" : "sidebar-view-main-panel sidebar-view-main-panel-without-sidebar"}>
-                    <div className="sidebar-view-main" >
-                        <div className="sidebar-view-header">
-                            {showSB}
-                            <div className="horizontal-expander"></div>
-                            {exitSettings}
+                    <div className="sidebar-view-header sidebar-view-main-width">
+                        {showSidebarBtn}
+                        <div className="horizontal-expander"></div>
+                        {exitSettingsBtn}
+                    </div>
+                    <div className="sidebar-view-main-scrollable-area">
+                        <div className="sidebar-view-main sidebar-view-main-width">
+                            <SettingsEditor settings={settingsContext} parametersInfoMap={settingService.parametersInfoMap} />
                         </div>
-                        <SettingsEditor settings={settingsContext} parametersInfoMap={settingService.parametersInfoMap}/>
                     </div>
                 </div>
             </FocusTrap>
