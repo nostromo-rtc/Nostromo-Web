@@ -133,9 +133,7 @@ export const SettingsLayer: React.FC<SettingsLayerProps> = ({ setShowSettings })
                     <div className="sidebar-view-main-scrollable-area" tabIndex={-1}>
                         {/* TODO: использовать тут вместо обычного div, компонент List
                             чтобы работала навигация при фокусе на нем (кнопки Home, End и стрелки), и так далее. */}
-                        <div className="sidebar-view-main sidebar-view-main-width" tabIndex={0}>
-                            <SettingsParametersList settings={settingsContext} parametersInfoMap={settingService.parametersInfoMap} />
-                        </div>
+                        <SettingsParametersList className="sidebar-view-main sidebar-view-main-width" settings={settingsContext} parametersInfoMap={settingService.parametersInfoMap} />
                     </div>
                 </div>
             </FocusTrap>

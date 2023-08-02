@@ -16,6 +16,7 @@ export const ListItem: FC<PropsWithChildren<ListItemProps>> = ({children, onKeyD
     const itemRef = useRef<HTMLDivElement>(null);
     const handleKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (ev) =>
     {
+        itemRef.current?.focus();
         if (onKeyDown !== undefined)
         {
             onKeyDown(ev);

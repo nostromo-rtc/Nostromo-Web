@@ -7,7 +7,7 @@ import { ListItemSwitch } from "../Base/List/ListItems";
 import { List } from "../Base/List/List";
 
 /* TODO: Переделать под сеттер */
-interface SettingsParametersListProps
+interface SettingsParametersListProps extends React.HTMLAttributes<HTMLDivElement>
 {
     settings: Settings;
     parametersInfoMap: ParametersInfoMap;
@@ -28,7 +28,7 @@ const handleSlider = (group: Group, param: string, val: number): void =>
 {
     group[param] = val;
 };
-export const SettingsParametersList: FC<SettingsParametersListProps> = ({ settings, parametersInfoMap }) =>
+export const SettingsParametersList: FC<SettingsParametersListProps> = ({ settings, parametersInfoMap, ...props}) =>
 {
     const RENDER_VALUE = 0;
     const [render, setRender] = useState<number>(RENDER_VALUE);
@@ -86,7 +86,7 @@ export const SettingsParametersList: FC<SettingsParametersListProps> = ({ settin
             }
         }
     }
-    settingsList.push(<List>{settingItemsList}</List>);
+    settingsList.push(<List {...props}>{settingItemsList}</List>);
     return (
         <>
             {settingsList}
