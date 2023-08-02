@@ -1,4 +1,4 @@
-import { PropsWithChildren, ReactNode, useRef } from "react";
+import { PropsWithChildren, ReactNode, useEffect, useRef } from "react";
 
 import { moveFocus, moveFocusToListBoundary } from "../../../Utils";
 
@@ -8,10 +8,38 @@ interface ListProps extends React.HTMLAttributes<HTMLDivElement>
 {
     children?: ReactNode;
 }
-export const List: React.FC<PropsWithChildren<ListProps>> = ({children, ...props}) =>
+export const List: React.FC<PropsWithChildren<ListProps>> = ({ children, ...props }) =>
 {
     const listRef = useRef<HTMLDivElement>(null);
 
+    // Первому элементу устанавливаем tabIndex='0'
+    // чтобы при навигации на Tab сфокусировалось на первый элемент списка.
+    useEffect(() => 
+    {
+        const list = listRef.current;
+
+        if (!list)
+        {
+            return;
+        }
+
+        const tabbableItem = list.querySelector("[tabindex='0']");
+
+        if (tabbableItem)
+        {
+            return;
+        }
+
+        const firstItem = list.querySelector("[tabindex='-1']");
+
+        if (firstItem)
+        {
+            (firstItem as HTMLElement).tabIndex = 0;
+        }
+
+    }, [listRef]);
+
+    // Навигация на стрелки и Home/End.
     const handleListKeyDown: DivKeyboardEventHandler = (ev) =>
     {
         const list = listRef.current;
@@ -61,14 +89,14 @@ export const List: React.FC<PropsWithChildren<ListProps>> = ({children, ...props
 
     return (
         <div
-            tabIndex={0}
+            tabIndex={-1}
             onKeyDown={handleListKeyDown}
             role="list"
             ref={listRef}
             {...props}
         >
-        {children !== undefined? children
-        :<></>}
+            {children !== undefined ? children
+                : <></>}
         </div>
     );
 };
