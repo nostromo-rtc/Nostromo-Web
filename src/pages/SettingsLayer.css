@@ -79,6 +79,11 @@
     height: max-content;
 }
 
+.sidebar-view-main:focus-visible
+{
+    outline-offset: -5px;
+}
+
 .sidebar-view-header
 {
     display: flex;

@@ -1,21 +1,39 @@
 .list-item-switch
 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
     padding-top: 8px;
     padding-bottom: 8px;
-    padding-left: 16px;    /* TODO: Отступы для совместимости с слайдером MUI. Как полностью перейдём на свои компоненты, надо будет удалить */
-    padding-right: 16px;   /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+    padding-left: 16px;
+    /* TODO: Отступы для совместимости с слайдером MUI. Как полностью перейдём на свои компоненты, надо будет удалить */
+    padding-right: 16px;
+    /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+}
+
+.list-item-switch-label-row
+{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: auto;
+    cursor: pointer;
 }
 
 .list-item-switch:hover
 {
     box-shadow: 0 0 2px white;
     border-radius: 5px;
-    background-color: rgba(255, 255, 255, 0.08); /* TODO: Отступы для совместимости с слайдером MUI. Как полностью перейдём на свои компоненты, надо будет удалить */
+    background-color: rgba(255, 255, 255, 0.08);
+    /* TODO: Отступы для совместимости с слайдером MUI. Как полностью перейдём на свои компоненты, надо будет удалить */
 }
+
 .list-item-switch:focus
 {
     box-shadow: 0 0 2px white;
     border-radius: 5px;
-    background-color: rgba(255, 255, 255, 0.08); /* TODO: Отступы для совместимости с слайдером MUI. Как полностью перейдём на свои компоненты, надо будет удалить */
+    background-color: rgba(255, 255, 255, 0.08);
+    /* TODO: Отступы для совместимости с слайдером MUI. Как полностью перейдём на свои компоненты, надо будет удалить */
     outline: none;
 }

@@ -1,42 +1,74 @@
-import { FC, useRef } from "react";
-import { Switch, SwitchHandlers } from "./Switch";
-import "./ListItems.css"
+import { Dispatch, FC, SetStateAction, useRef } from "react";
+import { Switch } from "./Switch";
+import "./ListItems.css";
 import { moveFocus } from "../../Utils";
 
 interface ListItemSwitchProps
 {
-    label?: string;
-    isChecked?: boolean;
+    text: string;
+    checked: boolean;
+    /** TODO: должно быть Dispatch<SetStateAction<boolean>>; */
+    setChecked: (val: boolean) => void;
 }
-export const ListItemSwitch : FC<ListItemSwitchProps> = ({label}) =>
+export const ListItemSwitch: FC<ListItemSwitchProps> = ({ text, checked, setChecked }) =>
 {
-    const divRef = useRef<HTMLInputElement>(null);
-    const switchRef = useRef<SwitchHandlers>(null);
-
-    // Пробрасываем фокус на input внутри слайдера, при попадании фокуса на этот элемент меню.
-    const handleFocus: React.FocusEventHandler<HTMLDivElement> = (ev) =>
-    {
-        if (divRef.current)
-        {
-            divRef.current.focus();
-        }
-    };
+    const itemRef = useRef<HTMLDivElement>(null);
 
     const handleKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (ev) =>
     {
-        if (ev.key === "ArrowDown" && divRef.current)
+        if (ev.code === "Space" || ev.code === "Enter")
         {
-            moveFocus(divRef.current, true);
+            ev.preventDefault();
+            //setChecked(prev => !prev);
+            setChecked(!checked);
         }
-        else if (ev.key === "ArrowUp" && divRef.current)
+        else if (ev.code === "ArrowRight")
         {
-            moveFocus(divRef.current, false);
+            ev.preventDefault();
+            setChecked(true);
         }
-        else if (switchRef.current)
+        else if (ev.code === "ArrowLeft")
         {
-            switchRef.current.handleKeyDown(ev);
+            ev.preventDefault();
+            console.log("alo?");
+            setChecked(false);
+        }
+
+        // Обработка кнопок для навигации.
+        // TODO: стоит навигацию поместить в более общий ListItem
+        // А в таких разновидностях, как ListItemSwitch 
+        // использовать внутри компонент ListItem
+        // и добавлять специфичные для Switch обработчики.
+        //
+        // Это можно сделать за счет того, что у ListItem будет prop с колбеком onKeyDown.
+        // В итоге в более общем ListItem в функции handleKeyDown будет реализована навигация 
+        // и вызов onKeyDown колбека из пропса.
+
+        if (ev.key === "ArrowDown" && itemRef.current)
+        {
+            moveFocus(itemRef.current, true);
+        }
+        else if (ev.key === "ArrowUp" && itemRef.current)
+        {
+            moveFocus(itemRef.current, false);
         }
     };
 
-    return <div ref={divRef} onFocus={handleFocus} tabIndex={0} onKeyDown={handleKeyDown} className="list-item-switch"><Switch ref={switchRef} label={label}/></div>
-}
+    const handleChange: React.ChangeEventHandler<HTMLInputElement> = (ev) => 
+    {
+        setChecked(ev.target.checked);
+    };
+
+    return (
+        <div ref={itemRef}
+            tabIndex={-1}
+            onKeyDown={handleKeyDown}
+            className="list-item-switch"
+        >
+            <label className="list-item-switch-label-row">
+                <p className="menu-item-label text-wrap">{text}</p>
+                <Switch checked={checked} onChange={handleChange} />
+            </label>
+        </div>
+    );
+};

@@ -130,8 +130,10 @@ export const SettingsLayer: React.FC<SettingsLayerProps> = ({ setShowSettings })
                         <div className="horizontal-expander"></div>
                         {exitSettingsBtn}
                     </div>
-                    <div className="sidebar-view-main-scrollable-area">
-                        <div className="sidebar-view-main sidebar-view-main-width">
+                    <div className="sidebar-view-main-scrollable-area" tabIndex={-1}>
+                        {/* TODO: использовать тут вместо обычного div, компонент List
+                            чтобы работала навигация при фокусе на нем (кнопки Home, End и стрелки), и так далее. */}
+                        <div className="sidebar-view-main sidebar-view-main-width" tabIndex={0}>
                             <SettingsEditor settings={settingsContext} parametersInfoMap={settingService.parametersInfoMap} />
                         </div>
                     </div>

@@ -12,14 +12,23 @@ interface SettingsEditorProps
     settings: Settings;
     parametersInfoMap: ParametersInfoMap;
 }
-const handleCheckbox = (group: Group, param: string) : void => {
+const handleCheckbox = (group: Group, param: string, val?: boolean): void =>
+{
     console.log("value: ", group[param]);
-    group[param] = group[param] === true? false : true;
-}
-const handleSlider = (group: Group, param: string, val: number) : void => {
+
+    if (val !== undefined)
+    {
+        group[param] = val;
+        return;
+    }
+
+    group[param] = group[param] === true ? false : true;
+};
+const handleSlider = (group: Group, param: string, val: number): void =>
+{
     group[param] = val;
-}
-export const SettingsEditor: FC<SettingsEditorProps> = ({settings, parametersInfoMap}) =>
+};
+export const SettingsEditor: FC<SettingsEditorProps> = ({ settings, parametersInfoMap }) =>
 {
     const RENDER_VALUE = 0;
     const [render, setRender] = useState<number>(RENDER_VALUE);
@@ -45,22 +54,27 @@ export const SettingsEditor: FC<SettingsEditorProps> = ({settings, parametersInf
                     const parameterId = `${category}.${section}.${group}.${parameter}`;
                     console.log("parameter:", parameterId, groupMap[parameter]);
                     console.log("parameter render info:", parametersInfoMap[parameterId]);
-                    
-                    if(parametersInfoMap[parameterId].type === "Switch")
+
+                    if (parametersInfoMap[parameterId].type === "Switch")
                     {
-                        settingsList.push(<ListItemSwitch label={parametersInfoMap[parameterId].name} />);
-                        /*settingsList.push(<MenuItemCheckbox
+                        settingsList.push(<ListItemSwitch
                             text={parametersInfoMap[parameterId].name}
-                            isChecked={groupMap[parameter] === true? true : false}
-                            onClick={() => { handleCheckbox(groupMap, parameter); setRender(RENDER_VALUE) }}
-                        />);*/
+                            checked={groupMap[parameter] === true ? true : false}
+                            setChecked={(val) =>
+                            {
+                                handleCheckbox(groupMap, parameter, val);
+                                // FIXME: просто чтобы заставить реакт перерендериться.
+                                // Надо вместо этой setRender реализовать с помощью useSyncExternalStore.
+                                setRender(Math.random());
+                            }}
+                        />);
                     }
-                    else if(parametersInfoMap[parameterId].type === "Slider")
+                    else if (parametersInfoMap[parameterId].type === "Slider")
                     {
                         settingsList.push(<MenuItemSlider
                             text={parametersInfoMap[parameterId].name + ": " + groupMap[parameter].toString()}
                             value={Number(groupMap[parameter])}
-                            setValue={(val) => { handleSlider(groupMap, parameter, val); setRender(val)}}
+                            setValue={(val) => { handleSlider(groupMap, parameter, val); setRender(val); }}
                         />);
                     }
                     else
