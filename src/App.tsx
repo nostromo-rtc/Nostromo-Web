@@ -5,7 +5,7 @@ import { createContext, useState } from "react";
 import { SettingsLayer } from "./pages/SettingsLayer";
 import { FocusTrap } from "./components/FocusTrap";
 import { MainLayer } from "./pages/MainLayer";
-import { Settings, defaultSettings } from "./services/SettingsService";
+import { SettingService } from "./services/SettingsService";
 
 const theme = createTheme({
     typography: {
@@ -17,7 +17,7 @@ const theme = createTheme({
 });
 
 // FIXME: Возможно нужно будет поменять тип контекста
-export const SettingsContext = createContext<Settings>(defaultSettings);
+export const SettingsContext = createContext<SettingService>(new SettingService());
 
 const App: React.FC = () =>
 {
@@ -31,7 +31,7 @@ const App: React.FC = () =>
         <BrowserRouter>
             <ThemeProvider theme={theme}>
                 <StyledEngineProvider injectFirst>
-                    <SettingsContext.Provider value={defaultSettings}>
+                    <SettingsContext.Provider value={new SettingService()}>
                         <div id="app">
                             <FocusTrap>
                                 <MainLayer setShowSettings={setShowSettings} />

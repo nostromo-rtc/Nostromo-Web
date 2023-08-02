@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import "../App.css";
 import "./SettingsLayer.css";
 import { FocusTrap } from "../components/FocusTrap";
-import * as settingService from "../services/SettingsService";
+import { parametersInfoMap, useSettings } from "../services/SettingsService";
 import { SettingsCategoryList } from "../components/Settings/SettingsCategoryList";
 import { SettingsParametersList } from "../components/Settings/SettingsParametersList";
 import { Tooltip } from '../components/Tooltip';
@@ -22,6 +22,8 @@ interface SettingsLayerProps
 // а конечной границей - кнопку выхода из настроек (её пока нет).
 export const SettingsLayer: React.FC<SettingsLayerProps> = ({ setShowSettings }) =>
 {
+    const settingsService = useContext(SettingsContext);
+    const settings = useSettings(settingsService);
     const layerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() =>
@@ -48,11 +50,11 @@ export const SettingsLayer: React.FC<SettingsLayerProps> = ({ setShowSettings })
     // FIXME: settingService не напрямую импортировать, а через React Context.
     useEffect(() =>
     {
-        for (const category in settingService.settings)
+        for (const category in settings)
         {
             console.log("category:", category);
 
-            const categoryMap = settingService.settings[category];
+            const categoryMap = settings[category];
 
             for (const section in categoryMap)
             {
@@ -74,7 +76,7 @@ export const SettingsLayer: React.FC<SettingsLayerProps> = ({ setShowSettings })
                         // для всех этих видов элементов.
                         const parameterId = `${category}.${section}.${group}.${parameter}`;
                         console.log("parameter:", parameterId, groupMap[parameter]);
-                        console.log("parameter render info:", settingService.parametersInfoMap[parameterId]);
+                        console.log("parameter render info:", parametersInfoMap[parameterId]);
                     }
                 }
             }
@@ -108,8 +110,6 @@ export const SettingsLayer: React.FC<SettingsLayerProps> = ({ setShowSettings })
         </Tooltip>
     );
 
-    const settingsContext = useContext(SettingsContext);
-
     return (
         <div id="layer-settings"
             className="layer"
@@ -120,7 +120,7 @@ export const SettingsLayer: React.FC<SettingsLayerProps> = ({ setShowSettings })
                 {showSidebar ?
                     <div className="sidebar-view-sidebar-panel">
                         <div className="sidebar-view-sidebar">
-                            <SettingsCategoryList settings={settingsContext} />
+                            <SettingsCategoryList settings={settings} />
                         </div>
                     </div>
                     : <></>}
@@ -133,7 +133,7 @@ export const SettingsLayer: React.FC<SettingsLayerProps> = ({ setShowSettings })
                     <div className="sidebar-view-main-scrollable-area" tabIndex={-1}>
                         {/* TODO: использовать тут вместо обычного div, компонент List
                             чтобы работала навигация при фокусе на нем (кнопки Home, End и стрелки), и так далее. */}
-                        <SettingsParametersList className="sidebar-view-main sidebar-view-main-width" settings={settingsContext} parametersInfoMap={settingService.parametersInfoMap} />
+                        <SettingsParametersList className="sidebar-view-main sidebar-view-main-width" settings={settings} parametersInfoMap={parametersInfoMap} />
                     </div>
                 </div>
             </FocusTrap>

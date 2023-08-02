@@ -1,7 +1,11 @@
+import { useSyncExternalStore } from "react";
+
 /* eslint-disable @typescript-eslint/naming-convention */
 export type ParameterType = "Select" | "Slider" | "Switch";
 export type ParameterValue = boolean | number | string;
+export const LOCAL_STORAGE_SETTINGS = "nostromo-settings";
 
+type SettingsListener = () => void;
 export interface ParameterInfo
 {
     name: string;
@@ -60,7 +64,7 @@ export interface Settings
 }
 
 /** Настройки по умолчанию. */
-export const defaultSettings: Settings =
+const defaultSettings: Settings =
 {
     general:
     {
@@ -172,15 +176,15 @@ export interface ParametersInfoMap
     "general.generalSection_4.generalGroup_4S_1.Gparam": ParameterInfo;
     "general.generalSection_4.generalGroup_4S_1.Hparam": ParameterInfo;
 
-    "audio.audioSection_1.audioGroup_1S_1.Iparam" : ParameterInfo;
-    "audio.audioSection_1.audioGroup_1S_1.Jparam" : ParameterInfo;
-    "audio.audioSection_2.audioGroup_2S_1.Kparam" : ParameterInfo;
-    "audio.audioSection_2.audioGroup_2S_1.Lparam" : ParameterInfo;
+    "audio.audioSection_1.audioGroup_1S_1.Iparam": ParameterInfo;
+    "audio.audioSection_1.audioGroup_1S_1.Jparam": ParameterInfo;
+    "audio.audioSection_2.audioGroup_2S_1.Kparam": ParameterInfo;
+    "audio.audioSection_2.audioGroup_2S_1.Lparam": ParameterInfo;
 
-    "video.videoSection_1.videoGroup_1S_1.Mparam" : ParameterInfo;
-    "video.videoSection_1.videoGroup_1S_1.Nparam" : ParameterInfo;
-    "video.videoSection_2.videoGroup_2S_1.Oparam" : ParameterInfo;
-    "video.videoSection_2.videoGroup_2S_1.Pparam" : ParameterInfo;
+    "video.videoSection_1.videoGroup_1S_1.Mparam": ParameterInfo;
+    "video.videoSection_1.videoGroup_1S_1.Nparam": ParameterInfo;
+    "video.videoSection_2.videoGroup_2S_1.Oparam": ParameterInfo;
+    "video.videoSection_2.videoGroup_2S_1.Pparam": ParameterInfo;
 }
 
 // TODO: такие же объекты нужно и для других видов элементов (категории, секции, группы).
@@ -252,53 +256,94 @@ export const parametersInfoMap: ParametersInfoMap = {
         defaultValue: defaultSettings.general.generalSection_4.generalGroup_4S_1.Hparam
     },
 
-    "audio.audioSection_1.audioGroup_1S_1.Iparam" :
+    "audio.audioSection_1.audioGroup_1S_1.Iparam":
     {
         name: "Девятый тестовый параметр",
         type: "Switch",
         defaultValue: defaultSettings.audio.audioSection_1.audioGroup_1S_1.Iparam
     },
-    "audio.audioSection_1.audioGroup_1S_1.Jparam" :
+    "audio.audioSection_1.audioGroup_1S_1.Jparam":
     {
         name: "Десятый тестовый параметр",
         type: "Switch",
         defaultValue: defaultSettings.audio.audioSection_1.audioGroup_1S_1.Jparam
     },
-    "audio.audioSection_2.audioGroup_2S_1.Kparam" :
+    "audio.audioSection_2.audioGroup_2S_1.Kparam":
     {
         name: "Одиннадцатый тестовый параметр",
         type: "Switch",
         defaultValue: defaultSettings.audio.audioSection_2.audioGroup_2S_1.Kparam
     },
-    "audio.audioSection_2.audioGroup_2S_1.Lparam" :
+    "audio.audioSection_2.audioGroup_2S_1.Lparam":
     {
         name: "Двеннадцатый тестовый параметр",
         type: "Switch",
         defaultValue: defaultSettings.audio.audioSection_2.audioGroup_2S_1.Lparam
     },
 
-    "video.videoSection_1.videoGroup_1S_1.Mparam" :
+    "video.videoSection_1.videoGroup_1S_1.Mparam":
     {
         name: "Тринадцатый тестовый параметр",
         type: "Switch",
         defaultValue: defaultSettings.video.videoSection_1.videoGroup_1S_1.Mparam
     },
-    "video.videoSection_1.videoGroup_1S_1.Nparam" :
+    "video.videoSection_1.videoGroup_1S_1.Nparam":
     {
         name: "Четырнадцатый тестовый параметр",
         type: "Switch",
         defaultValue: defaultSettings.video.videoSection_1.videoGroup_1S_1.Nparam
     },
-    "video.videoSection_2.videoGroup_2S_1.Oparam" :
+    "video.videoSection_2.videoGroup_2S_1.Oparam":
     {
         name: "Пятнадцатый тестовый параметр",
         type: "Switch",
         defaultValue: defaultSettings.video.videoSection_2.videoGroup_2S_1.Oparam
     },
-    "video.videoSection_2.videoGroup_2S_1.Pparam" :
+    "video.videoSection_2.videoGroup_2S_1.Pparam":
     {
         name: "Шестнадцатый тестовый параметр",
         type: "Switch",
         defaultValue: defaultSettings.video.videoSection_2.videoGroup_2S_1.Pparam
     }
 };
+
+export class SettingService
+{
+    private currentSettings: Settings = defaultSettings;
+    private listeners: SettingsListener[] = [];
+
+    public setSettings(newSettings: Settings): void
+    {
+        this.currentSettings = newSettings;
+        for (const listener of this.listeners)
+        {
+            console.log(this.currentSettings);
+            listener();
+        }
+    }
+    public addListener(listener: SettingsListener): void
+    {
+        this.listeners = [...this.listeners, listener];
+    }
+    public removeListener(listener: SettingsListener): void
+    {
+        this.listeners = this.listeners.filter(l => l !== listener);
+    }
+    public subscribe(listener: SettingsListener): () => void
+    {
+        this.addListener(listener);
+        return () => { this.removeListener(listener); };
+    }
+    public getSettingsSnapshot(): Settings
+    {
+        return this.currentSettings;
+    }
+}
+
+export function useSettings(service: SettingService): Settings
+{
+    return useSyncExternalStore(
+        (listener: () => void) => service.subscribe(listener),
+        () => service.getSettingsSnapshot()
+    );
+}
