@@ -1,17 +1,17 @@
 import { FC } from "react";
 import { Settings} from "../../services/SettingsService";
 
-import "./SettingsCategoryContainer.css";
-import { List } from "../Room/List";
+import "./SettingsCategoryList.css";
+import { List } from "../Base/List/List";
 import { MenuSectionLabel } from "../Menu/MenuItems";
 
 
-interface SettingsCategoryContainerProps
+interface SettingsCategoryListProps
 {
     settings: Settings;
 }
 
-export const SettingsCategoryContainer: FC<SettingsCategoryContainerProps> = ({settings}) =>
+export const SettingsCategoryList: FC<SettingsCategoryListProps> = ({settings}) =>
 {
     return (
         <List>

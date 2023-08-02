@@ -1,11 +1,14 @@
-import { PropsWithChildren, useRef } from "react";
-import "./UserList.css";
+import { PropsWithChildren, ReactNode, useRef } from "react";
 
-import { moveFocus, moveFocusToListBoundary } from "../../Utils";
+import { moveFocus, moveFocusToListBoundary } from "../../../Utils";
 
 type DivKeyboardEventHandler = React.KeyboardEventHandler<HTMLDivElement>;
 
-export const List: React.FC<PropsWithChildren> = (props) =>
+interface ListProps extends React.HTMLAttributes<HTMLDivElement>
+{
+    children?: ReactNode;
+}
+export const List: React.FC<PropsWithChildren<ListProps>> = ({children, ...props}) =>
 {
     const listRef = useRef<HTMLDivElement>(null);
 
@@ -57,13 +60,14 @@ export const List: React.FC<PropsWithChildren> = (props) =>
     };
 
     return (
-        <div id="user-list-container"
+        <div
             tabIndex={0}
             onKeyDown={handleListKeyDown}
             role="list"
             ref={listRef}
+            {...props}
         >
-        {props.children !== undefined? props.children
+        {children !== undefined? children
         :<></>}
         </div>
     );

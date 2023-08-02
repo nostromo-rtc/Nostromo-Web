@@ -191,6 +191,8 @@ export const parametersInfoMap: ParametersInfoMap = {
     {
         name: "Отображать неактивных участников",
         type: "Switch",
+        description: "ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddЭто тестовое описание... Ну в общем эта фича позволяет отображать участников, которые не активные. " +
+            "Ну ты понял крч, в названии вроде бы так и написано",
         defaultValue: defaultSettings.display.room.layout.displayInactiveVideos
     },
     "display.room.layout.displayLocalVideos":

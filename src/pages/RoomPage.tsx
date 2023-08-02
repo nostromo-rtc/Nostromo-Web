@@ -16,7 +16,7 @@ import { VideoLayout } from "../components/Room/VideoLayout";
 import "./RoomPage.css";
 import { DropArea } from "../components/Room/Chat/DropArea";
 import { DndVisibleContext } from "./MainLayer";
-import { List } from "../components/Room/List";
+import { List } from "../components/Base/List/List";
 import { UserInfo } from "nostromo-shared/types/RoomTypes";
 
 export enum SoundState

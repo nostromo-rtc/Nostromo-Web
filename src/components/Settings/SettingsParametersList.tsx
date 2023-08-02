@@ -1,13 +1,13 @@
-import { FC, useEffect, useState } from "react";
-import "./SettingsEditor.css";
+import { FC, useState } from "react";
+import "./SettingsParametersList.css";
 import { Group, ParametersInfoMap, Settings } from "../../services/SettingsService";
-import { MenuItemCheckbox, MenuItemSlider } from "../Menu/MenuItems";
+import { MenuItemSlider } from "../Menu/MenuItems";
 import { getToggleFunc } from "../../Utils";
-import { Switch } from "../Base/Switch";
-import { ListItemSwitch } from "../Base/ListItems";
+import { ListItemSwitch } from "../Base/List/ListItems";
+import { List } from "../Base/List/List";
 
 /* TODO: Переделать под сеттер */
-interface SettingsEditorProps
+interface SettingsParametersListProps
 {
     settings: Settings;
     parametersInfoMap: ParametersInfoMap;
@@ -28,22 +28,23 @@ const handleSlider = (group: Group, param: string, val: number): void =>
 {
     group[param] = val;
 };
-export const SettingsEditor: FC<SettingsEditorProps> = ({ settings, parametersInfoMap }) =>
+export const SettingsParametersList: FC<SettingsParametersListProps> = ({ settings, parametersInfoMap }) =>
 {
     const RENDER_VALUE = 0;
     const [render, setRender] = useState<number>(RENDER_VALUE);
     const settingsList: JSX.Element[] = [];
+    const settingItemsList: JSX.Element[] = [];
     for (const category in settings)
     {
-        settingsList.push(<h1>{category}</h1>);
+        settingItemsList.push(<h1>{category}</h1>);
         const categoryMap = settings[category];
         for (const section in categoryMap)
         {
-            settingsList.push(<h3>{section}</h3>);
+            settingItemsList.push(<h3>{section}</h3>);
             const sectionMap = categoryMap[section];
             for (const group in sectionMap)
             {
-                settingsList.push(<h5>{group}</h5>);
+                settingItemsList.push(<h5>{group}</h5>);
                 const groupMap = sectionMap[group];
                 for (const parameter in groupMap)
                 {
@@ -57,7 +58,9 @@ export const SettingsEditor: FC<SettingsEditorProps> = ({ settings, parametersIn
 
                     if (parametersInfoMap[parameterId].type === "Switch")
                     {
-                        settingsList.push(<ListItemSwitch
+                        settingItemsList.push(<ListItemSwitch
+                            viewSeparator={true}
+                            description={parametersInfoMap[parameterId].description}
                             text={parametersInfoMap[parameterId].name}
                             checked={groupMap[parameter] === true ? true : false}
                             setChecked={(val) =>
@@ -71,18 +74,19 @@ export const SettingsEditor: FC<SettingsEditorProps> = ({ settings, parametersIn
                     }
                     else if (parametersInfoMap[parameterId].type === "Slider")
                     {
-                        settingsList.push(<MenuItemSlider
+                        settingItemsList.push(<MenuItemSlider
                             text={parametersInfoMap[parameterId].name + ": " + groupMap[parameter].toString()}
                             value={Number(groupMap[parameter])}
                             setValue={(val) => { handleSlider(groupMap, parameter, val); setRender(val); }}
                         />);
                     }
                     else
-                        settingsList.push(<div>{parametersInfoMap[parameterId].name}</div>);
+                        settingItemsList.push(<div>{parametersInfoMap[parameterId].name}</div>);
                 }
             }
         }
     }
+    settingsList.push(<List>{settingItemsList}</List>);
     return (
         <>
             {settingsList}

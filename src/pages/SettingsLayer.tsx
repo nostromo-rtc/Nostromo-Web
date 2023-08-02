@@ -4,8 +4,8 @@ import "../App.css";
 import "./SettingsLayer.css";
 import { FocusTrap } from "../components/FocusTrap";
 import * as settingService from "../services/SettingsService";
-import { SettingsCategoryContainer } from "../components/Settings/SettingsCategoryContainer";
-import { SettingsEditor } from "../components/Settings/SettingsEditor";
+import { SettingsCategoryList } from "../components/Settings/SettingsCategoryList";
+import { SettingsParametersList } from "../components/Settings/SettingsParametersList";
 import { Tooltip } from '../components/Tooltip';
 import { TfiMenu } from "react-icons/tfi";
 import { IoMdClose } from "react-icons/io";
@@ -120,7 +120,7 @@ export const SettingsLayer: React.FC<SettingsLayerProps> = ({ setShowSettings })
                 {showSidebar ?
                     <div className="sidebar-view-sidebar-panel">
                         <div className="sidebar-view-sidebar">
-                            <SettingsCategoryContainer settings={settingsContext} />
+                            <SettingsCategoryList settings={settingsContext} />
                         </div>
                     </div>
                     : <></>}
@@ -134,7 +134,7 @@ export const SettingsLayer: React.FC<SettingsLayerProps> = ({ setShowSettings })
                         {/* TODO: использовать тут вместо обычного div, компонент List
                             чтобы работала навигация при фокусе на нем (кнопки Home, End и стрелки), и так далее. */}
                         <div className="sidebar-view-main sidebar-view-main-width" tabIndex={0}>
-                            <SettingsEditor settings={settingsContext} parametersInfoMap={settingService.parametersInfoMap} />
+                            <SettingsParametersList settings={settingsContext} parametersInfoMap={settingService.parametersInfoMap} />
                         </div>
                     </div>
                 </div>
