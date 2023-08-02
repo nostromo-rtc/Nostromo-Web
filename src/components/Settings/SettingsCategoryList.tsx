@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { Settings} from "../../services/SettingsService";
+import { Settings } from "../../services/SettingsService";
 
 import "./SettingsCategoryList.css";
 import { List } from "../Base/List/List";
@@ -11,10 +11,10 @@ interface SettingsCategoryListProps
     settings: Settings;
 }
 
-export const SettingsCategoryList: FC<SettingsCategoryListProps> = ({settings}) =>
+export const SettingsCategoryList: FC<SettingsCategoryListProps> = ({ settings }) =>
 {
     return (
-        <List>
+        <List id="settings-category-list">
             <ListSection sectionLabel="Настройки" list={settings} />
         </List>
     );
@@ -32,7 +32,7 @@ const ListSection: React.FC<ListSectionProps> = ({ sectionLabel, list }) =>
     const categoryList: JSX.Element[] = [];
     for (const category in list)
     {
-        categoryList.push(<ListItem category={category}/>);
+        categoryList.push(<ListItem category={category} />);
     }
     const content = <>
         <MenuSectionLabel text={`${sectionLabel}`} />

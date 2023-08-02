@@ -12,6 +12,7 @@
     justify-content: flex-end;
     flex: 1 0 280px;
     height: 100%;
+    overflow-y: auto;
 }
 
 .sidebar-view-main-panel
@@ -46,12 +47,15 @@
 
 .sidebar-view-sidebar
 {
+    display: flex;
     width: 280px;
     background-color: #2f3236;
     overflow-x: hidden;
     text-overflow: ellipsis;
-    padding: 20px;
+    padding: 20px 10px;
     box-sizing: border-box;
+    height: max-content;
+    min-height: 100%;
 }
 
 .sidebar-view-main-width
