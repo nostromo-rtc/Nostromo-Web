@@ -1,4 +1,4 @@
-import { Dispatch, FC, PropsWithChildren, ReactNode, SetStateAction, useRef } from "react";
+import { FC, PropsWithChildren, ReactNode, useRef } from "react";
 import { Switch } from "../Switch";
 import "./ListItems.css";
 import { isEmptyString } from "../../../Utils";
@@ -44,7 +44,7 @@ export const ListItem: FC<PropsWithChildren<ListItemProps>> = ({
         >
             {children}
             {isValidDescription ? <p className="list-item-description">{description}</p> : <></>}
-            {showSeparator === true ? <hr className="list-item-separator"></hr> : <></>}
+            {showSeparator ? <hr className="list-item-separator"></hr> : <></>}
         </div>
     );
 };
