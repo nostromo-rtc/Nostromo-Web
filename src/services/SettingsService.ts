@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from "react";
+import { cloneObject } from "../Utils";
 
 /* eslint-disable @typescript-eslint/naming-convention */
 export type ParameterType = "Input" | "Select" | "Slider" | "Switch";
@@ -6,6 +7,8 @@ export type ParameterValue = boolean | number | string;
 export const LOCAL_STORAGE_SETTINGS = "nostromo-settings";
 
 type SettingsListener = () => void;
+type SettingsSetCallback = (prev : Settings) => void;
+
 export interface ParameterInfo
 {
     name: string;
@@ -311,33 +314,72 @@ export const parametersInfoMap: ParametersInfoMap = {
 export class SettingService
 {
     private currentSettings: Settings = defaultSettings;
+    private shapshot: Settings = defaultSettings;
     private listeners: SettingsListener[] = [];
 
-    public setSettings(newSettings: Settings): void
+    public constructor()
     {
-        this.currentSettings = newSettings;
+        const storedSettings = localStorage.getItem(LOCAL_STORAGE_SETTINGS);
+        if (storedSettings === null)
+        {
+            this.restoreToDefault();
+            this.saveSnapshot();
+            return;
+        }
+
+        try
+        {
+            this.currentSettings = JSON.parse(storedSettings) as Settings;
+        }
+        catch
+        {
+            this.restoreToDefault();
+        }
+        this.saveSnapshot();
+    }
+
+    public restoreToDefault() : void
+    {
+        this.currentSettings = cloneObject(defaultSettings);
+        this.saveSnapshot();
+        localStorage.setItem(LOCAL_STORAGE_SETTINGS, JSON.stringify(this.currentSettings));
+    }
+
+    public setSettings(callback : SettingsSetCallback): void
+    {
+        callback(this.currentSettings);
+        this.saveSnapshot();
+        localStorage.setItem(LOCAL_STORAGE_SETTINGS, JSON.stringify(this.currentSettings));
         for (const listener of this.listeners)
         {
-            console.log(this.currentSettings);
             listener();
         }
     }
+
     public addListener(listener: SettingsListener): void
     {
         this.listeners = [...this.listeners, listener];
     }
+
     public removeListener(listener: SettingsListener): void
     {
         this.listeners = this.listeners.filter(l => l !== listener);
     }
+
     public subscribe(listener: SettingsListener): () => void
     {
         this.addListener(listener);
         return () => { this.removeListener(listener); };
     }
+
     public getSettingsSnapshot(): Settings
     {
-        return this.currentSettings;
+        return this.shapshot;
+    }
+
+    private saveSnapshot() : void
+    {
+        this.shapshot = cloneObject(this.currentSettings);
     }
 }
 

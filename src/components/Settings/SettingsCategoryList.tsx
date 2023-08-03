@@ -1,18 +1,15 @@
-import { FC } from "react";
-import { Settings } from "../../services/SettingsService";
+import { FC, useContext } from "react";
+import { Settings, useSettings } from "../../services/SettingsService";
 
 import "./SettingsCategoryList.css";
 import { List } from "../Base/List/List";
 import { MenuSectionLabel } from "../Menu/MenuItems";
+import { SettingsContext } from "../../App";
 
-
-interface SettingsCategoryListProps
+export const SettingsCategoryList: FC = () =>
 {
-    settings: Settings;
-}
-
-export const SettingsCategoryList: FC<SettingsCategoryListProps> = ({ settings }) =>
-{
+    const settingsService = useContext(SettingsContext);
+    const settings = useSettings(settingsService);
     return (
         <List id="settings-category-list">
             <ListSection sectionLabel="Настройки" list={settings} />

@@ -1,41 +1,39 @@
-import { FC, useState } from "react";
+import { FC, useContext } from "react";
 import "./SettingsParametersList.css";
-import { Group, ParametersInfoMap, Settings } from "../../services/SettingsService";
+import { ParametersInfoMap, Settings, useSettings } from "../../services/SettingsService";
 import { MenuItemSlider } from "../Menu/MenuItems";
-import { getToggleFunc } from "../../Utils";
 import { ListItemInput, ListItemSelect, ListItemSwitch } from "../Base/List/ListItems";
 import { List } from "../Base/List/List";
-import { Input } from "../Base/Input";
-import { Select } from "../Base/Select";
+import { SettingsContext } from "../../App";
 
-/* TODO: Переделать под сеттер */
 interface SettingsParametersListProps
 {
-    settings: Settings;
     parametersInfoMap: ParametersInfoMap;
 }
-const handleCheckbox = (group: Group, param: string, val?: boolean): void =>
-{
-    console.log("value: ", group[param]);
 
-    if (val !== undefined)
-    {
-        group[param] = val;
-        return;
-    }
-
-    group[param] = group[param] === true ? false : true;
-};
-const handleSlider = (group: Group, param: string, val: number): void =>
+export const SettingsParametersList: FC<SettingsParametersListProps> = ({ parametersInfoMap }) =>
 {
-    group[param] = val;
-};
-export const SettingsParametersList: FC<SettingsParametersListProps> = ({ settings, parametersInfoMap }) =>
-{
-    const RENDER_VALUE = 0;
-    const [render, setRender] = useState<number>(RENDER_VALUE);
     const settingsList: JSX.Element[] = [];
     const settingItemsList: JSX.Element[] = [];
+    const settingsService = useContext(SettingsContext);
+    const settings = useSettings(settingsService);
+
+    const handleSwitch = (category : string, section : string, group: string, param: string, val?: boolean): void =>
+    {
+        if (val !== undefined)
+        {
+            settingsService.setSettings((p : Settings) => {p[category][section][group][param] = val});
+        }
+        else
+        {
+            settingsService.setSettings((p : Settings) => {p[category][section][group][param] = p[category][section][group][param] === true ? false : true});
+        }
+    };
+    const handleSlider = (category : string, section : string, group: string, param: string, val: number): void =>
+    {
+        settingsService.setSettings((p : Settings) => {p[category][section][group][param] = val});
+    };
+
     for (const category in settings)
     {
         settingItemsList.push(<h1>{category}</h1>);
@@ -66,10 +64,7 @@ export const SettingsParametersList: FC<SettingsParametersListProps> = ({ settin
                             checked={groupMap[parameter] === true ? true : false}
                             setChecked={(val) =>
                             {
-                                handleCheckbox(groupMap, parameter, val);
-                                // FIXME: просто чтобы заставить реакт перерендериться.
-                                // Надо вместо этой setRender реализовать с помощью useSyncExternalStore.
-                                setRender(Math.random());
+                                handleSwitch(category, section, group,parameter, val);
                             }}
                         />);
                     }
@@ -80,7 +75,7 @@ export const SettingsParametersList: FC<SettingsParametersListProps> = ({ settin
                             disableTouchRipple
                             text={parametersInfoMap[parameterId].name + ": " + groupMap[parameter].toString()}
                             value={Number(groupMap[parameter])}
-                            setValue={(val) => { handleSlider(groupMap, parameter, val); setRender(val); }}
+                            setValue={(val) => { handleSlider(category, section, group, parameter, val); }}
                         />);
                     }
                     else if (parametersInfoMap[parameterId].type === "Input")
