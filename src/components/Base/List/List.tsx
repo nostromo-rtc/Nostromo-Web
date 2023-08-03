@@ -36,8 +36,7 @@ export const List: React.FC<PropsWithChildren<ListProps>> = ({ children, ...prop
         {
             (firstItem as HTMLElement).tabIndex = 0;
         }
-
-    }, [listRef]);
+    });
 
     // Навигация на стрелки и Home/End.
     const handleListKeyDown: DivKeyboardEventHandler = (ev) =>

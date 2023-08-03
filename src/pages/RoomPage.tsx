@@ -11,13 +11,11 @@ import { RoomAlert } from "../components/Room/RoomAlert";
 import { Chat } from "../components/Room/Chat/Chat";
 import { LoadFileInfo } from "../components/Room/Chat/UploadingFilesQueue";
 import { RoomHeaderToolbarProps } from "../components/Room/RoomHeaderToolbar";
-import { UserListSection } from "../components/Room/UserList";
+import { UserList } from "../components/Room/UserList";
 import { VideoLayout } from "../components/Room/VideoLayout";
 import "./RoomPage.css";
 import { DropArea } from "../components/Room/Chat/DropArea";
 import { DndVisibleContext } from "./MainLayer";
-import { List } from "../components/Base/List/List";
-import { UserInfo } from "nostromo-shared/types/RoomTypes";
 
 export enum SoundState
 {
@@ -180,17 +178,6 @@ export const RoomPage: React.FC = () =>
         document.title = `Nostromo - Комната "${roomName}"`;
     }, []);
 
-    const [onlineUserList, setOnlineUserList] = useState<UserInfo[]>([]);
-    const [offlineUserList, setOfflineUserList] = useState<UserInfo[]>([]);
-    useEffect(() =>
-    {
-        const newUserList: UserInfo[] = [
-            { id: "id111", name: "a_name1" },
-            { id: "id222", name: "b_name2" },
-            { id: "id333", name: "c_name3" }
-        ];
-        setOnlineUserList(newUserList);
-    }, []);
     return (
         <>
             <Header title={roomName} roomToolbarProps={roomToolbarProps} />
@@ -202,8 +189,7 @@ export const RoomPage: React.FC = () =>
                         upperContainer={callContainer}
                         lowerContainer={chatContainer}
                         upperMinHeight="200px" />}
-                {isUserListHidden ? <></> : <List><UserListSection sectionLabel="В сети" list={onlineUserList} transitionDuration={transitionDuration} />
-            <UserListSection sectionLabel="Не в сети" list={offlineUserList} transitionDuration={transitionDuration} /></List>}
+                {isUserListHidden ? <></> : <UserList transitionDuration={transitionDuration} />}
             </div>
         </>
     );
