@@ -3,8 +3,9 @@
     width: 100%;
     border: none;
     border-top: 1px solid #4b4f53;
-    margin-top: 20px;
+    margin-top: 12px;
 }
+
 .list-item-description
 {
     font-size: 12px;
@@ -12,6 +13,7 @@
     color: rgb(163, 163, 163);
     word-wrap: break-word;
 }
+
 .list-item-label
 {
     display: inline-flex;
@@ -19,15 +21,14 @@
     padding: 0;
     margin: 0;
 }
-.list-item-switch
+
+.list-item
 {
     user-select: none;
-    padding-top: 8px;
-    padding-bottom: 8px;
+    padding-top: 12px;
+    margin-bottom: 12px;
     padding-left: 16px;
-    /* TODO: Отступы для совместимости с слайдером MUI. Как полностью перейдём на свои компоненты, надо будет удалить */
     padding-right: 16px;
-    /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
 }
 
 .list-item-switch-label-row
@@ -38,20 +39,18 @@
     cursor: pointer;
 }
 
-.list-item-switch:hover
+.list-item:hover
 {
     box-shadow: 0 0 2px white;
     border-radius: 5px;
     background-color: rgba(255, 255, 255, 0.08);
-    /* TODO: Отступы для совместимости с слайдером MUI. Как полностью перейдём на свои компоненты, надо будет удалить */
 }
 
-.list-item-switch:focus
+.list-item:focus
 {
     box-shadow: 0 0 2px white;
     border-radius: 5px;
     background-color: rgba(255, 255, 255, 0.08);
-    /* TODO: Отступы для совместимости с слайдером MUI. Как полностью перейдём на свои компоненты, надо будет удалить */
     outline: none;
 }
 
@@ -60,31 +59,4 @@
     display: flex;
     flex-direction: column;
     cursor: pointer;
-}
-.list-item-input
-{
-    user-select: none;
-    padding-top: 8px;
-    padding-bottom: 8px;
-    padding-left: 16px;
-    /* TODO: Отступы для совместимости с слайдером MUI. Как полностью перейдём на свои компоненты, надо будет удалить */
-    padding-right: 16px;
-    /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
-}
-
-.list-item-input:hover
-{
-    box-shadow: 0 0 2px white;
-    border-radius: 5px;
-    background-color: rgba(255, 255, 255, 0.08);
-    /* TODO: Отступы для совместимости с слайдером MUI. Как полностью перейдём на свои компоненты, надо будет удалить */
-}
-
-.list-item-input:focus
-{
-    box-shadow: 0 0 2px white;
-    border-radius: 5px;
-    background-color: rgba(255, 255, 255, 0.08);
-    /* TODO: Отступы для совместимости с слайдером MUI. Как полностью перейдём на свои компоненты, надо будет удалить */
-    outline: none;
 }

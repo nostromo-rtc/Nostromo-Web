@@ -30,7 +30,7 @@ const handleSlider = (group: Group, param: string, val: number): void =>
 {
     group[param] = val;
 };
-export const SettingsParametersList: FC<SettingsParametersListProps> = ({ settings, parametersInfoMap}) =>
+export const SettingsParametersList: FC<SettingsParametersListProps> = ({ settings, parametersInfoMap }) =>
 {
     const RENDER_VALUE = 0;
     const [render, setRender] = useState<number>(RENDER_VALUE);
@@ -61,7 +61,6 @@ export const SettingsParametersList: FC<SettingsParametersListProps> = ({ settin
                     if (parametersInfoMap[parameterId].type === "Switch")
                     {
                         settingItemsList.push(<ListItemSwitch
-                            viewSeparator={true}
                             description={parametersInfoMap[parameterId].description}
                             text={parametersInfoMap[parameterId].name}
                             checked={groupMap[parameter] === true ? true : false}
@@ -77,6 +76,8 @@ export const SettingsParametersList: FC<SettingsParametersListProps> = ({ settin
                     else if (parametersInfoMap[parameterId].type === "Slider")
                     {
                         settingItemsList.push(<MenuItemSlider
+                            className="list-item"
+                            disableTouchRipple
                             text={parametersInfoMap[parameterId].name + ": " + groupMap[parameter].toString()}
                             value={Number(groupMap[parameter])}
                             setValue={(val) => { handleSlider(groupMap, parameter, val); setRender(val); }}
@@ -85,15 +86,15 @@ export const SettingsParametersList: FC<SettingsParametersListProps> = ({ settin
                     else if (parametersInfoMap[parameterId].type === "Input")
                     {
                         settingItemsList.push(<ListItemInput
-                            viewSeparator={true}
                             description={parametersInfoMap[parameterId].description}
                             text={parametersInfoMap[parameterId].name}
+                            value={groupMap[parameter] as string}
+                            setValue={() => { return; }}
                         />);
                     }
                     else if (parametersInfoMap[parameterId].type === "Select")
                     {
                         settingItemsList.push(<ListItemSelect
-                            viewSeparator={true}
                             description={parametersInfoMap[parameterId].description}
                             text={parametersInfoMap[parameterId].name}
                         />);
