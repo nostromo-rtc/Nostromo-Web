@@ -1,21 +1,49 @@
-import { FC } from "react";
+import { FC, ReactNode, useState } from "react";
+import { Tooltip } from "../Tooltip";
+import { Button } from "@mui/material";
+import { TfiMenu } from "react-icons/tfi";
+import { IoMdClose } from "react-icons/io";
 
 interface SidebarViewProps
 {
-    categoryList: JSX.Element[];
-    parameterList: JSX.Element[];
-    showSidebarBtn: JSX.Element;
-    exitSettingsBtn: JSX.Element;
-    showSidebar: boolean;
+    sidebar: ReactNode;
+    main: ReactNode;
+    onClickBtnClose: (state: boolean) => void;
 }
-export const SidebarView: FC<SidebarViewProps> = ({categoryList, parameterList, showSidebar, showSidebarBtn, exitSettingsBtn}) =>
+export const SidebarView: FC<SidebarViewProps> = ({sidebar, main, onClickBtnClose}) =>
 {
+    /** Показать/скрыть sidebar */
+    const [showSidebar, setShowSidebar] = useState(true);
+    /** Кнопка для скрытия/раскрытия sidebar */
+    const showSidebarBtn = (
+        <Tooltip title={showSidebar ? "Скрыть боковую панель" : "Показать боковую панель"}>
+            <Button
+                className="sidebar-btn"
+                aria-label="Show/hide sidebar"
+                onClick={ev => { setShowSidebar(prev => !prev); }}
+            >
+                <TfiMenu className="sidebar-btn-icon" />
+            </Button>
+        </Tooltip>
+    );
+    /** Кнопка для закрытия настроек */
+    const exitSettingsBtn = (
+        <Tooltip title="Закрыть настройки">
+            <Button
+                className="sidebar-btn"
+                aria-label="Exit settings"
+                onClick={ev => { onClickBtnClose(false) }}
+            >
+                <IoMdClose className="sidebar-btn-icon" />
+            </Button>
+        </Tooltip>
+    );
     return (
         <>
             {showSidebar ?
                 <div className="sidebar-view-sidebar-panel">
                     <div className="sidebar-view-sidebar">
-                        {categoryList}
+                        {sidebar}
                     </div>
                 </div>
                 : <></>}
@@ -29,7 +57,7 @@ export const SidebarView: FC<SidebarViewProps> = ({categoryList, parameterList, 
                     {/* TODO: использовать тут вместо обычного div, компонент List
                         чтобы работала навигация при фокусе на нем (кнопки Home, End и стрелки), и так далее. */}
                     <div className="sidebar-view-main sidebar-view-main-width">
-                        {parameterList}
+                        {main}
                     </div>
                 </div>
             </div>

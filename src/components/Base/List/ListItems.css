@@ -1,5 +1,6 @@
 .list-item-separator
 {
+    width: 100%;
     border: none;
     border-top: 1px solid #4b4f53;
     margin-top: 20px;
@@ -11,10 +12,15 @@
     color: rgb(163, 163, 163);
     word-wrap: break-word;
 }
+.list-item-label
+{
+    display: inline-flex;
+    flex: auto;
+    padding: 0;
+    margin: 0;
+}
 .list-item-switch
 {
-    justify-content: center;
-    align-items: center;
     user-select: none;
     padding-top: 8px;
     padding-bottom: 8px;
@@ -29,7 +35,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    flex: auto;
     cursor: pointer;
 }
 
@@ -42,6 +47,40 @@
 }
 
 .list-item-switch:focus
+{
+    box-shadow: 0 0 2px white;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.08);
+    /* TODO: Отступы для совместимости с слайдером MUI. Как полностью перейдём на свои компоненты, надо будет удалить */
+    outline: none;
+}
+
+.list-item-input-label-row
+{
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+}
+.list-item-input
+{
+    user-select: none;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 16px;
+    /* TODO: Отступы для совместимости с слайдером MUI. Как полностью перейдём на свои компоненты, надо будет удалить */
+    padding-right: 16px;
+    /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+}
+
+.list-item-input:hover
+{
+    box-shadow: 0 0 2px white;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.08);
+    /* TODO: Отступы для совместимости с слайдером MUI. Как полностью перейдём на свои компоненты, надо будет удалить */
+}
+
+.list-item-input:focus
 {
     box-shadow: 0 0 2px white;
     border-radius: 5px;

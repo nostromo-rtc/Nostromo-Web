@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from "react";
 
 /* eslint-disable @typescript-eslint/naming-convention */
-export type ParameterType = "Select" | "Slider" | "Switch";
+export type ParameterType = "Input" | "Select" | "Slider" | "Switch";
 export type ParameterValue = boolean | number | string;
 export const LOCAL_STORAGE_SETTINGS = "nostromo-settings";
 
@@ -202,7 +202,8 @@ export const parametersInfoMap: ParametersInfoMap = {
     "display.room.layout.displayLocalVideos":
     {
         name: "Отображать локальные видео",
-        type: "Switch",
+        type: "Input",
+        description: "Краткое описание параметра. Смотрите, наблюдайте, восхищайтесь",
         defaultValue: defaultSettings.display.room.layout.displayLocalVideos
     },
 
@@ -210,19 +211,19 @@ export const parametersInfoMap: ParametersInfoMap = {
     "general.generalSection_1.generalGroup_1S_1.Aparam":
     {
         name: "Первый тестовый параметр",
-        type: "Switch",
+        type: "Select",
         defaultValue: defaultSettings.general.generalSection_1.generalGroup_1S_1.Aparam
     },
     "general.generalSection_1.generalGroup_1S_1.Bparam":
     {
         name: "Второй тестовый параметр",
-        type: "Slider",
+        type: "Switch",
         defaultValue: defaultSettings.general.generalSection_1.generalGroup_1S_1.Bparam
     },
     "general.generalSection_2.generalGroup_2S_1.Cparam":
     {
         name: "Третий тестовый параметр",
-        type: "Switch",
+        type: "Select",
         defaultValue: defaultSettings.general.generalSection_2.generalGroup_2S_1.Cparam
     },
     "general.generalSection_2.generalGroup_2S_1.Dparam":

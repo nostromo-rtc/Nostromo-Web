@@ -2,6 +2,8 @@ import { Dispatch, FC, PropsWithChildren, ReactNode, SetStateAction, useRef } fr
 import { Switch } from "../Switch";
 import "./ListItems.css";
 import { isEmptyString } from "../../../Utils";
+import { Input } from "../Input";
+import { Select } from "../Select";
 
 interface ListItemProps extends React.HTMLAttributes<HTMLDivElement>
 {
@@ -82,8 +84,101 @@ export const ListItemSwitch: FC<ListItemSwitchProps> = ({ text, checked, setChec
             description={description}
         >
             <label className="list-item-switch-label-row">
-                <p className="menu-item-label text-wrap">{text}</p>
+                <p className="list-item-label text-wrap">{text}</p>
                 <Switch checked={checked} onChange={handleChange} />
+            </label>
+        </ListItem>
+    );
+};
+
+// TODO: Посмотреть на реализации Сергея: Input, Select, Slider (с помощью MUI)
+//       Мб оттуда что-нибудь вытащить нужно будет, обработчики или т.п.
+
+// TODO: Прокинуть необходимые обработчики, доделать onKeyDown
+interface ListItemInputProps
+{
+    text: string;
+    viewSeparator: boolean;
+    description?: string;
+}
+export const ListItemInput: FC<ListItemInputProps> = ({ text, viewSeparator, description}) =>
+{
+    const handleKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (ev) =>
+    {
+        ev.preventDefault();
+        if (ev.code === "Space" || ev.code === "Enter")
+        {
+            ev.preventDefault();
+            //setChecked(prev => !prev);
+            
+        }
+        else if (ev.code === "ArrowRight")
+        {
+            ev.preventDefault();
+            
+        }
+        else if (ev.code === "ArrowLeft")
+        {
+            ev.preventDefault();
+            console.log("alo?");
+            
+        }
+    };
+    return (
+        <ListItem 
+            className="list-item-input" 
+            viewSeparator={viewSeparator}
+            description={description}
+        >
+            <label className="list-item-input-label-row">
+                <p className="list-item-label text-wrap">{text}</p>
+                <Input />
+            </label>
+        </ListItem>
+    );
+};
+
+// TODO: Прокинуть необходимые обработчики, доделать onKeyDown
+//       Посмотреть стили, ибо сейчас тут стоят input-вские, можно сделать общие т.к. подходит
+//       либо написать новые для select
+interface ListItemSelectProps
+{
+    text: string;
+    viewSeparator: boolean;
+    description?: string;
+}
+export const ListItemSelect: FC<ListItemSelectProps> = ({ text, viewSeparator, description}) =>
+{
+    const handleKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (ev) =>
+    {
+        ev.preventDefault();
+        if (ev.code === "Space" || ev.code === "Enter")
+        {
+            ev.preventDefault();
+            //setChecked(prev => !prev);
+            
+        }
+        else if (ev.code === "ArrowRight")
+        {
+            ev.preventDefault();
+            
+        }
+        else if (ev.code === "ArrowLeft")
+        {
+            ev.preventDefault();
+            console.log("alo?");
+            
+        }
+    };
+    return (
+        <ListItem 
+            className="list-item-input" 
+            viewSeparator={viewSeparator}
+            description={description}
+        >
+            <label className="list-item-input-label-row">
+                <p className="list-item-label text-wrap">{text}</p>
+                <Select />
             </label>
         </ListItem>
     );

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { ReactNode, useContext, useEffect, useRef } from "react";
 
 import "../App.css";
 import "./SettingsLayer.css";
@@ -6,10 +6,6 @@ import { FocusTrap } from "../components/FocusTrap";
 import { parametersInfoMap, useSettings } from "../services/SettingsService";
 import { SettingsCategoryList } from "../components/Settings/SettingsCategoryList";
 import { SettingsParametersList } from "../components/Settings/SettingsParametersList";
-import { Tooltip } from '../components/Tooltip';
-import { TfiMenu } from "react-icons/tfi";
-import { IoMdClose } from "react-icons/io";
-import { Button } from "@mui/material";
 import { SettingsContext } from "../App";
 import { SidebarView } from "../components/Settings/SidebarView";
 
@@ -84,36 +80,8 @@ export const SettingsLayer: React.FC<SettingsLayerProps> = ({ setShowSettings })
         }
     }, []);
 
-    /** Показать/скрыть sidebar */
-    const [showSidebar, setShowSidebar] = useState(true);
-    /** Кнопка для скрытия/раскрытия sidebar */
-    const showSidebarBtn = (
-        <Tooltip title={showSidebar ? "Скрыть боковую панель" : "Показать боковую панель"}>
-            <Button
-                className="sidebar-btn"
-                aria-label="Show/hide sidebar"
-                onClick={ev => { setShowSidebar(prev => !prev); }}
-            >
-                <TfiMenu className="sidebar-btn-icon" />
-            </Button>
-        </Tooltip>
-    );
-    /** Кнопка для закрытия настроек */
-    const exitSettingsBtn = (
-        <Tooltip title="Закрыть настройки">
-            <Button
-                className="sidebar-btn"
-                aria-label="Exit settings"
-                onClick={ev => { setShowSettings(false); }}
-            >
-                <IoMdClose className="sidebar-btn-icon" />
-            </Button>
-        </Tooltip>
-    );
-    const categoryList: JSX.Element[] = [];
-    categoryList.push(<SettingsCategoryList settings={settings} />);
-    const parameterList: JSX.Element[] = [];
-    parameterList.push(<SettingsParametersList settings={settings} parametersInfoMap={parametersInfoMap} />);
+    const categoryList: ReactNode = (<SettingsCategoryList settings={settings} />);
+    const parameterList: ReactNode = (<SettingsParametersList settings={settings} parametersInfoMap={parametersInfoMap} />);
     return (
         <div id="layer-settings"
             className="layer"
@@ -122,11 +90,9 @@ export const SettingsLayer: React.FC<SettingsLayerProps> = ({ setShowSettings })
         >
             <FocusTrap>
                 <SidebarView 
-                    categoryList={categoryList} 
-                    parameterList={parameterList} 
-                    showSidebar={showSidebar}
-                    showSidebarBtn={showSidebarBtn}
-                    exitSettingsBtn={exitSettingsBtn}
+                    sidebar={categoryList} 
+                    main={parameterList} 
+                    onClickBtnClose={setShowSettings}
                 />
             </FocusTrap>
         </div>

@@ -3,8 +3,10 @@ import "./SettingsParametersList.css";
 import { Group, ParametersInfoMap, Settings } from "../../services/SettingsService";
 import { MenuItemSlider } from "../Menu/MenuItems";
 import { getToggleFunc } from "../../Utils";
-import { ListItemSwitch } from "../Base/List/ListItems";
+import { ListItemInput, ListItemSelect, ListItemSwitch } from "../Base/List/ListItems";
 import { List } from "../Base/List/List";
+import { Input } from "../Base/Input";
+import { Select } from "../Base/Select";
 
 /* TODO: Переделать под сеттер */
 interface SettingsParametersListProps
@@ -78,6 +80,22 @@ export const SettingsParametersList: FC<SettingsParametersListProps> = ({ settin
                             text={parametersInfoMap[parameterId].name + ": " + groupMap[parameter].toString()}
                             value={Number(groupMap[parameter])}
                             setValue={(val) => { handleSlider(groupMap, parameter, val); setRender(val); }}
+                        />);
+                    }
+                    else if (parametersInfoMap[parameterId].type === "Input")
+                    {
+                        settingItemsList.push(<ListItemInput
+                            viewSeparator={true}
+                            description={parametersInfoMap[parameterId].description}
+                            text={parametersInfoMap[parameterId].name}
+                        />);
+                    }
+                    else if (parametersInfoMap[parameterId].type === "Select")
+                    {
+                        settingItemsList.push(<ListItemSelect
+                            viewSeparator={true}
+                            description={parametersInfoMap[parameterId].description}
+                            text={parametersInfoMap[parameterId].name}
                         />);
                     }
                     else
