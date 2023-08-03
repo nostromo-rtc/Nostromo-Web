@@ -11,6 +11,7 @@ import { TfiMenu } from "react-icons/tfi";
 import { IoMdClose } from "react-icons/io";
 import { Button } from "@mui/material";
 import { SettingsContext } from "../App";
+import { SidebarView } from "../components/Settings/SidebarView";
 
 interface SettingsLayerProps
 {
@@ -109,7 +110,10 @@ export const SettingsLayer: React.FC<SettingsLayerProps> = ({ setShowSettings })
             </Button>
         </Tooltip>
     );
-
+    const categoryList: JSX.Element[] = [];
+    categoryList.push(<SettingsCategoryList settings={settings} />);
+    const parameterList: JSX.Element[] = [];
+    parameterList.push(<SettingsParametersList settings={settings} parametersInfoMap={parametersInfoMap} />);
     return (
         <div id="layer-settings"
             className="layer"
@@ -117,25 +121,13 @@ export const SettingsLayer: React.FC<SettingsLayerProps> = ({ setShowSettings })
             ref={layerRef}
         >
             <FocusTrap>
-                {showSidebar ?
-                    <div className="sidebar-view-sidebar-panel">
-                        <div className="sidebar-view-sidebar">
-                            <SettingsCategoryList settings={settings} />
-                        </div>
-                    </div>
-                    : <></>}
-                <div className={showSidebar ? "sidebar-view-main-panel" : "sidebar-view-main-panel sidebar-view-main-panel-without-sidebar"}>
-                    <div className="sidebar-view-header sidebar-view-main-width">
-                        {showSidebarBtn}
-                        <div className="horizontal-expander"></div>
-                        {exitSettingsBtn}
-                    </div>
-                    <div className="sidebar-view-main-scrollable-area" tabIndex={-1}>
-                        {/* TODO: использовать тут вместо обычного div, компонент List
-                            чтобы работала навигация при фокусе на нем (кнопки Home, End и стрелки), и так далее. */}
-                        <SettingsParametersList className="sidebar-view-main sidebar-view-main-width" settings={settings} parametersInfoMap={parametersInfoMap} />
-                    </div>
-                </div>
+                <SidebarView 
+                    categoryList={categoryList} 
+                    parameterList={parameterList} 
+                    showSidebar={showSidebar}
+                    showSidebarBtn={showSidebarBtn}
+                    exitSettingsBtn={exitSettingsBtn}
+                />
             </FocusTrap>
         </div>
     );
