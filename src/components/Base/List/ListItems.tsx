@@ -1,4 +1,4 @@
-import { FC, PropsWithChildren, ReactNode, useEffect, useRef, useState } from "react";
+import { Dispatch, FC, PropsWithChildren, ReactNode, SetStateAction, useEffect, useRef, useState } from "react";
 import { Switch } from "../Switch";
 import "./ListItems.css";
 import "../../Menu/MenuItems.css";
@@ -119,17 +119,50 @@ interface ListItemInputProps extends ListItemProps
     text: string;
     value: string;
     /** TODO: должно быть Dispatch<SetStateAction<string>>; */
-    setValue: (val: string) => void;
+    setValue: Dispatch<SetStateAction<string>>;
 }
 export const ListItemInput: FC<ListItemInputProps> = ({ value, setValue, text, ...props }) =>
 {
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    const handleInputKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (ev) =>
+    {
+        if (ev.key === "ArrowDown" || ev.key === "ArrowUp")
+        {
+            ev.preventDefault();
+        }
+        else
+        {
+            ev.stopPropagation();
+        }
+    };
+    const handleFocus: React.FocusEventHandler<HTMLDivElement> = (ev) =>
+    {
+        if (!inputRef.current)
+        {
+            return;
+        }
+        
+        ev.preventDefault();
+
+        const input = inputRef.current;
+        // Если предыдущий сфокусированный элемент был input,
+        // тогда не делаем переброса фокуса на него.
+        if (ev.relatedTarget !== input)
+        {
+            inputRef.current.focus();
+        }
+        
+
+    };
     return (
         <ListItem
+            onFocus={handleFocus}
             {...props}
         >
             <label className="list-item-input-label-row">
                 <p className="list-item-label text-wrap">{text}</p>
-                <Input />
+                <Input inputRef={inputRef} onKeyDown={handleInputKeyDown} setValue={setValue} value={value} role="input"/>
             </label>
         </ListItem>
     );

@@ -1,19 +1,17 @@
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import "./Input.css";
 
-interface InputProps
+interface InputProps extends React.HTMLAttributes<HTMLInputElement>
 {
-    checked: boolean;
-    onChange: (ev: React.ChangeEvent<HTMLInputElement>) => void;
+    inputRef: React.RefObject<HTMLInputElement>;
+    setValue: Dispatch<SetStateAction<string>>;
+    value: string;
 }
-
-// TODO: Прокинуть необходимые обработчики (пропсы)
-//       P.S. Добавить обработчик для ввода текста и саму работу с текстом.
-export const Input: React.FC = () =>
+export const Input: React.FC<InputProps> = ({inputRef, setValue, value, ...props}) =>
 {
     return (
         <>
-            <input type="text" className="input" />
+            <input ref={inputRef} type="text" className="input" value={value} onChange={(ev) => { setValue(ev.target.value) } } {...props}/>
         </>
     );
 };

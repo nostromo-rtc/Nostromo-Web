@@ -1,12 +1,14 @@
-import React, { ReactNode, useEffect, useRef } from "react";
+import React, { ReactNode, useContext, useEffect, useRef, useState } from "react";
 
 import "../App.css";
 import "./SettingsLayer.css";
 import { FocusTrap } from "../components/FocusTrap";
-import { parametersInfoMap } from "../services/SettingsService";
+import { parametersInfoMap, useSettings } from "../services/SettingsService";
 import { SettingsCategoryList } from "../components/Settings/SettingsCategoryList";
 import { SettingsParametersList } from "../components/Settings/SettingsParametersList";
 import { SidebarView } from "../components/Settings/SidebarView";
+import { SettingsContext } from "../App";
+import { ZERO_IDX } from "../Utils";
 
 interface SettingsLayerProps
 {
@@ -20,11 +22,16 @@ export const SettingsLayer: React.FC<SettingsLayerProps> = ({ setShowSettings })
 {
     const layerRef = useRef<HTMLDivElement>(null);
 
+    const settingsService = useContext(SettingsContext);
+    const settings = useSettings(settingsService);
     useEffect(() =>
     {
         const prevTitle = document.title;
         document.title = "Nostromo - Настройки приложения";
 
+        const keys = Object.keys(settings);
+        if(keys.length)
+            setSelectedCategory(keys[ZERO_IDX]);
         return () =>
         {
             document.title = prevTitle;
@@ -37,8 +44,9 @@ export const SettingsLayer: React.FC<SettingsLayerProps> = ({ setShowSettings })
         layerRef.current?.focus();
     }, [layerRef]);
 
-    const categoryList: ReactNode = (<SettingsCategoryList />);
-    const parameterList: ReactNode = (<SettingsParametersList parametersInfoMap={parametersInfoMap} />);
+    const [selectedCategory, setSelectedCategory] = useState<string>("");
+    const categoryList: ReactNode = (<SettingsCategoryList setSelectedCategory={setSelectedCategory}/>);
+    const parameterList: ReactNode = (<SettingsParametersList selectedCategory={selectedCategory} parametersInfoMap={parametersInfoMap} />);
     return (
         <div id="layer-settings"
             className="layer"

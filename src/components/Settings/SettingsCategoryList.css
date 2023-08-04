@@ -1,4 +1,53 @@
 #settings-category-list
 {
     width: 100%;
+    height: 100%;
+}
+
+.category-list-item
+{
+    display: flex;
+    height: 42px;
+    box-sizing: border-box;
+    align-items: center;
+    padding: 0 8px 0 8px;
+    margin: 2px 7px 2px 7px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.category-list-item:focus
+{
+    background-color: #3b3f41;
+    box-shadow: none;
+}
+
+.category-list-item:focus-visible
+{
+    background-color: #3b3f41;
+    outline: none;
+}
+
+.category-list-item:active
+{
+    background-color: #3b3f41;
+}
+
+.category-list-item:hover
+{
+    background-color: #3b3f41;
+    box-shadow: none;
+}
+
+.category-list-item-info
+{
+    display: flex;
+    flex-direction: column;
+}
+
+.category-list-item-info-name
+{
+    font-size: 1rem;
+    color: var(--primary-text-color);
+    word-wrap: anywhere;
 }
