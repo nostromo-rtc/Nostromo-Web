@@ -10,8 +10,6 @@ interface InputProps extends React.HTMLAttributes<HTMLInputElement>
 export const Input: React.FC<InputProps> = ({inputRef, setValue, value, ...props}) =>
 {
     return (
-        <>
-            <input ref={inputRef} type="text" className="input" value={value} onChange={(ev) => { setValue(ev.target.value) } } {...props}/>
-        </>
+        <input ref={inputRef} type="text" className="input" value={value} onChange={(ev) => { setValue(ev.target.value) } } {...props}/>
     );
 };

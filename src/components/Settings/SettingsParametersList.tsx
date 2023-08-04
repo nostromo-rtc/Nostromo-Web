@@ -1,7 +1,6 @@
 import { FC, useContext } from "react";
 import "./SettingsParametersList.css";
 import { ParametersInfoMap, Settings, useSettings } from "../../services/SettingsService";
-import { MenuItemSlider } from "../Menu/MenuItems";
 import { ListItemInput, ListItemSelect, ListItemSlider, ListItemSwitch } from "../Base/List/ListItems";
 import { List } from "../Base/List/List";
 import { SettingsContext } from "../../App";

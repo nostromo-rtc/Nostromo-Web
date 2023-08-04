@@ -1,4 +1,4 @@
-import { Dispatch, FC, PropsWithChildren, ReactNode, SetStateAction, useEffect, useRef, useState } from "react";
+import { Dispatch, FC, PropsWithChildren, ReactNode, SetStateAction, useRef} from "react";
 import { Switch } from "../Switch";
 import "./ListItems.css";
 import "../../Menu/MenuItems.css";
@@ -162,7 +162,7 @@ export const ListItemInput: FC<ListItemInputProps> = ({ value, setValue, text, .
         >
             <label className="list-item-input-label-row">
                 <p className="list-item-label text-wrap">{text}</p>
-                <Input inputRef={inputRef} onKeyDown={handleInputKeyDown} setValue={setValue} value={value} role="input"/>
+                <Input inputRef={inputRef} onKeyDown={handleInputKeyDown} setValue={setValue} value={value} />
             </label>
         </ListItem>
     );
