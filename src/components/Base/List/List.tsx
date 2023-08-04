@@ -14,7 +14,7 @@ export const List: React.FC<PropsWithChildren<ListProps>> = ({ children, ...prop
 
     // Первому элементу устанавливаем tabIndex='0'
     // чтобы при навигации на Tab сфокусировалось на первый элемент списка.
-    useEffect(() => 
+    useEffect(() =>
     {
         const list = listRef.current;
 
@@ -49,6 +49,17 @@ export const List: React.FC<PropsWithChildren<ListProps>> = ({ children, ...prop
         }
 
         const currentFocus = document.activeElement;
+        const focusedElementRole = currentFocus?.getAttribute("role");
+
+        // Проверяем на всякий случай, что текущий сфокусированный элемент
+        // хотя бы имеет роль списка или сам является списком.
+        // Так как гипотетически возможна ситуация, что можно забыть остановить распространение события
+        // и сюда дойдет событие с фокусированным элементом на каком-нибудь внутреннем элементе у listitem
+        // (например input внутри элемента списка).
+        if (focusedElementRole !== "list" && focusedElementRole !== "listitem")
+        {
+            return;
+        }
 
         if (ev.key === "ArrowDown")
         {

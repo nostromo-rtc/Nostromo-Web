@@ -27,10 +27,17 @@ export const ListItem: FC<PropsWithChildren<ListItemProps>> = ({
     const itemRef = useRef<HTMLDivElement>(null);
     const handleKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (ev) =>
     {
-        itemRef.current?.focus();
         if (onKeyDown !== undefined)
         {
             onKeyDown(ev);
+        }
+
+        // Если явно не остановили распространение события
+        // во внутреннем переданном обработчике (onKeyDown),
+        // тогда делаем фокус на элемент списка.
+        if (!ev.isPropagationStopped())
+        {
+            itemRef.current?.focus();
         }
     };
 
@@ -160,27 +167,26 @@ interface ListItemSliderProps extends ListItemProps
 }
 export const ListItemSlider: FC<ListItemSliderProps> = ({ text, value, setValue, ...props }) =>
 {
-    const handleChange = (event: Event, newValue: number[] | number): void =>
+    const handleSliderChange = (event: Event, newValue: number[] | number): void =>
     {
         // Поскольку это не range slider, то тип для value number, а не number[].
         setValue(newValue as number);
     };
 
-    // Переопределение клавиш для SliderItem.
-    // Стрелки влево-вправо - регулируют значение слайдера (это дефолтное поведение).
-    // Кнопка Escape - закрыть меню (путем автоматической передачи события выше к меню).
-    // Стрелки вверх-вниз - переход к следующему/предыдущему элементу в списке MenuList (вручную).
-    const handleKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (ev) =>
+    // Переопределение клавиш для Slider.
+    // 1. Стрелки влево-вправо регулируют значение слайдера (это дефолтное поведение).
+    //    Поэтому просто не даем сбить фокус с бегунка слайдера, для этого не распространяем событие дальше.
+    // 2. Стрелки вверх-вниз по умолчанию тоже регулируют значение слайдера,
+    //    но поскольку они нужны для навигации, то предотвращаем это поведение по умолчанию.
+    const handleSliderKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (ev) =>
     {
-        if (ev.key !== "ArrowLeft" 
-            && ev.key !== "ArrowRight" 
-            && ev.key !== "Escape" 
-            && ev.key !== "ArrowUp"
-            && ev.key !== "ArrowDown"
-            && ev.key !== "Enter")
+        if (ev.key === "ArrowLeft" || ev.key === "ArrowRight")
+        {
+            ev.stopPropagation();
+        }
+        if (ev.key === "ArrowDown" || ev.key === "ArrowUp")
         {
             ev.preventDefault();
-            ev.stopPropagation();
         }
     };
 
@@ -192,26 +198,37 @@ export const ListItemSlider: FC<ListItemSliderProps> = ({ text, value, setValue,
         {
             return;
         }
+
         ev.preventDefault();
+
         const input = sliderRef.current.querySelector("input");
-        input?.focus();
+
+        // Если предыдущий сфокусированный элемент был input,
+        // тогда не делаем переброса фокуса на него.
+        if (input != null && ev.relatedTarget !== input)
+        {
+            input.focus();
+        }
     };
+
     return (
         <ListItem
-            onKeyDown={handleKeyDown}
             onFocus={handleFocus}
             {...props}
         >
-            <p className="menu-item-label text-wrap">{text}</p>
-            <div className="menu-item-slider-container">
-                <Slider
-                    value={value}
-                    onChange={handleChange}
-                    valueLabelDisplay="auto"
-                    role="slider"
-                    ref={sliderRef}
-                />
-            </div>
+            <label className="list-item-slider-label-row">
+                <p className="menu-item-label text-wrap">{text}</p>
+                <div className="menu-item-slider-container">
+                    <Slider
+                        value={value}
+                        onChange={handleSliderChange}
+                        onKeyDown={handleSliderKeyDown}
+                        valueLabelDisplay="auto"
+                        role="slider"
+                        ref={sliderRef}
+                    />
+                </div>
+            </label>
         </ListItem>
     );
 };
