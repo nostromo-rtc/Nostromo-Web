@@ -1,9 +1,11 @@
-import { FC, PropsWithChildren, ReactNode, useRef } from "react";
+import { FC, PropsWithChildren, ReactNode, useEffect, useRef, useState } from "react";
 import { Switch } from "../Switch";
 import "./ListItems.css";
+import "../../Menu/MenuItems.css";
 import { isEmptyString } from "../../../Utils";
 import { Input } from "../Input";
 import { Select } from "../Select";
+import { Slider } from "@mui/material";
 
 interface ListItemProps extends React.HTMLAttributes<HTMLDivElement>
 {
@@ -143,6 +145,73 @@ export const ListItemSelect: FC<ListItemSelectProps> = ({ text, ...props }) =>
                 <p className="list-item-label text-wrap">{text}</p>
                 <Select />
             </label>
+        </ListItem>
+    );
+};
+
+// TODO: Прокинуть необходимые обработчики, доделать onKeyDown
+//       Посмотреть стили, ибо сейчас тут стоят input-вские, можно сделать общие т.к. подходит
+//       либо написать новые для select
+interface ListItemSliderProps extends ListItemProps
+{
+    text: string;
+    value: number;
+    setValue: (val: number) => void;
+}
+export const ListItemSlider: FC<ListItemSliderProps> = ({ text, value, setValue, ...props }) =>
+{
+    const handleChange = (event: Event, newValue: number[] | number): void =>
+    {
+        // Поскольку это не range slider, то тип для value number, а не number[].
+        setValue(newValue as number);
+    };
+
+    // Переопределение клавиш для SliderItem.
+    // Стрелки влево-вправо - регулируют значение слайдера (это дефолтное поведение).
+    // Кнопка Escape - закрыть меню (путем автоматической передачи события выше к меню).
+    // Стрелки вверх-вниз - переход к следующему/предыдущему элементу в списке MenuList (вручную).
+    const handleKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (ev) =>
+    {
+        if (ev.key !== "ArrowLeft" 
+            && ev.key !== "ArrowRight" 
+            && ev.key !== "Escape" 
+            && ev.key !== "ArrowUp"
+            && ev.key !== "ArrowDown"
+            && ev.key !== "Enter")
+        {
+            ev.preventDefault();
+            ev.stopPropagation();
+        }
+    };
+
+    const sliderRef = useRef<HTMLSpanElement>(null);
+    // Пробрасываем фокус на input внутри слайдера, при попадании фокуса на этот элемент меню.
+    const handleFocus: React.FocusEventHandler<HTMLDivElement> = (ev) =>
+    {
+        if (!sliderRef.current)
+        {
+            return;
+        }
+        ev.preventDefault();
+        const input = sliderRef.current.querySelector("input");
+        input?.focus();
+    };
+    return (
+        <ListItem
+            onKeyDown={handleKeyDown}
+            onFocus={handleFocus}
+            {...props}
+        >
+            <p className="menu-item-label text-wrap">{text}</p>
+            <div className="menu-item-slider-container">
+                <Slider
+                    value={value}
+                    onChange={handleChange}
+                    valueLabelDisplay="auto"
+                    role="slider"
+                    ref={sliderRef}
+                />
+            </div>
         </ListItem>
     );
 };

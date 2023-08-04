@@ -2,7 +2,7 @@ import { FC, useContext } from "react";
 import "./SettingsParametersList.css";
 import { ParametersInfoMap, Settings, useSettings } from "../../services/SettingsService";
 import { MenuItemSlider } from "../Menu/MenuItems";
-import { ListItemInput, ListItemSelect, ListItemSwitch } from "../Base/List/ListItems";
+import { ListItemInput, ListItemSelect, ListItemSlider, ListItemSwitch } from "../Base/List/ListItems";
 import { List } from "../Base/List/List";
 import { SettingsContext } from "../../App";
 
@@ -70,9 +70,8 @@ export const SettingsParametersList: FC<SettingsParametersListProps> = ({ parame
                     }
                     else if (parametersInfoMap[parameterId].type === "Slider")
                     {
-                        settingItemsList.push(<MenuItemSlider
+                        settingItemsList.push(<ListItemSlider
                             className="list-item"
-                            disableTouchRipple
                             text={parametersInfoMap[parameterId].name + ": " + groupMap[parameter].toString()}
                             value={Number(groupMap[parameter])}
                             setValue={(val) => { handleSlider(category, section, group, parameter, val); }}
