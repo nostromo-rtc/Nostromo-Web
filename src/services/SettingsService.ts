@@ -7,7 +7,7 @@ export type ParameterValue = boolean | number | string;
 export const LOCAL_STORAGE_SETTINGS = "nostromo-settings";
 
 type SettingsListener = () => void;
-type SettingsSetCallback = (prev : Settings) => void;
+type SettingsSetCallback = (prev: Settings) => void;
 
 export interface ParameterInfo
 {
@@ -154,11 +154,6 @@ const defaultSettings: Settings =
         }
     }
 };
-
-// TODO: такой объект нужно будет считывать из localStorage 
-// при инициализации программы.
-// И при сохранении настроек, сохранять их в localStorage.
-export const settings: Settings = defaultSettings;
 
 // -- Info objects -- //
 
@@ -323,29 +318,28 @@ export class SettingService
         if (storedSettings === null)
         {
             this.restoreToDefault();
-            this.saveSnapshot();
             return;
         }
 
         try
         {
             this.currentSettings = JSON.parse(storedSettings) as Settings;
+            this.saveSnapshot();
         }
         catch
         {
             this.restoreToDefault();
         }
-        this.saveSnapshot();
     }
 
-    public restoreToDefault() : void
+    public restoreToDefault(): void
     {
         this.currentSettings = cloneObject(defaultSettings);
         this.saveSnapshot();
         localStorage.setItem(LOCAL_STORAGE_SETTINGS, JSON.stringify(this.currentSettings));
     }
 
-    public setSettings(callback : SettingsSetCallback): void
+    public setSettings(callback: SettingsSetCallback): void
     {
         callback(this.currentSettings);
         this.saveSnapshot();
@@ -377,7 +371,7 @@ export class SettingService
         return this.shapshot;
     }
 
-    private saveSnapshot() : void
+    private saveSnapshot(): void
     {
         this.shapshot = cloneObject(this.currentSettings);
     }

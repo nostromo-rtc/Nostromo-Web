@@ -1,4 +1,4 @@
-import { Dispatch, FC, PropsWithChildren, ReactNode, SetStateAction, useRef} from "react";
+import { Dispatch, FC, PropsWithChildren, ReactNode, SetStateAction, useEffect, useRef } from "react";
 import { Switch } from "../Switch";
 import "./ListItems.css";
 import "../../Menu/MenuItems.css";
@@ -142,7 +142,7 @@ export const ListItemInput: FC<ListItemInputProps> = ({ value, setValue, text, .
         {
             return;
         }
-        
+
         ev.preventDefault();
 
         const input = inputRef.current;
@@ -152,7 +152,7 @@ export const ListItemInput: FC<ListItemInputProps> = ({ value, setValue, text, .
         {
             inputRef.current.focus();
         }
-        
+
 
     };
     return (
@@ -162,7 +162,7 @@ export const ListItemInput: FC<ListItemInputProps> = ({ value, setValue, text, .
         >
             <label className="list-item-input-label-row">
                 <p className="list-item-label text-wrap">{text}</p>
-                <Input inputRef={inputRef} onKeyDown={handleInputKeyDown} setValue={setValue} value={value} />
+                <Input ref={inputRef} onKeyDown={handleInputKeyDown} setValue={setValue} value={value} />
             </label>
         </ListItem>
     );
@@ -243,6 +243,17 @@ export const ListItemSlider: FC<ListItemSliderProps> = ({ text, value, setValue,
             input.focus();
         }
     };
+
+    // Делаем так, чтобы на "бегунок" слайдера нельзя было сфокусироваться кнопкой Tab.
+    useEffect(() => 
+    {
+        const input = sliderRef.current?.querySelector("input");
+
+        if (input)
+        {
+            input.tabIndex = -1;
+        }
+    });
 
     return (
         <ListItem

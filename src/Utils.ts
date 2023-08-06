@@ -93,7 +93,7 @@ export const FILE_SIZE_PRESCISSION = 3;
 
 export const IDX_STEP = 1;
 
-export function cloneObject<Type> (obj : Type) : Type
+export function cloneObject<T>(obj: T): T
 {
-    return JSON.parse(JSON.stringify(obj)) as Type;
+    return JSON.parse(JSON.stringify(obj)) as T;
 }

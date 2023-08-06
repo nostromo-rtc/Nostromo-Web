@@ -1,4 +1,4 @@
-import React, { ReactNode, useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 
 import "../App.css";
 import "./SettingsLayer.css";
@@ -6,7 +6,7 @@ import { FocusTrap } from "../components/FocusTrap";
 import { parametersInfoMap, useSettings } from "../services/SettingsService";
 import { SettingsCategoryList } from "../components/Settings/SettingsCategoryList";
 import { SettingsParametersList } from "../components/Settings/SettingsParametersList";
-import { SidebarView } from "../components/Settings/SidebarView";
+import { SidebarView } from "../components/Base/SidebarView";
 import { SettingsContext } from "../App";
 import { ZERO_IDX } from "../Utils";
 
@@ -24,14 +24,17 @@ export const SettingsLayer: React.FC<SettingsLayerProps> = ({ setShowSettings })
 
     const settingsService = useContext(SettingsContext);
     const settings = useSettings(settingsService);
+    const categories = Object.keys(settings);
+
+    const [selectedCategory, setSelectedCategory] = useState<string>(
+        categories.length ? categories[ZERO_IDX] : ""
+    );
+
     useEffect(() =>
     {
         const prevTitle = document.title;
         document.title = "Nostromo - Настройки приложения";
 
-        const keys = Object.keys(settings);
-        if(keys.length)
-            setSelectedCategory(keys[ZERO_IDX]);
         return () =>
         {
             document.title = prevTitle;
@@ -44,9 +47,17 @@ export const SettingsLayer: React.FC<SettingsLayerProps> = ({ setShowSettings })
         layerRef.current?.focus();
     }, [layerRef]);
 
-    const [selectedCategory, setSelectedCategory] = useState<string>("");
-    const categoryList: ReactNode = (<SettingsCategoryList setSelectedCategory={setSelectedCategory}/>);
-    const parameterList: ReactNode = (<SettingsParametersList selectedCategory={selectedCategory} parametersInfoMap={parametersInfoMap} />);
+    const categoryList = (
+        <SettingsCategoryList setSelectedCategory={setSelectedCategory} />
+    );
+
+    const parameterList = (
+        <SettingsParametersList
+            selectedCategory={selectedCategory}
+            parametersInfoMap={parametersInfoMap}
+        />
+    );
+
     return (
         <div id="layer-settings"
             className="layer"
@@ -54,9 +65,9 @@ export const SettingsLayer: React.FC<SettingsLayerProps> = ({ setShowSettings })
             ref={layerRef}
         >
             <FocusTrap>
-                <SidebarView 
-                    sidebar={categoryList} 
-                    main={parameterList} 
+                <SidebarView
+                    sidebar={categoryList}
+                    main={parameterList}
                     onClickBtnClose={setShowSettings}
                 />
             </FocusTrap>

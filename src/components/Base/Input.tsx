@@ -1,15 +1,27 @@
-import React, { Dispatch, SetStateAction } from "react";
+import React, { Dispatch, SetStateAction, forwardRef, ChangeEventHandler } from "react";
 import "./Input.css";
 
 interface InputProps extends React.HTMLAttributes<HTMLInputElement>
 {
-    inputRef: React.RefObject<HTMLInputElement>;
     setValue: Dispatch<SetStateAction<string>>;
     value: string;
 }
-export const Input: React.FC<InputProps> = ({inputRef, setValue, value, ...props}) =>
+export const Input = forwardRef<HTMLInputElement, InputProps>((
+    { setValue, value, ...props }, ref
+) =>
 {
+    const handleChange: ChangeEventHandler<HTMLInputElement> = (ev) =>
+    {
+        setValue(ev.target.value);
+    };
+
     return (
-        <input ref={inputRef} type="text" className="input" value={value} onChange={(ev) => { setValue(ev.target.value) } } {...props}/>
+        <input ref={ref}
+            type="text"
+            className="input"
+            value={value}
+            onChange={handleChange}
+            {...props}
+        />
     );
-};
+});

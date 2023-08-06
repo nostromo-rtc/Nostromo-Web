@@ -10,11 +10,13 @@ interface SidebarViewProps
     main: ReactNode;
     onClickBtnClose: (state: boolean) => void;
 }
-export const SidebarView: FC<SidebarViewProps> = ({sidebar, main, onClickBtnClose}) =>
+
+export const SidebarView: FC<SidebarViewProps> = ({ sidebar, main, onClickBtnClose }) =>
 {
-    /** Показать/скрыть sidebar */
+    /** Показать/скрыть sidebar. */
     const [showSidebar, setShowSidebar] = useState(true);
-    /** Кнопка для скрытия/раскрытия sidebar */
+
+    /** Кнопка для скрытия/раскрытия sidebar. */
     const showSidebarBtn = (
         <Tooltip title={showSidebar ? "Скрыть боковую панель" : "Показать боковую панель"}>
             <Button
@@ -26,18 +28,20 @@ export const SidebarView: FC<SidebarViewProps> = ({sidebar, main, onClickBtnClos
             </Button>
         </Tooltip>
     );
-    /** Кнопка для закрытия настроек */
+
+    /** Кнопка для закрытия настроек. */
     const exitSettingsBtn = (
         <Tooltip title="Закрыть настройки">
             <Button
                 className="sidebar-btn"
                 aria-label="Exit settings"
-                onClick={ev => { onClickBtnClose(false) }}
+                onClick={ev => { onClickBtnClose(false); }}
             >
                 <IoMdClose className="sidebar-btn-icon" />
             </Button>
         </Tooltip>
     );
+
     return (
         <>
             {showSidebar ?
@@ -54,8 +58,6 @@ export const SidebarView: FC<SidebarViewProps> = ({sidebar, main, onClickBtnClos
                     {exitSettingsBtn}
                 </div>
                 <div className="sidebar-view-main-scrollable-area" tabIndex={-1}>
-                    {/* TODO: использовать тут вместо обычного div, компонент List
-                        чтобы работала навигация при фокусе на нем (кнопки Home, End и стрелки), и так далее. */}
                     <div className="sidebar-view-main sidebar-view-main-width">
                         {main}
                     </div>

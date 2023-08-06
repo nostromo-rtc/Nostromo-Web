@@ -38,7 +38,7 @@
     overflow-x: hidden;
     overflow-y: auto;
     width: 100%;
-    min-height: calc( 100% - 48px ); /* Нужно, чтобы main занимал всю высоту с наличием header-а в 48px*/
+    flex: auto;
 }
 
 .sidebar-view-main-panel-without-sidebar .sidebar-view-main-scrollable-area
