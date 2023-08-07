@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Menu } from "../../Menu/Menu";
 import { MenuSectionLabel } from "../../Menu/MenuItems";
 import { Tooltip } from "../../Tooltip";
-import { Select } from "../../Select";
+import { Select } from "../../Base/Select";
 
 import "./DisplayBtnMenu.css";
 import { ResolutionObject } from "./RoomActionPanel";

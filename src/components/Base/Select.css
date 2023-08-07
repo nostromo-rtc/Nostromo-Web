@@ -1,3 +1,4 @@
+/* FIXME: Пока не юзается */
 .select
 {
     font-size: 13px;
@@ -19,4 +20,17 @@
 {
     box-shadow: 0 0 2px white;
     outline: none;
+}
+
+/* Старый css */
+.select-form-control
+{
+    width: 100%;
+    padding: 5px 10px 5px 10px;
+    box-sizing: border-box;
+}
+
+.select-input
+{
+    padding-left: 6px;
 }

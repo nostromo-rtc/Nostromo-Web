@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { DeviceListItem } from "../../../pages/RoomPage";
 import { Menu, MenuList } from "../../Menu/Menu";
 import { MenuItemRadio, MenuSectionLabel } from "../../Menu/MenuItems";
-import { Select } from "../../Select";
+import { Select } from "../../Base/Select";
 import { Tooltip } from "../../Tooltip";
 
 import "./CamBtnMenu.css";

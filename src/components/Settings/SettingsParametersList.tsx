@@ -51,6 +51,14 @@ export const SettingsParametersList: FC<SettingsParametersListProps> = ({ parame
         });
     };
 
+    const handleSelect = (section: string, group: string, param: string, val: string): void =>
+    {
+        settingsService.setSettings((prev: Settings) => 
+        {
+            prev[selectedCategory][section][group][param] = val;
+        });
+    };
+
     const getParametersList = (): JSX.Element[] =>
     {
         const parametersList: JSX.Element[] = [
@@ -129,9 +137,16 @@ export const SettingsParametersList: FC<SettingsParametersListProps> = ({ parame
                     }
                     else if (parametersInfoMap[parameterId].type === "Select")
                     {
+                        const selectList: string[] = ["First", "Second", "Third", "Fourth", "Fifth", "Sixth"];
                         parametersList.push(
                             <ListItemSelect
                                 key={parameterId}
+                                list={selectList}
+                                value={groupMap[parameter] as string}
+                                setValue={(val) =>
+                                {
+                                    handleSelect(section, group, parameter, val.toString());
+                                }}
                                 description={parametersInfoMap[parameterId].description}
                                 text={parametersInfoMap[parameterId].name}
                             />

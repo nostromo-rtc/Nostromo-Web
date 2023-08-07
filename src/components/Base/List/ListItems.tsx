@@ -4,8 +4,8 @@ import "./ListItems.css";
 import "../../Menu/MenuItems.css";
 import { isEmptyString } from "../../../Utils";
 import { Input } from "../Input";
+import { Divider, MenuItem, SelectChangeEvent, Slider } from "@mui/material";
 import { Select } from "../Select";
-import { Slider } from "@mui/material";
 
 interface ListItemProps extends React.HTMLAttributes<HTMLDivElement>
 {
@@ -173,18 +173,47 @@ export const ListItemInput: FC<ListItemInputProps> = ({ value, setValue, text, .
 //       либо написать новые для select
 interface ListItemSelectProps extends ListItemProps
 {
+    list: string[];
+    value: string;
+    setValue: Dispatch<SetStateAction<string>>;
     text: string;
 }
-export const ListItemSelect: FC<ListItemSelectProps> = ({ text, ...props }) =>
+export const ListItemSelect: FC<ListItemSelectProps> = ({ list, value, setValue, text, ...props }) =>
 {
+    const handleSelect = (ev: SelectChangeEvent): void =>
+    {
+        setValue(ev.target.value);
+        console.log(ev.target.value);
+    };
+
+    const selectItems = (item: string, index: number): JSX.Element =>
+    {
+        return (
+            <MenuItem value={item} key={index}>
+                <span className="v-align-middle">{item}</span>
+            </MenuItem>
+        );
+    };
+    
+    // FIXME: возможно ссылка понадобиться для обработчика, чтобы при нажатии Enter - открывался селект
+    //        и можно было стрелками передвигаться по списку
+    const selectRef = useRef<HTMLSelectElement>(null);
     return (
         <ListItem
             {...props}
         >
-            <label className="list-item-input-label-row">
-                <p className="list-item-label text-wrap">{text}</p>
-                <Select />
-            </label>
+            <Select
+                id="select-display-resolution"
+                value={value}
+                onChange={handleSelect}
+                transitionDuration={0}
+                autoFocus
+                ref={selectRef}
+            >
+                <MenuItem value={"default"}>По умолчанию</MenuItem>
+                <Divider className="menu-divider" />
+                {list.map(selectItems)}
+            </Select>
         </ListItem>
     );
 };
