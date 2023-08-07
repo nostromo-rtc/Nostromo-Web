@@ -1,4 +1,4 @@
-import { FC, useContext } from "react";
+import { FC, useContext, useState } from "react";
 import "./SettingsParametersList.css";
 import { Category, Group, ParametersInfoMap, Section, Settings, useSettings } from "../../services/SettingsService";
 import { ListItemInput, ListItemSelect, ListItemSlider, ListItemSwitch } from "../Base/List/ListItems";
@@ -15,6 +15,8 @@ export const SettingsParametersList: FC<SettingsParametersListProps> = ({ parame
 {
     const settingsService = useContext(SettingsContext);
     const settings = useSettings(settingsService);
+    // FIXME: Для сброса настроек
+    const [defaultSettings, setDefaultSettings] = useState<boolean>(false);
 
     const handleSwitch = (section: string, group: string, param: string, val?: boolean): void =>
     {
@@ -138,6 +140,23 @@ export const SettingsParametersList: FC<SettingsParametersListProps> = ({ parame
                 />
             );
         }
+        // Сброс настроек
+        // FIXME: Смотри сервис, я туда добавил новый тип
+        else if(paramValue.type as string === "Button")
+        {
+            elements.push(
+                <div className="settings-default-area">
+                    <label>{parametersInfoMap[parameterId].name}</label>
+                    <div className="settings-default-button-area">
+                        <div key={parameterId}
+                            className="settings-default-button"
+                            onClick={(ev) => { setDefaultSettings(true); }} 
+                        >Сбросить настройки
+                        </div>
+                    </div>
+                </div>
+            );
+        }
         else
         {
             elements.push(
@@ -146,6 +165,7 @@ export const SettingsParametersList: FC<SettingsParametersListProps> = ({ parame
                 </div>
             );
         }
+        console.log("dasdas: ", defaultSettings);
     };
 
     const loadGroup =

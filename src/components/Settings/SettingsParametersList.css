@@ -32,3 +32,36 @@
 {
     margin-top: 15px;
 }
+
+.settings-default-button
+{
+    height: 30px;
+    width: 150px;
+    background-color: #e53838;
+    border-radius: 5px;
+    cursor: pointer;
+    overflow: hidden;
+    display: flex;
+    font-size: 0.75rem;
+    justify-content: center;
+    align-items: center;
+    margin: 13px 0;
+}
+.settings-default-button:hover
+{
+    box-shadow: 0 0 2px white;
+}
+
+.settings-default-area
+{
+    user-select: none;
+    padding-top: 12px;
+    margin-bottom: 12px;
+    padding-left: 16px;
+    padding-right: 16px;
+}
+.settings-default-button-area
+{
+    display: flex;
+    justify-content: center;
+}

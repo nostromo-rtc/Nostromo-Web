@@ -2,7 +2,7 @@ import { useSyncExternalStore } from "react";
 import { cloneObject } from "../Utils";
 
 /* eslint-disable @typescript-eslint/naming-convention */
-export type ParameterType = "Input" | "Select" | "Slider" | "Switch";
+export type ParameterType = "Button" | "Input" | "Select" | "Slider" | "Switch";
 export type ParameterValue = boolean | number | string;
 export const LOCAL_STORAGE_SETTINGS = "nostromo-settings";
 
@@ -250,8 +250,8 @@ export const parametersInfoMap: ParametersInfoMap = {
     },
     "general.generalSection_4.generalGroup_4S_1.Hparam":
     {
-        name: "Восьмой тестовый параметр",
-        type: "Switch",
+        name: "Сбросить все настройки до стандартных",
+        type: "Button",
         defaultValue: defaultSettings.general.generalSection_4.generalGroup_4S_1.Hparam
     },
 

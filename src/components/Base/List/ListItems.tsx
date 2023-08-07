@@ -198,8 +198,6 @@ export const ListItemSelect: FC<ListItemSelectProps> = ({ list, value, setValue,
         if(ev.code === "Enter" || ev.code === "Space")
         {
             handleOpen();
-        }else{
-            ev.preventDefault();
         }
     };
     const handleClose = (): void => 
