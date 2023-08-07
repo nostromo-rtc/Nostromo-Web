@@ -2,7 +2,7 @@
 import "./Select.css";
 
 import { FormControl, Select as MuiSelect, SelectProps as MuiSelectProps } from "@mui/material";
-import { ReactNode, forwardRef} from "react";
+import { ReactNode, forwardRef } from "react";
 
 interface SelectProps<T = unknown>
 {
@@ -12,6 +12,7 @@ interface SelectProps<T = unknown>
     onChange: MuiSelectProps<T>["onChange"];
     open?: MuiSelectProps<T>["open"];
     onClose?: MuiSelectProps<T>["onClose"];
+    onOpen?: MuiSelectProps<T>["onOpen"];
     transitionDuration?: number;
     variant?: MuiSelectProps<T>["variant"];
     autoFocus?: boolean;
@@ -24,6 +25,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps<string>>(({
     onChange,
     open,
     onClose,
+    onOpen,
     children,
     transitionDuration,
     variant = "standard",
@@ -44,9 +46,10 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps<string>>(({
                     classes={{ select: "select-input" }}
                     MenuProps={{ transitionDuration: transitionDuration }}
                     autoFocus={autoFocus}
-                    ref={ref}
                     open={open}
                     onClose={onClose}
+                    onOpen={onOpen}
+                    ref={ref}
                 >
                     {children}
                 </MuiSelect>

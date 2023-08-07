@@ -197,23 +197,50 @@ export const ListItemSelect: FC<ListItemSelectProps> = ({ list, value, setValue,
     {
         if(ev.code === "Enter" || ev.code === "Space")
         {
-            setOpen(true);
+            handleOpen();
+        }else{
+            ev.preventDefault();
         }
     };
     const handleClose = (): void => 
     {
         setOpen(false);
     };
+    const handleOpen = (): void => 
+    {
+        setOpen(true);
+    };
     const handleSelectKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (ev) =>
     {
-        ev.stopPropagation();
+        if(open)
+        {
+            ev.stopPropagation();
+        }
+        else
+        {
+            // Если select закрыт, то оставляем дефолтное поведение, то есть клавиши вверх - вниз позволяют
+            // перемещаться по параметрам
+            ev.preventDefault();
+            // Так как дефолтного поведения не достаточно (из-за того что селект якобы открыт, хотя open и false)
+            // но необходимо явно закрыть его после preventDefault()
+            handleClose();
+        }
         if(ev.code === "Space")
         {
             handleClose();
         }
     };
-    
     const selectRef = useRef<HTMLSelectElement>(null);
+    // Делаем так, чтобы на select нельзя было сфокусироваться кнопкой Tab.
+    useEffect(() => 
+    {
+        const input = selectRef.current?.querySelector("div");
+
+        if (input)
+        {
+            input.tabIndex = -1;
+        }
+    });
     return (
         <ListItem
             {...props}
@@ -226,6 +253,7 @@ export const ListItemSelect: FC<ListItemSelectProps> = ({ list, value, setValue,
                 ref={selectRef}
                 open={open}
                 onClose={handleClose}
+                onOpen={handleOpen}
                 onKeyDown={handleSelectKeyDown}
             >
                 <MenuItem value={"default"}>По умолчанию</MenuItem>
