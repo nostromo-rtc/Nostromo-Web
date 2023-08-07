@@ -10,7 +10,9 @@ interface SelectProps<T = unknown>
     children: ReactNode;
     value: MuiSelectProps<T>["value"];
     onChange: MuiSelectProps<T>["onChange"];
-    transitionDuration: number;
+    open?: MuiSelectProps<T>["open"];
+    onClose?: MuiSelectProps<T>["onClose"];
+    transitionDuration?: number;
     variant?: MuiSelectProps<T>["variant"];
     autoFocus?: boolean;
 }
@@ -19,10 +21,12 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps<string>>(({
     id,
     value,
     onChange,
+    open,
+    onClose,
     children,
     transitionDuration,
     variant = "standard",
-    autoFocus = false
+    autoFocus = false,
 }, ref) =>
 {
     return (
@@ -37,7 +41,8 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps<string>>(({
                     MenuProps={{ transitionDuration: transitionDuration }}
                     autoFocus={autoFocus}
                     ref={ref}
-                    
+                    open={open}
+                    onClose={onClose}
                 >
                     {children}
                 </MuiSelect>

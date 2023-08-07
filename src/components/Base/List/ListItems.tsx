@@ -1,4 +1,4 @@
-import { Dispatch, FC, PropsWithChildren, ReactNode, SetStateAction, useEffect, useRef } from "react";
+import { Dispatch, FC, PropsWithChildren, ReactNode, SetStateAction, useEffect, useRef, useState } from "react";
 import { Switch } from "../Switch";
 import "./ListItems.css";
 import "../../Menu/MenuItems.css";
@@ -152,8 +152,6 @@ export const ListItemInput: FC<ListItemInputProps> = ({ value, setValue, text, .
         {
             inputRef.current.focus();
         }
-
-
     };
     return (
         <ListItem
@@ -194,21 +192,40 @@ export const ListItemSelect: FC<ListItemSelectProps> = ({ list, value, setValue,
             </MenuItem>
         );
     };
+    const [open, setOpen] = useState<boolean>(false);
+    const handleSelectKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (ev) =>
+    {
+        if(ev.code === "Enter" || ev.code === "Space")
+        {
+            setOpen(true);
+        }
+        if(open)
+        {
+            ev.stopPropagation();
+        }
+        else
+        {
+            ev.preventDefault();
+        }
+    };
+    const handleClose = (): void => 
+    {
+        setOpen(false);
+    };
     
-    // FIXME: возможно ссылка понадобиться для обработчика, чтобы при нажатии Enter - открывался селект
-    //        и можно было стрелками передвигаться по списку
     const selectRef = useRef<HTMLSelectElement>(null);
     return (
         <ListItem
             {...props}
+            onKeyDown={handleSelectKeyDown}
         >
             <Select
                 id="select-display-resolution"
                 value={value}
                 onChange={handleSelect}
-                transitionDuration={0}
-                autoFocus
                 ref={selectRef}
+                open={open}
+                onClose={handleClose}
             >
                 <MenuItem value={"default"}>По умолчанию</MenuItem>
                 <Divider className="menu-divider" />
