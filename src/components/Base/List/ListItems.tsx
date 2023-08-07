@@ -193,31 +193,31 @@ export const ListItemSelect: FC<ListItemSelectProps> = ({ list, value, setValue,
         );
     };
     const [open, setOpen] = useState<boolean>(false);
-    const handleSelectKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (ev) =>
+    const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (ev) =>
     {
         if(ev.code === "Enter" || ev.code === "Space")
         {
             setOpen(true);
-        }
-        if(open)
-        {
-            ev.stopPropagation();
-        }
-        else
-        {
-            ev.preventDefault();
         }
     };
     const handleClose = (): void => 
     {
         setOpen(false);
     };
+    const handleSelectKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (ev) =>
+    {
+        ev.stopPropagation();
+        if(ev.code === "Space")
+        {
+            handleClose();
+        }
+    };
     
     const selectRef = useRef<HTMLSelectElement>(null);
     return (
         <ListItem
             {...props}
-            onKeyDown={handleSelectKeyDown}
+            onKeyDown={handleKeyDown}
         >
             <Select
                 id="select-display-resolution"
@@ -226,6 +226,7 @@ export const ListItemSelect: FC<ListItemSelectProps> = ({ list, value, setValue,
                 ref={selectRef}
                 open={open}
                 onClose={handleClose}
+                onKeyDown={handleSelectKeyDown}
             >
                 <MenuItem value={"default"}>По умолчанию</MenuItem>
                 <Divider className="menu-divider" />

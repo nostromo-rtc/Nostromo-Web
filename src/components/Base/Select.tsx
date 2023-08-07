@@ -15,6 +15,7 @@ interface SelectProps<T = unknown>
     transitionDuration?: number;
     variant?: MuiSelectProps<T>["variant"];
     autoFocus?: boolean;
+    onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
 }
 
 export const Select = forwardRef<HTMLSelectElement, SelectProps<string>>(({
@@ -27,11 +28,14 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps<string>>(({
     transitionDuration,
     variant = "standard",
     autoFocus = false,
+    onKeyDown
 }, ref) =>
 {
     return (
         <div>
-            <FormControl className="select-form-control"> 
+            <FormControl className="select-form-control" 
+                onKeyDown={onKeyDown}
+            > 
                 <MuiSelect
                     id={id}
                     value={value}
