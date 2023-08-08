@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-import { cloneObject } from "../Utils";
+import { cloneObject, overrideValues } from "../Utils";
 
 /* eslint-disable @typescript-eslint/naming-convention */
 export type ParameterType = "Button" | "Input" | "Select" | "Slider" | "Switch";
@@ -314,8 +314,9 @@ export class SettingService
 
     public constructor()
     {
-        const storedSettings = localStorage.getItem(LOCAL_STORAGE_SETTINGS);
-        if (storedSettings === null)
+        this.currentSettings = cloneObject(defaultSettings);
+        const storedSettingsJson = localStorage.getItem(LOCAL_STORAGE_SETTINGS);
+        if (storedSettingsJson === null)
         {
             this.restoreToDefault();
             return;
@@ -323,13 +324,17 @@ export class SettingService
 
         try
         {
-            this.currentSettings = JSON.parse(storedSettings) as Settings;
-            this.saveSnapshot();
+            const storedSettings = JSON.parse(storedSettingsJson) as Settings;
+            overrideValues(this.currentSettings, storedSettings);
+            
+            localStorage.setItem(LOCAL_STORAGE_SETTINGS, JSON.stringify(this.currentSettings));
         }
         catch
         {
             this.restoreToDefault();
+            return;
         }
+        this.saveSnapshot();
     }
 
     public restoreToDefault(): void

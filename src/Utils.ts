@@ -97,3 +97,27 @@ export function cloneObject<T>(obj: T): T
 {
     return JSON.parse(JSON.stringify(obj)) as T;
 }
+
+export const isObjectAndNotArray = (obj : object) : boolean =>
+{
+    return typeof obj === "object" && !Array.isArray(obj); 
+}
+
+export const overrideValues = (target: object, override: object) : void =>
+{
+    for (const keyStr in target)
+    {
+        const key = keyStr as keyof object;
+        if (Object.hasOwn(override, key))
+        {
+            if (isObjectAndNotArray(target[key]) && isObjectAndNotArray(override[key]))
+            {
+                overrideValues(target[key], override[key]);
+            }
+            else
+            {
+                target[key] = override[key];
+            }
+        }
+    }
+}
