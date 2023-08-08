@@ -1,7 +1,7 @@
-import { FC, MouseEventHandler, useContext, useEffect, useRef, useState } from "react";
+import { FC, useContext, useEffect, useRef, useState } from "react";
 import "./SettingsParametersList.css";
 import { Category, Group, ParametersInfoMap, Section, Settings, useSettings } from "../../services/SettingsService";
-import { ListItemInput, ListItemSelect, ListItemSlider, ListItemSwitch } from "../Base/List/ListItems";
+import { ListItemButton, ListItemInput, ListItemSelect, ListItemSlider, ListItemSwitch } from "../Base/List/ListItems";
 import { List } from "../Base/List/List";
 import { SettingsContext } from "../../App";
 import { CiWarning } from "react-icons/ci";
@@ -65,11 +65,6 @@ export const SettingsParametersList: FC<SettingsParametersListProps> = ({ parame
     const settings = useSettings(settingsService);
 
     const [showRestoreDialog, setShowRestoreDialog] = useState<boolean>(false);
-
-    const handleRestoreSettingsClick: MouseEventHandler<HTMLButtonElement> = (): void =>
-    {
-        setShowRestoreDialog(true);
-    }
 
     const handleRestoreSettingsConfirm: MouseClickHandler= (): void =>
     {
@@ -208,16 +203,11 @@ export const SettingsParametersList: FC<SettingsParametersListProps> = ({ parame
         else if(paramValue.type as string === "Button")
         {
             elements.push(
-                <div className="settings-restore-area">
-                    <label>{parametersInfoMap[parameterId].name}</label>
-                    <div className="settings-default-button-area">
-                        <button key={parameterId}
-                            className="settings-button warning"
-                            onClick={handleRestoreSettingsClick} 
-                        >Сбросить настройки
-                        </button>
-                    </div>
-                </div>
+                <ListItemButton 
+                    name={parametersInfoMap[parameterId].name}
+                    action={"Сбросить найстроки"}
+                    setValue={setShowRestoreDialog}
+                />
             );
         }
         else

@@ -6,6 +6,7 @@ import { isEmptyString } from "../../../Utils";
 import { Input } from "../Input";
 import { Divider, MenuItem, SelectChangeEvent, Slider } from "@mui/material";
 import { Select } from "../Select";
+import { BaseButton } from "../BaseButton";
 
 interface ListItemProps extends React.HTMLAttributes<HTMLDivElement>
 {
@@ -334,8 +335,8 @@ export const ListItemSlider: FC<ListItemSliderProps> = ({ text, value, setValue,
             {...props}
         >
             <label className="list-item-slider-label-row">
-                <p className="menu-item-label text-wrap">{text}</p>
-                <div className="menu-item-slider-container">
+                <p className="list-item-label text-wrap">{text}</p>
+                <div className="list-item-slider-container">
                     <Slider
                         value={value}
                         onChange={handleSliderChange}
@@ -345,6 +346,44 @@ export const ListItemSlider: FC<ListItemSliderProps> = ({ text, value, setValue,
                         ref={sliderRef}
                     />
                 </div>
+            </label>
+        </ListItem>
+    );
+};
+
+interface ListItemButtonProps extends ListItemProps
+{
+    name: string;
+    action: string;
+    setValue: Dispatch<SetStateAction<boolean>>;
+}
+export const ListItemButton: FC<ListItemButtonProps> = ({ name, action, setValue, ...props }) =>
+{
+    const handleButtonKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (ev) =>
+    {
+        console.log("TUTTTT: ", ev.code);
+        if (ev.code === "Space" || ev.code === "Enter")
+        {
+            ev.preventDefault();
+            setValue(true);
+        }
+        if (ev.key === "ArrowDown" || ev.key === "ArrowUp")
+        {
+            ev.preventDefault();
+        }
+    };
+
+    return (
+        <ListItem
+            {...props}
+            onKeyDown={handleButtonKeyDown}
+        >
+            <label className="list-item-button-label-row">
+                <p className="list-item-label text-wrap">{name}</p>
+                <BaseButton
+                        action={action}
+                        setValue={setValue}
+                    />
             </label>
         </ListItem>
     );

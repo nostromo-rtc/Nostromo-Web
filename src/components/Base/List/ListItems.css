@@ -38,6 +38,13 @@
     align-items: center;
     cursor: pointer;
 }
+.list-item-button-label-row
+{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
 
 .list-item-slider-label-row
 {
@@ -45,6 +52,12 @@
     flex-direction: column;
     justify-content: center;
     cursor: pointer;
+}
+.list-item-slider-container {
+    display: inline-flex;
+    padding-right: 8px;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 .list-item:hover

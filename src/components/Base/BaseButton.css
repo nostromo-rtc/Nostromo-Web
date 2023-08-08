@@ -1,0 +1,22 @@
+.base-button
+{
+    border-radius: 5px;
+    color: var(--primary-text-color);
+    background-color: var(--error-color);
+    height: 30px;
+    width: 170px;
+    font-size: 0.75rem;
+}
+
+.base-button:hover
+{
+    background-color: var(--secondary-bg-color);
+    box-shadow: 0 0 2px white;
+    outline: none;
+}
+
+.base-button:focus
+{
+    background-color: var(--secondary-bg-color);
+    box-shadow: 0 0 2px white;
+}
