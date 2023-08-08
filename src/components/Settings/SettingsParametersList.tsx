@@ -66,6 +66,10 @@ export const SettingsParametersList: FC<SettingsParametersListProps> = ({ parame
 
     const [showRestoreDialog, setShowRestoreDialog] = useState<boolean>(false);
 
+    const handleRestoreSettingsShow: MouseClickHandler = (): void =>
+    {
+        setShowRestoreDialog(true);
+    }
     const handleRestoreSettingsConfirm: MouseClickHandler= (): void =>
     {
         settingsService.restoreToDefault();
@@ -204,9 +208,10 @@ export const SettingsParametersList: FC<SettingsParametersListProps> = ({ parame
         {
             elements.push(
                 <ListItemButton 
+                    key={parameterId}
                     name={parametersInfoMap[parameterId].name}
                     action={"Сбросить найстроки"}
-                    setValue={setShowRestoreDialog}
+                    onClick={handleRestoreSettingsShow}
                 />
             );
         }

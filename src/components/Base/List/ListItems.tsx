@@ -4,9 +4,8 @@ import "./ListItems.css";
 import "../../Menu/MenuItems.css";
 import { isEmptyString } from "../../../Utils";
 import { Input } from "../Input";
-import { Divider, MenuItem, SelectChangeEvent, Slider } from "@mui/material";
+import { Button, Divider, MenuItem, SelectChangeEvent, Slider } from "@mui/material";
 import { Select } from "../Select";
-import { BaseButton } from "../BaseButton";
 
 interface ListItemProps extends React.HTMLAttributes<HTMLDivElement>
 {
@@ -355,17 +354,16 @@ interface ListItemButtonProps extends ListItemProps
 {
     name: string;
     action: string;
-    setValue: Dispatch<SetStateAction<boolean>>;
+    onClick: () => void;
 }
-export const ListItemButton: FC<ListItemButtonProps> = ({ name, action, setValue, ...props }) =>
+export const ListItemButton: FC<ListItemButtonProps> = ({ name, action, onClick, ...props }) =>
 {
     const handleButtonKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (ev) =>
     {
-        console.log("TUTTTT: ", ev.code);
         if (ev.code === "Space" || ev.code === "Enter")
         {
             ev.preventDefault();
-            setValue(true);
+            onClick();
         }
         if (ev.key === "ArrowDown" || ev.key === "ArrowUp")
         {
@@ -380,10 +378,12 @@ export const ListItemButton: FC<ListItemButtonProps> = ({ name, action, setValue
         >
             <label className="list-item-button-label-row">
                 <p className="list-item-label text-wrap">{name}</p>
-                <BaseButton
-                        action={action}
-                        setValue={setValue}
-                    />
+                <Button key={action}
+                    className="list-item-button"
+                    onClick={onClick}
+                    tabIndex={-1}
+                >{action}
+                </Button>
             </label>
         </ListItem>
     );
