@@ -1,9 +1,57 @@
-import { FC, useContext, useState } from "react";
+import { FC, MouseEventHandler, useContext, useEffect, useRef, useState } from "react";
 import "./SettingsParametersList.css";
 import { Category, Group, ParametersInfoMap, Section, Settings, useSettings } from "../../services/SettingsService";
 import { ListItemInput, ListItemSelect, ListItemSlider, ListItemSwitch } from "../Base/List/ListItems";
 import { List } from "../Base/List/List";
 import { SettingsContext } from "../../App";
+import { CiWarning } from "react-icons/ci";
+import { FocusTrap } from "../FocusTrap";
+import { Button } from "@mui/material";
+
+type MouseClickHandler = () => void;
+
+interface SettingsRestoreConfirmPanelProps
+{
+    onConfirm: MouseClickHandler;
+    onCancel:  MouseClickHandler;
+}
+
+const SettingsRestoreConfirmPanel: FC<SettingsRestoreConfirmPanelProps> = ({onConfirm, onCancel}) =>
+{
+    const cancelRef = useRef<HTMLButtonElement>(null);
+
+    useEffect(() =>
+    {
+        cancelRef.current?.focus();
+    }, [cancelRef]);
+
+    return(
+        <div className="settings-restore-panel">
+            <CiWarning className="settings-restore-icon" />
+            <p>Это действие приведёт к сбросу всех настроек.</p>
+            <p>Вы уверены что хотите восстановить настройки по умолчанию?</p>
+            <div className="settings-restore-buttons-container">
+                <FocusTrap>
+                    <div className="settings-default-button-area">
+                        <Button
+                            className="settings-button warning"
+                            onClick={onConfirm}
+                        >Да
+                        </Button>
+                    </div>
+                    <div className="settings-default-button-area">
+                        <Button
+                            ref={cancelRef}
+                            className="settings-button"
+                            onClick={onCancel}
+                        >Нет
+                        </Button>
+                    </div>
+                </FocusTrap>
+            </div>
+        </div>
+    )
+}
 
 interface SettingsParametersListProps
 {
@@ -15,8 +63,23 @@ export const SettingsParametersList: FC<SettingsParametersListProps> = ({ parame
 {
     const settingsService = useContext(SettingsContext);
     const settings = useSettings(settingsService);
-    // FIXME: Для сброса настроек
-    const [defaultSettings, setDefaultSettings] = useState<boolean>(false);
+
+    const [showRestoreDialog, setShowRestoreDialog] = useState<boolean>(false);
+
+    const handleRestoreSettingsClick: MouseEventHandler<HTMLButtonElement> = (): void =>
+    {
+        setShowRestoreDialog(true);
+    }
+
+    const handleRestoreSettingsConfirm: MouseClickHandler= (): void =>
+    {
+        settingsService.restoreToDefault();
+        setShowRestoreDialog(false);
+    }
+    const handleRestoreSettingsCancel: MouseClickHandler = (): void =>
+    {
+        setShowRestoreDialog(false);
+    }
 
     const handleSwitch = (section: string, group: string, param: string, val?: boolean): void =>
     {
@@ -145,14 +208,14 @@ export const SettingsParametersList: FC<SettingsParametersListProps> = ({ parame
         else if(paramValue.type as string === "Button")
         {
             elements.push(
-                <div className="settings-default-area">
+                <div className="settings-restore-area">
                     <label>{parametersInfoMap[parameterId].name}</label>
                     <div className="settings-default-button-area">
-                        <div key={parameterId}
-                            className="settings-default-button"
-                            onClick={(ev) => { setDefaultSettings(true); }} 
+                        <button key={parameterId}
+                            className="settings-button warning"
+                            onClick={handleRestoreSettingsClick} 
                         >Сбросить настройки
-                        </div>
+                        </button>
                     </div>
                 </div>
             );
@@ -165,7 +228,6 @@ export const SettingsParametersList: FC<SettingsParametersListProps> = ({ parame
                 </div>
             );
         }
-        console.log("dasdas: ", defaultSettings);
     };
 
     const loadGroup =
@@ -225,6 +287,16 @@ export const SettingsParametersList: FC<SettingsParametersListProps> = ({ parame
     };
 
     return (
-        <List>{loadSelectedCategory()}</List>
+        <>
+            {showRestoreDialog ? 
+                <div className="backdrop">
+                    <SettingsRestoreConfirmPanel
+                        onConfirm={handleRestoreSettingsConfirm}
+                        onCancel={handleRestoreSettingsCancel}
+                    />
+                </div>
+            : <></>}
+            <List>{loadSelectedCategory()}</List>
+        </>
     );
 };

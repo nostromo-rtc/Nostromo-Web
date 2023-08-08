@@ -337,6 +337,7 @@ export class SettingService
         this.currentSettings = cloneObject(defaultSettings);
         this.saveSnapshot();
         localStorage.setItem(LOCAL_STORAGE_SETTINGS, JSON.stringify(this.currentSettings));
+        this.notifyListeners();
     }
 
     public setSettings(callback: SettingsSetCallback): void
@@ -344,10 +345,7 @@ export class SettingService
         callback(this.currentSettings);
         this.saveSnapshot();
         localStorage.setItem(LOCAL_STORAGE_SETTINGS, JSON.stringify(this.currentSettings));
-        for (const listener of this.listeners)
-        {
-            listener();
-        }
+        this.notifyListeners();
     }
 
     public addListener(listener: SettingsListener): void
@@ -374,6 +372,14 @@ export class SettingService
     private saveSnapshot(): void
     {
         this.shapshot = cloneObject(this.currentSettings);
+    }
+
+    private notifyListeners(): void
+    {
+        for (const listener of this.listeners)
+        {
+            listener();
+        }
     }
 }
 

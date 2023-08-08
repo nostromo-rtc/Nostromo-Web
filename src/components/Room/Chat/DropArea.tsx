@@ -69,11 +69,11 @@ export const DropArea: React.FC<DropAreaProps> = ({ uploadingFilesQueue, setUplo
     };
 
     return (
-        <div id="drop-area"
+        <div className="backdrop"
             onDrop={handleDrop}
             onDragOver={handleDragOver}
         >
-            <div id="drop-area-panel">
+            <div className="relative">
                 <div id="drop-area-icon-container"><GiFiles id="drop-area-icon" /></div>
                 <div id="drop-area-border">Отпустите файл для загрузки</div>
             </div>

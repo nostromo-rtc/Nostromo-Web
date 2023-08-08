@@ -1,21 +1,3 @@
-#drop-area
-{
-    position: absolute;
-    z-index: 10;
-    background-color: #00000099;
-    display: flex;
-    width: 100%;
-    height: 100%;
-    justify-content: center;
-    align-items: center;
-}
-
-#drop-area-panel
-{
-    position: relative;
-    z-index: 1;
-}
-
 #drop-area-border
 {
     background-color: #22485e;
