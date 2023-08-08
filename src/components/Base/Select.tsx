@@ -28,32 +28,30 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps<string>>(({
     onOpen,
     children,
     transitionDuration,
-    variant = "standard",
+    variant = "outlined",
     autoFocus = false,
     onKeyDown
 }, ref) =>
 {
     return (
-        <div>
-            <FormControl className="select-form-control" 
-                onKeyDown={onKeyDown}
-            > 
-                <MuiSelect
-                    id={id}
-                    value={value}
-                    onChange={onChange}
-                    variant={variant}
-                    classes={{ select: "select-input" }}
-                    MenuProps={{ transitionDuration: transitionDuration }}
-                    autoFocus={autoFocus}
-                    open={open}
-                    onClose={onClose}
-                    onOpen={onOpen}
-                    ref={ref}
-                >
-                    {children}
-                </MuiSelect>
-            </FormControl>
-        </div>
+        <FormControl className="select-form-control" 
+            onKeyDown={onKeyDown}
+        > 
+            <MuiSelect
+                id={id}
+                value={value}
+                onChange={onChange}
+                variant={variant}
+                classes={{ select: "select-input" }}
+                MenuProps={{ transitionDuration: transitionDuration }}
+                autoFocus={autoFocus}
+                open={open}
+                onClose={onClose}
+                onOpen={onOpen}
+                ref={ref}
+            >
+                {children}
+            </MuiSelect>
+        </FormControl>
     );
 });

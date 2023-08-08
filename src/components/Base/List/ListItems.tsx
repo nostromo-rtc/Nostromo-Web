@@ -1,4 +1,4 @@
-import { Dispatch, FC, PropsWithChildren, ReactNode, SetStateAction, useEffect, useRef, useState } from "react";
+import { Dispatch, FC, PropsWithChildren, ReactNode, SetStateAction, forwardRef, useEffect, useRef, useState } from "react";
 import { Switch } from "../Switch";
 import "./ListItems.css";
 import "../../Menu/MenuItems.css";
@@ -244,8 +244,9 @@ export const ListItemSelect: FC<ListItemSelectProps> = ({ list, value, setValue,
             {...props}
             onKeyDown={handleKeyDown}
         >
+            <p className="list-item-label select-label text-wrap">{text}</p>
             <Select
-                id="select-display-resolution"
+                id={text}
                 value={value}
                 onChange={handleSelect}
                 ref={selectRef}
@@ -356,7 +357,7 @@ interface ListItemButtonProps extends ListItemProps
     action: string;
     onClick: () => void;
 }
-export const ListItemButton: FC<ListItemButtonProps> = ({ name, action, onClick, ...props }) =>
+export const ListItemButton = forwardRef<HTMLLabelElement, ListItemButtonProps>(({ name, action, onClick, ...props }, ref) =>
 {
     const handleButtonKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (ev) =>
     {
@@ -370,13 +371,12 @@ export const ListItemButton: FC<ListItemButtonProps> = ({ name, action, onClick,
             ev.preventDefault();
         }
     };
-
     return (
         <ListItem
             {...props}
             onKeyDown={handleButtonKeyDown}
         >
-            <label className="list-item-button-label-row">
+            <label className="list-item-button-label-row" ref={ref}>
                 <p className="list-item-label text-wrap">{name}</p>
                 <Button key={action}
                     className="list-item-button"
@@ -387,4 +387,4 @@ export const ListItemButton: FC<ListItemButtonProps> = ({ name, action, onClick,
             </label>
         </ListItem>
     );
-};
+});

@@ -60,11 +60,11 @@
 
 .warning
 {
-    background-color: var(--error-color);
+    background-color: #c73335;
 }
 .warning:hover
 {
-    background-color: var(--error-color);
+    background-color: #e6595b;
 }
 
 

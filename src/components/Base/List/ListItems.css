@@ -21,6 +21,12 @@
     padding: 0;
     margin: 0;
 }
+.select-label
+{
+    text-transform: uppercase;
+    color: #b1bdbc;
+    font-size: 0.85rem;
+}
 
 .list-item
 {
@@ -86,7 +92,7 @@
 {
     border-radius: 5px;
     color: var(--primary-text-color);
-    background-color: var(--error-color);
+    background-color: #c73335;
     height: 30px;
     width: 170px;
     font-size: 0.75rem;
@@ -94,13 +100,7 @@
 
 .list-item-button:hover
 {
-    background-color: var(--secondary-bg-color);
+    background-color: #e6595b;
     box-shadow: 0 0 2px white;
     outline: none;
-}
-
-.list-item-button:focus
-{
-    background-color: var(--secondary-bg-color);
-    box-shadow: 0 0 2px white;
 }

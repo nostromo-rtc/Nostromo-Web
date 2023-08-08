@@ -64,6 +64,8 @@ export const SettingsParametersList: FC<SettingsParametersListProps> = ({ parame
     const settingsService = useContext(SettingsContext);
     const settings = useSettings(settingsService);
 
+    // Для выставления фокуса обратно на список после закрытия диалогового окна со сбросом настроек
+    const focusRef = useRef<HTMLLabelElement>(null);
     const [showRestoreDialog, setShowRestoreDialog] = useState<boolean>(false);
 
     const handleRestoreSettingsShow: MouseClickHandler = (): void =>
@@ -74,10 +76,12 @@ export const SettingsParametersList: FC<SettingsParametersListProps> = ({ parame
     {
         settingsService.restoreToDefault();
         setShowRestoreDialog(false);
+        focusRef.current?.focus();
     }
     const handleRestoreSettingsCancel: MouseClickHandler = (): void =>
     {
         setShowRestoreDialog(false);
+        focusRef.current?.focus();
     }
 
     const handleSwitch = (section: string, group: string, param: string, val?: boolean): void =>
@@ -209,6 +213,7 @@ export const SettingsParametersList: FC<SettingsParametersListProps> = ({ parame
             elements.push(
                 <ListItemButton 
                     key={parameterId}
+                    ref={focusRef}
                     name={parametersInfoMap[parameterId].name}
                     action={"Сбросить найстроки"}
                     onClick={handleRestoreSettingsShow}
