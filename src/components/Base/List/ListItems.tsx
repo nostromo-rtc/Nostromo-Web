@@ -287,13 +287,13 @@ export const ListItemSlider: FC<ListItemSliderProps> = ({ text, value, setValue,
     //    но поскольку они нужны для навигации, то предотвращаем это поведение по умолчанию.
     const handleSliderKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (ev) =>
     {
-        if (ev.key === "ArrowLeft" || ev.key === "ArrowRight")
-        {
-            ev.stopPropagation();
-        }
-        if (ev.key === "ArrowDown" || ev.key === "ArrowUp")
+        if (ev.key === "ArrowDown" || ev.key === "ArrowUp" )
         {
             ev.preventDefault();
+        }
+        else
+        {
+            ev.stopPropagation();
         }
     };
 

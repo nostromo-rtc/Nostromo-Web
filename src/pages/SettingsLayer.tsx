@@ -48,7 +48,7 @@ export const SettingsLayer: React.FC<SettingsLayerProps> = ({ setShowSettings })
     }, [layerRef]);
 
     const categoryList = (
-        <SettingsCategoryList setSelectedCategory={setSelectedCategory} />
+        <SettingsCategoryList setSelectedCategory={setSelectedCategory} selectedCategory={selectedCategory}/>
     );
 
     const parameterList = (

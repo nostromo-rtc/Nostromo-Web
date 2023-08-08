@@ -89,6 +89,10 @@ export const PrefixConstants = {
 
 export const ZERO_IDX = 0;
 
+export const ZERO_TAB_IDX = 0;
+
+export const NEGATIVE_TAB_IDX = -1;
+
 export const FILE_SIZE_PRESCISSION = 3;
 
 export const IDX_STEP = 1;

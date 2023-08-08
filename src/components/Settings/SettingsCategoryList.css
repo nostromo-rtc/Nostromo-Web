@@ -18,13 +18,13 @@
 
 .category-list-item:focus
 {
-    background-color: #3b3f41;
+    background-color: #414652;
     box-shadow: none;
 }
 
 .category-list-item:focus-visible
 {
-    background-color: #3b3f41;
+    background-color: #414652;
     outline: none;
 }
 
@@ -50,4 +50,9 @@
     font-size: 1rem;
     color: var(--primary-text-color);
     word-wrap: anywhere;
+}
+.category-list-active
+{
+    background-color: #3b3f41;
+    box-shadow: none;
 }
