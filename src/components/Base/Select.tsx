@@ -30,12 +30,22 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps<string>>(({
     onOpen,
     children,
     transitionDuration,
-    variant = "outlined",
+    variant = "standard",
     autoFocus = false,
     onKeyDown,
     tabIndex = ZERO_TAB_IDX
 }, ref) =>
 {
+    const selectDisplayProps: React.HTMLAttributes<HTMLDivElement> =
+    {
+        tabIndex: tabIndex
+    };
+
+    if (onKeyDown)
+    {
+        selectDisplayProps.onKeyDown = onKeyDown;
+    }
+
     return (
         <FormControl className="select-form-control"
             onKeyDown={onKeyDown}
@@ -52,10 +62,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps<string>>(({
                 onClose={onClose}
                 onOpen={onOpen}
                 ref={ref}
-                SelectDisplayProps={{
-                    tabIndex: tabIndex,
-                    onKeyDown: onKeyDown
-                }}
+                SelectDisplayProps={selectDisplayProps}
             >
                 {children}
             </MuiSelect>

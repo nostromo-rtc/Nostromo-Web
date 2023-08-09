@@ -250,7 +250,7 @@ export const ListItemSelect: FC<ListItemSelectProps> = ({
             {...props}
             onKeyDown={handleItemKeyDown}
         >
-            <p className="list-item-label select-label text-wrap">{label}</p>
+            <p className="list-item-label list-item-select-label text-wrap">{label}</p>
             <Select
                 value={value}
                 onChange={handleSelect}
@@ -259,6 +259,7 @@ export const ListItemSelect: FC<ListItemSelectProps> = ({
                 onOpen={handleOpen}
                 onKeyDown={handleSelectKeyDown}
                 tabIndex={NEGATIVE_TAB_IDX}
+                variant="outlined"
             >
                 <MenuItem value={"default"}>По умолчанию</MenuItem>
                 <Divider className="menu-divider" />

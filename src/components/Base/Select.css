@@ -1,12 +1,12 @@
 .select-form-control
 {
     width: 100%;
-    margin-top: 15px;
+    display: flex;
 }
 
 .select-input
 {
-    padding: 10px;
+    padding: 8px;
     background-color: rgb(37, 38, 39);
     padding-left: 15px;
 }
