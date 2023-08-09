@@ -1,16 +1,16 @@
-import { Dispatch, FC, SetStateAction, useContext } from "react";
+import { FC, useContext } from "react";
 import { Settings, useSettings } from "../../services/SettingsService";
 
-import "./SettingsCategoryList.css";
+import { SettingsContext } from "../../AppWrapper";
+import { NEGATIVE_TAB_IDX, ReactDispatch, ZERO_TAB_IDX } from "../../Utils";
 import { List } from "../Base/List/List";
-import { MenuSectionLabel } from "../Menu/MenuItems";
-import { SettingsContext } from "../../App";
-import { NEGATIVE_TAB_IDX, ZERO_TAB_IDX } from "../../Utils";
+import { ListSectionLabel } from "../Base/List/ListItems";
+import "./SettingsCategoryList.css";
 
 interface SettingsCategoryListProps
 {
     selectedCategory: string;
-    setSelectedCategory: Dispatch<SetStateAction<string>>;
+    setSelectedCategory: ReactDispatch<string>;
 }
 
 export const SettingsCategoryList: FC<SettingsCategoryListProps> = ({ selectedCategory, setSelectedCategory }) =>
@@ -20,27 +20,36 @@ export const SettingsCategoryList: FC<SettingsCategoryListProps> = ({ selectedCa
 
     return (
         <List id="settings-category-list">
-            <ListSection sectionLabel="Настройки" list={settings} setSelectedCategory={setSelectedCategory} selectedCategory={selectedCategory} />
+            <SettingsCategoryListSection sectionLabel="Настройки"
+                settings={settings}
+                selectedCategory={selectedCategory}
+                setSelectedCategory={setSelectedCategory}
+            />
         </List>
     );
 };
 
-interface ListSectionProps
+interface SettingsCategoryListSectionProps
 {
-    selectedCategory: string;
     sectionLabel: string;
-    list: Settings;
-    setSelectedCategory: Dispatch<SetStateAction<string>>;
+    settings: Settings;
+    selectedCategory: string;
+    setSelectedCategory: ReactDispatch<string>;
 }
 
-const ListSection: React.FC<ListSectionProps> = ({ selectedCategory, sectionLabel, list, setSelectedCategory }) =>
+const SettingsCategoryListSection: React.FC<SettingsCategoryListSectionProps> = ({
+    sectionLabel,
+    settings,
+    selectedCategory,
+    setSelectedCategory
+}) =>
 {
     const categoryList: JSX.Element[] = [];
 
-    for (const category in list)
+    for (const category in settings)
     {
         categoryList.push(
-            <ListItem
+            <SettingsCategoryListItem
                 onFocus={() => { setSelectedCategory(category); }}
                 selectedCategory={selectedCategory}
                 category={category}
@@ -50,22 +59,32 @@ const ListSection: React.FC<ListSectionProps> = ({ selectedCategory, sectionLabe
     }
 
     return <>
-        <MenuSectionLabel text={`${sectionLabel}`} />
+        <ListSectionLabel text={sectionLabel} />
         {categoryList}
     </>;
 };
 
-interface ListItemProps extends React.HTMLAttributes<HTMLDivElement>
+interface SettingsCategoryListItemProps extends React.HTMLAttributes<HTMLDivElement>
 {
     selectedCategory: string;
     category: string;
 }
 
-const ListItem: React.FC<ListItemProps> = ({ selectedCategory, category, ...props }) =>
+const SettingsCategoryListItem: React.FC<SettingsCategoryListItemProps> = ({
+    selectedCategory,
+    category,
+    ...props
+}) =>
 {
     return (
-        <div className={"category-list-item non-selectable " + (selectedCategory === category? "category-list-active" : "")}
-            tabIndex={selectedCategory === category? ZERO_TAB_IDX : NEGATIVE_TAB_IDX}
+        <div
+            className={
+                "category-list-item non-selectable" +
+                (selectedCategory === category ? " category-list-active" : "")
+            }
+            tabIndex={
+                selectedCategory === category ? ZERO_TAB_IDX : NEGATIVE_TAB_IDX
+            }
             role="listitem"
             {...props}
         >

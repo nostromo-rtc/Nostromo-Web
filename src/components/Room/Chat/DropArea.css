@@ -9,6 +9,7 @@
     align-items: center;
     text-align: center;
     filter: drop-shadow(0px 0px 12px rgb(170, 170, 210, 0.5));
+    box-sizing: border-box;
 }
 
 #drop-area-icon-container

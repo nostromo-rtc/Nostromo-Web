@@ -1,7 +1,6 @@
 #settings-category-list
 {
     width: 100%;
-    height: 100%;
 }
 
 .category-list-item
@@ -51,6 +50,7 @@
     color: var(--primary-text-color);
     word-wrap: anywhere;
 }
+
 .category-list-active
 {
     background-color: #3b3f41;

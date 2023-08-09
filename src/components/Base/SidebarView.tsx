@@ -1,14 +1,17 @@
-import { FC, ReactNode, useState } from "react";
+import { FC, MouseEventHandler, ReactNode, useState } from "react";
 import { Tooltip } from "../Tooltip";
 import { Button } from "@mui/material";
 import { TfiMenu } from "react-icons/tfi";
 import { IoMdClose } from "react-icons/io";
+import { NEGATIVE_TAB_IDX } from "../../Utils";
+
+import "./SidebarView.css";
 
 interface SidebarViewProps
 {
     sidebar: ReactNode;
     main: ReactNode;
-    onClickBtnClose: (state: boolean) => void;
+    onClickBtnClose: MouseEventHandler<HTMLButtonElement>;
 }
 
 export const SidebarView: FC<SidebarViewProps> = ({ sidebar, main, onClickBtnClose }) =>
@@ -29,35 +32,37 @@ export const SidebarView: FC<SidebarViewProps> = ({ sidebar, main, onClickBtnClo
         </Tooltip>
     );
 
-    /** Кнопка для закрытия настроек. */
-    const exitSettingsBtn = (
-        <Tooltip title="Закрыть настройки">
+    /** Кнопка для закрытия SidebarView. */
+    const exitSidebarViewBtn = (
+        <Tooltip title="Закрыть">
             <Button
                 className="sidebar-btn"
-                aria-label="Exit settings"
-                onClick={ev => { onClickBtnClose(false); }}
+                aria-label="Exit"
+                onClick={onClickBtnClose}
             >
                 <IoMdClose className="sidebar-btn-icon" />
             </Button>
         </Tooltip>
     );
 
+    const sidebarElem = (
+        <div className="sidebar-view-sidebar-panel">
+            <div className="sidebar-view-sidebar">
+                {sidebar}
+            </div>
+        </div>
+    );
+
     return (
         <>
-            {showSidebar ?
-                <div className="sidebar-view-sidebar-panel">
-                    <div className="sidebar-view-sidebar">
-                        {sidebar}
-                    </div>
-                </div>
-                : <></>}
+            {showSidebar ? sidebarElem : <></>}
             <div className={showSidebar ? "sidebar-view-main-panel" : "sidebar-view-main-panel sidebar-view-main-panel-without-sidebar"}>
                 <div className="sidebar-view-header sidebar-view-main-width">
                     {showSidebarBtn}
                     <div className="horizontal-expander"></div>
-                    {exitSettingsBtn}
+                    {exitSidebarViewBtn}
                 </div>
-                <div className="sidebar-view-main-scrollable-area" tabIndex={-1}>
+                <div className="sidebar-view-main-scrollable-area" tabIndex={NEGATIVE_TAB_IDX}>
                     <div className="sidebar-view-main sidebar-view-main-width">
                         {main}
                     </div>

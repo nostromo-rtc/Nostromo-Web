@@ -1,25 +1,25 @@
-import { Dispatch, FC, PropsWithChildren, ReactNode, SetStateAction, forwardRef, useEffect, useRef, useState } from "react";
+import { Button, Divider, MenuItem, SelectChangeEvent, Slider } from "@mui/material";
+import { ChangeEventHandler, FC, FocusEventHandler, KeyboardEventHandler, ReactNode, useRef, useState } from "react";
+import { NEGATIVE_TAB_IDX, isEmptyString } from "../../../Utils";
+import { Input } from "../Input";
+import { Select } from "../Select";
 import { Switch } from "../Switch";
 import "./ListItems.css";
-import "../../Menu/MenuItems.css";
-import { isEmptyString } from "../../../Utils";
-import { Input } from "../Input";
-import { Button, Divider, MenuItem, SelectChangeEvent, Slider } from "@mui/material";
-import { Select } from "../Select";
+import { MdInfoOutline } from "react-icons/md";
 
 interface ListItemProps extends React.HTMLAttributes<HTMLDivElement>
 {
-    onKeyDown?: React.KeyboardEventHandler<HTMLDivElement>;
     children?: ReactNode;
     showSeparator?: boolean;
     description?: string;
+    onKeyDown?: React.KeyboardEventHandler<HTMLDivElement>;
 }
 
-export const ListItem: FC<PropsWithChildren<ListItemProps>> = ({
+export const ListItem: FC<ListItemProps> = ({
     children,
-    onKeyDown,
     showSeparator = true,
     description,
+    onKeyDown,
     className,
     ...props
 }) =>
@@ -46,7 +46,7 @@ export const ListItem: FC<PropsWithChildren<ListItemProps>> = ({
     return (
         <div onKeyDown={handleKeyDown}
             ref={itemRef}
-            tabIndex={-1}
+            tabIndex={NEGATIVE_TAB_IDX}
             role="listitem"
             className={`list-item ${className ?? ""}`}
             {...props}
@@ -58,43 +58,44 @@ export const ListItem: FC<PropsWithChildren<ListItemProps>> = ({
     );
 };
 
-interface ListItemSwitchProps extends ListItemProps
+interface ListItemWithValueProps<T> extends ListItemProps
 {
-    text: string;
-    checked: boolean;
-    /** TODO: должно быть Dispatch<SetStateAction<boolean>>; */
-    setChecked: (val: boolean) => void;
+    label: string;
+    value: T;
+    onValueChange: (value: T) => void;
 }
+
+type ListItemSwitchProps = ListItemWithValueProps<boolean>;
+
 export const ListItemSwitch: FC<ListItemSwitchProps> = ({
-    text,
-    checked,
-    setChecked,
+    label,
+    value,
+    onValueChange,
     ...props
 }) =>
 {
-    const handleKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (ev) =>
+    const handleKeyDown: KeyboardEventHandler<HTMLDivElement> = (ev) =>
     {
         if (ev.code === "Space" || ev.code === "Enter")
         {
             ev.preventDefault();
-            //setChecked(prev => !prev);
-            setChecked(!checked);
+            onValueChange(!value);
         }
         else if (ev.code === "ArrowRight")
         {
             ev.preventDefault();
-            setChecked(true);
+            onValueChange(true);
         }
         else if (ev.code === "ArrowLeft")
         {
             ev.preventDefault();
-            setChecked(false);
+            onValueChange(false);
         }
     };
 
-    const handleChange: React.ChangeEventHandler<HTMLInputElement> = (ev) => 
+    const handleInputChange: ChangeEventHandler<HTMLInputElement> = (ev) =>
     {
-        setChecked(ev.target.checked);
+        onValueChange(ev.target.checked);
     };
 
     return (
@@ -103,29 +104,25 @@ export const ListItemSwitch: FC<ListItemSwitchProps> = ({
             {...props}
         >
             <label className="list-item-switch-label-row">
-                <p className="list-item-label text-wrap">{text}</p>
-                <Switch checked={checked} onChange={handleChange} />
+                <p className="list-item-label text-wrap">{label}</p>
+                <Switch checked={value} onChange={handleInputChange} />
             </label>
         </ListItem>
     );
 };
 
-// TODO: Посмотреть на реализации Сергея: Input, Select, Slider (с помощью MUI)
-//       Мб оттуда что-нибудь вытащить нужно будет, обработчики или т.п.
+type ListItemInputProps = ListItemWithValueProps<string>;
 
-// TODO: Прокинуть необходимые обработчики, доделать onKeyDown
-interface ListItemInputProps extends ListItemProps
-{
-    text: string;
-    value: string;
-    /** TODO: должно быть Dispatch<SetStateAction<string>>; */
-    setValue: Dispatch<SetStateAction<string>>;
-}
-export const ListItemInput: FC<ListItemInputProps> = ({ value, setValue, text, ...props }) =>
+export const ListItemInput: FC<ListItemInputProps> = ({
+    label,
+    value,
+    onValueChange,
+    ...props
+}) =>
 {
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const handleInputKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (ev) =>
+    const handleInputKeyDown: KeyboardEventHandler<HTMLDivElement> = (ev) =>
     {
         if (ev.key === "ArrowDown" || ev.key === "ArrowUp")
         {
@@ -136,55 +133,110 @@ export const ListItemInput: FC<ListItemInputProps> = ({ value, setValue, text, .
             ev.stopPropagation();
         }
     };
-    const handleFocus: React.FocusEventHandler<HTMLDivElement> = (ev) =>
+
+    const handleInputChange: ChangeEventHandler<HTMLInputElement> = (ev) =>
     {
-        if (!inputRef.current)
+        onValueChange(ev.target.value);
+    };
+
+    const handleItemFocus: FocusEventHandler<HTMLDivElement> = (ev) =>
+    {
+        const input = inputRef.current;
+
+        if (!input)
         {
             return;
         }
 
         ev.preventDefault();
 
-        const input = inputRef.current;
         // Если предыдущий сфокусированный элемент был input,
         // тогда не делаем переброса фокуса на него.
         if (ev.relatedTarget !== input)
         {
-            inputRef.current.focus();
+            input.focus();
         }
     };
+
     return (
         <ListItem
-            onFocus={handleFocus}
+            onFocus={handleItemFocus}
             {...props}
         >
             <label className="list-item-input-label-row">
-                <p className="list-item-label text-wrap">{text}</p>
-                <Input ref={inputRef} onKeyDown={handleInputKeyDown} setValue={setValue} value={value} />
+                <p className="list-item-label text-wrap">{label}</p>
+                <Input ref={inputRef}
+                    onKeyDown={handleInputKeyDown}
+                    onChange={handleInputChange}
+                    value={value}
+                    tabIndex={NEGATIVE_TAB_IDX}
+                />
             </label>
         </ListItem>
     );
 };
 
-// TODO: Прокинуть необходимые обработчики, доделать onKeyDown
-//       Посмотреть стили, ибо сейчас тут стоят input-вские, можно сделать общие т.к. подходит
-//       либо написать новые для select
-interface ListItemSelectProps extends ListItemProps
+interface ListItemSelectProps extends ListItemWithValueProps<string>
 {
-    list: string[];
-    value: string;
-    setValue: Dispatch<SetStateAction<string>>;
-    text: string;
+    options: string[];
 }
-export const ListItemSelect: FC<ListItemSelectProps> = ({ list, value, setValue, text, ...props }) =>
+
+export const ListItemSelect: FC<ListItemSelectProps> = ({
+    label,
+    value,
+    onValueChange,
+    options,
+    ...props
+}) =>
 {
-    const handleSelect = (ev: SelectChangeEvent): void =>
+    const [open, setOpen] = useState<boolean>(false);
+
+    const handleClose = (): void =>
     {
-        setValue(ev.target.value);
-        console.log(ev.target.value);
+        setOpen(false);
     };
 
-    const selectItems = (item: string, index: number): JSX.Element =>
+    const handleOpen = (): void =>
+    {
+        setOpen(true);
+    };
+
+    const handleItemKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (ev) =>
+    {
+        if (ev.code === "Enter" || ev.code === "Space")
+        {
+            handleOpen();
+        }
+    };
+
+    const handleSelectKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (ev) =>
+    {
+        if (!open)
+        {
+            ev.preventDefault();
+            return;
+        }
+
+        // Для того, чтобы при открытом селекте,
+        // события клавиш не доходили до ListItemSelect.
+        ev.stopPropagation();
+
+        if (ev.code === "Backspace")
+        {
+            handleClose();
+        }
+        else if (ev.code === "Space")
+        {
+            (ev.target as HTMLElement).click();
+        }
+    };
+
+    const handleSelect = (ev: SelectChangeEvent): void =>
+    {
+        onValueChange(ev.target.value);
+    };
+
+    const selectOptionsItemsToMap = (item: string, index: number): JSX.Element =>
     {
         return (
             <MenuItem value={item} key={index}>
@@ -192,102 +244,54 @@ export const ListItemSelect: FC<ListItemSelectProps> = ({ list, value, setValue,
             </MenuItem>
         );
     };
-    const [open, setOpen] = useState<boolean>(false);
-    const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (ev) =>
-    {
-        if(ev.code === "Enter" || ev.code === "Space")
-        {
-            handleOpen();
-        }
-    };
-    const handleClose = (): void => 
-    {
-        setOpen(false);
-    };
-    const handleOpen = (): void => 
-    {
-        setOpen(true);
-    };
-    const handleSelectKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (ev) =>
-    {
-        if(open)
-        {
-            ev.stopPropagation();
-        }
-        else
-        {
-            // Если select закрыт, то оставляем дефолтное поведение, то есть клавиши вверх - вниз позволяют
-            // перемещаться по параметрам
-            ev.preventDefault();
-            // Так как дефолтного поведения не достаточно (из-за того что селект якобы открыт, хотя open и false)
-            // но необходимо явно закрыть его после preventDefault()
-            handleClose();
-        }
-        if(ev.code === "Space")
-        {
-            handleClose();
-        }
-    };
-    const selectRef = useRef<HTMLSelectElement>(null);
-    // Делаем так, чтобы на select нельзя было сфокусироваться кнопкой Tab.
-    useEffect(() => 
-    {
-        const input = selectRef.current?.querySelector("div");
 
-        if (input)
-        {
-            input.tabIndex = -1;
-        }
-    });
     return (
         <ListItem
             {...props}
-            onKeyDown={handleKeyDown}
+            onKeyDown={handleItemKeyDown}
         >
-            <p className="list-item-label select-label text-wrap">{text}</p>
+            <p className="list-item-label select-label text-wrap">{label}</p>
             <Select
-                id={text}
                 value={value}
                 onChange={handleSelect}
-                ref={selectRef}
                 open={open}
                 onClose={handleClose}
                 onOpen={handleOpen}
                 onKeyDown={handleSelectKeyDown}
+                tabIndex={NEGATIVE_TAB_IDX}
             >
                 <MenuItem value={"default"}>По умолчанию</MenuItem>
                 <Divider className="menu-divider" />
-                {list.map(selectItems)}
+                {options.map(selectOptionsItemsToMap)}
             </Select>
         </ListItem>
     );
 };
 
-// TODO: Прокинуть необходимые обработчики, доделать onKeyDown
-//       Посмотреть стили, ибо сейчас тут стоят input-вские, можно сделать общие т.к. подходит
-//       либо написать новые для select
-interface ListItemSliderProps extends ListItemProps
+type ListItemSliderProps = ListItemWithValueProps<number>;
+
+export const ListItemSlider: FC<ListItemSliderProps> = ({
+    label,
+    value,
+    onValueChange,
+    ...props
+}) =>
 {
-    text: string;
-    value: number;
-    setValue: (val: number) => void;
-}
-export const ListItemSlider: FC<ListItemSliderProps> = ({ text, value, setValue, ...props }) =>
-{
+    const inputRef = useRef<HTMLInputElement>(null);
+
     const handleSliderChange = (event: Event, newValue: number[] | number): void =>
     {
         // Поскольку это не range slider, то тип для value number, а не number[].
-        setValue(newValue as number);
+        onValueChange(newValue as number);
     };
 
     // Переопределение клавиш для Slider.
-    // 1. Стрелки влево-вправо регулируют значение слайдера (это дефолтное поведение).
-    //    Поэтому просто не даем сбить фокус с бегунка слайдера, для этого не распространяем событие дальше.
-    // 2. Стрелки вверх-вниз по умолчанию тоже регулируют значение слайдера,
+    // 1. Стрелки вверх-вниз по умолчанию тоже регулируют значение слайдера,
     //    но поскольку они нужны для навигации, то предотвращаем это поведение по умолчанию.
+    // 2. Остальные нажатия не передаем выше в Item.
     const handleSliderKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (ev) =>
     {
-        if (ev.key === "ArrowDown" || ev.key === "ArrowUp" )
+        if (ev.key === "ArrowDown" || ev.key === "ArrowUp")
         {
             ev.preventDefault();
         }
@@ -297,45 +301,33 @@ export const ListItemSlider: FC<ListItemSliderProps> = ({ text, value, setValue,
         }
     };
 
-    const sliderRef = useRef<HTMLSpanElement>(null);
     // Пробрасываем фокус на input внутри слайдера, при попадании фокуса на этот элемент меню.
-    const handleFocus: React.FocusEventHandler<HTMLDivElement> = (ev) =>
+    const handleItemFocus: React.FocusEventHandler<HTMLDivElement> = (ev) =>
     {
-        if (!sliderRef.current)
+        const input = inputRef.current;
+
+        if (!input)
         {
             return;
         }
 
         ev.preventDefault();
 
-        const input = sliderRef.current.querySelector("input");
-
         // Если предыдущий сфокусированный элемент был input,
         // тогда не делаем переброса фокуса на него.
-        if (input != null && ev.relatedTarget !== input)
+        if (ev.relatedTarget !== input)
         {
             input.focus();
         }
     };
 
-    // Делаем так, чтобы на "бегунок" слайдера нельзя было сфокусироваться кнопкой Tab.
-    useEffect(() => 
-    {
-        const input = sliderRef.current?.querySelector("input");
-
-        if (input)
-        {
-            input.tabIndex = -1;
-        }
-    });
-
     return (
         <ListItem
-            onFocus={handleFocus}
+            onFocus={handleItemFocus}
             {...props}
         >
             <label className="list-item-slider-label-row">
-                <p className="list-item-label text-wrap">{text}</p>
+                <p className="list-item-label text-wrap">{label}</p>
                 <div className="list-item-slider-container">
                     <Slider
                         value={value}
@@ -343,7 +335,9 @@ export const ListItemSlider: FC<ListItemSliderProps> = ({ text, value, setValue,
                         onKeyDown={handleSliderKeyDown}
                         valueLabelDisplay="auto"
                         role="slider"
-                        ref={sliderRef}
+                        componentsProps={{
+                            input: { ref: inputRef, tabIndex: -1 }
+                        }}
                     />
                 </div>
             </label>
@@ -353,38 +347,60 @@ export const ListItemSlider: FC<ListItemSliderProps> = ({ text, value, setValue,
 
 interface ListItemButtonProps extends ListItemProps
 {
-    name: string;
-    action: string;
-    onClick: () => void;
+    label: string;
+    btnLabel: string;
+    onBtnClick: React.MouseEventHandler<HTMLButtonElement>;
+    btnRef?: React.RefObject<HTMLButtonElement>;
 }
-export const ListItemButton = forwardRef<HTMLLabelElement, ListItemButtonProps>(({ name, action, onClick, ...props }, ref) =>
+export const ListItemButton: FC<ListItemButtonProps> = ({
+    label,
+    btnLabel,
+    onBtnClick,
+    btnRef,
+    ...props
+}) =>
 {
-    const handleButtonKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (ev) =>
+    const handleItemKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (ev) =>
     {
         if (ev.code === "Space" || ev.code === "Enter")
         {
             ev.preventDefault();
-            onClick();
-        }
-        if (ev.key === "ArrowDown" || ev.key === "ArrowUp")
-        {
-            ev.preventDefault();
+            btnRef?.current?.click();
         }
     };
+
     return (
         <ListItem
             {...props}
-            onKeyDown={handleButtonKeyDown}
+            onKeyDown={handleItemKeyDown}
         >
-            <label className="list-item-button-label-row" ref={ref}>
-                <p className="list-item-label text-wrap">{name}</p>
-                <Button key={action}
+            <label className="list-item-button-label-row">
+                <p className="list-item-label text-wrap">{label}</p>
+                <Button
                     className="list-item-button"
-                    onClick={onClick}
-                    tabIndex={-1}
-                >{action}
+                    onClick={onBtnClick}
+                    tabIndex={NEGATIVE_TAB_IDX}
+                    ref={btnRef}
+                >
+                    {btnLabel}
                 </Button>
             </label>
         </ListItem>
     );
-});
+};
+
+interface ListSectionLabelProps
+{
+    text: string;
+    withTooltip?: boolean;
+}
+
+export const ListSectionLabel: React.FC<ListSectionLabelProps> = ({ text, withTooltip = false }) =>
+{
+    return (
+        <span className="list-section-label text-wrap non-selectable">
+            {text}
+            {withTooltip ? <MdInfoOutline className="ml-4" /> : undefined}
+        </span>
+    );
+};

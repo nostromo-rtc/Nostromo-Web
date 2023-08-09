@@ -1,8 +1,9 @@
-import { Dispatch, SetStateAction, createContext, useState } from "react";
+import { Dispatch, SetStateAction, createContext, useContext, useState } from "react";
 import { Navbar } from "../components/Navbar";
 import { PageRouter } from "../components/PageRouter";
 
 import "./MainLayer.css";
+import { SetShowSettingsContext } from "../App";
 
 // Объект React Context.
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -10,15 +11,12 @@ export const DndVisibleContext = createContext<boolean>(false);
 
 type DivDragEventHandler = React.DragEventHandler<HTMLDivElement>;
 
-interface MainLayerProps
-{
-    setShowSettings: Dispatch<SetStateAction<boolean>>;
-}
-export const MainLayer: React.FC<MainLayerProps> = ({ setShowSettings }) =>
+export const MainLayer: React.FC = () =>
 {
     /*** СОСТОЯНИЯ ***/
 
     const [dndVisible, setDndVisible] = useState(false);
+    const setShowSettings = useContext(SetShowSettingsContext);
 
     /*** ОБРАБОТЧИКИ ***/
 
@@ -36,9 +34,9 @@ export const MainLayer: React.FC<MainLayerProps> = ({ setShowSettings }) =>
 
     const handleDragLeave: DivDragEventHandler = (ev) =>
     {
-        // Специфично для Chrome. Если координаты screen = 0, 
+        // Специфично для Chrome. Если координаты screen = 0,
         // значит это было событие произошло когда была отпущена левая кнопка мыши.
-        // Можно сказать это аналог события 'drop'. 
+        // Можно сказать это аналог события 'drop'.
         // Это условие проверяется из-за того, что в Chrome не срабатывает событие 'drop'
         // при установленном `dataTransfer.dropEffect` в значении = "none".
         const CHROME_DRAG_LEAVE_SCREEN_ZERO_VALUE = 0;
@@ -63,6 +61,14 @@ export const MainLayer: React.FC<MainLayerProps> = ({ setShowSettings }) =>
         setDndVisible(false);
     };
 
+    const handleOpenSettings = (): void =>
+    {
+        if (setShowSettings !== null)
+        {
+            setShowSettings(true);
+        }
+    };
+
     return (
         <div id="layer-main" className="overflow-container"
             onDragEnter={handleDragEnter}
@@ -70,7 +76,7 @@ export const MainLayer: React.FC<MainLayerProps> = ({ setShowSettings }) =>
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}>
-            <Navbar openSettings={() => { setShowSettings(true); }} />
+            <Navbar openSettings={handleOpenSettings} />
             <div id="base">
                 <DndVisibleContext.Provider value={dndVisible}>
                     <PageRouter />

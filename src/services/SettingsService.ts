@@ -2,7 +2,7 @@ import { useSyncExternalStore } from "react";
 import { cloneObject, overrideValues } from "../Utils";
 
 /* eslint-disable @typescript-eslint/naming-convention */
-export type ParameterType = "Button" | "Input" | "Select" | "Slider" | "Switch";
+export type ParameterType = "Input" | "Select" | "Slider" | "Switch" | "Unknown";
 export type ParameterValue = boolean | number | string;
 export const LOCAL_STORAGE_SETTINGS = "nostromo-settings";
 
@@ -17,7 +17,7 @@ export interface ParameterInfo
     defaultValue: ParameterValue;
 }
 
-export interface Group 
+export interface Group
 {
     [key: string]: ParameterValue;
 }
@@ -75,16 +75,16 @@ const defaultSettings: Settings =
         {
             generalGroup_1S_1:
             {
-                Aparam: true,
-                Bparam: true
+                Aparam: "First",
+                Bparam: "some text"
             }
         },
         generalSection_2:
         {
             generalGroup_2S_1:
             {
-                Cparam: false,
-                Dparam: true
+                Cparam: "Second",
+                Dparam: 10
             }
         },
         generalSection_3:
@@ -157,7 +157,7 @@ const defaultSettings: Settings =
 
 // -- Info objects -- //
 
-export interface ParametersInfoMap 
+export interface ParametersInfoMap
 {
     readonly [key: string]: ParameterInfo;
 
@@ -200,7 +200,7 @@ export const parametersInfoMap: ParametersInfoMap = {
     "display.room.layout.displayLocalVideos":
     {
         name: "Отображать локальные видео",
-        type: "Input",
+        type: "Switch",
         description: "Краткое описание параметра. Смотрите, наблюдайте, восхищайтесь",
         defaultValue: defaultSettings.display.room.layout.displayLocalVideos
     },
@@ -215,7 +215,7 @@ export const parametersInfoMap: ParametersInfoMap = {
     "general.generalSection_1.generalGroup_1S_1.Bparam":
     {
         name: "Второй тестовый параметр",
-        type: "Switch",
+        type: "Input",
         defaultValue: defaultSettings.general.generalSection_1.generalGroup_1S_1.Bparam
     },
     "general.generalSection_2.generalGroup_2S_1.Cparam":
@@ -250,8 +250,8 @@ export const parametersInfoMap: ParametersInfoMap = {
     },
     "general.generalSection_4.generalGroup_4S_1.Hparam":
     {
-        name: "Сбросить все настройки до стандартных",
-        type: "Button",
+        name: "Восьмой тестовый параметр",
+        type: "Switch",
         defaultValue: defaultSettings.general.generalSection_4.generalGroup_4S_1.Hparam
     },
 
@@ -314,6 +314,8 @@ export class SettingService
 
     public constructor()
     {
+        console.debug("SettingService ctor");
+
         this.currentSettings = cloneObject(defaultSettings);
         const storedSettingsJson = localStorage.getItem(LOCAL_STORAGE_SETTINGS);
         if (storedSettingsJson === null)
@@ -326,7 +328,7 @@ export class SettingService
         {
             const storedSettings = JSON.parse(storedSettingsJson) as Settings;
             overrideValues(this.currentSettings, storedSettings);
-            
+
             localStorage.setItem(LOCAL_STORAGE_SETTINGS, JSON.stringify(this.currentSettings));
         }
         catch

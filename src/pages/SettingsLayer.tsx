@@ -2,24 +2,22 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 
 import "../App.css";
 import "./SettingsLayer.css";
-import { FocusTrap } from "../components/FocusTrap";
+import { FocusTrap } from "../components/Base/FocusTrap";
 import { parametersInfoMap, useSettings } from "../services/SettingsService";
 import { SettingsCategoryList } from "../components/Settings/SettingsCategoryList";
 import { SettingsParametersList } from "../components/Settings/SettingsParametersList";
 import { SidebarView } from "../components/Base/SidebarView";
-import { SettingsContext } from "../App";
+import { SettingsContext } from "../AppWrapper";
 import { ZERO_IDX } from "../Utils";
-
-interface SettingsLayerProps
-{
-    setShowSettings: (state: boolean) => void;
-}
+import { SetShowSettingsContext } from "../App";
 
 // TODO: настроить FocusTrap так, чтобы избежать создания лишних элементов-границ для навигации,
 // например можно стартовой границей сделать элемент со списком категорий (sidebar),
 // а конечной границей - кнопку выхода из настроек (её пока нет).
-export const SettingsLayer: React.FC<SettingsLayerProps> = ({ setShowSettings }) =>
+export const SettingsLayer: React.FC = () =>
 {
+    const setShowSettings = useContext(SetShowSettingsContext);
+
     const layerRef = useRef<HTMLDivElement>(null);
 
     const settingsService = useContext(SettingsContext);
@@ -48,7 +46,10 @@ export const SettingsLayer: React.FC<SettingsLayerProps> = ({ setShowSettings })
     }, [layerRef]);
 
     const categoryList = (
-        <SettingsCategoryList setSelectedCategory={setSelectedCategory} selectedCategory={selectedCategory}/>
+        <SettingsCategoryList
+            setSelectedCategory={setSelectedCategory}
+            selectedCategory={selectedCategory}
+        />
     );
 
     const parameterList = (
@@ -57,6 +58,14 @@ export const SettingsLayer: React.FC<SettingsLayerProps> = ({ setShowSettings })
             parametersInfoMap={parametersInfoMap}
         />
     );
+
+    const handleCloseSettings = (): void =>
+    {
+        if (setShowSettings !== null)
+        {
+            setShowSettings(false);
+        }
+    };
 
     return (
         <div id="layer-settings"
@@ -68,7 +77,7 @@ export const SettingsLayer: React.FC<SettingsLayerProps> = ({ setShowSettings })
                 <SidebarView
                     sidebar={categoryList}
                     main={parameterList}
-                    onClickBtnClose={setShowSettings}
+                    onClickBtnClose={handleCloseSettings}
                 />
             </FocusTrap>
         </div>

@@ -1,5 +1,7 @@
 import { Dispatch, ReactEventHandler, SetStateAction } from "react";
 
+export type ReactDispatch<T> = Dispatch<SetStateAction<T>>;
+
 export const getToggleFunc = (setState: Dispatch<SetStateAction<boolean>>) =>
 {
     return () => { setState(prevState => !prevState); };
@@ -102,12 +104,12 @@ export function cloneObject<T>(obj: T): T
     return JSON.parse(JSON.stringify(obj)) as T;
 }
 
-export const isObjectAndNotArray = (obj : object) : boolean =>
+export function isObjectAndNotArray(obj: object): boolean
 {
-    return typeof obj === "object" && !Array.isArray(obj); 
+    return typeof obj === "object" && !Array.isArray(obj);
 }
 
-export const overrideValues = (target: object, override: object) : void =>
+export function overrideValues(target: object, override: object): void
 {
     for (const keyStr in target)
     {

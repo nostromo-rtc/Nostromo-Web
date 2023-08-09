@@ -1,4 +1,4 @@
-import React, { ReactEventHandler, useRef, useState } from "react";
+import React, { ReactEventHandler, useContext, useRef, useState } from "react";
 import { Avatar, Button, Divider, Menu as MuiMenu } from "@mui/material";
 import { BiChevronDown, BiChevronUp } from "react-icons/bi";
 import { MdSettings, MdEdit } from "react-icons/md";
@@ -8,6 +8,7 @@ import { EditUsernameDialog } from "./EditUsernameDialog";
 import { Tooltip } from "./Tooltip";
 import { MenuItemWithIcon } from "./Menu/MenuItems";
 import { doNotHandleEvent } from "../Utils";
+import { SetShowSettingsContext } from "../App";
 
 export const AccountMenu: React.FC = () =>
 {
@@ -18,6 +19,8 @@ export const AccountMenu: React.FC = () =>
 
     const [username, setUsername] = useState<string>("User");
     const [openEditDialog, setOpenEditDialog] = useState<boolean>(false);
+
+    const setShowSettings = useContext(SetShowSettingsContext);
 
     const handleClick: ReactEventHandler = (ev) =>
     {
@@ -33,6 +36,14 @@ export const AccountMenu: React.FC = () =>
     {
         setOpen(false);
         setOpenEditDialog(true);
+    };
+
+    const handleOpenSettings = (): void =>
+    {
+        if (setShowSettings !== null)
+        {
+            setShowSettings(true);
+        }
     };
 
     return (
@@ -78,7 +89,7 @@ export const AccountMenu: React.FC = () =>
                 </div>
                 <Divider className="menu-divider" />
                 <MenuItemWithIcon onClick={handleClickOnEditName} icon={<MdEdit />} text="Изменить имя" />
-                <MenuItemWithIcon onClick={handleClose} icon={<MdSettings />} text="Настройки" />
+                <MenuItemWithIcon onClick={handleOpenSettings} icon={<MdSettings />} text="Настройки" />
             </MuiMenu>
             <EditUsernameDialog open={openEditDialog} prevName={username} setOpen={setOpenEditDialog} setUsername={setUsername} />
         </>

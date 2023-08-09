@@ -1,57 +1,10 @@
-import { FC, useContext, useEffect, useRef, useState } from "react";
-import "./SettingsParametersList.css";
-import { Category, Group, ParametersInfoMap, Section, Settings, useSettings } from "../../services/SettingsService";
-import { ListItemButton, ListItemInput, ListItemSelect, ListItemSlider, ListItemSwitch } from "../Base/List/ListItems";
+import { FC, useContext, useRef, useState } from "react";
+import { SettingsContext } from "../../AppWrapper";
+import { Category, Group, ParameterValue, ParametersInfoMap, Section, Settings, useSettings } from "../../services/SettingsService";
 import { List } from "../Base/List/List";
-import { SettingsContext } from "../../App";
-import { CiWarning } from "react-icons/ci";
-import { FocusTrap } from "../FocusTrap";
-import { Button } from "@mui/material";
-
-type MouseClickHandler = () => void;
-
-interface SettingsRestoreConfirmPanelProps
-{
-    onConfirm: MouseClickHandler;
-    onCancel:  MouseClickHandler;
-}
-
-const SettingsRestoreConfirmPanel: FC<SettingsRestoreConfirmPanelProps> = ({onConfirm, onCancel}) =>
-{
-    const cancelRef = useRef<HTMLButtonElement>(null);
-
-    useEffect(() =>
-    {
-        cancelRef.current?.focus();
-    }, [cancelRef]);
-
-    return(
-        <div className="settings-restore-panel">
-            <CiWarning className="settings-restore-icon" />
-            <p>Это действие приведёт к сбросу всех настроек.</p>
-            <p>Вы уверены что хотите восстановить настройки по умолчанию?</p>
-            <div className="settings-restore-buttons-container">
-                <FocusTrap>
-                    <div className="settings-default-button-area">
-                        <Button
-                            className="settings-button warning"
-                            onClick={onConfirm}
-                        >Да
-                        </Button>
-                    </div>
-                    <div className="settings-default-button-area">
-                        <Button
-                            ref={cancelRef}
-                            className="settings-button"
-                            onClick={onCancel}
-                        >Нет
-                        </Button>
-                    </div>
-                </FocusTrap>
-            </div>
-        </div>
-    )
-}
+import { ListItemButton, ListItemInput, ListItemSelect, ListItemSlider, ListItemSwitch } from "../Base/List/ListItems";
+import { RestoreSettingsDialog } from "./RestoreSettingsDialog";
+import "./SettingsParametersList.css";
 
 interface SettingsParametersListProps
 {
@@ -64,71 +17,37 @@ export const SettingsParametersList: FC<SettingsParametersListProps> = ({ parame
     const settingsService = useContext(SettingsContext);
     const settings = useSettings(settingsService);
 
-    // Для выставления фокуса обратно на список после закрытия диалогового окна со сбросом настроек
-    const focusRef = useRef<HTMLLabelElement>(null);
-    const [showRestoreDialog, setShowRestoreDialog] = useState<boolean>(false);
+    /* -- Для диалогового окна подтверждения сброса настроек. -- */
 
-    const handleRestoreSettingsShow: MouseClickHandler = (): void =>
+    // Для выставления фокуса обратно на кнопку сброса
+    // после закрытия диалогового окна со сбросом настроек.
+    const restoreSettingsBtnRef = useRef<HTMLButtonElement>(null);
+
+    const [showRestoreSettingsDialog, setShowRestoreSettingsDialog] = useState<boolean>(false);
+
+    const closeRestoreSettingsDialog = (): void =>
     {
-        setShowRestoreDialog(true);
-    }
-    const handleRestoreSettingsConfirm: MouseClickHandler= (): void =>
+        setShowRestoreSettingsDialog(false);
+        restoreSettingsBtnRef.current?.focus();
+    };
+
+    const handleRestoreSettingsConfirm = (): void =>
     {
         settingsService.restoreToDefault();
-        setShowRestoreDialog(false);
-        focusRef.current?.focus();
-    }
-    const handleRestoreSettingsCancel: MouseClickHandler = (): void =>
-    {
-        setShowRestoreDialog(false);
-        focusRef.current?.focus();
-    }
-
-    const handleSwitch = (section: string, group: string, param: string, val?: boolean): void =>
-    {
-        if (val !== undefined)
-        {
-            settingsService.setSettings((prev: Settings) => 
-            {
-                prev[selectedCategory][section][group][param] = val;
-            });
-        }
-        else
-        {
-            settingsService.setSettings((prev: Settings) =>
-            {
-                const oldVal = prev[selectedCategory][section][group][param] as boolean;
-                prev[selectedCategory][section][group][param] = !oldVal;
-            });
-        }
+        closeRestoreSettingsDialog();
     };
 
-    const handleSlider = (section: string, group: string, param: string, val: number): void =>
+    /* --------------------------------------------------------- */
+
+    const handleParameterChange = (section: string, group: string, param: string, val: ParameterValue): void =>
     {
-        settingsService.setSettings((prev: Settings) => 
+        settingsService.setSettings((prev: Settings) =>
         {
             prev[selectedCategory][section][group][param] = val;
         });
     };
 
-    const handleInput = (section: string, group: string, param: string, val: string): void =>
-    {
-        settingsService.setSettings((prev: Settings) => 
-        {
-            prev[selectedCategory][section][group][param] = val;
-        });
-    };
-
-    const handleSelect = (section: string, group: string, param: string, val: string): void =>
-    {
-        settingsService.setSettings((prev: Settings) => 
-        {
-            prev[selectedCategory][section][group][param] = val;
-        });
-    };
-
-    const loadParameter =
-    (
+    const loadParameter = (
         elements: JSX.Element[],
         groupMap: Group,
         category: string,
@@ -137,10 +56,6 @@ export const SettingsParametersList: FC<SettingsParametersListProps> = ({ parame
         parameter: string
     ): void =>
     {
-        // TODO: аналогично с помощью такого `id` можно вытаскивать информацию
-        // для рендера и других элементов (категории, секции, группы),
-        // при наличии соответствующих объектов с информацией как parametersInfoMap 
-        // для всех этих видов элементов.
         const parameterId = `${category}.${section}.${group}.${parameter}`;
         const paramValue = parametersInfoMap[parameterId];
 
@@ -149,12 +64,12 @@ export const SettingsParametersList: FC<SettingsParametersListProps> = ({ parame
             elements.push(
                 <ListItemSwitch
                     key={parameterId}
+                    label={parametersInfoMap[parameterId].name}
                     description={parametersInfoMap[parameterId].description}
-                    text={parametersInfoMap[parameterId].name}
-                    checked={groupMap[parameter] as boolean}
-                    setChecked={(val) =>
+                    value={groupMap[parameter] as boolean}
+                    onValueChange={(val) =>
                     {
-                        handleSwitch(section, group, parameter, val);
+                        handleParameterChange(section, group, parameter, val);
                     }}
                 />
             );
@@ -164,12 +79,12 @@ export const SettingsParametersList: FC<SettingsParametersListProps> = ({ parame
             elements.push(
                 <ListItemSlider
                     key={parameterId}
-                    className="list-item"
-                    text={parametersInfoMap[parameterId].name + ": " + groupMap[parameter].toString()}
+                    label={parametersInfoMap[parameterId].name + ": " + groupMap[parameter].toString()}
+                    description={parametersInfoMap[parameterId].description}
                     value={Number(groupMap[parameter])}
-                    setValue={(val) =>
+                    onValueChange={(val) =>
                     {
-                        handleSlider(section, group, parameter, val);
+                        handleParameterChange(section, group, parameter, val);
                     }}
                 />
             );
@@ -179,44 +94,30 @@ export const SettingsParametersList: FC<SettingsParametersListProps> = ({ parame
             elements.push(
                 <ListItemInput
                     key={parameterId}
+                    label={parametersInfoMap[parameterId].name}
                     description={parametersInfoMap[parameterId].description}
-                    text={parametersInfoMap[parameterId].name}
                     value={groupMap[parameter] as string}
-                    setValue={(val) =>
+                    onValueChange={(val) =>
                     {
-                        handleInput(section, group, parameter, val.toString());
+                        handleParameterChange(section, group, parameter, val);
                     }}
                 />
             );
         }
-        else if (paramValue.type as string === "Select")  // as string для проверки на получение недопустимого типа из хранилища
+        else if (paramValue.type === "Select")
         {
-            const selectList: string[] = ["First", "Second", "Third", "Fourth", "Fifth", "Sixth"];
+            const optionsList: string[] = ["First", "Second", "Third", "Fourth", "Fifth", "Sixth"];
             elements.push(
                 <ListItemSelect
                     key={parameterId}
-                    list={selectList}
-                    value={groupMap[parameter] as string}
-                    setValue={(val) =>
-                    {
-                        handleSelect(section, group, parameter, val.toString());
-                    }}
+                    label={parametersInfoMap[parameterId].name}
                     description={parametersInfoMap[parameterId].description}
-                    text={parametersInfoMap[parameterId].name}
-                />
-            );
-        }
-        // Сброс настроек
-        // FIXME: Смотри сервис, я туда добавил новый тип
-        else if(paramValue.type as string === "Button")
-        {
-            elements.push(
-                <ListItemButton 
-                    key={parameterId}
-                    ref={focusRef}
-                    name={parametersInfoMap[parameterId].name}
-                    action={"Сбросить найстроки"}
-                    onClick={handleRestoreSettingsShow}
+                    value={groupMap[parameter] as string}
+                    onValueChange={(val) =>
+                    {
+                        handleParameterChange(section, group, parameter, val);
+                    }}
+                    options={optionsList}
                 />
             );
         }
@@ -230,8 +131,7 @@ export const SettingsParametersList: FC<SettingsParametersListProps> = ({ parame
         }
     };
 
-    const loadGroup =
-    (
+    const loadGroup = (
         elements: JSX.Element[],
         sectionMap: Section,
         category: string,
@@ -251,8 +151,7 @@ export const SettingsParametersList: FC<SettingsParametersListProps> = ({ parame
         }
     };
 
-    const loadSection =
-    (
+    const loadSection = (
         elements: JSX.Element[],
         categoryMap: Category,
         category: string,
@@ -283,19 +182,34 @@ export const SettingsParametersList: FC<SettingsParametersListProps> = ({ parame
             loadSection(parametersList, categoryMap, selectedCategory, section);
         }
 
+        // Добавим кнопку для сброса настроек в конец
+        // для категории "general".
+        if (selectedCategory === "general")
+        {
+            parametersList.push(
+                <ListItemButton
+                    key={"restore-settings-btn"}
+                    btnRef={restoreSettingsBtnRef}
+                    label={"Сбросить все настройки до стандартных"}
+                    btnLabel={"Сбросить найстроки"}
+                    onBtnClick={() => { setShowRestoreSettingsDialog(true); }}
+                />
+            );
+        }
+
         return parametersList;
     };
 
+    const restoreSettingsDialog = (
+        <RestoreSettingsDialog
+            onConfirm={handleRestoreSettingsConfirm}
+            onCancel={closeRestoreSettingsDialog}
+        />
+    );
+
     return (
         <>
-            {showRestoreDialog ? 
-                <div className="backdrop">
-                    <SettingsRestoreConfirmPanel
-                        onConfirm={handleRestoreSettingsConfirm}
-                        onCancel={handleRestoreSettingsCancel}
-                    />
-                </div>
-            : <></>}
+            {showRestoreSettingsDialog ? restoreSettingsDialog : <></>}
             <List>{loadSelectedCategory()}</List>
         </>
     );

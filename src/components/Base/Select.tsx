@@ -3,11 +3,12 @@ import "./Select.css";
 
 import { FormControl, Select as MuiSelect, SelectProps as MuiSelectProps } from "@mui/material";
 import { ReactNode, forwardRef } from "react";
+import { ZERO_TAB_IDX } from "../../Utils";
 
 interface SelectProps<T = unknown>
 {
-    id: string;
-    children: ReactNode;
+    id?: string;
+    children?: ReactNode;
     value: MuiSelectProps<T>["value"];
     onChange: MuiSelectProps<T>["onChange"];
     open?: MuiSelectProps<T>["open"];
@@ -17,6 +18,7 @@ interface SelectProps<T = unknown>
     variant?: MuiSelectProps<T>["variant"];
     autoFocus?: boolean;
     onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
+    tabIndex?: number;
 }
 
 export const Select = forwardRef<HTMLSelectElement, SelectProps<string>>(({
@@ -30,13 +32,14 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps<string>>(({
     transitionDuration,
     variant = "outlined",
     autoFocus = false,
-    onKeyDown
+    onKeyDown,
+    tabIndex = ZERO_TAB_IDX
 }, ref) =>
 {
     return (
-        <FormControl className="select-form-control" 
+        <FormControl className="select-form-control"
             onKeyDown={onKeyDown}
-        > 
+        >
             <MuiSelect
                 id={id}
                 value={value}
@@ -49,6 +52,10 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps<string>>(({
                 onClose={onClose}
                 onOpen={onOpen}
                 ref={ref}
+                SelectDisplayProps={{
+                    tabIndex: tabIndex,
+                    onKeyDown: onKeyDown
+                }}
             >
                 {children}
             </MuiSelect>
