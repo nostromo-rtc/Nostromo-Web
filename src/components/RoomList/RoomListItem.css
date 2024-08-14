@@ -1,0 +1,82 @@
+/*
+    SPDX-FileCopyrightText: 2023 Sergey Katunin <sulmpx60@yandex.ru>
+    SPDX-FileCopyrightText: 2023 Vladislav Tarakanov <vladislav.tarakanov@bk.ru>
+    SPDX-FileCopyrightText: 2023 Amin Irgaliev <irgaliev01@mail.ru>
+
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
+.room-list-item
+{
+    padding-top: 12px;
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+.room-list-item:hover
+{
+    box-shadow: 0 0 2px white;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.room-list-item:focus-within
+{
+    box-shadow: 0 0 2px white;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.08);
+    outline: none;
+}
+
+.room-list-item-area
+{
+    display: flex;
+}
+
+.room-list-item-name
+{
+    font-size: 1.15rem;
+    color: var(--primary-text-color);
+    word-wrap: anywhere;
+}
+
+.room-list-item-id
+{
+    font-size: 0.8rem;
+    font-weight: 300;
+    color: var(--secondary-text-color);
+    margin-top: 2px;
+}
+
+.room-list-item-link
+{
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    color: inherit;
+    text-decoration: none;
+}
+
+.room-list-item-avatar-container
+{
+    display: flex;
+    align-items: center;
+    min-width: 56px;
+    flex-shrink: 0;
+    margin-left: 15px;
+}
+
+.room-list-item-avatar-container .room-list-item-avatar
+{
+    color: var(--primary-text-color);
+}
+
+.room-list-item-info-area
+{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}

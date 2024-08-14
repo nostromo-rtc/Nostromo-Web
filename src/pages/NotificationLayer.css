@@ -1,0 +1,97 @@
+/*
+    SPDX-FileCopyrightText: 2023-2024 Sergey Katunin <sulmpx60@yandex.ru>
+    SPDX-FileCopyrightText: 2023 Vladislav Tarakanov <vladislav.tarakanov@bk.ru>
+
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
+.popup-notification-container
+{
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+    position: fixed;
+    bottom: 15px;
+    right: 10px;
+}
+
+.notification-icon-size
+{
+    min-width: 3rem;
+    max-width: 3rem;
+    min-height: 3rem;
+    max-height: 3rem;
+}
+
+.notification-close-button
+{
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    border-radius: 5px;
+    min-height: 24px;
+    max-height: 24px;
+    max-width: 24px;
+    min-width: 24px;
+    color: var(--secondary-text-color);
+    font-size: 1.1rem;
+    padding: 0;
+    cursor: pointer;
+}
+
+.notification-close-button:hover
+{
+    color: white;
+    background-color: #ffffff30;
+    outline: none;
+}
+
+.notification-close-button:focus
+{
+    color: white;
+    background-color: #ffffff30;
+    outline: none;
+}
+
+.error-notification-icon
+{
+    color: var(--error-color);
+}
+
+.info-notification-icon
+{
+    color: var(--info-color);
+}
+
+.warning-notification-icon
+{
+    color: var(--warning-color);
+}
+
+.error-notification-background
+{
+    background-color: #4c3030f7;
+}
+
+.info-notification-background
+{
+    background-color: #343440f7;
+}
+
+.warning-notification-background
+{
+    background-color: #404034f7;
+}
+
+@media (width < 600px)
+{
+    .notification-close-button
+    {
+        min-height: 28px;
+        max-height: 28px;
+        max-width: 28px;
+        min-width: 28px;
+        font-size: 1.2rem;
+    }
+}

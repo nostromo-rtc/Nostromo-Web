@@ -1,12 +1,20 @@
+/*
+    SPDX-FileCopyrightText: 2023 Sergey Katunin <sulmpx60@yandex.ru>
+    SPDX-FileCopyrightText: 2023 Vladislav Tarakanov <vladislav.tarakanov@bk.ru>
+    SPDX-FileCopyrightText: 2023 Amin Irgaliev <irgaliev01@mail.ru>
+
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
 import { useSyncExternalStore } from "react";
-import { cloneObject, overrideValues } from "../Utils";
+import { cloneObject, overrideValues } from "../utils/Utils";
+import { AbstractExternalStorage } from "../utils/AbstractExternalStorage";
 
 /* eslint-disable @typescript-eslint/naming-convention */
 export type ParameterType = "Input" | "Select" | "Slider" | "Switch" | "Unknown";
 export type ParameterValue = boolean | number | string;
 export const LOCAL_STORAGE_SETTINGS = "nostromo-settings";
 
-type SettingsListener = () => void;
 type SettingsSetCallback = (prev: Settings) => void;
 
 export interface ParameterInfo
@@ -306,15 +314,14 @@ export const parametersInfoMap: ParametersInfoMap = {
     }
 };
 
-export class SettingService
+export class SettingService extends AbstractExternalStorage
 {
     private currentSettings: Settings = defaultSettings;
     private shapshot: Settings = defaultSettings;
-    private listeners: SettingsListener[] = [];
 
     public constructor()
     {
-        console.debug("SettingService ctor");
+        super();
 
         this.currentSettings = cloneObject(defaultSettings);
         const storedSettingsJson = localStorage.getItem(LOCAL_STORAGE_SETTINGS);
@@ -355,22 +362,6 @@ export class SettingService
         this.notifyListeners();
     }
 
-    public addListener(listener: SettingsListener): void
-    {
-        this.listeners = [...this.listeners, listener];
-    }
-
-    public removeListener(listener: SettingsListener): void
-    {
-        this.listeners = this.listeners.filter(l => l !== listener);
-    }
-
-    public subscribe(listener: SettingsListener): () => void
-    {
-        this.addListener(listener);
-        return () => { this.removeListener(listener); };
-    }
-
     public getSettingsSnapshot(): Settings
     {
         return this.shapshot;
@@ -379,14 +370,6 @@ export class SettingService
     private saveSnapshot(): void
     {
         this.shapshot = cloneObject(this.currentSettings);
-    }
-
-    private notifyListeners(): void
-    {
-        for (const listener of this.listeners)
-        {
-            listener();
-        }
     }
 }
 

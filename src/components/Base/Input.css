@@ -1,9 +1,15 @@
+/*
+    SPDX-FileCopyrightText: 2023 Sergey Katunin <sulmpx60@yandex.ru>
+    SPDX-FileCopyrightText: 2023 Amin Irgaliev <irgaliev01@mail.ru>
+
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
 .input
 {
     border-radius: 10px;
     border: 1px solid #a7a7a7;
     margin-top: 10px;
-    margin-bottom: 7px;
     padding: 10px;
     background-color: #34363b;
     color: white;
@@ -18,4 +24,39 @@
 {
     box-shadow: 0 0 2px white;
     outline: none;
+}
+
+.input-with-password-container
+{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.input-hide-password-button
+{
+    position: absolute;
+    margin-top: 10px;
+    right: 8px;
+    min-height: 28px;
+    max-height: 28px;
+    min-width: 28px;
+    max-width: 28px;
+    padding: 0;
+    font-size: 1.25rem;
+    color: var(--secondary-text-color);
+    user-select: none;
+}
+
+.input-hide-password-button:hover
+{
+    color: white;
+    background-color: transparent;
+}
+
+.input-hide-password-button:focus-visible
+{
+    color: white;
+    background-color: #535e76;
 }

@@ -1,8 +1,15 @@
-import { MenuItem, MenuItemProps, Slider } from "@mui/material";
-import { ReactElement, useRef } from "react";
-import { moveFocus } from "../../Utils";
+/*
+    SPDX-FileCopyrightText: 2023 Sergey Katunin <sulmpx60@yandex.ru>
 
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
+import { Divider, MenuItem, MenuItemProps, SelectChangeEvent, Slider } from "@mui/material";
+import { ReactElement, useRef, useState } from "react";
 import { MdCheckBox, MdCheckBoxOutlineBlank, MdInfoOutline, MdRadioButtonChecked, MdRadioButtonUnchecked } from "react-icons/md";
+import { moveFocus } from "../../utils/FocusUtils";
+import { NumericConstants as NC } from "../../utils/NumericConstants";
+import { Select } from "../Base/Select";
 import "./MenuItems.css";
 
 type LiFocusHandler = React.FocusEventHandler<HTMLLIElement>;
@@ -174,6 +181,112 @@ export const MenuItemSlider: React.FC<MenuItemSliderProps> = ({ text, value, set
                     ref={sliderRef}
                 />
             </div>
+        </MenuItem>
+    );
+};
+
+interface MenuItemSelectProps extends MenuItemProps
+{
+    label?: string;
+    value: string;
+    onValueChange: (val: string) => void;
+    options?: string[];
+}
+export const MenuItemSelect: React.FC<MenuItemSelectProps> = ({
+    label,
+    value,
+    onValueChange,
+    options,
+    children,
+    ...props
+}) =>
+{
+    const [open, setOpen] = useState<boolean>(false);
+
+    const handleClose = (): void =>
+    {
+        setOpen(false);
+    };
+
+    const handleOpen = (): void =>
+    {
+        setOpen(true);
+    };
+
+    const handleItemKeyDown: React.KeyboardEventHandler<HTMLLIElement> = (ev) =>
+    {
+        if (ev.code === "Enter" || ev.code === "Space")
+        {
+            handleOpen();
+        }
+    };
+
+    const handleSelectKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (ev) =>
+    {
+        if (!open)
+        {
+            ev.preventDefault();
+            return;
+        }
+
+        // Для того, чтобы при открытом селекте,
+        // события клавиш не доходили до MenuItemSelect.
+        ev.stopPropagation();
+
+        if (ev.code === "Backspace")
+        {
+            handleClose();
+        }
+        else if (ev.code === "Space")
+        {
+            (ev.target as HTMLElement).click();
+        }
+    };
+
+    const handleSelect = (ev: SelectChangeEvent): void =>
+    {
+        onValueChange(ev.target.value);
+    };
+
+    const selectOptionsItemsToMap = (item: string, index: number): JSX.Element =>
+    {
+        return (
+            <MenuItem value={item} key={index}>
+                <span className="v-align-middle">{item}</span>
+            </MenuItem>
+        );
+    };
+
+    const elementsFromOptions = (
+        <>
+            <MenuItem value={"default"}>По умолчанию</MenuItem>
+            <Divider className="menu-divider" />
+            {options?.map(selectOptionsItemsToMap)}
+        </>
+    );
+
+    const labelItem = (
+        <p className="menu-item-label text-wrap">{label}</p>
+    );
+
+    return (
+        <MenuItem
+            {...props}
+            className={`${props.className ?? ''} menu-item-select menu-item`}
+            onKeyDown={handleItemKeyDown}
+        >
+            {label !== undefined ? labelItem : <></>}
+            <Select
+                value={value}
+                onChange={handleSelect}
+                open={open}
+                onClose={handleClose}
+                onOpen={handleOpen}
+                onKeyDown={handleSelectKeyDown}
+                tabIndex={NC.NEGATIVE_TAB_IDX}
+            >
+                {options ? elementsFromOptions : children}
+            </Select>
         </MenuItem>
     );
 };

@@ -1,0 +1,50 @@
+/*
+    SPDX-FileCopyrightText: 2023-2024 Sergey Katunin <sulmpx60@yandex.ru>
+    SPDX-FileCopyrightText: 2023 Amin Irgaliev <irgaliev01@mail.ru>
+
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
+#block-by-ip-area
+{
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+#block-by-ip-input-area
+{
+    display: flex;
+    flex: auto;
+    flex-direction: column;
+    cursor: pointer;
+    margin-right: 15px;
+}
+
+#block-by-ip-button-area
+{
+    display: flex;
+    flex-direction: column;
+}
+
+.block-by-ip-button
+{
+    border-radius: 5px;
+    height: 33px;
+    width: 150px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    margin: 5px;
+}
+
+.block-by-ip-button:hover
+{
+    border: 1px solid white;
+}
+
+.block-by-ip-button:focus
+{
+    border: 1px solid white;
+}

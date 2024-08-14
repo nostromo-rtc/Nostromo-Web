@@ -1,0 +1,26 @@
+/*
+    SPDX-FileCopyrightText: 2023 Amin Irgaliev <irgaliev01@mail.ru>
+
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
+
+.search-panel
+{
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 12px;
+    flex: auto;
+    flex-grow: 0;
+}
+
+.search-panel-label
+{
+    padding-left: 5px;
+    display: inline-flex;
+    font-size: 0.8em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03rem;
+    color: var(--secondary-text-color);
+}

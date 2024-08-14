@@ -1,23 +1,8 @@
-import { Dispatch, ReactEventHandler, SetStateAction } from "react";
+/*
+    SPDX-FileCopyrightText: 2023 Sergey Katunin <sulmpx60@yandex.ru>
 
-export type ReactDispatch<T> = Dispatch<SetStateAction<T>>;
-
-export const getToggleFunc = (setState: Dispatch<SetStateAction<boolean>>) =>
-{
-    return () => { setState(prevState => !prevState); };
-};
-
-export const doNotHandleEvent: ReactEventHandler = (ev) =>
-{
-    ev.preventDefault();
-    ev.stopPropagation();
-};
-
-export function isEmptyString(str: string): boolean
-{
-    const EMPTY_STRING_LEN = 0;
-    return str.length === EMPTY_STRING_LEN;
-}
+    SPDX-License-Identifier: BSD-2-Clause
+*/
 
 /**
  * Переместить фокус от `currentFocus` к другому соседнему элементу.
@@ -78,52 +63,5 @@ export function moveFocusToListBoundary(list: Element | null, first: boolean): v
     if (focusTarget)
     {
         (focusTarget as HTMLElement).focus();
-    }
-}
-
-const BINARY_THOUSAND = 1024;
-
-export const PrefixConstants = {
-    KILO: BINARY_THOUSAND,
-    MEGA: BINARY_THOUSAND * BINARY_THOUSAND,
-    GIGA: BINARY_THOUSAND * BINARY_THOUSAND * BINARY_THOUSAND,
-} as const;
-
-export const ZERO_IDX = 0;
-
-export const ZERO_TAB_IDX = 0;
-
-export const NEGATIVE_TAB_IDX = -1;
-
-export const FILE_SIZE_PRESCISSION = 3;
-
-export const IDX_STEP = 1;
-
-export function cloneObject<T>(obj: T): T
-{
-    return JSON.parse(JSON.stringify(obj)) as T;
-}
-
-export function isObjectAndNotArray(obj: object): boolean
-{
-    return typeof obj === "object" && !Array.isArray(obj);
-}
-
-export function overrideValues(target: object, override: object): void
-{
-    for (const keyStr in target)
-    {
-        const key = keyStr as keyof object;
-        if (Object.hasOwn(override, key))
-        {
-            if (isObjectAndNotArray(target[key]) && isObjectAndNotArray(override[key]))
-            {
-                overrideValues(target[key], override[key]);
-            }
-            else
-            {
-                target[key] = override[key];
-            }
-        }
     }
 }

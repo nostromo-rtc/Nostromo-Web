@@ -1,0 +1,95 @@
+/*
+    SPDX-FileCopyrightText: 2023-2024 Sergey Katunin <sulmpx60@yandex.ru>
+    SPDX-FileCopyrightText: 2023 Vladislav Tarakanov <vladislav.tarakanov@bk.ru>
+
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
+.video-layout-wrapper
+{
+    flex: auto;
+    display: flex;
+    overflow: hidden;
+}
+
+.video-layout
+{
+    flex: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.video-layout-nav-area-size
+{
+    width: 50px;
+    box-sizing: border-box;
+    font-size: 0.9rem;
+}
+
+.video-layout-nav-area
+{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 275ms;
+}
+
+.video-layout-nav-area:hover
+{
+    background-color: #00000030;
+    user-select: none;
+}
+
+.video-layout-nav-button
+{
+    padding: 0;
+    color: inherit;
+    min-width: 32px;
+    min-height: 32px;
+}
+
+.video-layout-nav-button:hover
+{
+    background-color: transparent;
+}
+
+.video-layout-nav-button svg
+{
+    min-width: 32px;
+    min-height: 32px;
+}
+
+@media (width <=1280px) or (height <=720px)
+{
+    .video-layout-nav-area-size
+    {
+        position: absolute;
+        height: 100%;
+        top: 0px;
+        opacity: 50%;
+        padding-bottom: 10px;
+        font-size: 0.8rem;
+        box-sizing: border-box;
+        justify-content: end;
+    }
+
+    .video-layout-nav-area:hover
+    {
+        opacity: 100%;
+    }
+
+    .video-layout-nav-prev
+    {
+        left: 0px;
+    }
+
+    .video-layout-nav-next
+    {
+        right: 0px;
+    }
+}

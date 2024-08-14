@@ -1,3 +1,9 @@
+/*
+    SPDX-FileCopyrightText: 2023 Sergey Katunin <sulmpx60@yandex.ru>
+
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
 import React, { ReactEventHandler, useContext, useRef, useState } from "react";
 import { Avatar, Button, Divider, Menu as MuiMenu } from "@mui/material";
 import { BiChevronDown, BiChevronUp } from "react-icons/bi";
@@ -7,7 +13,7 @@ import "./AccountMenu.css";
 import { EditUsernameDialog } from "./EditUsernameDialog";
 import { Tooltip } from "./Tooltip";
 import { MenuItemWithIcon } from "./Menu/MenuItems";
-import { doNotHandleEvent } from "../Utils";
+import { doNotHandleEvent } from "../utils/Utils";
 import { SetShowSettingsContext } from "../App";
 
 export const AccountMenu: React.FC = () =>

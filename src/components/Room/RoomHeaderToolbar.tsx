@@ -1,18 +1,25 @@
-import React, { Dispatch, SetStateAction } from "react";
+/*
+    SPDX-FileCopyrightText: 2023 Sergey Katunin <sulmpx60@yandex.ru>
+
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
+import React from "react";
 
 import "./RoomHeaderToolbar.css";
 
 import { Button } from "@mui/material";
 import { BsChatTextFill, BsPeopleFill } from "react-icons/bs";
+import { ReactDispatch } from "../../utils/Utils";
 import { Tooltip } from "../Tooltip";
 
 export type ToggleUserListBtnInfo = {
     isUserListHidden: boolean,
-    setIsUserListHidden: Dispatch<SetStateAction<boolean>>;
+    setIsUserListHidden: ReactDispatch<boolean>;
 };
 export type ToggleChatBtnInfo = {
     isChatHidden: boolean,
-    setIsChatHidden: Dispatch<SetStateAction<boolean>>;
+    setIsChatHidden: ReactDispatch<boolean>;
 };
 export interface RoomHeaderToolbarProps
 {

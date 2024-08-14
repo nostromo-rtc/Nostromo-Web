@@ -1,7 +1,15 @@
-import { Dispatch, MouseEventHandler, SetStateAction, useRef } from "react";
+/*
+    SPDX-FileCopyrightText: 2023 Amin Irgaliev <irgaliev01@mail.ru>
+    SPDX-FileCopyrightText: 2023 Sergey Katunin <sulmpx60@yandex.ru>
+
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
+import { MouseEventHandler, useRef } from "react";
 import { FcFile } from "react-icons/fc";
+import { NumericConstants as NC } from "../../../utils/NumericConstants";
+import { PrefixConstants, ReactDispatch } from "../../../utils/Utils";
 import "./UploadingFilesQueue.css";
-import { FILE_SIZE_PRESCISSION, IDX_STEP, PrefixConstants, ZERO_IDX } from "../../../Utils";
 
 // TODO: Не забыть убрать отсюда после наладки работы с NS Shared
 export interface ChatFileInfo
@@ -21,7 +29,7 @@ const ZERO_PROGRESS = 0;
 interface UploadingFilesQueueProps
 {
     uploadingFilesQueue: LoadFileInfo[];
-    setUploadingFilesQueue: Dispatch<SetStateAction<LoadFileInfo[]>>;
+    setUploadingFilesQueue: ReactDispatch<LoadFileInfo[]>;
 }
 
 export const UploadingFilesQueue: React.FC<UploadingFilesQueueProps> = ({ uploadingFilesQueue, setUploadingFilesQueue }) =>
@@ -57,14 +65,14 @@ export const UploadingFilesQueue: React.FC<UploadingFilesQueueProps> = ({ upload
         const newFiles: LoadFileInfo[] = uploadingFilesQueue.slice();
         const fileIdx = newFiles.findIndex(а => а.file.fileId === fileId);
         if (
-            fileIdx !== ZERO_IDX
+            fileIdx !== NC.ZERO_IDX
             && newFiles[fileIdx].progress === ZERO_PROGRESS
-            && newFiles[fileIdx - IDX_STEP].progress === ZERO_PROGRESS
+            && newFiles[fileIdx - NC.IDX_STEP].progress === ZERO_PROGRESS
         )
         {
             const tmp: LoadFileInfo = newFiles[fileIdx];
-            newFiles[fileIdx] = newFiles[fileIdx - IDX_STEP];
-            newFiles[fileIdx - IDX_STEP] = tmp;
+            newFiles[fileIdx] = newFiles[fileIdx - NC.IDX_STEP];
+            newFiles[fileIdx - NC.IDX_STEP] = tmp;
         }
         setUploadingFilesQueue(newFiles);
     };
@@ -75,13 +83,13 @@ export const UploadingFilesQueue: React.FC<UploadingFilesQueueProps> = ({ upload
         const newFiles: LoadFileInfo[] = uploadingFilesQueue.slice();
         const fileIdx = newFiles.findIndex(f => f.file.fileId === fileId);
         if (
-            fileIdx !== (newFiles.length - IDX_STEP)
+            fileIdx !== (newFiles.length - NC.IDX_STEP)
             && newFiles[fileIdx].progress === ZERO_PROGRESS
         )
         {
             const tmp: LoadFileInfo = newFiles[fileIdx];
-            newFiles[fileIdx] = newFiles[fileIdx + IDX_STEP];
-            newFiles[fileIdx + IDX_STEP] = tmp;
+            newFiles[fileIdx] = newFiles[fileIdx + NC.IDX_STEP];
+            newFiles[fileIdx + NC.IDX_STEP] = tmp;
         }
         setUploadingFilesQueue(newFiles);
     };
@@ -170,7 +178,7 @@ const UploadingFileCard: React.FC<UploadingFileCardProps> = ({
             <div className="file-card-progress">
                 <progress id="progressBar" value={loading.progress} max={loading.file.size}></progress>
                 <div className="progress-load">
-                    {(loading.progress / PrefixConstants.MEGA).toFixed(FILE_SIZE_PRESCISSION)}MB из {(loading.file.size / PrefixConstants.MEGA).toFixed(FILE_SIZE_PRESCISSION)}MB
+                    {(loading.progress / PrefixConstants.MEGA).toFixed(NC.FILE_SIZE_PRECISION)}MB из {(loading.file.size / PrefixConstants.MEGA).toFixed(NC.FILE_SIZE_PRECISION)}MB
                 </div>
             </div>
         </div>

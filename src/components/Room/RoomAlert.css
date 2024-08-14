@@ -1,6 +1,12 @@
+/*
+    SPDX-FileCopyrightText: 2023 Sergey Katunin <sulmpx60@yandex.ru>
+
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
 .room-alert
 {
-    margin-bottom: 4px;
+    min-height: 36px;
     padding: 2px 16px;
     text-align: justify;
 }

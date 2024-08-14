@@ -1,9 +1,16 @@
-import { Dispatch, SetStateAction, createContext, useContext, useState } from "react";
+/*
+    SPDX-FileCopyrightText: 2023 Sergey Katunin <sulmpx60@yandex.ru>
+    SPDX-FileCopyrightText: 2023 Vladislav Tarakanov <vladislav.tarakanov@bk.ru>
+
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
+import { createContext, useContext, useState } from "react";
 import { Navbar } from "../components/Navbar";
 import { PageRouter } from "../components/PageRouter";
 
 import "./MainLayer.css";
-import { SetShowSettingsContext } from "../App";
+import { SetShowAdminPanelContext, SetShowSettingsContext } from "../App";
 
 // Объект React Context.
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -17,6 +24,7 @@ export const MainLayer: React.FC = () =>
 
     const [dndVisible, setDndVisible] = useState(false);
     const setShowSettings = useContext(SetShowSettingsContext);
+    const setShowAdminPanel = useContext(SetShowAdminPanelContext);
 
     /*** ОБРАБОТЧИКИ ***/
 
@@ -69,6 +77,14 @@ export const MainLayer: React.FC = () =>
         }
     };
 
+    const handleOpenAdminPanel = (): void =>
+    {
+        if (setShowAdminPanel !== null)
+        {
+            setShowAdminPanel(true);
+        }
+    };
+
     return (
         <div id="layer-main" className="overflow-container"
             onDragEnter={handleDragEnter}
@@ -76,7 +92,7 @@ export const MainLayer: React.FC = () =>
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}>
-            <Navbar openSettings={handleOpenSettings} />
+            <Navbar openSettings={handleOpenSettings} openAdminPanel={handleOpenAdminPanel} />
             <div id="base">
                 <DndVisibleContext.Provider value={dndVisible}>
                     <PageRouter />

@@ -1,3 +1,11 @@
+/*
+    SPDX-FileCopyrightText: 2023 Vladislav Tarakanov <vladislav.tarakanov@bk.ru>
+    SPDX-FileCopyrightText: 2023 Sergey Katunin <sulmpx60@yandex.ru>
+    SPDX-FileCopyrightText: 2023 Amin Irgaliev <irgaliev01@mail.ru>
+
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
 import { FC, useContext, useRef, useState } from "react";
 import { SettingsContext } from "../../AppWrapper";
 import { Category, Group, ParameterValue, ParametersInfoMap, Section, Settings, useSettings } from "../../services/SettingsService";
@@ -210,7 +218,7 @@ export const SettingsParametersList: FC<SettingsParametersListProps> = ({ parame
     return (
         <>
             {showRestoreSettingsDialog ? restoreSettingsDialog : <></>}
-            <List>{loadSelectedCategory()}</List>
+            <List id="settings-parameters-list">{loadSelectedCategory()}</List>
         </>
     );
 };

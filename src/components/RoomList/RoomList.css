@@ -1,0 +1,25 @@
+/*
+    SPDX-FileCopyrightText: 2023 Sergey Katunin <sulmpx60@yandex.ru>
+    SPDX-FileCopyrightText: 2023 Amin Irgaliev <irgaliev01@mail.ru>
+    SPDX-FileCopyrightText: 2023 Vladislav Tarakanov <vladislav.tarakanov@bk.ru>
+
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
+.room-list
+{
+    border-radius: 7px;
+    padding: 5px 10px 5px 5px;
+    flex: auto;
+    flex-grow: 1;
+    overflow: scroll;
+}
+
+.room-list-container
+{
+    display: flex;
+    flex: auto;
+    flex-direction: column;
+    max-height: 100%;
+    box-sizing: border-box;
+}

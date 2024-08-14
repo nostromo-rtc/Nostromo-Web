@@ -1,14 +1,24 @@
+/*
+    SPDX-FileCopyrightText: 2023-2024 Sergey Katunin <sulmpx60@yandex.ru>
+    SPDX-FileCopyrightText: 2023 Amin Irgaliev <irgaliev01@mail.ru>
+
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
 import { ReactNode, useEffect, useRef } from "react";
 
-import { NEGATIVE_TAB_IDX, ZERO_TAB_IDX, moveFocus, moveFocusToListBoundary } from "../../../Utils";
+import { moveFocus, moveFocusToListBoundary } from "../../../utils/FocusUtils";
+import { NumericConstants as NC } from "../../../utils/NumericConstants";
 
 type DivKeyboardEventHandler = React.KeyboardEventHandler<HTMLDivElement>;
 
 interface ListProps extends React.HTMLAttributes<HTMLDivElement>
 {
     children?: ReactNode;
+    onPageChange?: (next: boolean) => void;
+    horizontal?: boolean;
 }
-export const List: React.FC<ListProps> = ({ children, ...props }) =>
+export const List: React.FC<ListProps> = ({ children, onPageChange, horizontal = false, ...props }) =>
 {
     const listRef = useRef<HTMLDivElement>(null);
 
@@ -35,7 +45,7 @@ export const List: React.FC<ListProps> = ({ children, ...props }) =>
 
         if (firstItem)
         {
-            (firstItem as HTMLElement).tabIndex = ZERO_TAB_IDX;
+            (firstItem as HTMLElement).tabIndex = NC.ZERO_TAB_IDX;
         }
     });
 
@@ -62,28 +72,28 @@ export const List: React.FC<ListProps> = ({ children, ...props }) =>
             return;
         }
 
-        if (ev.key === "ArrowDown")
+        const transitionNextKey = horizontal ? "ArrowRight" : "ArrowDown";
+        const transitionPrevKey = horizontal ? "ArrowLeft" : "ArrowUp";
+
+        if (ev.key === transitionNextKey || ev.key === transitionPrevKey)
         {
+            const next = ev.key === transitionNextKey;
+            const sibling = next ? currentFocus?.nextElementSibling : currentFocus?.previousElementSibling;
+
             ev.preventDefault();
             if (currentFocus === list)
             {
-                moveFocusToListBoundary(list, true);
+                moveFocusToListBoundary(list, next);
+                return;
             }
-            else
+
+            if (sibling)
             {
-                moveFocus(currentFocus, true);
+                moveFocus(currentFocus, next);
             }
-        }
-        else if (ev.key === "ArrowUp")
-        {
-            ev.preventDefault();
-            if (currentFocus === list)
+            else if (onPageChange !== undefined)
             {
-                moveFocusToListBoundary(list, false);
-            }
-            else
-            {
-                moveFocus(currentFocus, false);
+                onPageChange(next);
             }
         }
         else if (ev.key === "Home")
@@ -96,11 +106,12 @@ export const List: React.FC<ListProps> = ({ children, ...props }) =>
             ev.preventDefault();
             moveFocusToListBoundary(list, false);
         }
+        // TODO: добавить Page Up / Page Down
     };
 
     return (
         <div
-            tabIndex={NEGATIVE_TAB_IDX}
+            tabIndex={NC.NEGATIVE_TAB_IDX}
             onKeyDown={handleListKeyDown}
             role="list"
             ref={listRef}

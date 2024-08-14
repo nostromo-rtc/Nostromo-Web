@@ -1,0 +1,103 @@
+/*
+    SPDX-FileCopyrightText: 2023 Vladislav Tarakanov <vladislav.tarakanov@bk.ru>
+    SPDX-FileCopyrightText: 2023 Amin Irgaliev <irgaliev01@mail.ru>
+    SPDX-FileCopyrightText: 2023 Sergey Katunin <sulmpx60@yandex.ru>
+
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
+.popup-notification-card
+{
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    width: 420px;
+    opacity: 1;
+    color: white;
+    box-shadow: 1px 1px 5px 0 rgba(0, 0, 0, 0.8);
+    border-radius: 8px;
+    margin: 5px;
+    padding: 10px 13px;
+    overflow: hidden;
+    box-sizing: border-box;
+    min-height: 110px;
+    max-height: 110px;
+}
+
+.popup-notification-header-area
+{
+    padding-bottom: 10px;
+    display: flex;
+    align-items: center;
+    margin-right: 28px;
+}
+
+.popup-notification-header-icon
+{
+    min-height: 1rem;
+    max-height: 1rem;
+    min-width: 1rem;
+    max-width: 1rem;
+    overflow: hidden;
+    margin-right: 5px;
+}
+
+.popup-notification-header
+{
+    text-align: left;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--primary-text-color);
+    margin-right: 5px;
+    flex-grow: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    cursor: pointer;
+}
+
+.popup-notification-header-date
+{
+    color: var(--secondary-text-color);
+    font-size: 0.75rem;
+    font-weight: 200;
+    flex-grow: 0;
+}
+
+.popup-notification-description
+{
+    font-size: 0.85rem;
+    color: var(--primary-text-color);
+    overflow: hidden;
+    word-wrap: break-word;
+    text-align: left;
+    line-height: 1rem;
+    height: 4rem;
+    max-height: 4rem;
+    /* Для обрезки текста многоточием после 4 строк */
+    display: -webkit-box;
+    line-clamp: 4;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+}
+
+.popup-notification-description-icon
+{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 4rem;
+    max-height: 4rem;
+    width: 3rem;
+    max-width: 3rem;
+    margin-right: 13px;
+    box-sizing: border-box;
+}
+
+@media (width < 600px)
+{
+    .popup-notification-card
+    {
+        max-width: 300px;
+    }
+}

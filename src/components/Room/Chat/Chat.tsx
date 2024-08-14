@@ -1,12 +1,21 @@
-import React, { useEffect, useRef, useState, Dispatch, SetStateAction, ChangeEventHandler } from 'react';
+/*
+    SPDX-FileCopyrightText: 2023 Sergey Katunin <sulmpx60@yandex.ru>
+    SPDX-FileCopyrightText: 2023 Amin Irgaliev <irgaliev01@mail.ru>
+    SPDX-FileCopyrightText: 2023 Vladislav Tarakanov <vladislav.tarakanov@bk.ru>
+
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
+import { Button } from '@mui/material';
+import React, { ChangeEventHandler, useEffect, useRef, useState } from 'react';
 import { ImAttachment } from 'react-icons/im';
 import { MdSend } from 'react-icons/md';
+import { NumericConstants as NC } from "../../../utils/NumericConstants";
+import { ReactDispatch, isEmptyString } from "../../../utils/Utils";
+import { Tooltip } from '../../Tooltip';
 import "./Chat.css";
 import { Message } from './Message/Message';
-import { Tooltip } from '../../Tooltip';
-import { Button } from '@mui/material';
 import { ChatFileInfo, LoadFileInfo, UploadingFilesQueue } from './UploadingFilesQueue';
-import { ZERO_IDX, isEmptyString } from "../../../Utils";
 
 /** Информация о сообщении в чате. */
 interface ChatMessage
@@ -20,9 +29,9 @@ interface ChatMessage
 interface ChatProps
 {
     uploadingFilesQueue: LoadFileInfo[];
-    setUploadingFilesQueue: Dispatch<SetStateAction<LoadFileInfo[]>>;
+    setUploadingFilesQueue: ReactDispatch<LoadFileInfo[]>;
     isFileUploading: boolean;
-    setIsFileUploading: Dispatch<SetStateAction<boolean>>;
+    setIsFileUploading: ReactDispatch<boolean>;
 }
 
 export const Chat: React.FC<ChatProps> = ({
@@ -88,7 +97,7 @@ export const Chat: React.FC<ChatProps> = ({
                 content: newMessage
             };
             // FIXME: возможно concat не самый лучший способ в React так объединять старое и новое состояние.
-            // Это просто пока заглушка, но когда будет настоящий код, 
+            // Это просто пока заглушка, но когда будет настоящий код,
             // следует подобрать наилучший метод для этого действия.
             setMessages((prev) => prev.concat(message));
 
@@ -99,7 +108,7 @@ export const Chat: React.FC<ChatProps> = ({
             setShowPlaceholder(true);
         }
 
-        setIsFileUploading(uploadingFilesQueue.length > ZERO_IDX);
+        setIsFileUploading(uploadingFilesQueue.length > NC.ZERO_IDX);
     };
 
     /* Иммитация загрузки файла на сервер
@@ -145,7 +154,7 @@ export const Chat: React.FC<ChatProps> = ({
         }
 
         const filesToUpload = inputFileRef.current.files;
-        if (filesToUpload && filesToUpload.length > ZERO_IDX)
+        if (filesToUpload && filesToUpload.length > NC.ZERO_IDX)
         {
             const newFiles: LoadFileInfo[] = uploadingFilesQueue.slice();
             let count = 0;

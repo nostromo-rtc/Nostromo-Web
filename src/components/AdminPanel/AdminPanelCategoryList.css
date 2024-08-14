@@ -1,0 +1,72 @@
+/*
+    SPDX-FileCopyrightText: 2023 Amin Irgaliev <irgaliev01@mail.ru>
+
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
+#admin-panel-category-list
+{
+    width: 100%;
+}
+
+.admin-panel-list-item
+{
+    display: flex;
+    height: 42px;
+    box-sizing: border-box;
+    align-items: center;
+    padding: 0 8px 0 8px;
+    margin: 2px 7px 2px 7px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.admin-panel-list-item:focus
+{
+    background-color: #414652;
+    box-shadow: none;
+}
+
+.admin-panel-list-item:focus-visible
+{
+    background-color: #414652;
+    outline: none;
+}
+
+.admin-panel-list-item:active
+{
+    background-color: #3b3f41;
+}
+
+.admin-panel-list-item:hover
+{
+    background-color: #3b3f41;
+    box-shadow: none;
+}
+
+.admin-panel-list-item-info
+{
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-panel-list-item-info-name
+{
+    font-size: 1rem;
+    color: var(--primary-text-color);
+    word-wrap: anywhere;
+}
+
+.admin-panel-list-active
+{
+    background-color: #3b3f41;
+    box-shadow: none;
+}
+
+.admin-panel-category-label
+{
+    font-size: 1.5rem;
+    letter-spacing: 0.03rem;
+    margin-top: 5px;
+    margin-bottom: 25px;
+}

@@ -1,3 +1,10 @@
+/*
+    SPDX-FileCopyrightText: 2023 Sergey Katunin <sulmpx60@yandex.ru>
+    SPDX-FileCopyrightText: 2023 Vladislav Tarakanov <vladislav.tarakanov@bk.ru>
+
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
 import React, { useContext, useEffect, useRef, useState } from "react";
 
 import "../App.css";
@@ -6,9 +13,9 @@ import { FocusTrap } from "../components/Base/FocusTrap";
 import { parametersInfoMap, useSettings } from "../services/SettingsService";
 import { SettingsCategoryList } from "../components/Settings/SettingsCategoryList";
 import { SettingsParametersList } from "../components/Settings/SettingsParametersList";
-import { SidebarView } from "../components/Base/SidebarView";
+import { SidebarView, SidebarViewMainArea } from "../components/Base/SidebarView";
 import { SettingsContext } from "../AppWrapper";
-import { ZERO_IDX } from "../Utils";
+import { NumericConstants as NC } from "../utils/NumericConstants";
 import { SetShowSettingsContext } from "../App";
 
 // TODO: настроить FocusTrap так, чтобы избежать создания лишних элементов-границ для навигации,
@@ -25,7 +32,7 @@ export const SettingsLayer: React.FC = () =>
     const categories = Object.keys(settings);
 
     const [selectedCategory, setSelectedCategory] = useState<string>(
-        categories.length ? categories[ZERO_IDX] : ""
+        categories.length ? categories[NC.ZERO_IDX] : ""
     );
 
     useEffect(() =>
@@ -53,10 +60,12 @@ export const SettingsLayer: React.FC = () =>
     );
 
     const parameterList = (
-        <SettingsParametersList
-            selectedCategory={selectedCategory}
-            parametersInfoMap={parametersInfoMap}
-        />
+        <SidebarViewMainArea>
+            <SettingsParametersList
+                selectedCategory={selectedCategory}
+                parametersInfoMap={parametersInfoMap}
+            />
+        </SidebarViewMainArea>
     );
 
     const handleCloseSettings = (): void =>

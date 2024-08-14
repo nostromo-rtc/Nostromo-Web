@@ -1,3 +1,9 @@
+/*
+    SPDX-FileCopyrightText: 2022-2023 Sergey Katunin <sulmpx60@yandex.ru>
+
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
 :root
 {
     --primary-text-color: #e1e3e6;
@@ -22,6 +28,21 @@
     --success-text-color: #cce8cd;
 }
 
+.backdrop
+{
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
 .flex
 {
     display: flex;
@@ -35,6 +56,11 @@
 .flex-row
 {
     flex-direction: row;
+}
+
+.flex-auto
+{
+    flex: auto;
 }
 
 .inline
@@ -152,6 +178,11 @@
     position: relative;
 }
 
+.absolute
+{
+    position: absolute;
+}
+
 .overflow-container
 {
     display: flex;
@@ -170,19 +201,4 @@
     right: 0;
     bottom: 0;
     overflow: hidden;
-}
-
-.backdrop
-{
-    display: flex;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    overflow: hidden;
-    background-color: rgba(0, 0, 0, 0.5);
-    justify-content: center;
-    align-items: center;
-    z-index: 10;
 }

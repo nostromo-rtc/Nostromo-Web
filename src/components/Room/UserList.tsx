@@ -1,10 +1,16 @@
+/*
+    SPDX-FileCopyrightText: 2023 Sergey Katunin <sulmpx60@yandex.ru>
+
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
 import { useEffect, useState } from "react";
 import "./UserList.css";
 
 import { Avatar, Divider } from "@mui/material";
 import { UserInfo } from "nostromo-shared/types/RoomTypes";
 import { HiHashtag, HiIdentification } from "react-icons/hi";
-import { getToggleFunc } from "../../Utils";
+import { getToggleFunc } from "../../utils/Utils";
 import { AnchorPosition, Menu, MenuList } from "../Menu/Menu";
 import { MenuItemCheckbox, MenuItemSlider, MenuItemWithIcon, MenuSectionLabel } from "../Menu/MenuItems";
 import { List } from "../Base/List/List";
@@ -121,7 +127,7 @@ const UserListItem: React.FC<UserListItemProps> = ({ user, transitionDuration })
             transitionDuration={transitionDuration}
             popperPlacement="left-start"
         >
-            <MenuList open={open} disableAutoFocusItem>
+            <MenuList open={open} variant="menu">
                 <MenuItemCheckbox
                     text="Приглушить звук"
                     isChecked={userMuted}

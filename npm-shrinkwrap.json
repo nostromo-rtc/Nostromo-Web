@@ -19,7 +19,7 @@
                 "plyr": "^3.7.2",
                 "react": "^18.2.0",
                 "react-dom": "^18.2.0",
-                "react-icons": "^4.8.0",
+                "react-icons": "^4.10.1",
                 "react-resize-detector": "^9.1.0",
                 "react-router-dom": "^6.10.0",
                 "socket.io-client": "^4.5.2"
@@ -15665,9 +15665,9 @@
             "dev": true
         },
         "node_modules/react-icons": {
-            "version": "4.8.0",
-            "resolved": "https://registry.npmjs.org/react-icons/-/react-icons-4.8.0.tgz",
-            "integrity": "sha512-N6+kOLcihDiAnj5Czu637waJqSnwlMNROzVZMhfX68V/9bu9qHaMIJC4UdozWoOk57gahFCNHwVvWzm0MTzRjg==",
+            "version": "4.12.0",
+            "resolved": "https://registry.npmjs.org/react-icons/-/react-icons-4.12.0.tgz",
+            "integrity": "sha512-IBaDuHiShdZqmfc/TwHu6+d6k2ltNCf3AszxNmjJc1KUfXdEeRJOKyNvLmAHaarhzGmTSVygNdyu8/opXv2gaw==",
             "peerDependencies": {
                 "react": "*"
             }
@@ -30008,9 +30008,9 @@
             "dev": true
         },
         "react-icons": {
-            "version": "4.8.0",
-            "resolved": "https://registry.npmjs.org/react-icons/-/react-icons-4.8.0.tgz",
-            "integrity": "sha512-N6+kOLcihDiAnj5Czu637waJqSnwlMNROzVZMhfX68V/9bu9qHaMIJC4UdozWoOk57gahFCNHwVvWzm0MTzRjg==",
+            "version": "4.12.0",
+            "resolved": "https://registry.npmjs.org/react-icons/-/react-icons-4.12.0.tgz",
+            "integrity": "sha512-IBaDuHiShdZqmfc/TwHu6+d6k2ltNCf3AszxNmjJc1KUfXdEeRJOKyNvLmAHaarhzGmTSVygNdyu8/opXv2gaw==",
             "requires": {}
         },
         "react-is": {

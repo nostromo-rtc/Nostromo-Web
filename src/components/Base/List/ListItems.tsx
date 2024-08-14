@@ -1,13 +1,24 @@
+/*
+    SPDX-FileCopyrightText: 2023-2024 Sergey Katunin <sulmpx60@yandex.ru>
+    SPDX-FileCopyrightText: 2023 Amin Irgaliev <irgaliev01@mail.ru>
+    SPDX-FileCopyrightText: 2023 Vladislav Tarakanov <vladislav.tarakanov@bk.ru>
+
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
+import React, { ChangeEventHandler, FocusEventHandler, KeyboardEventHandler, ReactNode, forwardRef, useImperativeHandle, useRef, useState } from "react";
+
 import { Button, Divider, MenuItem, SelectChangeEvent, Slider } from "@mui/material";
-import { ChangeEventHandler, FC, FocusEventHandler, KeyboardEventHandler, ReactNode, useRef, useState } from "react";
-import { NEGATIVE_TAB_IDX, isEmptyString } from "../../../Utils";
-import { Input } from "../Input";
+import { MdInfoOutline } from "react-icons/md";
+import { NumericConstants as NC } from "../../../utils/NumericConstants";
+import { isEmptyString } from "../../../utils/Utils";
+import { Input, PasswordSlotOptions } from "../Input";
 import { Select } from "../Select";
 import { Switch } from "../Switch";
-import "./ListItems.css";
-import { MdInfoOutline } from "react-icons/md";
 
-interface ListItemProps extends React.HTMLAttributes<HTMLDivElement>
+import "./ListItems.css";
+
+export interface ListItemProps extends React.HTMLAttributes<HTMLDivElement>
 {
     children?: ReactNode;
     showSeparator?: boolean;
@@ -15,19 +26,27 @@ interface ListItemProps extends React.HTMLAttributes<HTMLDivElement>
     onKeyDown?: React.KeyboardEventHandler<HTMLDivElement>;
 }
 
-export const ListItem: FC<ListItemProps> = ({
+export const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
     children,
     showSeparator = true,
     description,
     onKeyDown,
     className,
     ...props
-}) =>
+}, forwardedRef) =>
 {
+    // This allows us to separate the usage of
+    // 1) external forwared ref to set the focus on listitem from parent components;
+    // and 2) internal ref - to set the focus here in `handleKeyDown`.
     const itemRef = useRef<HTMLDivElement>(null);
+
+    useImperativeHandle<HTMLDivElement | null, HTMLDivElement | null>(
+        forwardedRef, () => itemRef.current, []
+    );
+
     const handleKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (ev) =>
     {
-        if (onKeyDown !== undefined)
+        if (onKeyDown)
         {
             onKeyDown(ev);
         }
@@ -46,17 +65,17 @@ export const ListItem: FC<ListItemProps> = ({
     return (
         <div onKeyDown={handleKeyDown}
             ref={itemRef}
-            tabIndex={NEGATIVE_TAB_IDX}
+            tabIndex={NC.NEGATIVE_TAB_IDX}
             role="listitem"
             className={`list-item ${className ?? ""}`}
             {...props}
         >
             {children}
             {isValidDescription ? <p className="list-item-description">{description}</p> : <></>}
-            {showSeparator ? <hr className="list-item-separator"></hr> : <></>}
+            {showSeparator ? <hr className="list-item-separator"></hr> : <div className="list-item-without-separator"></div>}
         </div>
     );
-};
+});
 
 interface ListItemWithValueProps<T> extends ListItemProps
 {
@@ -67,7 +86,7 @@ interface ListItemWithValueProps<T> extends ListItemProps
 
 type ListItemSwitchProps = ListItemWithValueProps<boolean>;
 
-export const ListItemSwitch: FC<ListItemSwitchProps> = ({
+export const ListItemSwitch: React.FC<ListItemSwitchProps> = ({
     label,
     value,
     onValueChange,
@@ -111,12 +130,16 @@ export const ListItemSwitch: FC<ListItemSwitchProps> = ({
     );
 };
 
-type ListItemInputProps = ListItemWithValueProps<string>;
+interface ListItemInputProps extends ListItemWithValueProps<string>
+{
+    password?: boolean;
+}
 
-export const ListItemInput: FC<ListItemInputProps> = ({
+export const ListItemInput: React.FC<ListItemInputProps> = ({
     label,
     value,
     onValueChange,
+    password = false,
     ...props
 }) =>
 {
@@ -158,6 +181,15 @@ export const ListItemInput: FC<ListItemInputProps> = ({
         }
     };
 
+    const handleHidePasswordBtnKeyDown: KeyboardEventHandler<HTMLButtonElement> = (ev) =>
+    {
+        ev.stopPropagation();
+    };
+
+    const passwordSlotOptions: PasswordSlotOptions | boolean = password
+        ? { onKeyDown: handleHidePasswordBtnKeyDown }
+        : false;
+
     return (
         <ListItem
             onFocus={handleItemFocus}
@@ -169,7 +201,8 @@ export const ListItemInput: FC<ListItemInputProps> = ({
                     onKeyDown={handleInputKeyDown}
                     onChange={handleInputChange}
                     value={value}
-                    tabIndex={NEGATIVE_TAB_IDX}
+                    tabIndex={password ? NC.ZERO_TAB_IDX : NC.NEGATIVE_TAB_IDX}
+                    password={passwordSlotOptions}
                 />
             </label>
         </ListItem>
@@ -179,13 +212,15 @@ export const ListItemInput: FC<ListItemInputProps> = ({
 interface ListItemSelectProps extends ListItemWithValueProps<string>
 {
     options: string[];
+    hasDefaultValue?: boolean;
 }
 
-export const ListItemSelect: FC<ListItemSelectProps> = ({
+export const ListItemSelect: React.FC<ListItemSelectProps> = ({
     label,
     value,
     onValueChange,
     options,
+    hasDefaultValue = false,
     ...props
 }) =>
 {
@@ -245,6 +280,11 @@ export const ListItemSelect: FC<ListItemSelectProps> = ({
         );
     };
 
+    const defaultValueElem = ([
+        <MenuItem value={"default"} key={"defaultOption"}>По умолчанию</MenuItem>,
+        <Divider className="menu-divider" key="divider" />
+    ]);
+
     return (
         <ListItem
             {...props}
@@ -258,11 +298,10 @@ export const ListItemSelect: FC<ListItemSelectProps> = ({
                 onClose={handleClose}
                 onOpen={handleOpen}
                 onKeyDown={handleSelectKeyDown}
-                tabIndex={NEGATIVE_TAB_IDX}
+                tabIndex={NC.NEGATIVE_TAB_IDX}
                 variant="outlined"
             >
-                <MenuItem value={"default"}>По умолчанию</MenuItem>
-                <Divider className="menu-divider" />
+                {hasDefaultValue ? defaultValueElem : undefined}
                 {options.map(selectOptionsItemsToMap)}
             </Select>
         </ListItem>
@@ -271,7 +310,7 @@ export const ListItemSelect: FC<ListItemSelectProps> = ({
 
 type ListItemSliderProps = ListItemWithValueProps<number>;
 
-export const ListItemSlider: FC<ListItemSliderProps> = ({
+export const ListItemSlider: React.FC<ListItemSliderProps> = ({
     label,
     value,
     onValueChange,
@@ -348,16 +387,18 @@ export const ListItemSlider: FC<ListItemSliderProps> = ({
 
 interface ListItemButtonProps extends ListItemProps
 {
-    label: string;
+    label?: string;
     btnLabel: string;
     onBtnClick: React.MouseEventHandler<HTMLButtonElement>;
     btnRef?: React.RefObject<HTMLButtonElement>;
+    showSeparator?: boolean;
 }
-export const ListItemButton: FC<ListItemButtonProps> = ({
+export const ListItemButton: React.FC<ListItemButtonProps> = ({
     label,
     btnLabel,
     onBtnClick,
     btnRef,
+    showSeparator = false,
     ...props
 }) =>
 {
@@ -374,13 +415,14 @@ export const ListItemButton: FC<ListItemButtonProps> = ({
         <ListItem
             {...props}
             onKeyDown={handleItemKeyDown}
+            showSeparator={showSeparator}
         >
             <label className="list-item-button-label-row">
                 <p className="list-item-label text-wrap">{label}</p>
                 <Button
                     className="list-item-button"
                     onClick={onBtnClick}
-                    tabIndex={NEGATIVE_TAB_IDX}
+                    tabIndex={NC.NEGATIVE_TAB_IDX}
                     ref={btnRef}
                 >
                     {btnLabel}

@@ -1,20 +1,28 @@
+/*
+    SPDX-FileCopyrightText: 2023 Sergey Katunin <sulmpx60@yandex.ru>
+
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
 import { Button } from "@mui/material";
-import React, { Dispatch, SetStateAction, useRef } from 'react';
+import React, { useRef } from 'react';
 import { BiChevronDown, BiChevronUp } from "react-icons/bi";
 import { MdMic, MdMicOff, MdScreenShare, MdStopScreenShare, MdVideocam, MdVideocamOff, MdVolumeOff, MdVolumeUp } from "react-icons/md";
 import { Tooltip } from "../../Tooltip";
 
-import { getToggleFunc } from "../../../Utils";
+import { getToggleFunc } from "../../../utils/Utils";
 import { DeviceListItem, MicState, SoundState } from "../../../pages/RoomPage";
 import { MicBtnMenu } from "./MicBtnMenu";
 import "./RoomActionPanel.css";
 import { CamBtnMenu } from "./CamBtnMenu";
 import { DisplayBtnMenu } from "./DisplayBtnMenu";
 
+import { ReactDispatch } from "../../../utils/Utils";
+
 export interface ActionBtnInfo<S>
 {
     state: S;
-    setState: Dispatch<SetStateAction<S>>;
+    setState: ReactDispatch<S>;
 }
 
 export interface ActionBtnWithMenuInfo<S> extends ActionBtnInfo<S>

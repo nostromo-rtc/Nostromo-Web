@@ -1,0 +1,211 @@
+/*
+    SPDX-FileCopyrightText: 2023 Amin Irgaliev <irgaliev01@mail.ru>
+    SPDX-FileCopyrightText: 2023-2024 Sergey Katunin <sulmpx60@yandex.ru>
+    SPDX-FileCopyrightText: 2023 Vladislav Tarakanov <vladislav.tarakanov@bk.ru>
+
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
+.video-asymmetric-layout-wrapper
+{
+    display: flex;
+    flex: auto;
+    overflow: hidden;
+}
+
+.active-asymmetric-item-icon
+{
+    min-width: 32px;
+    max-width: 32px;
+    min-height: 32px;
+    max-height: 32px;
+    color: var(--secondary-text-color);
+}
+
+.video-asymmetric-list-container
+{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    flex-direction: column;
+    padding: 10px;
+}
+
+.video-asymmetric-nav-area-size
+{
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    font-size: 0.9rem;
+}
+
+.video-asymmetric-nav-area
+{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #888888;
+    cursor: pointer;
+    transition: color 275ms;
+    user-select: none;
+}
+
+.video-asymmetric-nav-area:hover
+{
+    color: #ffffff;
+}
+
+.video-asymmetric-nav-button
+{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    white-space: nowrap;
+    padding: 0;
+    line-height: inherit;
+    color: inherit;
+}
+
+.video-asymmetric-nav-button:hover
+{
+    background-color: inherit;
+}
+
+.video-asymmetric-nav-button:focus-visible
+{
+    color: #ffffff;
+    background-color: #3b3f41;
+    outline: 1px #ffffff solid;
+}
+
+.video-asymmetric-nav-button svg
+{
+    min-width: 32px;
+    min-height: 32px;
+}
+
+.video-asymmetric-nav-prev
+{
+    padding: 0 0 10px 0;
+    justify-content: end;
+}
+
+.video-asymmetric-nav-prev .video-asymmetric-nav-button svg
+{
+    transform: rotate(270deg);
+}
+
+.video-asymmetric-nav-next
+{
+    padding: 10px 0 0 0;
+    justify-content: start;
+}
+
+.video-asymmetric-nav-next .video-asymmetric-nav-button
+{
+    flex-direction: column-reverse;
+}
+
+.video-asymmetric-nav-next .video-asymmetric-nav-button svg
+{
+    transform: rotate(90deg);
+}
+
+.video-asymmetric-item
+{
+    display: flex;
+    cursor: pointer;
+    padding: 0;
+    height: 90px;
+    width: 155px;
+    box-sizing: border-box;
+}
+
+.video-asymmetric-item-child
+{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.video-asymmetric-list-item
+{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin-top: 3px;
+    margin-bottom: 3px;
+}
+
+.video-asymmetric-list
+{
+    display: flex;
+    flex-direction: column;
+}
+
+@media (orientation: portrait)
+{
+    .video-asymmetric-layout-wrapper
+    {
+        flex-direction: column-reverse;
+    }
+
+    .video-asymmetric-list-container
+    {
+        padding-top: 20px;
+        flex-direction: row;
+    }
+
+    .video-asymmetric-nav-area-size
+    {
+        justify-content: center;
+    }
+
+    .video-asymmetric-nav-button
+    {
+        height: 100%;
+        width: 50px;
+    }
+
+    .video-asymmetric-nav-prev
+    {
+        align-items: end;
+        padding: 0 10px 0 0;
+    }
+
+    .video-asymmetric-nav-next
+    {
+        align-items: start;
+        padding: 0 0 0 10px;
+    }
+
+    .video-asymmetric-nav-next .video-asymmetric-nav-button
+    {
+        flex-direction: column;
+    }
+
+    .video-asymmetric-nav-prev .video-asymmetric-nav-button svg
+    {
+        transform: rotate(180deg);
+    }
+
+    .video-asymmetric-nav-next .video-asymmetric-nav-button svg
+    {
+        transform: rotate(0deg);
+    }
+
+    .video-asymmetric-item
+    {
+        margin-left: 3px;
+        margin-right: 3px;
+    }
+
+    .video-asymmetric-list
+    {
+        flex-direction: row;
+    }
+}

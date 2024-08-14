@@ -1,8 +1,16 @@
+/*
+    SPDX-FileCopyrightText: 2023 Sergey Katunin <sulmpx60@yandex.ru>
+    SPDX-FileCopyrightText: 2023 Amin Irgaliev <irgaliev01@mail.ru>
+    SPDX-FileCopyrightText: 2023 Vladislav Tarakanov <vladislav.tarakanov@bk.ru>
+
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
 import React, { forwardRef } from "react";
 import "./Switch.css";
 
 import { RiCheckboxCircleFill, RiCloseCircleFill } from "react-icons/ri";
-import { NEGATIVE_TAB_IDX } from "../../Utils";
+import { NumericConstants as NC } from "../../utils/NumericConstants";
 
 interface SwitchProps
 {
@@ -20,7 +28,7 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>((
                 type="checkbox"
                 onChange={onChange}
                 checked={checked}
-                tabIndex={NEGATIVE_TAB_IDX}
+                tabIndex={NC.NEGATIVE_TAB_IDX}
                 aria-label="controlled"
                 ref={ref}
             />

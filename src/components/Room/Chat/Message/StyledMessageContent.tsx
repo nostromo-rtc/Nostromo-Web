@@ -1,6 +1,12 @@
+/*
+    SPDX-FileCopyrightText: 2023 Vladislav Tarakanov <vladislav.tarakanov@bk.ru>
+
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
 import { FC, Fragment } from "react";
+import { NumericConstants as NC } from "../../../../utils/NumericConstants";
 import "./StyledMessageContent.css";
-import { IDX_STEP, ZERO_IDX } from "../../../../Utils";
 
 const URL_RE = /[\S.]+\.\S{1,}[\w|/|#]/g;                          //!< Ссылки
 const INLINE_CODE_OPEN_TAG_RE = /(\s|^)(`\n?)[^`]/;                //!< Метка начала блока отображения кода в пределах 1 строки
@@ -10,10 +16,9 @@ const BLOCK_CODE_CLOSE_TAG_RE = /([^`])(((?<!\s)\n)?```)(\s|$)/;   //!< Метк
 const INLINE_BOLD_OPEN_TAG_RE = /(\s|^)(\*\*\n?)/;                 //!< Метка начала блока жирного выделения в пределах 1 строки
 const INLINE_BOLD_CLOSE_TAG_RE = /([^*])(((?<!\s)\n)?\*\*)(\s|$)/; //!< Метка завершения блока жирного выделения в пределах 1 строки
 
-
 const RE_PREFIX_GROUP = 1;
 const RE_TAG_GROUP = 2;
-enum BlockType 
+enum BlockType
 {
     INLINE_CODE = 0,
     BLOCK_CODE = 1,
@@ -53,7 +58,7 @@ const createBlock = (
  * Обработка символов \n при использовании многострочного тега
  * @param block Обновляемый блок
  * @param text Строка, в которой выделен блок
- * 
+ *
  * В многострочных блоках требуется удалять первый \n за открывающим тегом и первый \n за
  * последним тегом, так как они добавляют лишние пустые строки в сообщение.
  */
@@ -63,8 +68,8 @@ const updateToMultiline = (block: Block, text: string): void =>
         block.endPos + block.endLen < text.length
         && text[block.endPos + block.endLen] === "\n"
         && (
-            block.startPos - IDX_STEP < ZERO_IDX
-            || text[block.startPos - IDX_STEP] === "\n"
+            block.startPos - NC.IDX_STEP < NC.ZERO_IDX
+            || text[block.startPos - NC.IDX_STEP] === "\n"
         )
         && text.substring(block.startPos, block.endPos).includes("\n")
     )
@@ -173,7 +178,7 @@ const getFirstSubblock = (text: string): Block | null =>
     {
         blocks.sort((l, r) => l.startPos - r.startPos);
     }
-    return blocks.length ? blocks[ZERO_IDX] : null;
+    return blocks.length ? blocks[NC.ZERO_IDX] : null;
 };
 
 const UrlToLinks = (words: string): JSX.Element =>
@@ -193,7 +198,7 @@ const UrlToLinks = (words: string): JSX.Element =>
             blocks.push(<Fragment key={subblockNumber}>{words.substring(textBlockStartIdx, url.index)}</Fragment>);
             subblockNumber++;
         }
-        const linkText = words.substring(url.index, url.index + url[ZERO_IDX].length);
+        const linkText = words.substring(url.index, url.index + url[NC.ZERO_IDX].length);
         const ref = linkText.startsWith("http") ? linkText : `http://${linkText}`;
         blocks.push(<a
             key={subblockNumber}
@@ -205,7 +210,7 @@ const UrlToLinks = (words: string): JSX.Element =>
             {linkText}
         </a>);
         subblockNumber++;
-        textBlockStartIdx = url.index + url[ZERO_IDX].length;
+        textBlockStartIdx = url.index + url[NC.ZERO_IDX].length;
     }
     if (textBlockStartIdx !== words.length)
     {
@@ -221,7 +226,7 @@ const analyzeBlock = (words: string): JSX.Element =>
     const blocks: JSX.Element[] = [];
     while (subblock)
     {
-        const lPart = words.substring(ZERO_IDX, subblock.startPos);
+        const lPart = words.substring(NC.ZERO_IDX, subblock.startPos);
         const mPart = words.substring(subblock.startPos + subblock.startLen, subblock.endPos);
         const rPart = words.substring(subblock.endPos + subblock.endLen, words.length);
         if (lPart.length)

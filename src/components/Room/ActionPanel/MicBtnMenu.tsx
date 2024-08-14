@@ -1,3 +1,9 @@
+/*
+    SPDX-FileCopyrightText: 2023 Sergey Katunin <sulmpx60@yandex.ru>
+
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
 import { Divider } from "@mui/material";
 import React, { useState } from "react";
 import { MdClose } from "react-icons/md";
@@ -61,7 +67,7 @@ export const MicBtnMenu: React.FC<MicBtnMenuProps> = ({
             popperPlacement="top"
         >
             <MenuSectionLabel text="Выбор микрофона" />
-            <MenuList open={open}>
+            <MenuList open={open} variant="selectedMenu">
                 {micList.map(micListToListItems)}
                 {micEnabled ?
                     <div>

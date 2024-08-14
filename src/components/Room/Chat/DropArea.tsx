@@ -1,8 +1,17 @@
-import React, { Dispatch, SetStateAction } from "react";
+/*
+    SPDX-FileCopyrightText: 2023 Sergey Katunin <sulmpx60@yandex.ru>
+    SPDX-FileCopyrightText: 2023 Amin Irgaliev <irgaliev01@mail.ru>
+    SPDX-FileCopyrightText: 2023 Vladislav Tarakanov <vladislav.tarakanov@bk.ru>
+
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
+import React from "react";
 import { GiFiles } from "react-icons/gi";
 
 import "./DropArea.css";
 import { LoadFileInfo } from "./UploadingFilesQueue";
+import { ReactDispatch } from "../../../utils/Utils";
 
 type DivDragEventHandler = React.DragEventHandler<HTMLDivElement>;
 
@@ -17,7 +26,7 @@ declare global
 interface DropAreaProps
 {
     uploadingFilesQueue: LoadFileInfo[];
-    setUploadingFilesQueue: Dispatch<SetStateAction<LoadFileInfo[]>>;
+    setUploadingFilesQueue: ReactDispatch<LoadFileInfo[]>;
 }
 
 export const DropArea: React.FC<DropAreaProps> = ({ uploadingFilesQueue, setUploadingFilesQueue }) =>
@@ -69,7 +78,7 @@ export const DropArea: React.FC<DropAreaProps> = ({ uploadingFilesQueue, setUplo
     };
 
     return (
-        <div className="backdrop"
+        <div className="backdrop absolute"
             onDrop={handleDrop}
             onDragOver={handleDragOver}
         >

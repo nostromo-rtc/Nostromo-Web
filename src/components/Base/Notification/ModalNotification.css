@@ -1,0 +1,152 @@
+/*
+    SPDX-FileCopyrightText: 2023 Vladislav Tarakanov <vladislav.tarakanov@bk.ru>
+    SPDX-FileCopyrightText: 2023 Amin Irgaliev <irgaliev01@mail.ru>
+    SPDX-FileCopyrightText: 2023 Sergey Katunin <sulmpx60@yandex.ru>
+
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
+.modal-notification-area
+{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background-color: gray;
+    min-width: 20%;
+    max-width: 60%;
+    max-height: 60%;
+    border-radius: 8px;
+}
+
+@media (width < 1280px)
+{
+    .modal-notification-area
+    {
+        max-width: 70%;
+    }
+}
+
+@media (height < 720px)
+{
+    .modal-notification-area
+    {
+        max-height: 70%;
+    }
+}
+
+@media (width < 600px) or (height < 600px)
+{
+    .modal-notification-area
+    {
+        max-width: 90%;
+        max-height: 85%;
+    }
+}
+
+.modal-notification-header-area
+{
+    padding: 15px 15px 10px 15px;
+    display: flex;
+    align-items: center;
+}
+
+.modal-notification-header-date
+{
+    color: var(--secondary-text-color);
+    font-size: 0.75rem;
+    font-weight: 200;
+    flex-grow: 0;
+}
+
+.modal-notification-icon-area
+{
+    display: flex;
+    justify-content: center;
+    margin-left: 13px;
+}
+
+.modal-notification-body-area
+{
+    display: flex;
+    flex: auto;
+    flex-direction: row;
+    overflow: hidden;
+}
+
+.modal-notification-body
+{
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    margin-left: 13px;
+}
+
+.modal-notification-label
+{
+    text-align: left;
+    font-size: 0.95rem;
+    line-height: 1.2rem;
+    font-weight: 600;
+    color: var(--primary-text-color);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    margin: 0 13px 10px 0;
+    min-height: 1.2rem;
+}
+
+.modal-notification-description-area
+{
+    overflow-y: scroll;
+    flex: auto;
+}
+
+.modal-notification-description
+{
+    font-size: 0.85rem;
+    color: var(--primary-text-color);
+    word-wrap: break-word;
+    text-align: left;
+    line-height: 1.2rem;
+    margin-right: 13px;
+}
+
+.modal-notification-toolbar
+{
+    display: flex;
+    justify-content: flex-end;
+    padding: 13px;
+}
+
+.modal-notification-toolbar-button
+{
+    color: var(--primary-text-color);
+    background-color: #00000015;
+    border: 1px solid #00000020;
+    margin-left: 10px;
+    font-size: 0.85rem;
+}
+
+@media (orientation: portrait)
+{
+    .modal-notification-body-area
+    {
+        flex-direction: column;
+    }
+
+    .modal-notification-body
+    {
+        margin-left: 13px;
+    }
+
+    .modal-notification-label
+    {
+        text-align: center;
+        margin-top: 10px;
+    }
+
+    .modal-notification-icon-area
+    {
+        margin-left: 0;
+    }
+}

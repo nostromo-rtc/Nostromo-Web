@@ -1,6 +1,12 @@
+/*
+    SPDX-FileCopyrightText: 2023 Sergey Katunin <sulmpx60@yandex.ru>
+
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
 import { Button, Dialog, DialogTitle, DialogContent, DialogContentText, TextField, DialogActions } from "@mui/material";
 import React, { useState } from "react";
-import { isEmptyString } from "../Utils";
+import { isEmptyString } from "../utils/Utils";
 
 type ButtonMouseEventHandler = React.MouseEventHandler<HTMLButtonElement>;
 

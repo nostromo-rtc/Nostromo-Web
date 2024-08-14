@@ -1,3 +1,9 @@
+/*
+    SPDX-FileCopyrightText: 2022-2024 Sergey Katunin <sulmpx60@yandex.ru>
+
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
 import React, { useContext, useEffect, useState } from "react";
 import { Header } from "../components/Header";
 
@@ -6,13 +12,13 @@ import { RoomActionPanel, RoomActionPanelProps } from "../components/Room/Action
 import { VerticalLayout } from "../components/VerticalLayout";
 
 import { Link } from "@mui/material";
-import { getToggleFunc } from "../Utils";
+import { getToggleFunc } from "../utils/Utils";
 import { RoomAlert } from "../components/Room/RoomAlert";
 import { Chat } from "../components/Room/Chat/Chat";
 import { LoadFileInfo } from "../components/Room/Chat/UploadingFilesQueue";
 import { RoomHeaderToolbarProps } from "../components/Room/RoomHeaderToolbar";
 import { UserList } from "../components/Room/UserList";
-import { VideoLayout } from "../components/Room/VideoLayout";
+import { VideoLayoutContainer } from "../components/Room/VideoLayout/VideoLayoutContainer";
 import "./RoomPage.css";
 import { DropArea } from "../components/Room/Chat/DropArea";
 import { DndVisibleContext } from "./MainLayer";
@@ -160,7 +166,7 @@ export const RoomPage: React.FC = () =>
     const callContainer = (
         <div id="call-container">
             {roomAlerts}
-            <VideoLayout />
+            <VideoLayoutContainer />
             <hr id="call-container-divider" />
             <RoomActionPanel {...roomActionPanelProps} />
         </div>

@@ -1,0 +1,30 @@
+/*
+    SPDX-FileCopyrightText: 2023 Amin Irgaliev <irgaliev01@mail.ru>
+
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
+.manage-rooms-list-item-icon
+{
+    color: var(--primary-text-color);
+    min-height: 24px;
+    min-width: 24px;
+    max-height: 24px;
+    max-width: 24px;
+}
+
+.manage-rooms-button
+{
+    background-color: rgb(0, 0, 0, 0.2);
+    border-radius: 50%;
+    min-height: 40px;
+    min-width: 40px;
+    max-height: 40px;
+    max-width: 40px;
+    margin-right: 15px;
+}
+
+.manage-rooms-button:hover
+{
+    background-color: rgb(0, 0, 0, 0.1);
+}

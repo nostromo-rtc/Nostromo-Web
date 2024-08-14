@@ -1,3 +1,9 @@
+/*
+    SPDX-FileCopyrightText: 2021-2023 Sergey Katunin <sulmpx60@yandex.ru>
+
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
 module.exports = {
     root: true,
     extends: [
@@ -64,7 +70,7 @@ module.exports = {
             },
             {
                 "selector": "classProperty",
-                "format": ["PascalCase"],
+                "format": ["camelCase"],
                 "prefix": ["m_"]
             },
             {

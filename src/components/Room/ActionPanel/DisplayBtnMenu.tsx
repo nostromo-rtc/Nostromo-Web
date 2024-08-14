@@ -1,10 +1,15 @@
-import { Divider, MenuItem, SelectChangeEvent } from "@mui/material";
+/*
+    SPDX-FileCopyrightText: 2023 Sergey Katunin <sulmpx60@yandex.ru>
+
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
+import { Divider, MenuItem } from "@mui/material";
 import React, { useState } from "react";
 
-import { Menu } from "../../Menu/Menu";
-import { MenuSectionLabel } from "../../Menu/MenuItems";
+import { Menu, MenuList } from "../../Menu/Menu";
+import { MenuItemSelect, MenuSectionLabel } from "../../Menu/MenuItems";
 import { Tooltip } from "../../Tooltip";
-import { Select } from "../../Base/Select";
 
 import "./DisplayBtnMenu.css";
 import { ResolutionObject } from "./RoomActionPanel";
@@ -32,16 +37,14 @@ export const DisplayBtnMenu: React.FC<DisplayBtnMenuProps> = ({ anchorRef, open,
         { width: 256, height: 144, name: "144p" }
     ];
 
-    const handleSelectFps = (ev: SelectChangeEvent): void =>
+    const handleSelectFps = (val: string): void =>
     {
-        setFps(ev.target.value);
-        console.log(ev.target.value);
+        setFps(val);
     };
 
-    const handleSelectResolution = (ev: SelectChangeEvent): void =>
+    const handleSelectResolution = (val: string): void =>
     {
-        setResolution(ev.target.value);
-        console.log(ev.target.value);
+        setResolution(val);
     };
 
     const resolutionListToListItems = (resObj: ResolutionObject, index: number): JSX.Element =>
@@ -57,41 +60,30 @@ export const DisplayBtnMenu: React.FC<DisplayBtnMenuProps> = ({ anchorRef, open,
         );
     };
 
-    const SelectResolution: React.FC = () =>
-    {
-        return (
-            <Select
-                id="select-display-resolution"
-                value={resolution}
-                onChange={handleSelectResolution}
-                transitionDuration={transitionDuration}
-                autoFocus
-            >
-                <MenuItem value={"default"}>По умолчанию</MenuItem>
-                <Divider className="menu-divider" />
-                {resolutionList.map(resolutionListToListItems)}
-            </Select>
-        );
-    };
+    const selectResolution = (
+        <MenuItemSelect
+            value={resolution}
+            onValueChange={handleSelectResolution}
+        >
+            <MenuItem value={"default"}>По умолчанию</MenuItem>
+            <Divider className="menu-divider" />
+            {resolutionList.map(resolutionListToListItems)}
+        </MenuItemSelect>
+    );
 
-    const SelectFps: React.FC = () =>
-    {
-        return (
-            <Select
-                id="select-display-fps"
-                value={fps}
-                onChange={handleSelectFps}
-                transitionDuration={transitionDuration}
-            >
-                <MenuItem value={"default"}>По умолчанию</MenuItem>
-                <Divider className="menu-divider" />
-                <MenuItem value={"60"}><span className="v-align-middle">60</span></MenuItem>
-                <MenuItem value={"30"}><span className="v-align-middle">30</span></MenuItem>
-                <MenuItem value={"15"}><span className="v-align-middle">15</span></MenuItem>
-                <MenuItem value={"5"}><span className="v-align-middle">5</span></MenuItem>
-            </Select>
-        );
-    };
+    const selectFps = (
+        <MenuItemSelect
+            value={fps}
+            onValueChange={handleSelectFps}
+        >
+            <MenuItem value={"default"}>По умолчанию</MenuItem>
+            <Divider className="menu-divider" />
+            <MenuItem value={"60"}><span className="v-align-middle">60</span></MenuItem>
+            <MenuItem value={"30"}><span className="v-align-middle">30</span></MenuItem>
+            <MenuItem value={"15"}><span className="v-align-middle">15</span></MenuItem>
+            <MenuItem value={"5"}><span className="v-align-middle">5</span></MenuItem>
+        </MenuItemSelect>
+    );
 
     return (
         <Menu
@@ -102,15 +94,17 @@ export const DisplayBtnMenu: React.FC<DisplayBtnMenuProps> = ({ anchorRef, open,
             transitionDuration={transitionDuration}
             popperPlacement="top"
         >
-            <Tooltip id="tooltip-select-display-resolution" title={"Разрешение изображения в пикселях"} offset={2} placement="right">
-                <div className="inline"><MenuSectionLabel text="Настройка качества" withTooltip /></div>
-            </Tooltip>
-            <SelectResolution />
-            <Divider className="menu-divider" />
-            <Tooltip id="tooltip-select-display-fps" title={"Количество кадров в секунду"} offset={2} placement="right">
-                <div className="inline"><MenuSectionLabel text="Настройка плавности (FPS)" withTooltip /></div>
-            </Tooltip>
-            <SelectFps />
+            <MenuList open={open} variant="menu">
+                <Tooltip id="tooltip-select-display-resolution" title={"Разрешение изображения в пикселях"} offset={2} placement="right">
+                    <div className="inline"><MenuSectionLabel text="Настройка качества" withTooltip /></div>
+                </Tooltip>
+                {selectResolution}
+                <Divider className="menu-divider" />
+                <Tooltip id="tooltip-select-display-fps" title={"Количество кадров в секунду"} offset={2} placement="right">
+                    <div className="inline"><MenuSectionLabel text="Настройка плавности (FPS)" withTooltip /></div>
+                </Tooltip>
+                {selectFps}
+            </MenuList>
         </Menu>
     );
 };

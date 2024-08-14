@@ -1,8 +1,14 @@
+/*
+    SPDX-FileCopyrightText: 2023 Sergey Katunin <sulmpx60@yandex.ru>
+
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
 import { ClickAwayListener, Grow, MenuList as MuiMenuList, Paper, Popper } from "@mui/material";
 import React, { ReactNode, useEffect, useRef } from "react";
 import { PopperPlacementType } from "@mui/material";
 
-import { doNotHandleEvent } from "../../Utils";
+import { doNotHandleEvent } from "../../utils/Utils";
 import "./Menu.css";
 
 type DivKeyboardEventHandler = React.KeyboardEventHandler<HTMLDivElement>;
@@ -22,7 +28,7 @@ function generateGetBoundingClientRect(x = ZERO_COORDINATE_VALUE, y = ZERO_COORD
 interface MenuProps
 {
     id?: string;
-    anchorRef?: React.RefObject<HTMLDivElement>;
+    anchorRef?: React.RefObject<HTMLElement>;
     anchorPosition?: AnchorPosition;
     open: boolean;
     onClose: () => void;
@@ -50,7 +56,6 @@ export const Menu: React.FC<MenuProps> = ({
     const handleClose = (): void =>
     {
         onClose();
-        initialFocusRef.current?.focus();
     };
 
     const handleCloseByMouse = (ev: Event | React.SyntheticEvent): void =>
@@ -68,8 +73,9 @@ export const Menu: React.FC<MenuProps> = ({
 
     const handleListKeyDown: DivKeyboardEventHandler = (ev) =>
     {
-        if (ev.key === "Escape")
+        if (ev.key === "Escape" || ev.key === "Tab")
         {
+            ev.preventDefault();
             handleClose();
         }
 
@@ -96,6 +102,10 @@ export const Menu: React.FC<MenuProps> = ({
         if (open)
         {
             initialFocusRef.current = document.activeElement as HTMLElement | null;
+        }
+        else
+        {
+            initialFocusRef.current?.focus();
         }
     }, [open]);
 
@@ -161,23 +171,23 @@ export const Menu: React.FC<MenuProps> = ({
 interface MenuListProps
 {
     open: boolean;
-    disableAutoFocusItem?: boolean;
+    variant?: "menu" | "selectedMenu";
     children: ReactNode;
 }
 
 export const MenuList: React.FC<MenuListProps> = ({
     open,
-    disableAutoFocusItem = false,
+    variant = "menu",
     children
 }) =>
 {
     return (
         <MuiMenuList
-            autoFocusItem={open && !disableAutoFocusItem}
-            autoFocus={open && disableAutoFocusItem}
+            autoFocus={open && variant === "menu"}
+            autoFocusItem={open && variant === "selectedMenu"}
             className="menu-list small-text"
             onClick={doNotHandleEvent}
-            tabIndex={0}
+            variant={variant}
         >
             {children}
         </MuiMenuList>

@@ -1,16 +1,30 @@
+/*
+    SPDX-FileCopyrightText: 2023 Sergey Katunin <sulmpx60@yandex.ru>
+    SPDX-FileCopyrightText: 2023 Amin Irgaliev <irgaliev01@mail.ru>
+    SPDX-FileCopyrightText: 2023 Vladislav Tarakanov <vladislav.tarakanov@bk.ru>
+
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
 .list-item-separator
 {
     width: 100%;
     border: none;
     border-top: 1px solid #4b4f53;
+    margin: 0;
     margin-top: 12px;
+}
+
+.list-item-without-separator
+{
+    padding-top: 12px;
 }
 
 .list-item-description
 {
-    font-size: 12px;
+    font-size: 0.75rem;
     text-align: justify;
-    color: rgb(163, 163, 163);
+    color: var(--secondary-text-color);
     word-wrap: break-word;
 }
 
@@ -34,7 +48,6 @@
 {
     user-select: none;
     padding-top: 12px;
-    margin-bottom: 12px;
     padding-left: 16px;
     padding-right: 16px;
 }
@@ -107,7 +120,6 @@
 {
     background-color: #e6595b;
     box-shadow: 0 0 2px white;
-    outline: none;
 }
 
 .list-section-label

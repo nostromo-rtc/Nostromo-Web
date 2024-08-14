@@ -1,11 +1,35 @@
+/*
+    SPDX-FileCopyrightText: 2023 Sergey Katunin <sulmpx60@yandex.ru>
+    SPDX-FileCopyrightText: 2023 Vladislav Tarakanov <vladislav.tarakanov@bk.ru>
+    SPDX-FileCopyrightText: 2023 Amin Irgaliev <irgaliev01@mail.ru>
+
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
 import { FC, MouseEventHandler, ReactNode, useState } from "react";
-import { Tooltip } from "../Tooltip";
+
 import { Button } from "@mui/material";
-import { TfiMenu } from "react-icons/tfi";
 import { IoMdClose } from "react-icons/io";
-import { NEGATIVE_TAB_IDX } from "../../Utils";
+import { TfiMenu } from "react-icons/tfi";
+import { NumericConstants as NC } from "../../utils/NumericConstants";
+import { Tooltip } from "../Tooltip";
 
 import "./SidebarView.css";
+
+interface SidebarViewMainAreaProps
+{
+    className?: string;
+    children?: ReactNode;
+}
+
+export const SidebarViewMainArea: FC<SidebarViewMainAreaProps> = ({ children, className = "" }) =>
+{
+    return (
+        <div className={"sidebar-view-main sidebar-view-main-width " + className}>
+            {children}
+        </div>
+    );
+};
 
 interface SidebarViewProps
 {
@@ -62,10 +86,8 @@ export const SidebarView: FC<SidebarViewProps> = ({ sidebar, main, onClickBtnClo
                     <div className="horizontal-expander"></div>
                     {exitSidebarViewBtn}
                 </div>
-                <div className="sidebar-view-main-scrollable-area" tabIndex={NEGATIVE_TAB_IDX}>
-                    <div className="sidebar-view-main sidebar-view-main-width">
-                        {main}
-                    </div>
+                <div className="sidebar-view-main-scrollable-area" tabIndex={NC.NEGATIVE_TAB_IDX}>
+                    {main}
                 </div>
             </div>
         </>
