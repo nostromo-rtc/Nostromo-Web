@@ -1,5 +1,5 @@
 /*
-    SPDX-FileCopyrightText: 2023 Sergey Katunin <sulmpx60@yandex.ru>
+    SPDX-FileCopyrightText: 2023-2024 Sergey Katunin <sulmpx60@yandex.ru>
 
     SPDX-License-Identifier: BSD-2-Clause
 */
@@ -7,20 +7,22 @@
 import { Divider, MenuItem } from "@mui/material";
 import React, { useState } from "react";
 
-import { DeviceListItem } from "../../../pages/RoomPage";
 import { Menu, MenuList } from "../../Menu/Menu";
 import { MenuItemRadio, MenuItemSelect, MenuSectionLabel } from "../../Menu/MenuItems";
 import { Tooltip } from "../../Tooltip";
 
+import { ResolutionObject } from "../../../services/UserMediaService/UserMediaService";
 import "./CamBtnMenu.css";
-import { ResolutionObject } from "./RoomActionPanel";
+
+import { MediaDeviceInfo } from "../../../services/UserMediaService/UserMediaDeviceStorage";
+import { NumericConstants as NC } from "../../../utils/NumericConstants";
 
 interface CamBtnMenuProps
 {
     anchorRef: React.RefObject<HTMLDivElement>;
     open: boolean;
     setOpen: (state: boolean) => void;
-    camList: DeviceListItem[];
+    camList: MediaDeviceInfo[];
     transitionDuration: number;
 }
 
@@ -56,14 +58,14 @@ export const CamBtnMenu: React.FC<CamBtnMenuProps> = ({ anchorRef, open, setOpen
         setOpen(false);
     };
 
-    const camListToListItems = (cam: DeviceListItem, index: number): JSX.Element =>
+    const camListToListItems = (cam: MediaDeviceInfo, index: number): JSX.Element =>
     {
         const isSelected = selectedCam === cam.deviceId;
 
         return (
             <MenuItemRadio
                 isSelected={isSelected}
-                text={cam.name}
+                text={cam.label}
                 key={index}
                 onClick={() => { setSelectedCam(cam.deviceId); }}
             />
@@ -117,17 +119,20 @@ export const CamBtnMenu: React.FC<CamBtnMenuProps> = ({ anchorRef, open, setOpen
             transitionDuration={transitionDuration}
             popperPlacement="top"
         >
+            {/* TODO: fix variant like in MicBtnMenu */}
             <MenuList open={open} variant="selectedMenu">
                 <MenuSectionLabel text="Выбор камеры" />
-                {camList.map(camListToListItems)}
+                {camList.length > NC.EMPTY_LENGTH
+                    ? camList.map(camListToListItems)
+                    : <MenuSectionLabel text="Камер не обнаружено" />}
                 <Divider className="menu-divider" />
                 <Tooltip id="tooltip-select-cam-resolution" title={"Разрешение изображения в пикселях"} offset={2} placement="right">
-                    <div className="inline"><MenuSectionLabel text="Настройка качества" withTooltip /></div>
+                    <div><MenuSectionLabel text="Настройка качества" withTooltip /></div>
                 </Tooltip>
                 {selectResolution}
                 <Divider className="menu-divider" />
                 <Tooltip id="tooltip-select-cam-fps" title={"Количество кадров в секунду"} offset={2} placement="right">
-                    <div className="inline"><MenuSectionLabel text="Настройка плавности (FPS)" withTooltip /></div>
+                    <div><MenuSectionLabel text="Настройка плавности (FPS)" withTooltip /></div>
                 </Tooltip>
                 {selectFps}
             </MenuList>

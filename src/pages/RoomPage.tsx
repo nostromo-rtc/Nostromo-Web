@@ -12,38 +12,19 @@ import { RoomActionPanel, RoomActionPanelProps } from "../components/Room/Action
 import { VerticalLayout } from "../components/VerticalLayout";
 
 import { Link } from "@mui/material";
-import { getToggleFunc } from "../utils/Utils";
-import { RoomAlert } from "../components/Room/RoomAlert";
+import { UserMediaServiceContext } from "../AppWrapper";
 import { Chat } from "../components/Room/Chat/Chat";
+import { DropArea } from "../components/Room/Chat/DropArea";
 import { LoadFileInfo } from "../components/Room/Chat/UploadingFilesQueue";
+import { RoomAlert } from "../components/Room/RoomAlert";
 import { RoomHeaderToolbarProps } from "../components/Room/RoomHeaderToolbar";
 import { UserList } from "../components/Room/UserList";
 import { VideoLayoutContainer } from "../components/Room/VideoLayout/VideoLayoutContainer";
-import "./RoomPage.css";
-import { DropArea } from "../components/Room/Chat/DropArea";
+import { useUserMediaDeviceStorage } from "../services/UserMediaService/UserMediaDeviceStorage";
+import { getToggleFunc } from "../utils/Utils";
 import { DndVisibleContext } from "./MainLayer";
-
-export enum SoundState
-{
-    DISABLED = 0,
-    DISABLED_WITH_ALERT = 1,
-    ENABLED = 2
-}
-
-export enum MicState
-{
-    DISABLED = 0,
-    PAUSED = 1,
-    WORKING = 2
-}
-
-export interface DeviceListItem
-{
-    name: string;
-    deviceId: string;
-    groupId: string;
-    kind: "audio" | "video";
-}
+import "./RoomPage.css";
+import { SoundState, useSoundStateModel } from "../services/UserMediaService/SoundStateModel";
 
 export const RoomPage: React.FC = () =>
 {
@@ -52,12 +33,11 @@ export const RoomPage: React.FC = () =>
 
     const roomName = "Тестовая";
 
-    const [soundState, setSoundState] = useState<SoundState>(SoundState.DISABLED_WITH_ALERT);
+    const userMediaService = useContext(UserMediaServiceContext);
+    const mediaDevices = useUserMediaDeviceStorage(userMediaService.deviceStorage);
+    const soundState = useSoundStateModel(userMediaService.soundStateModel);
 
     // TODO: состояния открыто меню или закрыто попробовать прокинуть ниже в дочерние компоненты.
-
-    const [micState, setMicState] = useState<MicState>(MicState.DISABLED);
-    const [micMenuOpen, setMicMenuOpen] = useState<boolean>(false);
 
     const [camEnabled, setCamEnabled] = useState<boolean>(false);
     const [camMenuOpen, setCamMenuOpen] = useState<boolean>(false);
@@ -65,17 +45,7 @@ export const RoomPage: React.FC = () =>
     const [displayEnabled, setDisplayEnabled] = useState<boolean>(false);
     const [displayMenuOpen, setDisplayMenuOpen] = useState<boolean>(false);
 
-    const [micList, setMicList] = useState<DeviceListItem[]>(
-        [{ name: "Микрофон 1", deviceId: "testMicDeviceId1", groupId: "testMicGroupId1", kind: "audio" },
-        { name: "Микрофон 2", deviceId: "testMicDeviceId2", groupId: "testMicGroupId2", kind: "audio" },
-        { name: "Микрофон 3", deviceId: "testMicDeviceId3", groupId: "testMicGroupId3", kind: "audio" }]
-    );
-
-    const [camList, setCamList] = useState<DeviceListItem[]>(
-        [{ name: "Веб-камера 1", deviceId: "testCamDeviceId1", groupId: "testCamGroupId1", kind: "video" },
-        { name: "Веб-камера 2", deviceId: "testCamDeviceId2", groupId: "testCamGroupId2", kind: "video" },
-        { name: "Веб-камера 3", deviceId: "testCamDeviceId3", groupId: "testCamGroupId3", kind: "video" }]
-    );
+    const camList = mediaDevices.filter((dev) => dev.kind === "videoinput");
 
     const [isFileUploading, setIsFileUploading] = useState<boolean>(false);
     const [uploadingFilesQueue, setUploadingFilesQueue] = useState<LoadFileInfo[]>([
@@ -94,16 +64,6 @@ export const RoomPage: React.FC = () =>
 
     const roomActionPanelProps: RoomActionPanelProps =
     {
-        soundBtnInfo: { state: soundState, setState: setSoundState },
-
-        micBtnInfo: {
-            state: micState,
-            setState: setMicState,
-            menuOpen: micMenuOpen,
-            toggleMenu: getToggleFunc(setMicMenuOpen),
-            deviceList: micList
-        },
-
         camBtnInfo: {
             state: camEnabled,
             setState: setCamEnabled,
@@ -137,7 +97,7 @@ export const RoomPage: React.FC = () =>
         <Link
             component="button"
             variant="body2"
-            onClick={() => { setSoundState(SoundState.ENABLED); }}
+            onClick={() => { userMediaService.soundStateModel.setState(SoundState.ENABLED); }}
             className="v-align-default"
         >
             <b>здесь</b>
@@ -149,7 +109,7 @@ export const RoomPage: React.FC = () =>
         <div id="room-alerts-container">
             <RoomAlert severity="warning"
                 isOpen={soundState === SoundState.DISABLED_WITH_ALERT}
-                onCloseAction={() => { setSoundState(SoundState.DISABLED); }}
+                onCloseAction={() => { userMediaService.soundStateModel.setState(SoundState.DISABLED); }}
                 children={disabledAudioAlertMessage}
             />
         </div>;

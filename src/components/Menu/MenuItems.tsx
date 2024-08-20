@@ -60,23 +60,24 @@ interface MenuSectionLabelProps
 export const MenuSectionLabel: React.FC<MenuSectionLabelProps> = ({ text, withTooltip = false }) =>
 {
     return (
-        <span className="menu-section-label text-wrap non-selectable">
+        <div className="menu-section-label text-wrap non-selectable">
             {text}
             {withTooltip ? <MdInfoOutline className="ml-4" /> : undefined}
-        </span>
+        </div>
     );
 };
 
-interface MenuItemRadioProps
+interface MenuItemRadioProps extends MenuItemProps
 {
     text: string;
     isSelected: boolean;
     onClick: () => void;
 }
-export const MenuItemRadio: React.FC<MenuItemRadioProps> = ({ isSelected, text, onClick }) =>
+export const MenuItemRadio: React.FC<MenuItemRadioProps> = ({ isSelected, text, onClick, ...props }) =>
 {
     return (
         <MenuItemWithIcon
+            {...props}
             role="menuitemradio"
             icon={isSelected ? <MdRadioButtonChecked /> : <MdRadioButtonUnchecked />}
             text={text}

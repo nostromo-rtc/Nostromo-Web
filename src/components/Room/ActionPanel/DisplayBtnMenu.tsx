@@ -1,5 +1,5 @@
 /*
-    SPDX-FileCopyrightText: 2023 Sergey Katunin <sulmpx60@yandex.ru>
+    SPDX-FileCopyrightText: 2023-2024 Sergey Katunin <sulmpx60@yandex.ru>
 
     SPDX-License-Identifier: BSD-2-Clause
 */
@@ -12,7 +12,7 @@ import { MenuItemSelect, MenuSectionLabel } from "../../Menu/MenuItems";
 import { Tooltip } from "../../Tooltip";
 
 import "./DisplayBtnMenu.css";
-import { ResolutionObject } from "./RoomActionPanel";
+import { ResolutionObject } from "../../../services/UserMediaService/UserMediaService";
 
 interface DisplayBtnMenuProps
 {
@@ -96,12 +96,12 @@ export const DisplayBtnMenu: React.FC<DisplayBtnMenuProps> = ({ anchorRef, open,
         >
             <MenuList open={open} variant="menu">
                 <Tooltip id="tooltip-select-display-resolution" title={"Разрешение изображения в пикселях"} offset={2} placement="right">
-                    <div className="inline"><MenuSectionLabel text="Настройка качества" withTooltip /></div>
+                    <div><MenuSectionLabel text="Настройка качества" withTooltip /></div>
                 </Tooltip>
                 {selectResolution}
                 <Divider className="menu-divider" />
                 <Tooltip id="tooltip-select-display-fps" title={"Количество кадров в секунду"} offset={2} placement="right">
-                    <div className="inline"><MenuSectionLabel text="Настройка плавности (FPS)" withTooltip /></div>
+                    <div><MenuSectionLabel text="Настройка плавности (FPS)" withTooltip /></div>
                 </Tooltip>
                 {selectFps}
             </MenuList>
