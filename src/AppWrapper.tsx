@@ -9,22 +9,23 @@
 import { createContext } from "react";
 import App from "./App";
 
-import { NotificationSeverity, NotificationType, NotificationsService } from "./services/NotificationsService";
+import { NotificationsService } from "./services/NotificationsService";
 import { SettingService } from "./services/SettingsService";
 import { UserMediaService } from "./services/UserMediaService/UserMediaService";
+import { MicStateNotificationsService } from "./services/Notifications/MicStateNotificationsService";
 
-export const SettingsContext = createContext<SettingService>(new SettingService());
-export const UserMediaServiceContext = createContext<UserMediaService>(new UserMediaService());
+const settingService = new SettingService();
+const userMediaService = new UserMediaService();
+const notificationService = new NotificationsService();
 
-const notificationService: NotificationsService = new NotificationsService();
-
-// FIXME: new NotificationsService в createContext
+export const SettingsContext = createContext<SettingService>(settingService);
+export const UserMediaServiceContext = createContext<UserMediaService>(userMediaService);
 export const NotificationsContext = createContext<NotificationsService>(notificationService);
 
-//notificationService.add({ label: "Warning DASD ASD ASD ASD ASD ASD ASD ASD ASD ASD dasdas adasdas asdasd", description: "Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING Какое-то всплывающее оповещение severity WARNING ///", severity: NotificationSeverity.WARNING, type: NotificationType.POPUP, datetime: new Date().getTime() });
-//notificationService.add({ label: "Info", description: "Какое-то всплывающее оповещение severity INFO", severity: NotificationSeverity.INFO, type: NotificationType.POPUP, datetime: new Date().getTime() });
-//notificationService.add({ label: "Error", description: "Какое-то всплывающее оповещение severity ERROR", severity: NotificationSeverity.ERROR, type: NotificationType.POPUP, datetime: new Date().getTime() });
-//notificationService.add({ label: "Error", description: "Какое-то всплывающее оповещение severity ERROR", severity: NotificationSeverity.ERROR, type: NotificationType.POPUP, datetime: new Date().getTime() });
+const micStateNotificationsService = new MicStateNotificationsService(
+    userMediaService,
+    notificationService
+);
 
 export const AppWrapper: React.FC = () =>
 {
