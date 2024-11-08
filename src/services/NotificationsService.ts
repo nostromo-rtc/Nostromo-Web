@@ -24,7 +24,16 @@ export enum NotificationType
     CRITICAL = 1
 }
 
-interface NotificationBase
+interface NewNotificationBase
+{
+    label: string;
+    description: string;
+    severity?: NotificationSeverity;
+    type?: NotificationType;
+    datetime?: number;
+}
+
+interface NotificationBase extends NewNotificationBase
 {
     label: string;
     description: string;
@@ -51,9 +60,15 @@ export class NotificationsService extends AbstractExternalStorage
         super();
     }
 
-    public add(notification: NotificationBase): void
+    public add(notification: NewNotificationBase): void
     {
-        this.m_notifications.push({ ...notification, id: this.m_id++ });
+        this.m_notifications.push({
+            ...notification,
+            severity: notification.severity ?? NotificationSeverity.INFO,
+            type: notification.type ?? NotificationType.POPUP,
+            datetime: notification.datetime ?? new Date().getTime(),
+            id: this.m_id++
+        });
         this.saveSnapshot();
         this.notifyListeners();
     }
