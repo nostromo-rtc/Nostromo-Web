@@ -9,10 +9,11 @@
 import { createContext } from "react";
 import App from "./App";
 
+import { useHotkey } from "./hooks/UseHotkey";
+import { MicStateNotificationsService } from "./services/Notifications/MicStateNotificationsService";
 import { NotificationsService } from "./services/NotificationsService";
 import { SettingService } from "./services/SettingsService";
 import { UserMediaService } from "./services/UserMediaService/UserMediaService";
-import { MicStateNotificationsService } from "./services/Notifications/MicStateNotificationsService";
 
 const settingService = new SettingService();
 const userMediaService = new UserMediaService();
@@ -29,6 +30,11 @@ const micStateNotificationsService = new MicStateNotificationsService(
 
 export const AppWrapper: React.FC = () =>
 {
+    useHotkey(" ",
+        () => { userMediaService.toggleMic(); },
+        () => { userMediaService.toggleMic(); }
+    );
+
     return (
         <App />
     );
