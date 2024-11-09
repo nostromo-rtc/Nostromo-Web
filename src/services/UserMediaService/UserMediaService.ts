@@ -209,6 +209,21 @@ export class UserMediaService
         //this.ui.playSound(UiSound.micOn);
     }
 
+    /** Toggle mic pause. */
+    public toggleMic(): void
+    {
+        const micState = this.m_micStateModel.getStateSnapshot().state;
+
+        if (micState === MicState.PAUSED)
+        {
+            this.unpauseMic();
+        }
+        else if (micState === MicState.WORKING)
+        {
+            this.pauseMic();
+        }
+    }
+
     /** Захватить веб-камеру. */
     public async getCam(deviceId: string, resolution: ResolutionObject, frameRate: number): Promise<boolean>
     {
