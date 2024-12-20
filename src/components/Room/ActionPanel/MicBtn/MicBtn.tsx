@@ -14,6 +14,7 @@ import { MicState, useMicStateModel } from "../../../../services/UserMediaServic
 import { useUserMediaDeviceStorage } from "../../../../services/UserMediaService/UserMediaDeviceStorage";
 import { NumericConstants as NC } from "../../../../utils/NumericConstants";
 import { getToggleFunc } from "../../../../utils/Utils";
+
 import { Tooltip } from "../../../Tooltip";
 import { MicBtnMenu } from "./MicBtnMenu";
 
@@ -91,7 +92,7 @@ export const MicBtn: React.FC<MicBtnProps> = ({ transitionDuration }) =>
             onClose={() => { setMicMenuOpen(false); }}
             micList={micList}
             selectedMic={micStateInfo.id ?? selectedMic}
-            onSelectMic={(mic) => { setSelectedMic(mic); }}
+            onSelectMic={setSelectedMic}
             micEnabled={isMicEnabled}
             onDisableMic={handleDisableMic}
             transitionDuration={transitionDuration}
