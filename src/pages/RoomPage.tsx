@@ -4,15 +4,11 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
-import React, { useContext, useEffect, useState } from "react";
-import { Header } from "../components/Header";
-
-import "../App.css";
-import { RoomActionPanel, RoomActionPanelProps } from "../components/Room/ActionPanel/RoomActionPanel";
-import { VerticalLayout } from "../components/VerticalLayout";
-
 import { Link } from "@mui/material";
-import { UserMediaServiceContext } from "../AppWrapper";
+import React, { useContext, useEffect, useState } from "react";
+
+import { Header } from "../components/Header";
+import { RoomActionPanel, RoomActionPanelProps } from "../components/Room/ActionPanel/RoomActionPanel";
 import { Chat } from "../components/Room/Chat/Chat";
 import { DropArea } from "../components/Room/Chat/DropArea";
 import { LoadFileInfo } from "../components/Room/Chat/UploadingFilesQueue";
@@ -20,11 +16,16 @@ import { RoomAlert } from "../components/Room/RoomAlert";
 import { RoomHeaderToolbarProps } from "../components/Room/RoomHeaderToolbar";
 import { UserList } from "../components/Room/UserList";
 import { VideoLayoutContainer } from "../components/Room/VideoLayout/VideoLayoutContainer";
+import { VerticalLayout } from "../components/VerticalLayout";
+
+import { UserMediaServiceContext } from "../AppWrapper";
+import { SoundState, useSoundStateModel } from "../services/UserMediaService/SoundStateModel";
 import { useUserMediaDeviceStorage } from "../services/UserMediaService/UserMediaDeviceStorage";
 import { getToggleFunc } from "../utils/Utils";
 import { DndVisibleContext } from "./MainLayer";
+
+import "../App.css";
 import "./RoomPage.css";
-import { SoundState, useSoundStateModel } from "../services/UserMediaService/SoundStateModel";
 
 export const RoomPage: React.FC = () =>
 {
@@ -41,9 +42,6 @@ export const RoomPage: React.FC = () =>
 
     const [camEnabled, setCamEnabled] = useState<boolean>(false);
     const [camMenuOpen, setCamMenuOpen] = useState<boolean>(false);
-
-    const [displayEnabled, setDisplayEnabled] = useState<boolean>(false);
-    const [displayMenuOpen, setDisplayMenuOpen] = useState<boolean>(false);
 
     const camList = mediaDevices.filter((dev) => dev.kind === "videoinput");
 
@@ -70,13 +68,6 @@ export const RoomPage: React.FC = () =>
             menuOpen: camMenuOpen,
             toggleMenu: getToggleFunc(setCamMenuOpen),
             deviceList: camList
-        },
-
-        displayBtnInfo: {
-            state: displayEnabled,
-            setState: setDisplayEnabled,
-            menuOpen: displayMenuOpen,
-            toggleMenu: getToggleFunc(setDisplayMenuOpen)
         },
 
         transitionDuration: transitionDuration
