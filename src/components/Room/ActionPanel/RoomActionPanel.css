@@ -149,19 +149,11 @@
 .action-btn-optional.action-btn-off
 {
     background-color: #444b50;
-    color: #f7f1f1;
 }
 
 .action-btn-optional.action-btn-off:hover
 {
     background-color: #646c72;
-    color: #f7f1f1;
-}
-
-.action-btn-optional.action-btn-on:hover
-{
-    background-color: #feb4b4;
-    color: #000;
 }
 
 .action-btn-clickable-area

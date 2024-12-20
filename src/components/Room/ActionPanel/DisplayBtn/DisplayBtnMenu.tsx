@@ -5,27 +5,38 @@
 */
 
 import { Divider, MenuItem } from "@mui/material";
-import React, { useState } from "react";
+import React from "react";
 
-import { Menu, MenuList } from "../../Menu/Menu";
-import { MenuItemSelect, MenuSectionLabel } from "../../Menu/MenuItems";
-import { Tooltip } from "../../Tooltip";
+import { Menu, MenuList } from "../../../Menu/Menu";
+import { MenuItemSelect, MenuSectionLabel } from "../../../Menu/MenuItems";
+import { Tooltip } from "../../../Tooltip";
 
+import { ResolutionObject } from "../../../../services/UserMediaService/UserMediaService";
 import "./DisplayBtnMenu.css";
-import { ResolutionObject } from "../../../services/UserMediaService/UserMediaService";
 
 interface DisplayBtnMenuProps
 {
     anchorRef: React.RefObject<HTMLDivElement>;
     open: boolean;
-    setOpen: (state: boolean) => void;
+    onClose: () => void;
+    selectedFps: string;
+    onSelectFps: (fps: string) => void;
+    selectedResolution: string;
+    onSelectResolution: (res: string) => void;
     transitionDuration: number;
 }
 
-export const DisplayBtnMenu: React.FC<DisplayBtnMenuProps> = ({ anchorRef, open, setOpen, transitionDuration }) =>
+export const DisplayBtnMenu: React.FC<DisplayBtnMenuProps> = ({
+    anchorRef,
+    open,
+    onClose,
+    selectedFps,
+    onSelectFps,
+    selectedResolution,
+    onSelectResolution,
+    transitionDuration
+}) =>
 {
-    const [fps, setFps] = useState<string>("default");
-    const [resolution, setResolution] = useState<string>("default");
     const resolutionList: ResolutionObject[] = [
         { width: 2560, height: 1440, name: "WQHD" },
         { width: 1920, height: 1080, name: "FHD" },
@@ -37,22 +48,12 @@ export const DisplayBtnMenu: React.FC<DisplayBtnMenuProps> = ({ anchorRef, open,
         { width: 256, height: 144, name: "144p" }
     ];
 
-    const handleSelectFps = (val: string): void =>
-    {
-        setFps(val);
-    };
-
-    const handleSelectResolution = (val: string): void =>
-    {
-        setResolution(val);
-    };
-
     const resolutionListToListItems = (resObj: ResolutionObject, index: number): JSX.Element =>
     {
         const resolutionStr = `${resObj.width}⨯${resObj.height}`;
 
         return (
-            <MenuItem value={resolutionStr} key={index}>
+            <MenuItem value={`${resObj.width}x${resObj.height}`} key={index}>
                 <span className="v-align-middle">{resolutionStr}</span>
                 <div className="horizontal-expander" />
                 <span className="chip-resolution">{resObj.name}</span>
@@ -62,8 +63,8 @@ export const DisplayBtnMenu: React.FC<DisplayBtnMenuProps> = ({ anchorRef, open,
 
     const selectResolution = (
         <MenuItemSelect
-            value={resolution}
-            onValueChange={handleSelectResolution}
+            value={selectedResolution}
+            onValueChange={onSelectResolution}
         >
             <MenuItem value={"default"}>По умолчанию</MenuItem>
             <Divider className="menu-divider" />
@@ -73,10 +74,10 @@ export const DisplayBtnMenu: React.FC<DisplayBtnMenuProps> = ({ anchorRef, open,
 
     const selectFps = (
         <MenuItemSelect
-            value={fps}
-            onValueChange={handleSelectFps}
+            value={selectedFps}
+            onValueChange={onSelectFps}
         >
-            <MenuItem value={"default"}>По умолчанию</MenuItem>
+            <MenuItem value={"default"}>По умолчанию (30)</MenuItem>
             <Divider className="menu-divider" />
             <MenuItem value={"60"}><span className="v-align-middle">60</span></MenuItem>
             <MenuItem value={"30"}><span className="v-align-middle">30</span></MenuItem>
@@ -90,7 +91,7 @@ export const DisplayBtnMenu: React.FC<DisplayBtnMenuProps> = ({ anchorRef, open,
             id="toggle-display-btn-menu"
             anchorRef={anchorRef}
             open={open}
-            onClose={() => { setOpen(false); }}
+            onClose={onClose}
             transitionDuration={transitionDuration}
             popperPlacement="top"
         >

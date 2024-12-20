@@ -7,19 +7,19 @@
 import { Button } from "@mui/material";
 import React, { useContext, useRef } from 'react';
 import { BiChevronDown, BiChevronUp } from "react-icons/bi";
-import { MdScreenShare, MdStopScreenShare, MdVideocam, MdVideocamOff } from "react-icons/md";
+import { MdVideocam, MdVideocamOff } from "react-icons/md";
 import { Tooltip } from "../../Tooltip";
 
 import { UserMediaServiceContext } from "../../../AppWrapper";
 import { MediaDeviceInfo } from "../../../services/UserMediaService/UserMediaDeviceStorage";
 import { ResolutionObject } from "../../../services/UserMediaService/UserMediaService";
 import { CamBtnMenu } from "./CamBtnMenu";
-import { DisplayBtnMenu } from "./DisplayBtnMenu";
 import "./RoomActionPanel.css";
 
 import { ReactDispatch } from "../../../utils/Utils";
-import { SoundBtn } from "./SoundBtn";
+import { DisplayBtn } from "./DisplayBtn/DisplayBtn";
 import { MicBtn } from "./MicBtn/MicBtn";
+import { SoundBtn } from "./SoundBtn";
 
 export interface ActionBtnInfo<S>
 {
@@ -41,13 +41,11 @@ export interface ActionDeviceBtn<S> extends ActionBtnWithMenuInfo<S>
 export interface RoomActionPanelProps
 {
     camBtnInfo: ActionDeviceBtn<boolean>;
-    displayBtnInfo: ActionBtnWithMenuInfo<boolean>;
     transitionDuration: number;
 }
 
 export const RoomActionPanel: React.FC<RoomActionPanelProps> = ({
     camBtnInfo,
-    displayBtnInfo,
     transitionDuration
 }) =>
 {
@@ -122,70 +120,7 @@ export const RoomActionPanel: React.FC<RoomActionPanelProps> = ({
         />
     </>);
 
-    /// Display button --------------------------- ///
-
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    const displayBtnBoxRef = useRef<HTMLDivElement>(null);
-    const displayBtnMsg = displayBtnInfo.state ? "Выключить демонстрацию экрана" : "Включить демонстрацию экрана";
-
-    const handleDisplayBtnClick = async (): Promise<void> =>
-    {
-        //TODO: 1. block button before result
-        // 2. get selectedResolution and fps
-
-        const selectedResolution: ResolutionObject = { width: 1920, height: 1080 };
-        const selectedFps = 30;
-
-        if (!displayBtnInfo.state)
-        {
-            const result = await userMediaService.getDisplay(
-                selectedResolution,
-                selectedFps
-            );
-
-            if (!result)
-            {
-                return;
-            }
-
-            displayBtnInfo.setState(true);
-        }
-        else
-        {
-            userMediaService.stopDisplay();
-            displayBtnInfo.setState(false);
-        }
-    };
-
-    const displayBtn = (<>
-        <div className="action-btn-box non-selectable" ref={displayBtnBoxRef}>
-            <Tooltip id="tooltip-toggle-display-btn" title={displayBtnMsg} offset={15}>
-                <div>
-                    <Button aria-label="Start/stop screensharing"
-                        className={"action-btn " + (displayBtnInfo.state ? "action-btn-optional action-btn-on" : "action-btn-optional action-btn-off")}
-                        onClick={handleDisplayBtnClick}>
-                        <MdScreenShare className="action-btn-icon action-btn-icon-on" />
-                        <MdStopScreenShare className="action-btn-icon action-btn-icon-off" />
-                    </Button>
-                    <div className="action-btn-clickable-area non-selectable" onClick={handleDisplayBtnClick}></div>
-                </div>
-            </Tooltip>
-            <Button className="action-list-btn"
-                onClick={displayBtnInfo.toggleMenu}>
-                {displayBtnInfo.menuOpen ? <BiChevronUp /> : <BiChevronDown />}
-            </Button>
-            <span className="action-btn-desc">Экран</span>
-            <div className="action-list-btn-clickable-area non-selectable" onClick={displayBtnInfo.toggleMenu}></div>
-        </div>
-        <DisplayBtnMenu
-            anchorRef={displayBtnBoxRef}
-            open={displayBtnInfo.menuOpen}
-            setOpen={displayBtnInfo.toggleMenu}
-            transitionDuration={transitionDuration}
-        />
-    </>);
-
-    /// ------------------------------------------ ///
 
     return (
         <div id="action-panel-container">
@@ -193,7 +128,7 @@ export const RoomActionPanel: React.FC<RoomActionPanelProps> = ({
             <SoundBtn />
             <MicBtn transitionDuration={transitionDuration} />
             {camBtn}
-            {isMobile ? <></> : displayBtn}
+            {isMobile ? <></> : <DisplayBtn transitionDuration={transitionDuration} />}
             <div className="horizontal-expander"></div>
         </div>
     );

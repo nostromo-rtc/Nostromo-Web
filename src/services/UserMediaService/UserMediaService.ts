@@ -9,6 +9,7 @@
 //import { UnsupportedError } from "../../legacy/src/rooms/scripts/AppError";
 
 import { NumericConstants as NC } from "../../utils/NumericConstants";
+import { DisplayState, DisplayStateModel } from "./DisplayStateModel";
 import { MicState, MicStateModel } from "./MicStateModel";
 import { SoundStateModel } from "./SoundStateModel";
 import { UserMediaDeviceStorage } from "./UserMediaDeviceStorage";
@@ -39,6 +40,7 @@ export class UserMediaService
     private readonly m_deviceStorage = new UserMediaDeviceStorage();
     private readonly m_soundStateModel = new SoundStateModel();
     private readonly m_micStateModel = new MicStateModel();
+    private readonly m_displayStateModel = new DisplayStateModel();
 
     /** Объект - комната. */
     //private readonly room: Room;
@@ -86,7 +88,6 @@ export class UserMediaService
 
         //this.room = _room;
 
-        //this.m_defaultStreamConstraintsDisplay = this.prepareCaptureDisplayConstraints();
         //this.m_defaultStreamConstraintsCam = this.prepareCaptureCamConstraints();
 
         //this.micAudioProcessing = new MicAudioProcessing(this.audioContext, this.ui);
@@ -109,6 +110,11 @@ export class UserMediaService
     public get micStateModel(): MicStateModel
     {
         return this.m_micStateModel;
+    }
+
+    public get displayStateModel(): DisplayStateModel
+    {
+        return this.m_displayStateModel;
     }
 
     /** Захват микрофона. */
@@ -318,35 +324,55 @@ export class UserMediaService
         }
     }
 
-    /** Захват экрана компьютера. */
-    public async getDisplay(resolution: ResolutionObject, frameRate: number): Promise<boolean>
+    /** Screenshare feature. */
+    public async getDisplay(resolution: string, frameRate: string): Promise<boolean>
     {
         /*if (!this.room.isAllowedToSpeak)
         {
             return;
         }*/
 
+        this.m_displayStateModel.setState(DisplayState.LOADING);
+
+        // Use spread to copy constraints object.
+        const constraints = { ...this.m_defaultStreamConstraintsDisplay };
+
+        if (frameRate !== "default")
+        {
+            (constraints.video as MediaTrackConstraints).frameRate = Number(frameRate);
+        }
+
+        if (resolution !== "default")
+        {
+            const [width, height] = resolution.split("x");
+            (constraints.video as MediaTrackConstraints).width = Number(width);
+            (constraints.video as MediaTrackConstraints).height = Number(height);
+        }
+
+        console.debug("[UserMedia] > getDisplayMedia", constraints);
+
         try
         {
-            // Используем spread оператор для копирования объекта constraints.
-            const constraints = { ...this.m_defaultStreamConstraintsDisplay };
-            (constraints.video as MediaTrackConstraints).frameRate = frameRate;
-            (constraints.video as MediaTrackConstraints).width = resolution.width;
-            (constraints.video as MediaTrackConstraints).height = resolution.height;
+            const mediaStream: MediaStream = await navigator.mediaDevices.getDisplayMedia(constraints);
 
-            // Захват изображения с экрана компьютера.
-            await this.getDisplayMedia(constraints);
+            console.debug("[UserMedia] > getDisplayMedia success:", mediaStream);
+            this.m_displayStateModel.setState(DisplayState.CAPTURED);
+
+            //this.ui.addSecondaryVideo("local", "display", this.ui.usernames.get("local")!);
+            await this.handleMediaDisplayStream(mediaStream);
 
             return true;
         }
         catch (error)
         {
             console.error("[UserMedia] > getDisplayMedia error:", error as DOMException);
+            this.m_displayStateModel.setState(DisplayState.IDLE);
+
             return false;
         }
     }
 
-    /** Прекратить захват экрана. */
+    /** Stop screensharing. */
     public stopDisplay(): void
     {
         const stream = this.getDisplayStream();
@@ -356,12 +382,16 @@ export class UserMediaService
             return;
         }
 
+        this.m_displayStateModel.setState(DisplayState.LOADING);
+
         for (const track of stream.getTracks())
         {
             track.stop();
         }
 
         this.removeEndedDisplayStream();
+
+        this.m_displayStateModel.setState(DisplayState.IDLE);
     }
 
     private getMainStreamAudioTrack(): MediaStreamTrack | undefined
@@ -535,21 +565,6 @@ export class UserMediaService
             return (mainStream.getVideoTracks().length > 0);
         }
         return false;
-    }
-
-    /** Захват видео с экрана юзера. */
-    private async getDisplayMedia(constraints: MediaStreamConstraints): Promise<void>
-    {
-        console.debug("[UserMedia] > getDisplayMedia", constraints);
-
-        // Захват экрана.
-        const mediaStream: MediaStream = await navigator.mediaDevices.getDisplayMedia(constraints);
-
-        console.debug("[UserMedia] > getDisplayMedia success:", mediaStream);
-
-        //this.ui.addSecondaryVideo("local", "display", this.ui.usernames.get("local")!);
-
-        await this.handleMediaDisplayStream(mediaStream);
     }
 
     /**
@@ -809,11 +824,7 @@ export class UserMediaService
     ): MediaStreamConstraints
     {
         const result: MediaStreamConstraints = {
-            video: {
-                frameRate,
-                width,
-                height
-            },
+            video: { width, height, frameRate },
             audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
         };
 
@@ -832,123 +843,6 @@ export class UserMediaService
         };
 
         return result;
-    }
-
-    /** Подготовить опции с разрешениями захватываемого видеоизображения. */
-    private prepareCaptureDisplayConstraints(): Map<string, MediaStreamConstraints>
-    {
-        const _constraints = new Map<string, MediaStreamConstraints>();
-
-        const constraints1440p60 = this.createDisplayConstraints(2560, 1440, 60);
-        const constraints1440p30 = this.createDisplayConstraints(2560, 1440, 30);
-        const constraints1440p5 = this.createDisplayConstraints(2560, 1440, 5);
-
-        const constraints1080p60 = this.createDisplayConstraints(1920, 1080, 60);
-        const constraints1080p30 = this.createDisplayConstraints(1920, 1080, 30);
-        const constraints1080p5 = this.createDisplayConstraints(1920, 1080, 5);
-
-        const constraints900p60 = this.createDisplayConstraints(1600, 900, 60);
-        const constraints900p30 = this.createDisplayConstraints(1600, 900, 30);
-        const constraints900p5 = this.createDisplayConstraints(1600, 900, 5);
-
-        const constraints720p60 = this.createDisplayConstraints(1280, 720, 60);
-        const constraints720p30 = this.createDisplayConstraints(1280, 720, 30);
-        const constraints720p5 = this.createDisplayConstraints(1280, 720, 5);
-
-        const constraints480p30 = this.createDisplayConstraints(854, 480, 30);
-        const constraints360p30 = this.createDisplayConstraints(640, 360, 30);
-        const constraints240p30 = this.createDisplayConstraints(426, 240, 30);
-        const constraints144p30 = this.createDisplayConstraints(256, 144, 30);
-
-        const defaultConstraints: MediaStreamConstraints = {
-            video: { frameRate: 30 },
-            audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
-        };
-
-        /*const settingsDisplay = this.ui.captureSettingsDisplay;
-
-
-        _constraints.set('default', defaultConstraints);
-        this.ui.addOptionToSelect(settingsDisplay, 'По умолчанию', 'default');
-        this.ui.addSeparatorToSelect(settingsDisplay);
-
-        // 1440
-        _constraints.set('1440p@60', constraints1440p60);
-        this.ui.addOptionToSelect(settingsDisplay, '2560x1440@60', '1440p@60');
-
-        _constraints.set('1440p@30', constraints1440p30);
-        this.ui.addOptionToSelect(settingsDisplay, '2560x1440@30', '1440p@30');
-
-        _constraints.set('1440p@5', constraints1440p5);
-        this.ui.addOptionToSelect(settingsDisplay, '2560x1440@5', '1440p@5');
-
-        this.ui.addSeparatorToSelect(settingsDisplay);
-
-        // 1080
-        _constraints.set('1080p@60', constraints1080p60);
-        this.ui.addOptionToSelect(settingsDisplay, '1920x1080@60', '1080p@60');
-
-        _constraints.set('1080p@30', constraints1080p30);
-        this.ui.addOptionToSelect(settingsDisplay, '1920x1080@30', '1080p@30');
-
-        _constraints.set('1080p@5', constraints1080p5);
-        this.ui.addOptionToSelect(settingsDisplay, '1920x1080@5', '1080p@5');
-
-        this.ui.addSeparatorToSelect(settingsDisplay);
-
-        // 900
-        _constraints.set('900p@60', constraints900p60);
-        this.ui.addOptionToSelect(settingsDisplay, '1600x900@60', '900p@60');
-
-        _constraints.set('900p@30', constraints900p30);
-        this.ui.addOptionToSelect(settingsDisplay, '1600x900@30', '900p@30');
-
-        _constraints.set('900p@5', constraints900p5);
-        this.ui.addOptionToSelect(settingsDisplay, '1600x900@5', '900p@5');
-
-        this.ui.addSeparatorToSelect(settingsDisplay);
-
-        // 720
-        _constraints.set('720p@60', constraints720p60);
-        this.ui.addOptionToSelect(settingsDisplay, '1280x720@60', '720p@60');
-
-        _constraints.set('720p@30', constraints720p30);
-        this.ui.addOptionToSelect(settingsDisplay, '1280x720@30', '720p@30');
-
-        _constraints.set('720p@5', constraints720p5);
-        this.ui.addOptionToSelect(settingsDisplay, '1280x720@5', '720p@5');
-
-        this.ui.addSeparatorToSelect(settingsDisplay);
-
-        // 480
-        _constraints.set('480p@30', constraints480p30);
-        this.ui.addOptionToSelect(settingsDisplay, '854x480@30', '480p@30');
-
-        this.ui.addSeparatorToSelect(settingsDisplay);
-
-        // 360
-        _constraints.set('360p@30', constraints360p30);
-        this.ui.addOptionToSelect(settingsDisplay, '640x360@30', '360p@30');
-
-        this.ui.addSeparatorToSelect(settingsDisplay);
-
-        // 240
-        _constraints.set('240p@30', constraints240p30);
-        this.ui.addOptionToSelect(settingsDisplay, '426x240@30', '240p@30');
-
-        this.ui.addSeparatorToSelect(settingsDisplay);
-
-        // 144
-        _constraints.set('144p@30', constraints144p30);
-        this.ui.addOptionToSelect(settingsDisplay, '256x144@30', '144p@30');
-
-        for (const constraint of _constraints)
-        {
-            const currentFrameRate = Number((constraint[1].video as MediaTrackConstraintSet).frameRate);
-            (constraint[1].video as MediaTrackConstraintSet).frameRate = currentFrameRate * 1.5;
-        }*/
-
-        return _constraints;
     }
 
     /** Подготовить опции с разрешениями захватываемого изображения с веб-камеры. */
