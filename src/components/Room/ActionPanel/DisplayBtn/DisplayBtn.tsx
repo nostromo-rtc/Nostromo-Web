@@ -23,7 +23,6 @@ export interface DisplayBtnProps
 export const DisplayBtn: React.FC<DisplayBtnProps> = ({ transitionDuration }) =>
 {
     // TODO:
-    // 4. где-то хранить полученный стрим, вероятно в UserMediaService
     // 5. вывод этого стрима в видеоплеер
 
     const userMediaService = useContext(UserMediaServiceContext);
