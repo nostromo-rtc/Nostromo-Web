@@ -14,6 +14,7 @@ import { MicStateNotificationsService } from "./services/Notifications/MicStateN
 import { NotificationsService } from "./services/NotificationsService";
 import { SettingService } from "./services/SettingsService";
 import { UserMediaService } from "./services/UserMediaService/UserMediaService";
+import { DisplayStateNotificationsService } from "./services/Notifications/DisplayStateNotificationsService";
 
 const settingService = new SettingService();
 const userMediaService = new UserMediaService();
@@ -24,6 +25,11 @@ export const UserMediaServiceContext = createContext<UserMediaService>(userMedia
 export const NotificationsContext = createContext<NotificationsService>(notificationService);
 
 const micStateNotificationsService = new MicStateNotificationsService(
+    userMediaService,
+    notificationService
+);
+
+const displayStateNotificationsService = new DisplayStateNotificationsService(
     userMediaService,
     notificationService
 );
