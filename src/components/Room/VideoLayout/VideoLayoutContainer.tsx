@@ -6,45 +6,38 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
-import React, { MouseEventHandler, useEffect, useState } from 'react';
-
-import "./VideoLayoutContainer.css";
-
+import React, { MouseEventHandler, useContext, useState } from 'react';
 import { Button } from "@mui/material";
 import { LuLayoutGrid } from "react-icons/lu";
-import { NumericConstants as NC } from "../../../utils/NumericConstants";
+
 import { Tooltip } from '../../Tooltip';
-import { VideoList } from './VideoLayoutItem';
-import { MemoizedVideoLayout } from "./VideoLayout";
 import { MemoizedVideoAsymmetricLayout } from './VideoAsymmetricLayout';
+import { MemoizedVideoLayout } from "./VideoLayout";
+import { VideoList } from './VideoLayoutItem';
+
+import { GeneralSocketServiceContext, UserMediaServiceContext } from "../../../AppWrapper";
+import { useUserModel } from "../../../services/GeneralSocketService/UserModel";
+
+import "./VideoLayoutContainer.css";
+import { useUserMediaStreamStorage } from "../../../services/UserMediaService/UserMediaStreamStorage";
 
 export const VideoLayoutContainer: React.FC = () =>
 {
     const [asymmetricLayout, setAsymmetricLayout] = useState<boolean>(false);
 
-    const [videoList, setVideoList] = useState<VideoList>([{ id: '0', label: '1' }]);
+    const generalSocketService = useContext(GeneralSocketServiceContext);
+    const userMediaService = useContext(UserMediaServiceContext);
 
-    // TODO: Типо загрузили список с сервера.
-    useEffect(() =>
+    const userInfo = useUserModel(generalSocketService.userModel);
+    const streams = useUserMediaStreamStorage(userMediaService.streamStorage);
+
+    const videoList: VideoList = [{ id: userInfo.id, label: userInfo.name }];
+
+    const displayStream = streams.find((s) => s.type === "display");
+    if (displayStream)
     {
-        console.debug("[VideoLayout] Loading data from API...");
-
-        setVideoList((prev) =>
-        {
-            const arr: VideoList = [];
-            for (let i = 0; i < arr.length; ++i)
-            {
-                arr.push({ id: `${prev.length + i}`, label: `${prev.length + i + NC.IDX_STEP}` });
-            }
-            return prev.concat(arr);
-        });
-
-        return () =>
-        {
-            setVideoList([{ id: '0', label: '1' }]);
-        };
-
-    }, []);
+        videoList.push({ id: "display", label: `${userInfo.name} [Экран]` });
+    }
 
     const handleChangeLayout: MouseEventHandler = () =>
     {
@@ -58,22 +51,6 @@ export const VideoLayoutContainer: React.FC = () =>
                     <LuLayoutGrid className="video-layout-change-btn-icon" />
                 </Button>
             </Tooltip>
-            <button className="debug-btn" onClick={() => { setVideoList(prev => [...prev, { id: `${prev.length + NC.IDX_STEP}`, label: "new" }]); }}>+1</button>
-            <button className="debug-btn-2" onClick={() =>
-            {
-                setVideoList((prev) =>
-                {
-                    const arr: VideoList = [];
-                    const TEN = 10;
-                    for (let i = 0; i < TEN; ++i)
-                    {
-                        arr.push({ id: `${prev.length + i}`, label: `${prev.length + i + NC.IDX_STEP}` });
-                    }
-                    return prev.concat(arr);
-                });
-            }}>
-                +10
-            </button>
             {asymmetricLayout ?
                 <MemoizedVideoAsymmetricLayout videoList={videoList} />
                 : <MemoizedVideoLayout videoList={videoList} />

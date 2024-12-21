@@ -15,14 +15,17 @@ import { NotificationsService } from "./services/NotificationsService";
 import { SettingService } from "./services/SettingsService";
 import { UserMediaService } from "./services/UserMediaService/UserMediaService";
 import { DisplayStateNotificationsService } from "./services/Notifications/DisplayStateNotificationsService";
+import { GeneralSocketService } from "./services/GeneralSocketService/GeneralSocketService";
 
 const settingService = new SettingService();
 const userMediaService = new UserMediaService();
 const notificationService = new NotificationsService();
+const generalSocketService = new GeneralSocketService();
 
 export const SettingsContext = createContext<SettingService>(settingService);
 export const UserMediaServiceContext = createContext<UserMediaService>(userMediaService);
 export const NotificationsContext = createContext<NotificationsService>(notificationService);
+export const GeneralSocketServiceContext = createContext<GeneralSocketService>(generalSocketService);
 
 const micStateNotificationsService = new MicStateNotificationsService(
     userMediaService,

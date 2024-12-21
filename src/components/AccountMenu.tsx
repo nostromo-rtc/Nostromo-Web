@@ -4,17 +4,21 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
-import React, { ReactEventHandler, useContext, useRef, useState } from "react";
 import { Avatar, Button, Divider, Menu as MuiMenu } from "@mui/material";
+import React, { ReactEventHandler, useContext, useRef, useState } from "react";
 import { BiChevronDown, BiChevronUp } from "react-icons/bi";
-import { MdSettings, MdEdit } from "react-icons/md";
+import { MdEdit, MdSettings } from "react-icons/md";
+
+import { SetShowSettingsContext } from "../App";
+import { TextEditDialog } from "./Dialog/TextEditDialog";
+import { MenuItemWithIcon } from "./Menu/MenuItems";
+import { Tooltip } from "./Tooltip";
+
+import { GeneralSocketServiceContext } from "../AppWrapper";
+import { useUserModel } from "../services/GeneralSocketService/UserModel";
+import { doNotHandleEvent } from "../utils/Utils";
 
 import "./AccountMenu.css";
-import { EditUsernameDialog } from "./EditUsernameDialog";
-import { Tooltip } from "./Tooltip";
-import { MenuItemWithIcon } from "./Menu/MenuItems";
-import { doNotHandleEvent } from "../utils/Utils";
-import { SetShowSettingsContext } from "../App";
 
 export const AccountMenu: React.FC = () =>
 {
@@ -23,8 +27,10 @@ export const AccountMenu: React.FC = () =>
     const btnRef = useRef<HTMLButtonElement>(null);
     const [open, setOpen] = useState<boolean>(false);
 
-    const [username, setUsername] = useState<string>("User");
-    const [openEditDialog, setOpenEditDialog] = useState<boolean>(false);
+    const generalSocketService = useContext(GeneralSocketServiceContext);
+    const userInfo = useUserModel(generalSocketService.userModel);
+
+    const [nameEditDialogOpen, setNameEditDialogOpen] = useState<boolean>(false);
 
     const setShowSettings = useContext(SetShowSettingsContext);
 
@@ -41,7 +47,18 @@ export const AccountMenu: React.FC = () =>
     const handleClickOnEditName: ReactEventHandler = (ev) =>
     {
         setOpen(false);
-        setOpenEditDialog(true);
+        setNameEditDialogOpen(true);
+    };
+
+    const handleNameEditDialogCancel = (): void =>
+    {
+        setNameEditDialogOpen(false);
+    };
+
+    const handleNameEditDialogConfirm = (name: string): void =>
+    {
+        generalSocketService.setUserName(name);
+        setNameEditDialogOpen(false);
     };
 
     const handleOpenSettings = (): void =>
@@ -52,10 +69,12 @@ export const AccountMenu: React.FC = () =>
         }
     };
 
+    const renameUserDescription = <>Введите желаемое имя, которое будут видеть остальные пользователи.</>;
+
     return (
         <>
             <Button id="account-menu-btn" ref={btnRef} onClick={handleClick}>
-                <Avatar id="account-menu-btn-avatar" children={username[INDEX_OF_FIRST_SYMBOL]} />
+                <Avatar id="account-menu-btn-avatar" children={userInfo.name[INDEX_OF_FIRST_SYMBOL]} />
                 {
                     open ? <BiChevronUp id="account-menu-btn-down-icon" />
                         : <BiChevronDown id="account-menu-btn-down-icon" />
@@ -79,17 +98,17 @@ export const AccountMenu: React.FC = () =>
             >
                 <div id="account-menu-header" onClick={doNotHandleEvent} aria-disabled>
                     <div id="account-menu-avatar-container">
-                        <Avatar className="account-menu-avatar" children={username[INDEX_OF_FIRST_SYMBOL]} />
+                        <Avatar className="account-menu-avatar" children={userInfo.name[INDEX_OF_FIRST_SYMBOL]} />
                     </div>
                     <div id="account-menu-info">
                         <Tooltip title="Ваше имя" placement="left">
-                            <span id="account-menu-info-name">{username}</span>
+                            <span id="account-menu-info-name">{userInfo.name}</span>
                         </Tooltip>
                         <Tooltip title="Ваш идентификатор в системе" placement="left">
-                            <span id="account-menu-info-id">#UsgHhiGI6UDkitt8GTUOl</span>
+                            <span id="account-menu-info-id">#{userInfo.id}</span>
                         </Tooltip>
                         <Tooltip id="tooltip-account-menu-info-role" title="Ваша роль в системе" placement="left">
-                            <span id="account-menu-info-role">Гость</span>
+                            <span id="account-menu-info-role">{userInfo.role === "user" ? "Пользователь" : "Администратор"}</span>
                         </Tooltip>
                     </div>
                 </div>
@@ -97,7 +116,14 @@ export const AccountMenu: React.FC = () =>
                 <MenuItemWithIcon onClick={handleClickOnEditName} icon={<MdEdit />} text="Изменить имя" />
                 <MenuItemWithIcon onClick={handleOpenSettings} icon={<MdSettings />} text="Настройки" />
             </MuiMenu>
-            <EditUsernameDialog open={openEditDialog} prevName={username} setOpen={setOpenEditDialog} setUsername={setUsername} />
+            <TextEditDialog
+                open={nameEditDialogOpen}
+                label="Изменение имени"
+                description={renameUserDescription}
+                value={userInfo.name}
+                onClose={handleNameEditDialogCancel}
+                onValueConfirm={handleNameEditDialogConfirm}
+            />
         </>
     );
 };

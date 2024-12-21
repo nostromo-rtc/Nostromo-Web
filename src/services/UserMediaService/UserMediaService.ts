@@ -100,6 +100,11 @@ export class UserMediaService
         return this.m_deviceStorage;
     }
 
+    public get streamStorage(): UserMediaStreamStorage
+    {
+        return this.m_streamStorage;
+    }
+
     public get soundStateModel(): SoundStateModel
     {
         return this.m_soundStateModel;
