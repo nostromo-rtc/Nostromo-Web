@@ -8,11 +8,11 @@
 //import { MicAudioProcessing } from "../../legacy/src/rooms/scripts/MicAudioProcessing";
 //import { UnsupportedError } from "../../legacy/src/rooms/scripts/AppError";
 
-import { NumericConstants as NC } from "../../utils/NumericConstants";
 import { DisplayState, DisplayStateModel } from "./DisplayStateModel";
 import { MicState, MicStateModel } from "./MicStateModel";
 import { SoundStateModel } from "./SoundStateModel";
 import { UserMediaDeviceStorage } from "./UserMediaDeviceStorage";
+import { MediaStreamInfo, UserMediaStreamStorage } from "./UserMediaStreamStorage";
 
 export type ResolutionObject = {
     width: number;
@@ -38,15 +38,13 @@ declare global
 export class UserMediaService
 {
     private readonly m_deviceStorage = new UserMediaDeviceStorage();
+    private readonly m_streamStorage = new UserMediaStreamStorage();
     private readonly m_soundStateModel = new SoundStateModel();
     private readonly m_micStateModel = new MicStateModel();
     private readonly m_displayStateModel = new DisplayStateModel();
 
     /** Объект - комната. */
     //private readonly room: Room;
-
-    /** Медиапотоки. */
-    private readonly m_streams = new Map<string, MediaStream>();
 
     /** Список захваченных видеоустройств. */
     private readonly m_capturedVideoDevices = new Set<string>();
@@ -171,16 +169,17 @@ export class UserMediaService
     /** Прекратить захват микрофона. */
     public stopMic(): void
     {
-        console.debug("[UserMedia] > stopMic");
+        const streamInfo = this.m_streamStorage.getStateSnapshot().find(
+            (s) => s.type === "mic"
+        );
 
-        const track = this.getMainStreamAudioTrack();
-        if (!track)
+        if (!streamInfo)
         {
             return;
         }
 
-        track.stop();
-        this.removeEndedTrack("main", track);
+        console.debug("[UserMedia] > stopMic");
+        this.removeEndedStream(streamInfo);
     }
 
     /** Выключить микрофон (поставить на паузу). */
@@ -188,12 +187,6 @@ export class UserMediaService
     {
         console.debug("[UserMedia] > pauseMic");
         this.m_micStateModel.setState(MicState.PAUSED);
-
-        const track = this.getMainStreamAudioTrack();
-        if (!track)
-        {
-            return;
-        }
 
         //this.room.pauseMediaStreamTrack(track.id);
         //this.ui.playSound(UiSound.micOff);
@@ -204,12 +197,6 @@ export class UserMediaService
     {
         console.debug("[UserMedia] > unpauseMic");
         this.m_micStateModel.setState(MicState.WORKING);
-
-        const track = this.getMainStreamAudioTrack();
-        if (!track)
-        {
-            return;
-        }
 
         //this.room.resumeMediaStreamTrack(track.id);
         //this.ui.playSound(UiSound.micOn);
@@ -284,7 +271,7 @@ export class UserMediaService
     {
         console.debug("[UserMedia] > stopCam", deviceId);
 
-        // Если это устройство не числится, как захваченное.
+        /*// Если это устройство не числится, как захваченное.
         if (!this.m_capturedVideoDevices.has(deviceId))
         {
             return;
@@ -312,17 +299,17 @@ export class UserMediaService
         this.removeEndedTrack(streamId, track);
 
         // Отметим, что устройство deviceId больше не занято.
-        this.m_capturedVideoDevices.delete(deviceId);
+        this.m_capturedVideoDevices.delete(deviceId);*/
     }
 
     /** Прекратить захват всех веб-камер. */
-    public stopAllCams(): void
+    /*public stopAllCams(): void
     {
         for (const deviceId of this.m_capturedVideoDevices)
         {
             this.stopCam(deviceId);
         }
-    }
+    }*/
 
     /** Screenshare feature. */
     public async getDisplay(resolution: string, frameRate: string): Promise<boolean>
@@ -356,10 +343,44 @@ export class UserMediaService
             const mediaStream: MediaStream = await navigator.mediaDevices.getDisplayMedia(constraints);
 
             console.debug("[UserMedia] > getDisplayMedia success:", mediaStream);
+
+            const mediaStreamInfo: MediaStreamInfo = {
+                stream: mediaStream,
+                type: "display"
+            };
+
+            this.m_streamStorage.addStream(mediaStreamInfo);
+            this.handleEndedStream(mediaStreamInfo);
+
             this.m_displayStateModel.setState(DisplayState.CAPTURED);
 
             //this.ui.addSecondaryVideo("local", "display", this.ui.usernames.get("local")!);
-            await this.handleMediaDisplayStream(mediaStream);
+            /*const video = this.ui.getVideo("local", "display");
+
+            // Подключаем медиапоток к HTML-видеоэлементу.
+            if (!video.srcObject)
+            {
+                video.srcObject = stream;
+            }
+
+            // Так как добавили новую дорожку, включаем отображение элементов управления.
+            // Но регулятор громкости не показываем.
+            this.ui.showControls(video.plyr, false);
+
+            // Переключаем метку на видео.
+            this.ui.toggleVideoLabels(
+                this.ui.getCenterVideoLabel("local", "display")!,
+                this.ui.getVideoLabel("local", "display")!
+            );
+
+            // Воспроизведем звук захвата видеодорожки.
+            this.ui.playSound(UiSound.videoOn);*/
+
+            /*for (const newTrack of stream.getTracks())
+            {
+                // Отправим всем новую медиадорожку.
+                // await this.room.addMediaStreamTrack("display", newTrack);
+            }*/
 
             return true;
         }
@@ -375,33 +396,17 @@ export class UserMediaService
     /** Stop screensharing. */
     public stopDisplay(): void
     {
-        const stream = this.getDisplayStream();
+        const streamInfo = this.m_streamStorage.getStateSnapshot().find(
+            (s) => s.type === "display"
+        );
 
-        if (!stream)
+        if (!streamInfo)
         {
             return;
         }
 
-        this.m_displayStateModel.setState(DisplayState.LOADING);
-
-        for (const track of stream.getTracks())
-        {
-            track.stop();
-        }
-
-        this.removeEndedDisplayStream();
-
-        this.m_displayStateModel.setState(DisplayState.IDLE);
-    }
-
-    private getMainStreamAudioTrack(): MediaStreamTrack | undefined
-    {
-        return this.m_streams.get("main")?.getAudioTracks()[NC.ZERO_IDX];
-    }
-
-    private getDisplayStream(): MediaStream | undefined
-    {
-        return this.m_streams.get("display");
+        console.debug("[UserMedia] > stopDisplay");
+        this.removeEndedStream(streamInfo);
     }
 
     /** Создать контекст для Web Audio API. */
@@ -457,23 +462,13 @@ export class UserMediaService
         if (streamConstraints.audio as boolean)
         {
             //const proccessedStream = (await this.handleMicAudioProcessing(mediaStream)).clone();
-
-            //await this.handleMediaStream("main", proccessedStream);
-
-            await this.handleMediaStream("main", mediaStream);
-
             console.debug("[UserMedia] > Captured mic settings:", mediaStream.getAudioTracks()[0].getSettings());
-            return deviceId;
         }
 
-        // ---------------------------------------
-        // Иначе это веб-камера (видеоустройство).
-        // ---------------------------------------
-
         // Запишем, что устройство deviceId занято, для исключения дубликатов.
-        this.m_capturedVideoDevices.add(deviceId);
+        //this.m_capturedVideoDevices.add(deviceId);
 
-        // Определим, нужен ли дополнительный видеоэлемент под вебку.
+        /*// Определим, нужен ли дополнительный видеоэлемент под вебку.
         if (this.isNeededSecondaryVideoStream())
         {
             //this.ui.addSecondaryVideo("local", deviceId, this.ui.usernames.get("local")!);
@@ -485,7 +480,41 @@ export class UserMediaService
 
             // Запишем идентификатор видеоустройства.
             this.m_mainStreamVideoDeviceId = deviceId;
+        }*/
+
+        const streamInfo: MediaStreamInfo = {
+            stream: mediaStream,
+            type: streamConstraints.audio as boolean ? "mic" : "cam",
+            deviceId
+        };
+
+        this.m_streamStorage.addStream(streamInfo);
+        this.handleEndedStream(streamInfo);
+
+        /*// Подключаем медиапоток к HTML-видеоэлементу.
+        if (!video.srcObject)
+        {
+            video.srcObject = stream;
         }
+ 
+        // Так как добавили новую дорожку, включаем отображение элементов управления.
+        // Но регулятор громкости не показываем.
+        this.ui.showControls(video.plyr, false);
+ 
+        // Отправляем всем новую медиадорожку.
+        await this.room.addMediaStreamTrack(streamId, newTrack);
+ 
+        if (newTrack.kind == "video")
+        {
+            // Переключаем метку на видео.
+            this.ui.toggleVideoLabels(
+                this.ui.getCenterVideoLabel("local", streamId)!,
+                this.ui.getVideoLabel("local", streamId)!
+            );
+ 
+            // Воспроизведем звук захвата видеодорожки.
+            this.ui.playSound(UiSound.videoOn);
+        }*/
 
         return deviceId;
     }
@@ -556,201 +585,53 @@ export class UserMediaService
         return deviceId;
     }
 
-    /** Нужен ли дополнительный видеоэлемент под веб-камеру. */
-    private isNeededSecondaryVideoStream(): boolean
+    /** Handle ended tracks in stream. */
+    private handleEndedStream(streamInfo: MediaStreamInfo): void
     {
-        const mainStream = this.m_streams.get("main");
-        if (mainStream)
+        for (const track of streamInfo.stream.getTracks())
         {
-            return (mainStream.getVideoTracks().length > 0);
-        }
-        return false;
-    }
-
-    /**
-     * Обработка медиапотока с вебкой или микрофоном.
-     * @param videoDeviceId - опциональный параметр, Id захваченного видеоустройства.
-     */
-    // eslint-disable-next-line @typescript-eslint/require-await
-    private async handleMediaStream(
-        streamId: string,
-        mediaStream: MediaStream,
-        videoDeviceId?: string
-    ): Promise<void>
-    {
-        // Вытягиваем новую дорожку.
-        const newTrack = mediaStream.getTracks()[0];
-
-        // Подключаем обработчик закончившейся дорожки.
-        this.handleEndedTrack(streamId, newTrack, videoDeviceId);
-
-        let stream = this.m_streams.get(streamId);
-        //const video = this.ui.getVideo("local", streamId)!;
-
-        // Если такой поток есть.
-        if (stream)
-        {
-            const streamWasActive = stream.active;
-
-            // Добавляем дорожку.
-            stream.addTrack(newTrack);
-
-            // Перезагружаем видеоэлемент. Это необходимо, на тот случай,
-            // если до этого из стрима удалили все дорожки и стрим стал неактивным,
-            // а при удалении видеодорожки (и она была последней при удалении) вызывали load(),
-            // чтобы убрать зависнувший последний кадр.
-            // Иначе баг на Chrome: если в стриме только аудиодорожка,
-            // то play/pause на видеоэлементе не будут работать, а звук будет все равно идти.
-            if (!streamWasActive)
+            track.addEventListener('ended', () =>
             {
-                //video.load();
-            }
+                this.removeEndedStream(streamInfo);
+            });
         }
-        else // Если создаем его впервые.
-        {
-            stream = new MediaStream([newTrack]);
-
-            // Запоминаем поток.
-            this.m_streams.set(streamId, stream);
-        }
-
-        /*// Подключаем медиапоток к HTML-видеоэлементу.
-        if (!video.srcObject)
-        {
-            video.srcObject = stream;
-        }
-
-        // Так как добавили новую дорожку, включаем отображение элементов управления.
-        // Но регулятор громкости не показываем.
-        this.ui.showControls(video.plyr, false);
-
-        // Отправляем всем новую медиадорожку.
-        await this.room.addMediaStreamTrack(streamId, newTrack);
-
-        if (newTrack.kind == "video")
-        {
-            // Переключаем метку на видео.
-            this.ui.toggleVideoLabels(
-                this.ui.getCenterVideoLabel("local", streamId)!,
-                this.ui.getVideoLabel("local", streamId)!
-            );
-
-            // Воспроизведем звук захвата видеодорожки.
-            this.ui.playSound(UiSound.videoOn);
-        }*/
     }
 
-    /** Обработка медиапотока (захват экрана). */
-    private async handleMediaDisplayStream(stream: MediaStream): Promise<void>
+    private removeEndedStream(streamInfo: MediaStreamInfo): void
     {
-        /*const video = this.ui.getVideo("local", "display");
-
-        if (!video)
-        {
-            return;
-        }
-
-        // Запоминаем поток.
-        this.m_streams.set("display", stream);
-
-        // Подключаем медиапоток к HTML-видеоэлементу.
-        if (!video.srcObject)
-        {
-            video.srcObject = stream;
-        }
-
-        // Так как добавили новую дорожку, включаем отображение элементов управления.
-        // Но регулятор громкости не показываем.
-        this.ui.showControls(video.plyr, false);
-
-        // Переключаем метку на видео.
-        this.ui.toggleVideoLabels(
-            this.ui.getCenterVideoLabel("local", "display")!,
-            this.ui.getVideoLabel("local", "display")!
-        );
-
-        for (const newTrack of stream.getTracks())
-        {
-            // Подключаем обработчик закончившейся дорожки.
-            this.handleEndedTrack("display", newTrack);
-
-            // Отправим всем новую медиадорожку.
-            await this.room.addMediaStreamTrack("display", newTrack);
-        }
-
-        // Воспроизведем звук захвата видеодорожки.
-        this.ui.playSound(UiSound.videoOn);*/
-    }
-
-    /** Обработка закончившейся (ended) дорожки. */
-    private handleEndedTrack(
-        streamId: string,
-        track: MediaStreamTrack,
-        videoDeviceId?: string
-    ): void
-    {
-        track.addEventListener('ended', () =>
-        {
-            if (streamId === "display" && this.m_streams.has(streamId))
-            {
-                this.removeEndedDisplayStream();
-            }
-            else
-            {
-                // Удалим дорожку.
-                this.removeEndedTrack(streamId, track);
-
-                // Отметим, что устройство deviceId больше не занято.
-                if (videoDeviceId !== undefined && videoDeviceId !== "")
-                {
-                    this.m_capturedVideoDevices.delete(videoDeviceId);
-                }
-            }
-        });
-    }
-
-    /** Удалить закончившуюся (ended) дорожку. */
-    private removeEndedTrack(streamId: string, track: MediaStreamTrack): void
-    {
-        console.debug("[UserMedia] > removeEndedTrack", streamId, track);
+        console.debug("[UserMedia] > removeEndedStream", streamInfo);
 
         //this.room.removeMediaStreamTrack(track.id);
 
-        // Если это дорожка основного потока (main).
-        if (streamId === "main")
+        for (const track of streamInfo.stream.getTracks())
         {
-            this.removeTrackFromMainStream(streamId, track);
-        }
-        else // Иначе необходимо удалить дорожку неосновного медиапотока.
-        {
-            this.removeTrackFromSecondaryStream(streamId);
-        }
-    }
-
-    /** Удалить закончившийся поток display - экран компьютера: видео и аудио (если есть). */
-    private removeEndedDisplayStream()
-    {
-        console.debug("[UserMedia] > removeEndedDisplayStream");
-
-        /*const stream = this.m_streams.get("display")!;
-        for (const track of stream.getTracks())
-        {
-            this.room.removeMediaStreamTrack(track.id);
+            track.stop();
         }
 
+        if (streamInfo.type === "mic")
+        {
+            this.m_micStateModel.disableMic();
 
-        this.ui.removeVideoItem(this.ui.getVideoItem("local", "display")!);
-        this.m_streams.delete("display");
+            // Удалим ноду с микрофонным потоком.
+            //this.m_micAudioProcessing.destroyMicNode();
+        }
+        else if (streamInfo.type === "display")
+        {
+            this.m_displayStateModel.setState(DisplayState.IDLE);
 
-        // Переключаем кнопку захвата экрана.
-        this.ui.toggleDisplayButtons();
+            /*for (const track of stream.getTracks())
+            {
+                this.room.removeMediaStreamTrack(track.id);
+            }
 
-        // Воспроизводим звук.
-        this.ui.playSound(UiSound.videoOff);*/
+            this.ui.removeVideoItem(this.ui.getVideoItem("local", "display")!);*/
+        }
+
+        this.m_streamStorage.removeStream(streamInfo.stream.id);
     }
 
     /** Удалить медиадорожку из локального основного стрима. */
-    private removeTrackFromMainStream(streamId: string, track: MediaStreamTrack): void
+    /*private removeTrackFromMainStream(streamId: string, track: MediaStreamTrack): void
     {
         console.debug("[UserMedia] > removeTrackFromMainStream", track);
 
@@ -761,7 +642,7 @@ export class UserMediaService
 
         if (track.kind == "video")
         {
-            /*// Сбрасываем видео объект.
+            // Сбрасываем видео объект.
             video.load();
 
             // Переключаем видимость текстовых меток.
@@ -777,45 +658,15 @@ export class UserMediaService
             this.m_mainStreamVideoDeviceId = "";
 
             // И переключаем кнопку захвата веб-камеры.
-            this.ui.toggleCamButtons();*/
-        }
-        else
-        {
-            /*// Поскольку дорожка микрофона была удалена,
-            // то скрываем кнопки включения/выключения микрофона.
-            this.ui.hideMicPauseButtons();
-
-            // И переключаем кнопку захвата микрофона.
-            this.ui.toggleMicButtons();
-
-            // Удалим ноду с микрофонным потоком.
-            this.m_micAudioProcessing.destroyMicNode();*/
-
-            this.m_micStateModel.disableMic();
+            this.ui.toggleCamButtons();
         }
 
-        /*// Если дорожек не осталось, выключаем элементы управления плеера.
+        // Если дорожек не осталось, выключаем элементы управления плеера.
         if (stream.getTracks().length == 0)
         {
             this.ui.hideControls(video.plyr);
-        }*/
-    }
-
-    /** Удалить медиадорожку из локального неосновного стрима. */
-    private removeTrackFromSecondaryStream(streamId: string): void
-    {
-        // Удаляем видеоэлемент.
-        /*this.ui.removeVideoItem(this.ui.getVideoItem("local", streamId)!);
-
-        // Удаляем из списка потоков.
-        this.m_streams.delete(streamId);
-
-        // Воспроизводим звук.
-        this.ui.playSound(UiSound.videoOff);
-
-        // И переключаем кнопку захвата веб-камеры.
-        this.ui.toggleCamButtons();*/
-    }
+        }
+    }*/
 
     private createDisplayConstraints(
         width: number,
