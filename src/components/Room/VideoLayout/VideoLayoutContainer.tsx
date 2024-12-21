@@ -36,7 +36,11 @@ export const VideoLayoutContainer: React.FC = () =>
     const displayStream = streams.find((s) => s.type === "display");
     if (displayStream)
     {
-        videoList.push({ id: "display", label: `${userInfo.name} [Экран]` });
+        videoList.push({
+            id: "display",
+            label: `${userInfo.name} [Экран]`,
+            stream: displayStream.stream
+        });
     }
 
     const handleChangeLayout: MouseEventHandler = () =>

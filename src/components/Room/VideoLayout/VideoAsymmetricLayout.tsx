@@ -17,6 +17,7 @@ import { ListItem } from "../../Base/List/ListItems";
 import "./VideoAsymmetricLayout.css";
 import "./VideoLayout.css";
 import { VideoLayoutItem, VideoLayoutItemInfo, VideoLayoutMatrixState, VideoList, calculateLastPageIdx, calculateVideoItemSize } from "./VideoLayoutItem";
+import { Video } from "./Video";
 
 // Minimal video item width.
 const MIN_ITEM_WIDTH = 155;
@@ -193,6 +194,15 @@ const VideoAsymmetricLayout: FC<VideoAsymmetricLayoutProps> = ({ videoList }) =>
         }
     };
 
+    const getVideoItem = (video: VideoLayoutItemInfo): JSX.Element =>
+    {
+        return (
+            !video.stream ?
+                <span className="v-align-middle">{video.label}</span> :
+                <Video srcObject={video.stream} autoPlay />
+        );
+    };
+
     const videoItemsToMap = (video: VideoLayoutItemInfo, idx: number): JSX.Element =>
     {
         const handleClick: MouseEventHandler = () =>
@@ -219,6 +229,13 @@ const VideoAsymmetricLayout: FC<VideoAsymmetricLayoutProps> = ({ videoList }) =>
             itemRef = lastItemRef;
         }
 
+        const activeVideoItem = (
+            <div className="video-asymmetric-item-child">
+                <BsCameraVideoFill className="active-asymmetric-item-icon" />
+                {video.label}
+            </div>
+        );
+
         return (
             <ListItem
                 key={video.id}
@@ -231,13 +248,7 @@ const VideoAsymmetricLayout: FC<VideoAsymmetricLayoutProps> = ({ videoList }) =>
                     className="video-asymmetric-item"
                     onClick={handleClick}
                 >
-                    {video.id === activeVideoId ?
-                        <div className="video-asymmetric-item-child">
-                            <BsCameraVideoFill className="active-asymmetric-item-icon" />
-                            {video.label}
-                        </div>
-                        : video.label
-                    }
+                    {video.id === activeVideoId ? activeVideoItem : getVideoItem(video)}
                 </VideoLayoutItem>
             </ListItem>
         );
@@ -263,23 +274,23 @@ const VideoAsymmetricLayout: FC<VideoAsymmetricLayoutProps> = ({ videoList }) =>
             </Button>
         </div > : <div className="video-asymmetric-nav-area-size video-asymmetric-nav-next"></div>;
 
-    const activeItemIdx: number = videoList.findIndex(f => f.id === activeVideoId);
+    const activeItem = videoList.find(f => f.id === activeVideoId);
 
-    const activeItem = <VideoLayoutItem
+    const activeItemElement = <VideoLayoutItem
         className="video-layout-item"
         style={{
             width: matrixState.videoItemSize.width,
             height: matrixState.videoItemSize.height
         }}
     >
-        {activeItemIdx !== NC.NOT_FOUND_IDX ? videoList[activeItemIdx].label : ""}
+        {activeItem ? getVideoItem(activeItem) : ""}
     </VideoLayoutItem>;
 
     const pageStartIdx = matrixState.currentPageIdx * matrixState.itemCount;
 
     return (
         <div className="video-asymmetric-layout-wrapper">
-            <div className="video-layout" ref={layoutRef}>{activeItem}</div>
+            <div className="video-layout" ref={layoutRef}>{activeItemElement}</div>
             <div className="video-asymmetric-list-container">
                 {prevPageBtn}
                 <List className="video-asymmetric-list"
