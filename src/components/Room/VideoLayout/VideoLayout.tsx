@@ -12,6 +12,7 @@ import { useResizeDetector } from "react-resize-detector";
 import { NumericConstants as NC } from "../../../utils/NumericConstants";
 import "./VideoLayout.css";
 import { calculateLastPageIdx, calculateVideoItemSize, ElementSize, VideoLayoutItem, VideoLayoutItemInfo, VideoLayoutMatrixState, VideoList } from "./VideoLayoutItem";
+import { Video } from "./Video";
 
 // Minimal video item width.
 const MIN_ITEM_WIDTH = 320;
@@ -178,18 +179,22 @@ const VideoLayout: FC<VideoLayoutProps> = ({ videoList }) =>
         });
     };
 
-    const rowToMap = (val: VideoLayoutItemInfo, index: number): JSX.Element =>
+    const rowToMap = (video: VideoLayoutItemInfo, index: number): JSX.Element =>
     {
         return (
             <VideoLayoutItem
                 className="video-layout-item"
-                key={index}
+                key={video.id}
                 style={{
                     width: matrixState.videoItemSize.width,
                     height: matrixState.videoItemSize.height
                 }}
             >
-                {val.label}
+                {
+                    !video.stream ?
+                        <span className="v-align-middle">{video.label}</span> :
+                        <Video srcObject={video.stream} autoPlay />
+                }
             </VideoLayoutItem>
         );
     };

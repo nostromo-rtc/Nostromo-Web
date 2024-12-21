@@ -22,9 +22,6 @@ export interface DisplayBtnProps
 
 export const DisplayBtn: React.FC<DisplayBtnProps> = ({ transitionDuration }) =>
 {
-    // TODO:
-    // 5. вывод этого стрима в видеоплеер
-
     const userMediaService = useContext(UserMediaServiceContext);
     const displayState = useDisplayStateModel(userMediaService.displayStateModel);
 

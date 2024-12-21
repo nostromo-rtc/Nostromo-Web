@@ -14,3 +14,12 @@
     border-radius: 5px;
     background-color: #282828;
 }
+
+.video-container video
+{
+    border: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    aspect-ratio: 16 / 9;
+}

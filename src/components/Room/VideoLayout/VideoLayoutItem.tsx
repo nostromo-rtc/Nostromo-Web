@@ -13,6 +13,7 @@ export interface VideoLayoutItemInfo
 {
     id: string;
     label: string;
+    stream?: MediaStream;
 }
 
 export type VideoList = VideoLayoutItemInfo[];
@@ -80,7 +81,7 @@ export const VideoLayoutItem: React.FC<VideoLayoutItemProps> = (({ children, ...
     return (
         <div {...props}>
             <div className="video-container">
-                <span className="v-align-middle">{children}</span>
+                {children}
             </div>
         </div>
     );
