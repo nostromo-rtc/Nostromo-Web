@@ -193,7 +193,10 @@ const VideoLayout: FC<VideoLayoutProps> = ({ videoList }) =>
                 {
                     !video.stream ?
                         <span className="v-align-middle">{video.label}</span> :
-                        <Video srcObject={video.stream} autoPlay />
+                        <>
+                            <span className="video-label">{video.label}</span>
+                            <Video srcObject={video.stream} autoPlay />
+                        </>
                 }
             </VideoLayoutItem>
         );
