@@ -36,7 +36,11 @@ declare global
     }
 }
 
-/** Класс, управляющий медиапотоками пользователя. */
+/** 
+ * Service for Media Capture and Streams API.
+ * 
+ * Microphone, web-cameras and display capturing.
+ */
 export class UserMediaService
 {
     private readonly m_deviceStorage = new UserMediaDeviceStorage();
@@ -45,37 +49,16 @@ export class UserMediaService
     private readonly m_micStateModel = new MicStateModel();
     private readonly m_displayStateModel = new DisplayStateModel();
     private readonly m_camStatesModel = new CamStatesModel();
-
-    /** Объект - комната. */
-    //private readonly room: Room;
-
-    /** Настройки медиапотока при захвате видеоизображения экрана. */
-    private readonly m_defaultStreamConstraintsDisplay: MediaStreamConstraints = {
-        video: { frameRate: 30 },
-        audio: {
-            echoCancellation: false,
-            noiseSuppression: false,
-            autoGainControl: false
-        }
-    };
-
     private readonly m_audioContext?: AudioContext = this.createAudioContext();
 
     //private readonly m_micAudioProcessing: MicAudioProcessing;
-
-    public constructor(/*_room: Room*/)
+    public constructor()
     {
         console.debug("[UserMedia] > constructor");
-
-        //this.room = _room;
-
-        //this.m_defaultStreamConstraintsCam = this.prepareCaptureCamConstraints();
 
         //this.micAudioProcessing = new MicAudioProcessing(this.audioContext, this.ui);
 
         this.handleDevicesList();
-        //this.handleChoosingCamDevices();
-        //this.handleButtons();
     }
 
     public get deviceStorage(): UserMediaDeviceStorage
@@ -108,13 +91,9 @@ export class UserMediaService
         return this.m_camStatesModel;
     }
 
-    /** Захват микрофона. */
     public async getMic(deviceId: string): Promise<boolean>
     {
-        /*if (!this.room.isAllowedToSpeak)
-        {
-            return;
-        }*/
+        // TODO: !this.room.isAllowedToSpeak)
 
         console.debug("[UserMedia] > getMic", deviceId);
 
@@ -166,7 +145,6 @@ export class UserMediaService
         }
     }
 
-    /** Прекратить захват микрофона. */
     public stopMic(): void
     {
         const streamInfo = this.m_streamStorage.getStateSnapshot().find(
@@ -182,7 +160,6 @@ export class UserMediaService
         this.removeEndedStream(streamInfo);
     }
 
-    /** Выключить микрофон (поставить на паузу). */
     public pauseMic(): void
     {
         console.debug("[UserMedia] > pauseMic");
@@ -192,7 +169,6 @@ export class UserMediaService
         //this.ui.playSound(UiSound.micOff);
     }
 
-    /** Включить микрофон (снять с паузы). */
     public unpauseMic(): void
     {
         console.debug("[UserMedia] > unpauseMic");
@@ -217,15 +193,9 @@ export class UserMediaService
         }
     }
 
-    /** Capture web-camera. */
     public async getCam(deviceId: string, resolution: string, frameRate: string): Promise<string>
     {
-        /*if (!this.room.isAllowedToSpeak)
-        {
-            return;
-        }*/
-
-        console.debug("[UserMedia] > getCam", deviceId);
+        //TODO: !this.room.isAllowedToSpeak)
 
         const constraints = {
             video: {}, audio: false
@@ -259,6 +229,8 @@ export class UserMediaService
             (constraints.video as MediaTrackConstraints).width = { ideal: Number(width) };
             (constraints.video as MediaTrackConstraints).height = { ideal: Number(height) };
         }
+
+        console.debug("[UserMedia] > getCam", deviceId, constraints);
 
         // Workaround: on Chromium on first page visit
         // when we don't have permission for devices id.
@@ -299,7 +271,6 @@ export class UserMediaService
         }
     }
 
-    /** Прекратить захват веб-камеры. */
     public stopCam(deviceId: string): void
     {
         const streamInfo = this.m_streamStorage.getStateSnapshot().find(
@@ -315,22 +286,26 @@ export class UserMediaService
         this.removeEndedStream(streamInfo);
     }
 
-    /** Прекратить захват всех веб-камер. */
-    /*public stopAllCams(): void
+    public stopAllCams(): void
     {
-        for (const deviceId of this.m_capturedVideoDevices)
+        const camStreams = this.m_streamStorage.getStateSnapshot().filter(
+            (s) => s.type === "cam"
+        );
+
+        for (const streamInfo of camStreams)
         {
-            this.stopCam(deviceId);
+            if (streamInfo.deviceId !== undefined
+                && streamInfo.deviceId !== "")
+            {
+                this.stopCam(streamInfo.deviceId);
+            }
         }
-    }*/
+    }
 
     /** Screenshare feature. */
     public async getDisplay(resolution: string, frameRate: string): Promise<boolean>
     {
-        /*if (!this.room.isAllowedToSpeak)
-        {
-            return;
-        }*/
+        // TODO: (!this.room.isAllowedToSpeak)
 
         this.m_displayStateModel.setState(DisplayState.LOADING);
 
@@ -409,7 +384,7 @@ export class UserMediaService
         this.removeEndedStream(streamInfo);
     }
 
-    /** Создать контекст для Web Audio API. */
+    /** Create context for Web Audio API. */
     private createAudioContext(): AudioContext | undefined
     {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, @typescript-eslint/strict-boolean-expressions
@@ -425,7 +400,10 @@ export class UserMediaService
         //throw new UnsupportedError("Web Audio API is not supported by this browser.");
     }
 
-    /** Подготовить список устройств и подключение обработчика событий изменения устройств. */
+    /** 
+     * Prepare device list 
+     * and connect `devicechange` event handler. 
+     */
     private handleDevicesList(): void
     {
         void this.m_deviceStorage.enumerateDevices();
@@ -571,9 +549,7 @@ export class UserMediaService
             /*for (const track of stream.getTracks())
             {
                 this.room.removeMediaStreamTrack(track.id);
-            }
-
-            this.ui.removeVideoItem(this.ui.getVideoItem("local", "display")!);*/
+            }*/
         }
         else if (streamInfo.type === "cam" && streamInfo.deviceId !== undefined)
         {
@@ -582,44 +558,6 @@ export class UserMediaService
 
         this.m_streamStorage.removeStream(streamInfo.stream.id);
     }
-
-    /** Удалить медиадорожку из локального основного стрима. */
-    /*private removeTrackFromMainStream(streamId: string, track: MediaStreamTrack): void
-    {
-        console.debug("[UserMedia] > removeTrackFromMainStream", track);
-
-        const stream = this.m_streams.get("main")!;
-        //const video = this.ui.getVideo("local", "main")!;
-
-        stream.removeTrack(track);
-
-        if (track.kind == "video")
-        {
-            // Сбрасываем видео объект.
-            video.load();
-
-            // Переключаем видимость текстовых меток.
-            this.ui.toggleVideoLabels(
-                this.ui.getCenterVideoLabel("local", streamId)!,
-                this.ui.getVideoLabel("local", streamId)!
-            );
-
-            // Воспроизводим звук.
-            this.ui.playSound(UiSound.videoOff);
-
-            // Очищаем идентификатор видеоустройства, захваченного в главном медиапотоке.
-            this.m_mainStreamVideoDeviceId = "";
-
-            // И переключаем кнопку захвата веб-камеры.
-            this.ui.toggleCamButtons();
-        }
-
-        // Если дорожек не осталось, выключаем элементы управления плеера.
-        if (stream.getTracks().length == 0)
-        {
-            this.ui.hideControls(video.plyr);
-        }
-    }*/
 
     // Если панель скрыта, то отключаем индикатор громкости, иначе подключаем.
     /*private handleVolumeMeter(): void
