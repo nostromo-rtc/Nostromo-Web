@@ -1,5 +1,5 @@
 /*
-    SPDX-FileCopyrightText: 2024 Sergey Katunin <sulmpx60@yandex.ru>
+    SPDX-FileCopyrightText: 2024-2025 Sergey Katunin <sulmpx60@yandex.ru>
 
     SPDX-License-Identifier: BSD-2-Clause
 */
@@ -36,13 +36,13 @@ export class UserMediaDeviceStorage extends AbstractExternalStorage
 
         for (const device of mediaDevices)
         {
-            // Пропустим виртуальное устройство в Chrome (который "По умолчанию для связи").
+            // Skip virtual device in Chromium (default for communications).
             if (device.deviceId === "communications")
             {
                 continue;
             }
 
-            // Пропустим устройства с ненужным типом (аудиовывод и так далее).
+            // Skip unneccesary devices (like audiooutput).
             if (device.kind !== "audioinput" && device.kind !== "videoinput")
             {
                 continue;

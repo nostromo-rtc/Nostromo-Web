@@ -1,5 +1,5 @@
 /*
-    SPDX-FileCopyrightText: 2022-2024 Sergey Katunin <sulmpx60@yandex.ru>
+    SPDX-FileCopyrightText: 2022-2025 Sergey Katunin <sulmpx60@yandex.ru>
 
     SPDX-License-Identifier: BSD-2-Clause
 */
@@ -8,7 +8,7 @@ import { Link } from "@mui/material";
 import React, { useContext, useEffect, useState } from "react";
 
 import { Header } from "../components/Header";
-import { RoomActionPanel, RoomActionPanelProps } from "../components/Room/ActionPanel/RoomActionPanel";
+import { RoomActionPanel } from "../components/Room/ActionPanel/RoomActionPanel";
 import { Chat } from "../components/Room/Chat/Chat";
 import { DropArea } from "../components/Room/Chat/DropArea";
 import { LoadFileInfo } from "../components/Room/Chat/UploadingFilesQueue";
@@ -20,8 +20,6 @@ import { VerticalLayout } from "../components/VerticalLayout";
 
 import { UserMediaServiceContext } from "../AppWrapper";
 import { SoundState, useSoundStateModel } from "../services/UserMediaService/SoundStateModel";
-import { useUserMediaDeviceStorage } from "../services/UserMediaService/UserMediaDeviceStorage";
-import { getToggleFunc } from "../utils/Utils";
 import { DndVisibleContext } from "./MainLayer";
 
 import "../App.css";
@@ -35,15 +33,7 @@ export const RoomPage: React.FC = () =>
     const roomName = "Тестовая";
 
     const userMediaService = useContext(UserMediaServiceContext);
-    const mediaDevices = useUserMediaDeviceStorage(userMediaService.deviceStorage);
     const soundState = useSoundStateModel(userMediaService.soundStateModel);
-
-    // TODO: состояния открыто меню или закрыто попробовать прокинуть ниже в дочерние компоненты.
-
-    const [camEnabled, setCamEnabled] = useState<boolean>(false);
-    const [camMenuOpen, setCamMenuOpen] = useState<boolean>(false);
-
-    const camList = mediaDevices.filter((dev) => dev.kind === "videoinput");
 
     const [isFileUploading, setIsFileUploading] = useState<boolean>(false);
     const [uploadingFilesQueue, setUploadingFilesQueue] = useState<LoadFileInfo[]>([
@@ -59,19 +49,6 @@ export const RoomPage: React.FC = () =>
         { file: { fileId: "loi785", name: "Т.3. Искусство программирования", size: 8612462 }, progress: 0 },
         { file: { fileId: "nbv890", name: "Т.4. Искусство программирования", size: 99124812 }, progress: 0 }
     ]);
-
-    const roomActionPanelProps: RoomActionPanelProps =
-    {
-        camBtnInfo: {
-            state: camEnabled,
-            setState: setCamEnabled,
-            menuOpen: camMenuOpen,
-            toggleMenu: getToggleFunc(setCamMenuOpen),
-            deviceList: camList
-        },
-
-        transitionDuration: transitionDuration
-    };
 
     const [isUserListHidden, setIsUserListHidden] = useState(true);
     const [isChatHidden, setIsChatHidden] = useState(true);
@@ -119,7 +96,7 @@ export const RoomPage: React.FC = () =>
             {roomAlerts}
             <VideoLayoutContainer />
             <hr id="call-container-divider" />
-            <RoomActionPanel {...roomActionPanelProps} />
+            <RoomActionPanel transitionDuration={transitionDuration} />
         </div>
     );
 

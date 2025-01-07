@@ -1,5 +1,5 @@
 /*
-    SPDX-FileCopyrightText: 2021-2024 Sergey Katunin <sulmpx60@yandex.ru>
+    SPDX-FileCopyrightText: 2021-2025 Sergey Katunin <sulmpx60@yandex.ru>
 
     SPDX-License-Identifier: BSD-2-Clause
 */
@@ -8,6 +8,8 @@
 //import { MicAudioProcessing } from "../../legacy/src/rooms/scripts/MicAudioProcessing";
 //import { UnsupportedError } from "../../legacy/src/rooms/scripts/AppError";
 
+import { NumericConstants } from "../../utils/NumericConstants";
+import { CamState, CamStatesModel } from "./CamStatesModel";
 import { DisplayState, DisplayStateModel } from "./DisplayStateModel";
 import { MicState, MicStateModel } from "./MicStateModel";
 import { SoundStateModel } from "./SoundStateModel";
@@ -42,24 +44,10 @@ export class UserMediaService
     private readonly m_soundStateModel = new SoundStateModel();
     private readonly m_micStateModel = new MicStateModel();
     private readonly m_displayStateModel = new DisplayStateModel();
+    private readonly m_camStatesModel = new CamStatesModel();
 
     /** Объект - комната. */
     //private readonly room: Room;
-
-    /** Список захваченных видеоустройств. */
-    private readonly m_capturedVideoDevices = new Set<string>();
-
-    /** Идентификатор видеоустройства, захваченного в главном медиапотоке (main). */
-    private m_mainStreamVideoDeviceId = "";
-
-    /** Настройки медиапотока при захвате микрофона. */
-    private readonly m_defaultStreamConstraintsMic: MediaStreamConstraints = {
-        audio: {
-            noiseSuppression: true,
-            echoCancellation: true,
-            autoGainControl: true
-        }, video: false
-    };
 
     /** Настройки медиапотока при захвате видеоизображения экрана. */
     private readonly m_defaultStreamConstraintsDisplay: MediaStreamConstraints = {
@@ -69,11 +57,6 @@ export class UserMediaService
             noiseSuppression: false,
             autoGainControl: false
         }
-    };
-
-    /** Настройки медиапотока при захвате изображения веб-камеры. */
-    private readonly m_defaultStreamConstraintsCam: MediaStreamConstraints = {
-        video: {}, audio: false
     };
 
     private readonly m_audioContext?: AudioContext = this.createAudioContext();
@@ -120,6 +103,11 @@ export class UserMediaService
         return this.m_displayStateModel;
     }
 
+    public get camStatesModel(): CamStatesModel
+    {
+        return this.m_camStatesModel;
+    }
+
     /** Захват микрофона. */
     public async getMic(deviceId: string): Promise<boolean>
     {
@@ -132,7 +120,14 @@ export class UserMediaService
 
         this.m_micStateModel.setState(MicState.LOADING);
 
-        const constraints = { ...this.m_defaultStreamConstraintsMic };
+        const constraints = {
+            audio: {
+                noiseSuppression: true,
+                echoCancellation: true,
+                autoGainControl: true
+            }, video: false
+        };
+
         (constraints.audio as MediaTrackConstraints).deviceId = { ideal: deviceId };
 
         // Применяем настройки шумоподавления и эхоподавления.
@@ -140,8 +135,8 @@ export class UserMediaService
         //(constraints.audio as MediaTrackConstraints).echoCancellation = this.ui.checkboxEnableEchoCancellation.checked;
         //(constraints.audio as MediaTrackConstraints).autoGainControl = this.ui.checkboxEnableAutoGainControl.checked;
 
-        // Это происходит на Chrome, при первом заходе на страницу
-        // когда нет прав на получение Id устройства.
+        // Workaround: on Chromium on first page visit
+        // when we don't have permission for devices id.
         if (deviceId === "")
         {
             const devices = await this.m_deviceStorage.enumerateDevices();
@@ -157,7 +152,7 @@ export class UserMediaService
         try
         {
             // Захват микрофона.
-            deviceId = await this.getUserMedia(constraints, deviceId);
+            deviceId = await this.getUserMedia(constraints);
             this.m_micStateModel.enableMic(deviceId);
 
             return true;
@@ -222,8 +217,8 @@ export class UserMediaService
         }
     }
 
-    /** Захватить веб-камеру. */
-    public async getCam(deviceId: string, resolution: ResolutionObject, frameRate: number): Promise<boolean>
+    /** Capture web-camera. */
+    public async getCam(deviceId: string, resolution: string, frameRate: string): Promise<string>
     {
         /*if (!this.room.isAllowedToSpeak)
         {
@@ -232,21 +227,41 @@ export class UserMediaService
 
         console.debug("[UserMedia] > getCam", deviceId);
 
-        if (this.m_capturedVideoDevices.has(deviceId))
+        const constraints = {
+            video: {}, audio: false
+        };
+
+        if (deviceId !== "")
         {
-            //alert("Это видеоустройство уже захвачено.");
-            return false;
+            const currentCamState = this.m_camStatesModel.getStateSnapshot().find(
+                (c) => c.id === deviceId
+            );
+
+            // If already captured.
+            if (currentCamState?.state === CamState.CAPTURED)
+            {
+                return "";
+            }
+
+            this.m_camStatesModel.setCamState({ id: deviceId, state: CamState.LOADING });
+
+            (constraints.video as MediaTrackConstraints).deviceId = { ideal: deviceId };
         }
 
-        // Используем spread оператор для копирования объекта constraints.
-        const constraints = { ...this.m_defaultStreamConstraintsCam };
-        (constraints.video as MediaTrackConstraints).deviceId = { ideal: deviceId };
-        (constraints.video as MediaTrackConstraints).frameRate = frameRate;
-        (constraints.video as MediaTrackConstraints).width = resolution.width;
-        (constraints.video as MediaTrackConstraints).height = resolution.height;
+        if (frameRate !== "default")
+        {
+            (constraints.video as MediaTrackConstraints).frameRate = Number(frameRate);
+        }
 
-        // Это происходит на Chrome, при первом заходе на страницу
-        // когда нет прав на получение Id устройства.
+        if (resolution !== "default")
+        {
+            const [width, height] = resolution.split("x");
+            (constraints.video as MediaTrackConstraints).width = { ideal: Number(width) };
+            (constraints.video as MediaTrackConstraints).height = { ideal: Number(height) };
+        }
+
+        // Workaround: on Chromium on first page visit
+        // when we don't have permission for devices id.
         if (deviceId === "")
         {
             const devices = await this.m_deviceStorage.enumerateDevices();
@@ -261,50 +276,43 @@ export class UserMediaService
 
         try
         {
-            deviceId = await this.getUserMedia(constraints, deviceId);
-            return true;
+            const realDeviceId = await this.getUserMedia(constraints);
+
+            if (realDeviceId !== deviceId)
+            {
+                this.m_camStatesModel.removeCam(deviceId);
+            }
+
+            if (realDeviceId !== "")
+            {
+                this.m_camStatesModel.setCamState({ id: realDeviceId, state: CamState.CAPTURED });
+            }
+
+            return realDeviceId;
         }
         catch (error)
         {
             console.error("[UserMedia] > getUserMedia (cam) error:", error as DOMException);
-            return false;
+            this.m_camStatesModel.removeCam(deviceId);
+
+            return "";
         }
     }
 
     /** Прекратить захват веб-камеры. */
     public stopCam(deviceId: string): void
     {
+        const streamInfo = this.m_streamStorage.getStateSnapshot().find(
+            (s) => s.deviceId === deviceId
+        );
+
+        if (!streamInfo)
+        {
+            return;
+        }
+
         console.debug("[UserMedia] > stopCam", deviceId);
-
-        /*// Если это устройство не числится, как захваченное.
-        if (!this.m_capturedVideoDevices.has(deviceId))
-        {
-            return;
-        }
-
-        let streamId = deviceId;
-        if (streamId === this.m_mainStreamVideoDeviceId)
-        {
-            streamId = "main";
-        }
-
-        const stream = this.m_streams.get(streamId);
-
-        if (!stream)
-        {
-            return;
-        }
-
-        const track = stream.getVideoTracks()[NC.ZERO_IDX];
-
-        // Останавливаем видеодорожку.
-        track.stop();
-
-        // Удаляем дорожку.
-        this.removeEndedTrack(streamId, track);
-
-        // Отметим, что устройство deviceId больше не занято.
-        this.m_capturedVideoDevices.delete(deviceId);*/
+        this.removeEndedStream(streamInfo);
     }
 
     /** Прекратить захват всех веб-камер. */
@@ -326,8 +334,14 @@ export class UserMediaService
 
         this.m_displayStateModel.setState(DisplayState.LOADING);
 
-        // Use spread to copy constraints object.
-        const constraints = { ...this.m_defaultStreamConstraintsDisplay };
+        const constraints = {
+            video: { frameRate: 30 },
+            audio: {
+                echoCancellation: false,
+                noiseSuppression: false,
+                autoGainControl: false
+            }
+        };
 
         if (frameRate !== "default")
         {
@@ -359,33 +373,14 @@ export class UserMediaService
 
             this.m_displayStateModel.setState(DisplayState.CAPTURED);
 
-            //this.ui.addSecondaryVideo("local", "display", this.ui.usernames.get("local")!);
-            /*const video = this.ui.getVideo("local", "display");
+            // // Воспроизведем звук захвата видеодорожки.
+            // this.ui.playSound(UiSound.videoOn);*/
 
-            // Подключаем медиапоток к HTML-видеоэлементу.
-            if (!video.srcObject)
-            {
-                video.srcObject = stream;
-            }
-
-            // Так как добавили новую дорожку, включаем отображение элементов управления.
-            // Но регулятор громкости не показываем.
-            this.ui.showControls(video.plyr, false);
-
-            // Переключаем метку на видео.
-            this.ui.toggleVideoLabels(
-                this.ui.getCenterVideoLabel("local", "display")!,
-                this.ui.getVideoLabel("local", "display")!
-            );
-
-            // Воспроизведем звук захвата видеодорожки.
-            this.ui.playSound(UiSound.videoOn);*/
-
-            /*for (const newTrack of stream.getTracks())
-            {
-                // Отправим всем новую медиадорожку.
-                // await this.room.addMediaStreamTrack("display", newTrack);
-            }*/
+            // for (const newTrack of stream.getTracks())
+            // {
+            //     Отправим всем новую медиадорожку.
+            //     await this.room.addMediaStreamTrack("display", newTrack);
+            // }
 
             return true;
         }
@@ -442,50 +437,40 @@ export class UserMediaService
     }
 
     /**
-     * Получение потока видео (веб-камера) или аудио (микрофон).
-     * @returns deviceId - Id захваченного устройства.
+     * Capture stream from cam or mic.
+     * @returns deviceId - Id of captured device.
     */
     private async getUserMedia(
-        streamConstraints: MediaStreamConstraints,
-        deviceId: string
+        streamConstraints: MediaStreamConstraints
     ): Promise<string>
     {
         console.debug("[UserMedia] > getUserMedia", streamConstraints);
         const mediaStream: MediaStream = await navigator.mediaDevices.getUserMedia(streamConstraints);
 
-        // Обновим список устройств после получения прав
-        // и получим настоящий Id захваченного устройства.
-        deviceId = await this.updateDevicesAfterGettingPermissions(
+        // Update devices list after get permissions 
+        // to get real id of device.
+        const deviceId = await this.updateDevicesAfterGettingPermissions(
             mediaStream,
-            deviceId,
             streamConstraints.audio as boolean ? true : false
         );
 
+        // We already have stream from this device.
+        if (this.m_streamStorage.getStateSnapshot().findIndex(
+            s => s.deviceId === deviceId
+        ) !== NumericConstants.NOT_FOUND_IDX)
+        {
+            return "";
+        }
+
         console.debug("[UserMedia] > getUserMedia success:", deviceId, mediaStream);
 
-        // Если это микрофон.
         if (streamConstraints.audio as boolean)
         {
             //const proccessedStream = (await this.handleMicAudioProcessing(mediaStream)).clone();
-            console.debug("[UserMedia] > Captured mic settings:", mediaStream.getAudioTracks()[0].getSettings());
+            console.debug("[UserMedia] > Captured mic settings:",
+                mediaStream.getAudioTracks()[NumericConstants.ZERO_IDX].getSettings()
+            );
         }
-
-        // Запишем, что устройство deviceId занято, для исключения дубликатов.
-        //this.m_capturedVideoDevices.add(deviceId);
-
-        /*// Определим, нужен ли дополнительный видеоэлемент под вебку.
-        if (this.isNeededSecondaryVideoStream())
-        {
-            //this.ui.addSecondaryVideo("local", deviceId, this.ui.usernames.get("local")!);
-            await this.handleMediaStream(deviceId, mediaStream, deviceId);
-        }
-        else
-        {
-            await this.handleMediaStream("main", mediaStream, deviceId);
-
-            // Запишем идентификатор видеоустройства.
-            this.m_mainStreamVideoDeviceId = deviceId;
-        }*/
 
         const streamInfo: MediaStreamInfo = {
             stream: mediaStream,
@@ -496,90 +481,49 @@ export class UserMediaService
         this.m_streamStorage.addStream(streamInfo);
         this.handleEndedStream(streamInfo);
 
-        /*// Подключаем медиапоток к HTML-видеоэлементу.
-        if (!video.srcObject)
-        {
-            video.srcObject = stream;
-        }
- 
-        // Так как добавили новую дорожку, включаем отображение элементов управления.
-        // Но регулятор громкости не показываем.
-        this.ui.showControls(video.plyr, false);
- 
-        // Отправляем всем новую медиадорожку.
-        await this.room.addMediaStreamTrack(streamId, newTrack);
- 
-        if (newTrack.kind == "video")
-        {
-            // Переключаем метку на видео.
-            this.ui.toggleVideoLabels(
-                this.ui.getCenterVideoLabel("local", streamId)!,
-                this.ui.getVideoLabel("local", streamId)!
-            );
- 
-            // Воспроизведем звук захвата видеодорожки.
-            this.ui.playSound(UiSound.videoOn);
-        }*/
+        // // Отправляем всем новую медиадорожку.
+        // await this.room.addMediaStreamTrack(streamId, newTrack);
+
+        // if (newTrack.kind == "video")
+        // {
+        //     // Воспроизведем звук захвата видеодорожки.
+        //     this.ui.playSound(UiSound.videoOn);
+        // }
 
         return deviceId;
     }
 
     /**
-     * Обновление списка устройств после получения прав в соответствии с браузером (Firefox или Chrome).
-     * @returns deviceId - настоящий Id захваченного устройства.
+     * Update devices list after getting permissions 
+     * with workarounds for Firefox and Chromium.
+     * @returns deviceId - real id of captured device.
      */
     private async updateDevicesAfterGettingPermissions(
         mediaStream: MediaStream,
-        deviceId: string,
         isAudioDevice: boolean
     ): Promise<string>
     {
-        // Обновим списки устройств, после того как мы получили права после запроса getUserMedia.
-        // У Firefox у нас уже были Id устройств, осталось обновить список с полученными названиями устройств обоих видов.
-        if (deviceId !== "")
-        {
-            await this.m_deviceStorage.enumerateDevices();
-        }
-        // Chrome изначально не сообщает количество устройств, а также не сообщает их Id (возвращает пустой Id).
-        // Поэтому если это Chrome, то в эту функцию был передан пустой deviceId.
-        // Поэтому для Chrome вручную обновим списки устройств только определенного типа (video или audio),
-        // поскольку права выдаются только на тот тип, что был захвачен.
-        else if (deviceId === "" && isAudioDevice)
-        {
-            await this.m_deviceStorage.enumerateDevices();
-        }
-        else if (deviceId === "" && !isAudioDevice)
-        {
-            await this.m_deviceStorage.enumerateDevices();
-        }
+        await this.m_deviceStorage.enumerateDevices();
 
-        // Получаем настоящий Id захваченного устройства.
-        deviceId = mediaStream.getTracks()[0].getSettings().deviceId!;
+        // Read id of captured device from stream.
+        let deviceId = mediaStream.getTracks()[NumericConstants.ZERO_IDX].getSettings().deviceId ?? "";
 
-        const isPoorDeviceId = (id: string) =>
+        const isPoorDeviceId = (id: string): boolean =>
         {
             return (id === "" || id === "default" || id === "communications");
         };
 
-        // Если нас не устраивает Id захваченного устройства.
-        // Попробуем выяснить его через groupId.
+        // If we are not satisfied with the Id of the captured device,
+        // let's try to find out through `groupId`.
         if (isPoorDeviceId(deviceId))
         {
-            const groupId = mediaStream.getTracks()[0].getSettings().groupId!;
+            const groupId = mediaStream.getTracks()[NumericConstants.ZERO_IDX].getSettings().groupId ?? "";
             const kind = isAudioDevice ? "audioinput" : "videoinput";
 
             const devices = await this.m_deviceStorage.enumerateDevices();
-            const device = devices.find((val) =>
-            {
-                if (val.kind === kind
-                    && val.groupId === groupId
-                    && !isPoorDeviceId(val.deviceId))
-                {
-                    return val;
-                }
-
-                return undefined;
-            });
+            const device = devices.find((d) =>
+                d.kind === kind && d.groupId === groupId && !isPoorDeviceId(d.deviceId)
+            );
 
             if (device)
             {
@@ -630,6 +574,10 @@ export class UserMediaService
             }
 
             this.ui.removeVideoItem(this.ui.getVideoItem("local", "display")!);*/
+        }
+        else if (streamInfo.type === "cam" && streamInfo.deviceId !== undefined)
+        {
+            this.m_camStatesModel.removeCam(streamInfo.deviceId);
         }
 
         this.m_streamStorage.removeStream(streamInfo.stream.id);
