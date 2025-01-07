@@ -197,9 +197,9 @@ const VideoAsymmetricLayout: FC<VideoAsymmetricLayoutProps> = ({ videoList }) =>
     const getVideoItem = (video: VideoLayoutItemInfo): JSX.Element =>
     {
         return (
-            !video.stream ?
+            !video.streamInfo?.stream ?
                 <span className="v-align-middle">{video.label}</span> :
-                <Video srcObject={video.stream} autoPlay />
+                <Video srcObject={video.streamInfo.stream} autoPlay />
         );
     };
 

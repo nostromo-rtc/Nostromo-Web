@@ -6,8 +6,8 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
-import React, { MouseEventHandler, useContext, useState } from 'react';
 import { Button } from "@mui/material";
+import React, { MouseEventHandler, useContext, useState } from 'react';
 import { LuLayoutGrid } from "react-icons/lu";
 
 import { Tooltip } from '../../Tooltip';
@@ -17,9 +17,12 @@ import { VideoList } from './VideoLayoutItem';
 
 import { GeneralSocketServiceContext, UserMediaServiceContext } from "../../../AppWrapper";
 import { useUserModel } from "../../../services/GeneralSocketService/UserModel";
+import { useUserMediaStreamStorage } from "../../../services/UserMediaService/UserMediaStreamStorage";
+import { NumericConstants } from "../../../utils/NumericConstants";
 
 import "./VideoLayoutContainer.css";
-import { useUserMediaStreamStorage } from "../../../services/UserMediaService/UserMediaStreamStorage";
+
+const CAM_ID_SHORT_LENGTH = 4;
 
 export const VideoLayoutContainer: React.FC = () =>
 {
@@ -31,15 +34,45 @@ export const VideoLayoutContainer: React.FC = () =>
     const userInfo = useUserModel(generalSocketService.userModel);
     const streams = useUserMediaStreamStorage(userMediaService.streamStorage);
 
-    const videoList: VideoList = [{ id: userInfo.id, label: userInfo.name }];
+    const videoList: VideoList = [];
 
+    const camStreams = streams.filter((s) => s.type === "cam");
     const displayStream = streams.find((s) => s.type === "display");
+
+    // If we don't have local streams.
+    if (camStreams.length === NumericConstants.EMPTY_LENGTH
+        && displayStream === undefined)
+    {
+        videoList.push({ id: userInfo.id, label: userInfo.name });
+    }
+
+    for (let i = 0; i < camStreams.length; ++i)
+    {
+        const camStream = camStreams[i];
+
+        if (camStream.deviceId === undefined)
+        {
+            continue;
+        }
+
+        // First cam without id.
+        // Other cams with short id (4 first chars).
+        const camLabel = (i === NumericConstants.ZERO_IDX) ? userInfo.name
+            : `${userInfo.name} [${camStream.deviceId.substring(NumericConstants.ZERO_IDX, CAM_ID_SHORT_LENGTH)}]`;
+
+        videoList.push({
+            id: camStream.deviceId,
+            label: camLabel,
+            streamInfo: camStream
+        });
+    }
+
     if (displayStream)
     {
         videoList.push({
             id: "display",
-            label: `${userInfo.name} [Экран]`,
-            stream: displayStream.stream
+            label: userInfo.name,
+            streamInfo: displayStream
         });
     }
 

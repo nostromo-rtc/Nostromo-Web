@@ -7,12 +7,16 @@
 
 import Button from "@mui/material/Button";
 import { FC, memo, useCallback, useEffect, useState } from "react";
+import { FaDesktop } from "react-icons/fa";
 import { MdNavigateBefore, MdNavigateNext } from "react-icons/md";
 import { useResizeDetector } from "react-resize-detector";
-import { NumericConstants as NC } from "../../../utils/NumericConstants";
-import "./VideoLayout.css";
-import { calculateLastPageIdx, calculateVideoItemSize, ElementSize, VideoLayoutItem, VideoLayoutItemInfo, VideoLayoutMatrixState, VideoList } from "./VideoLayoutItem";
+
 import { Video } from "./Video";
+import { calculateLastPageIdx, calculateVideoItemSize, ElementSize, VideoLayoutItem, VideoLayoutItemInfo, VideoLayoutMatrixState, VideoList } from "./VideoLayoutItem";
+
+import { NumericConstants as NC } from "../../../utils/NumericConstants";
+
+import "./VideoLayout.css";
 
 // Minimal video item width.
 const MIN_ITEM_WIDTH = 320;
@@ -191,11 +195,14 @@ const VideoLayout: FC<VideoLayoutProps> = ({ videoList }) =>
                 }}
             >
                 {
-                    !video.stream ?
+                    !video.streamInfo?.stream ?
                         <span className="v-align-middle">{video.label}</span> :
                         <>
-                            <span className="video-label">{video.label}</span>
-                            <Video srcObject={video.stream} autoPlay />
+                            <span className="video-label">
+                                {video.streamInfo.type === "display" && <FaDesktop />}
+                                {video.label}
+                            </span>
+                            <Video srcObject={video.streamInfo.stream} autoPlay />
                         </>
                 }
             </VideoLayoutItem>
