@@ -5,12 +5,12 @@
 */
 
 //import { UiSound } from "../../legacy/src/rooms/scripts/UI";
-//import { MicAudioProcessing } from "../../legacy/src/rooms/scripts/MicAudioProcessing";
 //import { UnsupportedError } from "../../legacy/src/rooms/scripts/AppError";
 
 import { NumericConstants } from "../../utils/NumericConstants";
 import { CamState, CamStatesModel } from "./CamStatesModel";
 import { DisplayState, DisplayStateModel } from "./DisplayStateModel";
+import { MicAudioProcessing } from "./MicAudioProcessing";
 import { MicState, MicStateModel } from "./MicStateModel";
 import { SoundStateModel } from "./SoundStateModel";
 import { UserMediaDeviceStorage } from "./UserMediaDeviceStorage";
@@ -49,14 +49,11 @@ export class UserMediaService
     private readonly m_micStateModel = new MicStateModel();
     private readonly m_displayStateModel = new DisplayStateModel();
     private readonly m_camStatesModel = new CamStatesModel();
-    private readonly m_audioContext?: AudioContext = this.createAudioContext();
-
-    //private readonly m_micAudioProcessing: MicAudioProcessing;
+    private readonly m_audioContext: AudioContext = this.createAudioContext();
+    private readonly m_micAudioProcessing: MicAudioProcessing = new MicAudioProcessing(this.m_audioContext);
     public constructor()
     {
         console.debug("[UserMedia] > constructor");
-
-        //this.micAudioProcessing = new MicAudioProcessing(this.audioContext, this.ui);
 
         this.handleDevicesList();
     }
@@ -385,24 +382,18 @@ export class UserMediaService
     }
 
     /** Create context for Web Audio API. */
-    private createAudioContext(): AudioContext | undefined
+    private createAudioContext(): AudioContext
     {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, @typescript-eslint/strict-boolean-expressions
         window.AudioContext = window.AudioContext  // Default
             || window.webkitAudioContext;          // Workaround for Safari
 
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, @typescript-eslint/strict-boolean-expressions
-        if (AudioContext)
-        {
-            return new AudioContext();
-        }
-
-        //throw new UnsupportedError("Web Audio API is not supported by this browser.");
+        return new AudioContext();
     }
 
-    /** 
-     * Prepare device list 
-     * and connect `devicechange` event handler. 
+    /**
+     * Prepare device list
+     * and connect `devicechange` event handler.
      */
     private handleDevicesList(): void
     {
@@ -425,7 +416,7 @@ export class UserMediaService
         console.debug("[UserMedia] > getUserMedia", streamConstraints);
         const mediaStream: MediaStream = await navigator.mediaDevices.getUserMedia(streamConstraints);
 
-        // Update devices list after get permissions 
+        // Update devices list after get permissions
         // to get real id of device.
         const deviceId = await this.updateDevicesAfterGettingPermissions(
             mediaStream,
@@ -444,7 +435,9 @@ export class UserMediaService
 
         if (streamConstraints.audio as boolean)
         {
-            //const proccessedStream = (await this.handleMicAudioProcessing(mediaStream)).clone();
+            // TODO: should be enough to just send this processed stream to server, maybe with .clone(), maybe not.
+            const processedStream = (await this.handleMicAudioProcessing(mediaStream));
+
             console.debug("[UserMedia] > Captured mic settings:",
                 mediaStream.getAudioTracks()[NumericConstants.ZERO_IDX].getSettings()
             );
@@ -472,7 +465,7 @@ export class UserMediaService
     }
 
     /**
-     * Update devices list after getting permissions 
+     * Update devices list after getting permissions
      * with workarounds for Firefox and Chromium.
      * @returns deviceId - real id of captured device.
      */
@@ -540,7 +533,7 @@ export class UserMediaService
             this.m_micStateModel.disableMic();
 
             // Удалим ноду с микрофонным потоком.
-            //this.m_micAudioProcessing.destroyMicNode();
+            this.m_micAudioProcessing.destroyMicNode();
         }
         else if (streamInfo.type === "display")
         {
@@ -559,37 +552,48 @@ export class UserMediaService
         this.m_streamStorage.removeStream(streamInfo.stream.id);
     }
 
-    // Если панель скрыта, то отключаем индикатор громкости, иначе подключаем.
-    /*private handleVolumeMeter(): void
+    private handleVolumeMeter(): void
     {
-        const micOptionsHidden = this.ui.micOptions.hidden;
-        micOptionsHidden ? this.m_micAudioProcessing.disconnectVolumeMeter()
-            : this.m_micAudioProcessing.connectVolumeMeter(this.ui.volumeMeterElem);
-    }*/
+        this.m_micAudioProcessing.connectVolumeMeter();
+    }
 
-    /*private handleMicOutput(): void
+    private handleMicOutput(): void
     {
-        const btn_toggleMicOutput = this.ui.buttons.get('toggle-mic-output')!;
-        const isOutputDisabled = (btn_toggleMicOutput.innerText === "Вкл. прослушивание микрофона");
+        // For debug - mic auto listening.
+        this.m_micAudioProcessing.listenOutput();
+    }
 
-        isOutputDisabled ? this.m_micAudioProcessing.stopListenOutput() : this.m_micAudioProcessing.listenOutput();
-    }*/
-
-    /*private handleMicNoiseGate(): void
+    private handleMicNoiseGate(): void
     {
-        this.ui.checkboxEnableNoiseGate.checked ?
-            this.m_micAudioProcessing.connectNoiseGate() :
+        const noiseGate = this.m_settingsService.getSettingsSnapshot().audio.mic.noiseGate;
+
+        if (noiseGate.enableNoiseGate)
+        {
+            this.m_micAudioProcessing.connectNoiseGate();
+            this.m_micAudioProcessing.setNoiseGateParams({
+                attack: noiseGate.noiseGateDelay,
+                release: noiseGate.noiseGateDelay,
+                threshold: noiseGate.noiseGateThreshold
+            });
+        }
+        else
+        {
             this.m_micAudioProcessing.disconnectNoiseGate();
-    }*/
+        }
+    }
 
-    /*private handleMicManualGain(): void
+    private handleMicManualGain(): void
     {
-        this.ui.checkboxEnableManualGainControl.checked ?
-            this.m_micAudioProcessing.connectGain() :
+        const gain = this.m_settingsService.getSettingsSnapshot().audio.mic.gain;
+        if (gain.enableManualGainControl) {
+            this.m_micAudioProcessing.connectGain();
+            this.m_micAudioProcessing.setGainValue(gain.manualGain);
+        } else {
             this.m_micAudioProcessing.disconnectGain();
-    }*/
+        }
+    }
 
-    /*private async handleMicAudioProcessing(micStream: MediaStream): Promise<MediaStream>
+    private async handleMicAudioProcessing(micStream: MediaStream): Promise<MediaStream>
     {
         // Проверяем, готова ли VolumeMeter, и если нет, то инициализируем эту ноду.
         if (!this.m_micAudioProcessing.isVolumeMeterReady)
@@ -612,5 +616,5 @@ export class UserMediaService
         this.handleMicManualGain();
 
         return this.m_micAudioProcessing.getOutputStream();
-    }*/
+    }
 }
