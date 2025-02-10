@@ -25,6 +25,7 @@
                 "socket.io-client": "^4.5.2"
             },
             "devDependencies": {
+                "@types/audioworklet": "^0.0.65",
                 "@types/howler": "^2.2.7",
                 "@types/node": "^16.18.23",
                 "@types/react": "^18.0.34",
@@ -4084,6 +4085,12 @@
             "engines": {
                 "node": ">=10.13.0"
             }
+        },
+        "node_modules/@types/audioworklet": {
+            "version": "0.0.65",
+            "resolved": "https://registry.npmjs.org/@types/audioworklet/-/audioworklet-0.0.65.tgz",
+            "integrity": "sha512-JnPJtR94nLPBBQ2iUuZ3Te6FzeABVXXuATR3zw3Hl/EvSYvU8Ipd2tI8/svvTmZ5sPUEnT/fDUF7f2kSjXWC3w==",
+            "dev": true
         },
         "node_modules/@types/babel__core": {
             "version": "7.1.19",
@@ -21539,6 +21546,12 @@
             "version": "0.2.0",
             "resolved": "https://registry.npmjs.org/@trysound/sax/-/sax-0.2.0.tgz",
             "integrity": "sha512-L7z9BgrNEcYyUYtF+HaEfiS5ebkh9jXqbszz7pC0hRBPaatV0XjSD3+eHrpqFemQfgwiFF0QPIarnIihIDn7OA==",
+            "dev": true
+        },
+        "@types/audioworklet": {
+            "version": "0.0.65",
+            "resolved": "https://registry.npmjs.org/@types/audioworklet/-/audioworklet-0.0.65.tgz",
+            "integrity": "sha512-JnPJtR94nLPBBQ2iUuZ3Te6FzeABVXXuATR3zw3Hl/EvSYvU8Ipd2tI8/svvTmZ5sPUEnT/fDUF7f2kSjXWC3w==",
             "dev": true
         },
         "@types/babel__core": {

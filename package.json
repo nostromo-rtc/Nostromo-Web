@@ -26,6 +26,7 @@
         "socket.io-client": "^4.5.2"
     },
     "devDependencies": {
+        "@types/audioworklet": "^0.0.65",
         "@types/howler": "^2.2.7",
         "@types/node": "^16.18.23",
         "@types/react": "^18.0.34",
