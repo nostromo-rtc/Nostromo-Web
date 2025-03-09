@@ -4,7 +4,7 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
-//import { WorkerUrl } from "worker-url";
+import { WorkerUrl } from "worker-url";
 import { DoublyLinkedList } from "../../utils/DoublyLinkedList";
 import { NumericConstants } from "../../utils/NumericConstants";
 //import { NoiseGateOptions, NoiseGateParams } from "../AudioWorklets/NoiseGate";
@@ -19,7 +19,7 @@ export class MicAudioProcessing
     private m_micNode?: MediaStreamAudioSourceNode;
 
     /** Индикатор громкости, не является эффектом. */
-    //private m_volumeMeterNode?: AudioWorkletNode;
+    private m_volumeMeterNode?: AudioWorkletNode;
 
     /** Нода для вывода звука в outputNode. */
     private readonly m_outputNodeDestination: MediaStreamAudioDestinationNode;
@@ -40,11 +40,11 @@ export class MicAudioProcessing
     // TODO: states in enum (not ready, ready, connected, etc)
 
     private m_isOutputListening = false;
-    //private m_isVolumeMeterConnected = false;
+    private m_isVolumeMeterConnected = false;
     //private m_isNoiseGateConnected = false;
     private m_isGainNodeConnected = false;
 
-    //private m_isVolumeMeterReady = false;
+    private m_isVolumeMeterReady = false;
     //private m_isNoiseGateReady = false;
 
     public constructor(ctx: AudioContext)
@@ -56,19 +56,21 @@ export class MicAudioProcessing
         this.m_gainNode = this.m_ctx.createGain();
     }
 
-    /*public async initVolumeMeter(): Promise<void>
+    public get isVolumeMeterReady(): boolean
     {
-        const workletUrl = new WorkerUrl(new URL("./AudioWorklets/VolumeMeter.ts", import.meta.url), {
-            name: "public/VolumeMeterWorklet", customPath: () =>
-            {
-                return new URL("VolumeMeterWorklet.js", window.location.origin);
-            }
+        return this.m_isVolumeMeterReady;
+    }
+
+    public async initVolumeMeter(): Promise<void>
+    {
+        const workletUrl = new WorkerUrl(new URL("../AudioWorklets/VolumeMeter.ts", import.meta.url), {
+            name: "VolumeMeterWorklet"
         });
 
         await this.m_ctx.audioWorklet.addModule(workletUrl);
 
         this.m_isVolumeMeterReady = true;
-    }*/
+    }
 
     /*public async initNoiseGate(): Promise<void>
     {
@@ -115,7 +117,7 @@ export class MicAudioProcessing
         }
     }
 
-    /*public connectVolumeMeter(): void
+    public connectVolumeMeter(): void
     {
         const scaleFactor = 500;
 
@@ -138,7 +140,7 @@ export class MicAudioProcessing
         }
     }
 
-    public disconnectVolumeMeter(): void
+    /*public disconnectVolumeMeter(): void
     {
         if (this.m_micNode && this.m_volumeMeterNode && this.m_isVolumeMeterConnected)
         {

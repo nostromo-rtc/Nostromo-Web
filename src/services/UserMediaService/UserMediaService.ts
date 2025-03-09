@@ -436,11 +436,7 @@ export class UserMediaService
 
         if (streamConstraints.audio as boolean)
         {
-            //const proccessedStream = (await this.handleMicAudioProcessing(mediaStream)).clone();
-
-            // For debug - mic auto listening.
-            await this.m_micAudioProcessing.initMicNode(mediaStream);
-            this.m_micAudioProcessing.listenOutput();
+            const proccessedStream = (await this.handleMicAudioProcessing(mediaStream)).clone();
 
             console.debug("[UserMedia] > Captured mic settings:",
                 mediaStream.getAudioTracks()[NumericConstants.ZERO_IDX].getSettings()
@@ -556,21 +552,16 @@ export class UserMediaService
         this.m_streamStorage.removeStream(streamInfo.stream.id);
     }
 
-    // Если панель скрыта, то отключаем индикатор громкости, иначе подключаем.
-    /*private handleVolumeMeter(): void
+    private handleVolumeMeter(): void
     {
-        const micOptionsHidden = this.ui.micOptions.hidden;
-        micOptionsHidden ? this.m_micAudioProcessing.disconnectVolumeMeter()
-            : this.m_micAudioProcessing.connectVolumeMeter(this.ui.volumeMeterElem);
-    }*/
+        this.m_micAudioProcessing.connectVolumeMeter();
+    }
 
-    /*private handleMicOutput(): void
+    private handleMicOutput(): void
     {
-        const btn_toggleMicOutput = this.ui.buttons.get('toggle-mic-output')!;
-        const isOutputDisabled = (btn_toggleMicOutput.innerText === "Вкл. прослушивание микрофона");
-
-        isOutputDisabled ? this.m_micAudioProcessing.stopListenOutput() : this.m_micAudioProcessing.listenOutput();
-    }*/
+        // For debug - mic auto listening.
+        this.m_micAudioProcessing.listenOutput();
+    }
 
     /*private handleMicNoiseGate(): void
     {
@@ -586,7 +577,7 @@ export class UserMediaService
             this.m_micAudioProcessing.disconnectGain();
     }*/
 
-    /*private async handleMicAudioProcessing(micStream: MediaStream): Promise<MediaStream>
+    private async handleMicAudioProcessing(micStream: MediaStream): Promise<MediaStream>
     {
         // Проверяем, готова ли VolumeMeter, и если нет, то инициализируем эту ноду.
         if (!this.m_micAudioProcessing.isVolumeMeterReady)
@@ -595,19 +586,19 @@ export class UserMediaService
         }
 
         // Проверяем, готов ли NoiseGate, и если нет, то инициализируем эту ноду.
-        if (!this.m_micAudioProcessing.isNoiseGateReady)
+        /*if (!this.m_micAudioProcessing.isNoiseGateReady)
         {
             await this.m_micAudioProcessing.initNoiseGate();
-        }
+        }*/
 
         // Инициализируем ноду с микрофонным потоком для последующей обработки.
         await this.m_micAudioProcessing.initMicNode(micStream);
 
         this.handleVolumeMeter();
         this.handleMicOutput();
-        this.handleMicNoiseGate();
-        this.handleMicManualGain();
+        //this.handleMicNoiseGate();
+        //this.handleMicManualGain();
 
         return this.m_micAudioProcessing.getOutputStream();
-    }*/
+    }
 }

@@ -4,9 +4,8 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
-import { NumericConstants as NC } from "../../utils/NumericConstants";
-
 const ZERO_VOLUME = 0;
+const ZERO_IDX = 0;
 const FRAME_INTERVAL = 0.02; // 50 fps
 const SMOOTHING_FACTOR = 0.8;
 
@@ -31,7 +30,7 @@ export class VolumeMeter extends AudioWorkletProcessor
         parameters: Record<string, Float32Array>
     ): boolean
     {
-        const inputChannelData = inputs[NC.ZERO_IDX][NC.ZERO_IDX];
+        const inputChannelData = inputs[ZERO_IDX][ZERO_IDX];
 
         if (currentTime - this.m_lastUpdate > FRAME_INTERVAL)
         {
