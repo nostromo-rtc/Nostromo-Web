@@ -16,6 +16,7 @@ const WorkboxWebpackPlugin = require('workbox-webpack-plugin');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 const getCSSModuleLocalIdent = require('react-dev-utils/getCSSModuleLocalIdent');
 const ESLintPlugin = require('eslint-webpack-plugin');
+const WorkerUrlPlugin = require("worker-url/plugin");
 const paths = require('./paths');
 const modules = require('./modules');
 const getClientEnvironment = require('./env');
@@ -615,7 +616,8 @@ module.exports = function (webpackEnv) {
       isEnvDevelopment &&
         shouldUseReactRefresh &&
         new ReactRefreshWebpackPlugin({
-          overlay: false
+          overlay: false,
+          exclude: [/src\/services\/AudioWorklets/i, /node_modules/i],
         }),
       // Watcher doesn't work well if you mistype casing in a path so we use
       // a plugin that prints an error when you attempt to do this.
@@ -722,6 +724,7 @@ module.exports = function (webpackEnv) {
             infrastructure: 'silent',
           },
         }),
+      new WorkerUrlPlugin(),
       !disableESLintPlugin &&
         new ESLintPlugin({
           // Plugin options
