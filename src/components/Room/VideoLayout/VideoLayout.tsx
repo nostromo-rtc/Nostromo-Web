@@ -6,15 +6,17 @@
 */
 
 import Button from "@mui/material/Button";
-import { FC, memo, useCallback, useEffect, useState } from "react";
+import { FC, memo, useCallback, useContext, useEffect, useState } from "react";
 import { FaDesktop } from "react-icons/fa";
 import { MdNavigateBefore, MdNavigateNext } from "react-icons/md";
 import { useResizeDetector } from "react-resize-detector";
 
+import { UserMediaServiceContext } from "../../../AppWrapper";
+import { useAudioVolumeStorage } from "../../../services/UserMediaService/AudioVolumeStorage";
+import { useUserMediaStreamStorage } from "../../../services/UserMediaService/UserMediaStreamStorage";
+import { NumericConstants as NC } from "../../../utils/NumericConstants";
 import { Video } from "./Video";
 import { calculateLastPageIdx, calculateVideoItemSize, ElementSize, VideoLayoutItem, VideoLayoutItemInfo, VideoLayoutMatrixState, VideoList } from "./VideoLayoutItem";
-
-import { NumericConstants as NC } from "../../../utils/NumericConstants";
 
 import "./VideoLayout.css";
 
@@ -89,6 +91,14 @@ function calculateVideoItemSizeForPage(layoutWidth: number, layoutHeight: number
 
 const VideoLayout: FC<VideoLayoutProps> = ({ videoList }) =>
 {
+    const userMediaService = useContext(UserMediaServiceContext);
+
+    const streams = useUserMediaStreamStorage(userMediaService.streamStorage);
+    const audioVolumeStorage = useAudioVolumeStorage(userMediaService.audioVolumeStorage);
+
+    const micStream = streams.find((s) => s.type === "mic");
+    const micVolume = audioVolumeStorage.find((i) => i.streamId === micStream?.stream.id);
+
     const [matrixState, setMatrixState] = useState<VideoLayoutMatrixState>({
         itemCount: MIN_ITEM_COUNT,
         videoItemSize: { width: MIN_ITEM_WIDTH, height: MIN_ITEM_HEIGHT },
@@ -194,6 +204,7 @@ const VideoLayout: FC<VideoLayoutProps> = ({ videoList }) =>
                     height: matrixState.videoItemSize.height
                 }}
             >
+                <div className="audio-volume-border" style={{ opacity: micVolume?.volume }}></div>
                 {
                     !video.streamInfo?.stream ?
                         <span className="v-align-middle">{video.label}</span> :

@@ -6,7 +6,8 @@
 
 const ZERO_VOLUME = 0;
 const ZERO_IDX = 0;
-const FRAME_INTERVAL = 0.02; // 50 fps
+const MIN_VALUE = 0.001;
+const FRAME_INTERVAL = 0.1; // 10 fps
 const SMOOTHING_FACTOR = 0.8;
 
 /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioWorkletGlobalScope/currentTime) */
@@ -55,6 +56,11 @@ export class VolumeMeter extends AudioWorkletProcessor
             const RMS = Math.sqrt(sum / data.length);
 
             this.m_volume = Math.max(RMS, this.m_volume * SMOOTHING_FACTOR);
+
+            if (this.m_volume < MIN_VALUE)
+            {
+                this.m_volume = 0;
+            }
         }
     }
 }
