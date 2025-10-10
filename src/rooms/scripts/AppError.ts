@@ -1,7 +1,8 @@
 // браузер не поддерживается
-import { UnsupportedError } from "mediasoup-client/lib/errors";
-
-export { UnsupportedError };
+export declare class UnsupportedError extends Error
+{
+    constructor(message: string);
+}
 
 // ICE состояние транспортного канала стало failed
 export class TransportFailedError extends Error
