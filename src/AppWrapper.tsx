@@ -16,7 +16,7 @@ import { CamStatesNotificationsService } from "./services/Notifications/CamState
 import { DisplayStateNotificationsService } from "./services/Notifications/DisplayStateNotificationsService";
 import { MicStateNotificationsService } from "./services/Notifications/MicStateNotificationsService";
 import { NotificationsService } from "./services/NotificationsService";
-import { SettingService } from "./services/SettingsService";
+import { SettingService } from "./services/Settings/SettingsService";
 import { UserMediaService } from "./services/UserMediaService/UserMediaService";
 
 const settingService = new SettingService();
