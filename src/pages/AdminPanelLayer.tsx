@@ -9,31 +9,26 @@ import { useContext, useState } from "react";
 
 import { SetShowAdminPanelContext } from "../App";
 import { AdminPanelActionArea } from "../components/AdminPanel/AdminPanelActionArea";
-import { AdminPanelCategoryList } from "../components/AdminPanel/AdminPanelCategoryList";
 import { FocusTrap } from "../components/Base/FocusTrap";
+import { ListEntry, SidebarList } from "../components/Base/SidebarList";
 import { SidebarView, SidebarViewMainArea } from "../components/Base/SidebarView";
+
 import { NumericConstants as NC } from "../utils/NumericConstants";
 
 import "./AdminPanelLayer.css";
 
-export interface AdminPanelCategory
-{
-    id: string;
-    name: string;
-    innerScroll?: boolean;
-}
-
 export interface IAdminPanelCategories
 {
-    [key: string]: AdminPanelCategory;
-    manageRooms: AdminPanelCategory;
-    createRoom: AdminPanelCategory;
-    blockByIp: AdminPanelCategory;
+    [key: string]: ListEntry;
+    manageRooms: ListEntry;
+    createRoom: ListEntry;
+    blockByIp: ListEntry;
 }
 
 export const AdminPanelLayer: React.FC = () =>
 {
-    /// Список категорий админской панели.
+    const setShowAdminPanel = useContext(SetShowAdminPanelContext);
+
     const categories: IAdminPanelCategories = {
         manageRooms: {
             id: "manage-rooms",
@@ -43,8 +38,6 @@ export const AdminPanelLayer: React.FC = () =>
         createRoom: { id: "create-room", name: "Создание комнаты" },
         blockByIp: { id: "block-by-ip", name: "Блокировка по IP" }
     } as const;
-
-    const setShowAdminPanel = useContext(SetShowAdminPanelContext);
 
     const [selectedCategoryId, setSelectedCategoryId] = useState<string>(categories.manageRooms.id);
 
@@ -67,10 +60,11 @@ export const AdminPanelLayer: React.FC = () =>
     };
 
     const categoryList = (
-        <AdminPanelCategoryList
-            selectedCategoryId={selectedCategoryId}
-            setSelectedCategoryId={setSelectedCategoryId}
-            categories={categories}
+        <SidebarList
+            label="Панель администратора"
+            selectedEntryId={selectedCategoryId}
+            onSelectEntry={setSelectedCategoryId}
+            entries={categories}
         />
     );
 

@@ -1,22 +1,30 @@
 /*
-    SPDX-FileCopyrightText: 2023 Sergey Katunin <sulmpx60@yandex.ru>
+    SPDX-FileCopyrightText: 2023-2025 Sergey Katunin <sulmpx60@yandex.ru>
     SPDX-FileCopyrightText: 2023 Vladislav Tarakanov <vladislav.tarakanov@bk.ru>
 
     SPDX-License-Identifier: BSD-2-Clause
 */
 
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
-import "../App.css";
-import "./SettingsLayer.css";
-import { FocusTrap } from "../components/Base/FocusTrap";
-import { parametersInfoMap, useSettings } from "../services/SettingsService";
-import { SettingsCategoryList } from "../components/Settings/SettingsCategoryList";
-import { SettingsParametersList } from "../components/Settings/SettingsParametersList";
-import { SidebarView, SidebarViewMainArea } from "../components/Base/SidebarView";
-import { SettingsContext } from "../AppWrapper";
-import { NumericConstants as NC } from "../utils/NumericConstants";
 import { SetShowSettingsContext } from "../App";
+import { FocusTrap } from "../components/Base/FocusTrap";
+import { ListEntry, SidebarList } from "../components/Base/SidebarList";
+import { SidebarView, SidebarViewMainArea } from "../components/Base/SidebarView";
+import { SettingsParametersList } from "../components/Settings/SettingsParametersList";
+
+import { NumericConstants as NC } from "../utils/NumericConstants";
+
+import "./SettingsLayer.css";
+
+export interface ISettingsCategories
+{
+    [key: string]: ListEntry;
+    general: ListEntry;
+    audio: ListEntry;
+    video: ListEntry;
+    display: ListEntry;
+}
 
 // TODO: настроить FocusTrap так, чтобы избежать создания лишних элементов-границ для навигации,
 // например можно стартовой границей сделать элемент со списком категорий (sidebar),
@@ -25,15 +33,14 @@ export const SettingsLayer: React.FC = () =>
 {
     const setShowSettings = useContext(SetShowSettingsContext);
 
-    const layerRef = useRef<HTMLDivElement>(null);
+    const categories: ISettingsCategories = {
+        general: { id: "general", name: "Общие" },
+        audio: { id: "audio", name: "Звук и микрофон" },
+        video: { id: "video", name: "Видео" },
+        display: { id: "display", name: "Внешний вид" },
+    } as const;
 
-    const settingsService = useContext(SettingsContext);
-    const settings = useSettings(settingsService);
-    const categories = Object.keys(settings);
-
-    const [selectedCategory, setSelectedCategory] = useState<string>(
-        categories.length ? categories[NC.ZERO_IDX] : ""
-    );
+    const [selectedCategoryId, setSelectedCategoryId] = useState<string>(categories.general.id);
 
     useEffect(() =>
     {
@@ -47,27 +54,6 @@ export const SettingsLayer: React.FC = () =>
 
     }, []);
 
-    useEffect(() =>
-    {
-        layerRef.current?.focus();
-    }, [layerRef]);
-
-    const categoryList = (
-        <SettingsCategoryList
-            setSelectedCategory={setSelectedCategory}
-            selectedCategory={selectedCategory}
-        />
-    );
-
-    const parameterList = (
-        <SidebarViewMainArea>
-            <SettingsParametersList
-                selectedCategory={selectedCategory}
-                parametersInfoMap={parametersInfoMap}
-            />
-        </SidebarViewMainArea>
-    );
-
     const handleCloseSettings = (): void =>
     {
         if (setShowSettings !== null)
@@ -76,11 +62,28 @@ export const SettingsLayer: React.FC = () =>
         }
     };
 
+    const categoryList = (
+        <SidebarList
+            label="Настройки"
+            selectedEntryId={selectedCategoryId}
+            onSelectEntry={setSelectedCategoryId}
+            entries={categories}
+        />
+    );
+
+    const parameterList = (
+        <SidebarViewMainArea>
+            <SettingsParametersList
+                selectedCategoryId={selectedCategoryId}
+                categories={categories}
+            />
+        </SidebarViewMainArea>
+    );
+
     return (
         <div id="layer-settings"
             className="layer"
-            tabIndex={-1}
-            ref={layerRef}
+            tabIndex={NC.NEGATIVE_TAB_IDX}
         >
             <FocusTrap>
                 <SidebarView
