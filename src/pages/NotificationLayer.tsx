@@ -7,10 +7,13 @@
 
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { VscError, VscInfo, VscWarning } from "react-icons/vsc";
-import { NotificationsContext } from "../AppWrapper";
+
+import { NotificationsContext, SettingsContext } from "../AppWrapper";
 import { ModalNotification } from "../components/Base/Notification/ModalNotification";
 import { PopupNotification } from "../components/Base/Notification/PopupNotification";
 import { Notification, NotificationSeverity, NotificationType, useNotifications } from "../services/NotificationsService";
+import { useSettings } from "../services/Settings/SettingsService";
+
 import "./NotificationLayer.css";
 
 const PANEL_HEIGHT_COEFFICIENT = 0.8;
@@ -73,8 +76,10 @@ function useStopAutocloseTimerSemaphore(): StopAutocloseTimerSemaphore
 export const NotificationLayer: React.FC = () =>
 {
     const notificationService = useContext(NotificationsContext);
-
     const notificationList = useNotifications(notificationService);
+
+    const settingsService = useContext(SettingsContext);
+    const settings = useSettings(settingsService);
 
     const stopAutocloseTimerSemaphore = useStopAutocloseTimerSemaphore();
 
@@ -189,7 +194,7 @@ export const NotificationLayer: React.FC = () =>
         <div id="notification-layer">
             {criticalNotificationElement}
             <div className="popup-notification-container">
-                {popupNotifications}
+                {settings.general.main.enableNotifications ? popupNotifications : <></>}
             </div>
         </div>
     );
