@@ -5,6 +5,8 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
+import "./VideoLayout.css";
+
 import Button from "@mui/material/Button";
 import { FC, memo, useCallback, useContext, useEffect, useState } from "react";
 import { FaDesktop } from "react-icons/fa";
@@ -13,12 +15,12 @@ import { useResizeDetector } from "react-resize-detector";
 
 import { UserMediaServiceContext } from "../../../AppWrapper";
 import { useAudioVolumeStorage } from "../../../services/UserMediaService/AudioVolumeStorage";
+import { MicState, useMicStateModel } from "../../../services/UserMediaService/MicStateModel";
 import { useUserMediaStreamStorage } from "../../../services/UserMediaService/UserMediaStreamStorage";
 import { NumericConstants as NC } from "../../../utils/NumericConstants";
 import { Video } from "./Video";
 import { calculateLastPageIdx, calculateVideoItemSize, ElementSize, VideoLayoutItem, VideoLayoutItemInfo, VideoLayoutMatrixState, VideoList } from "./VideoLayoutItem";
 
-import "./VideoLayout.css";
 
 // Minimal video item width.
 const MIN_ITEM_WIDTH = 320;
@@ -34,6 +36,8 @@ const START_PAGE_IDX = 0;
 const NEXT_PAGE_NUMBER_OFFSET = 2;
 // Minimum number of lines with items.
 const MIN_NUM_OF_LINE_WITH_ITEMS = 1;
+
+const ZERO_VOLUME = 0;
 
 interface VideoLayoutProps
 {
@@ -92,9 +96,9 @@ function calculateVideoItemSizeForPage(layoutWidth: number, layoutHeight: number
 const VideoLayout: FC<VideoLayoutProps> = ({ videoList }) =>
 {
     const userMediaService = useContext(UserMediaServiceContext);
-
     const streams = useUserMediaStreamStorage(userMediaService.streamStorage);
     const audioVolumeStorage = useAudioVolumeStorage(userMediaService.audioVolumeStorage);
+    const micStateInfo = useMicStateModel(userMediaService.micStateModel);
 
     const micStream = streams.find((s) => s.type === "mic");
     const micVolume = audioVolumeStorage.find((i) => i.streamId === micStream?.stream.id);
@@ -204,7 +208,9 @@ const VideoLayout: FC<VideoLayoutProps> = ({ videoList }) =>
                     height: matrixState.videoItemSize.height
                 }}
             >
-                <div className="audio-volume-border" style={{ opacity: micVolume?.volume }}></div>
+                {micStateInfo.state === MicState.WORKING
+                    ? <div className="audio-volume-border" style={{ opacity: `${micVolume?.volume ?? ZERO_VOLUME}%` }}></div>
+                    : <></>}
                 {
                     !video.streamInfo?.stream ?
                         <span className="v-align-middle">{video.label}</span> :
