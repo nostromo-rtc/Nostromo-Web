@@ -6,22 +6,51 @@
 
 import React, { useContext } from "react";
 
-import { SettingsContext } from "../../../AppWrapper";
+import { SettingsContext, UserMediaServiceContext } from "../../../AppWrapper";
 import { ISettings } from "../../../services/Settings/Settings";
 import { useSettings } from "../../../services/Settings/SettingsService";
+import { useAudioVolumeStorage } from "../../../services/UserMediaService/AudioVolumeStorage";
+import { useUserMediaStreamStorage } from "../../../services/UserMediaService/UserMediaStreamStorage";
 import { List } from "../../Base/List/List";
 import { ListItemSlider, ListItemSwitch } from "../../Base/List/ListItems";
 import { SettingsCategoryProps } from "../SettingsParametersList";
+
+const ZERO_VOLUME = 0;
 
 export const AudioSettings: React.FC<SettingsCategoryProps> = ({ categoryName }) =>
 {
     const settingsService = useContext(SettingsContext);
     const settings = useSettings(settingsService);
 
+    const userMediaService = useContext(UserMediaServiceContext);
+    const streams = useUserMediaStreamStorage(userMediaService.streamStorage);
+    const audioVolumeStorage = useAudioVolumeStorage(userMediaService.audioVolumeStorage);
+
+    const micStream = streams.find((s) => s.type === "mic");
+    const micVolume = audioVolumeStorage.find((i) => i.streamId === micStream?.stream.id);
+
     return (
         <List className="flex-auto">
             <p className="settings-category-label">{categoryName}</p>
             <p className="settings-section-label">Микрофон</p>
+            <p className="settings-group-label">Проверка звука</p>
+            <div id="volume-meter-container">
+                <div id="volume-meter">
+                    <div id="volume-meter-level" style={{ width: `${micVolume?.volume ?? ZERO_VOLUME}%` }}></div>
+                </div>
+            </div>
+            <ListItemSwitch
+                label={"Включить прослушивание микрофона"}
+                description={"Позволяет проверить звук микрофона."}
+                value={settings.audio.mic.enableMicListening}
+                onValueChange={(val) =>
+                {
+                    settingsService.setSettings((prev: ISettings) =>
+                    {
+                        prev.audio.mic.enableMicListening = val;
+                    });
+                }}
+            />
             <p className="settings-group-label">Обработка звука</p>
             <ListItemSwitch
                 label={"Включить шумоподавление"}

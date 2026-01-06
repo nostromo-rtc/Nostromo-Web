@@ -18,6 +18,7 @@ export interface ISettings
     {
         mic:
         {
+            enableMicListening: boolean;
             processing:
             {
                 enableNoiseSuppression: boolean;
@@ -68,6 +69,7 @@ export const DefaultSettings: ISettings =
     {
         mic:
         {
+            enableMicListening: false,
             processing:
             {
                 enableNoiseSuppression: true,
