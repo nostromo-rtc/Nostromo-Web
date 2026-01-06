@@ -9,6 +9,7 @@
 //import { UnsupportedError } from "../../legacy/src/rooms/scripts/AppError";
 
 import { NumericConstants } from "../../utils/NumericConstants";
+import { SettingService } from "../Settings/SettingsService";
 import { AudioVolumeStorage } from "./AudioVolumeStorage";
 import { CamState, CamStatesModel } from "./CamStatesModel";
 import { DisplayState, DisplayStateModel } from "./DisplayStateModel";
@@ -38,9 +39,9 @@ declare global
     }
 }
 
-/** 
+/**
  * Service for Media Capture and Streams API.
- * 
+ *
  * Microphone, web-cameras and display capturing.
  */
 export class UserMediaService
@@ -56,12 +57,15 @@ export class UserMediaService
     private readonly m_micAudioProcessing: MicAudioProcessing = new MicAudioProcessing(
         this.m_audioContext, this.m_audioVolumeStorage
     );
+    private readonly m_settingsService;
 
-    public constructor()
+    public constructor(_settings: SettingService)
     {
         console.debug("[UserMedia] > constructor");
 
         this.handleDevicesList();
+
+        this.m_settingsService = _settings;
     }
 
     public get deviceStorage(): UserMediaDeviceStorage
@@ -107,11 +111,13 @@ export class UserMediaService
 
         this.m_micStateModel.setState(MicState.LOADING);
 
+        const micSettings = this.m_settingsService.getSettingsSnapshot().audio.mic;
+
         const constraints = {
             audio: {
-                noiseSuppression: true,
-                echoCancellation: true,
-                autoGainControl: true
+                noiseSuppression: micSettings.processing.enableNoiseSuppression,
+                echoCancellation: micSettings.processing.enableEchoCancellation,
+                autoGainControl: micSettings.gain.enableAutoGainControl
             }, video: false
         };
 
@@ -569,8 +575,12 @@ export class UserMediaService
 
     private handleMicOutput(): void
     {
-        // For debug - mic auto listening.
-        this.m_micAudioProcessing.listenOutput();
+        const micListening = this.m_settingsService.getSettingsSnapshot().audio.mic.enableMicListening;
+        if (micListening) {
+            this.m_micAudioProcessing.listenOutput();
+        } else {
+            this.m_micAudioProcessing.stopListenOutput();
+        }
     }
 
     /*private handleMicNoiseGate(): void
