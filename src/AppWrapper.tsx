@@ -46,7 +46,7 @@ const displayStateNotificationsService = new DisplayStateNotificationsService(
 
 export const AppWrapper: React.FC = () =>
 {
-    useHotkey(" ",
+    useHotkey("KeyM",
         () => { userMediaService.toggleMic(); },
         () => { userMediaService.toggleMic(); }
     );
