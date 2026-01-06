@@ -20,7 +20,7 @@ import { SettingService } from "./services/Settings/SettingsService";
 import { UserMediaService } from "./services/UserMediaService/UserMediaService";
 
 const settingService = new SettingService();
-const userMediaService = new UserMediaService();
+const userMediaService = new UserMediaService(settingService);
 const notificationService = new NotificationsService();
 const generalSocketService = new GeneralSocketService();
 

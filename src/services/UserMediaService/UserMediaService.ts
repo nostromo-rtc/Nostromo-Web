@@ -8,6 +8,7 @@
 //import { UnsupportedError } from "../../legacy/src/rooms/scripts/AppError";
 
 import { NumericConstants } from "../../utils/NumericConstants";
+import { SettingService } from "../Settings/SettingsService";
 import { AudioVolumeStorage } from "./AudioVolumeStorage";
 import { CamState, CamStatesModel } from "./CamStatesModel";
 import { DisplayState, DisplayStateModel } from "./DisplayStateModel";
@@ -37,9 +38,9 @@ declare global
     }
 }
 
-/** 
+/**
  * Service for Media Capture and Streams API.
- * 
+ *
  * Microphone, web-cameras and display capturing.
  */
 export class UserMediaService
@@ -55,12 +56,15 @@ export class UserMediaService
     private readonly m_micAudioProcessing: MicAudioProcessing = new MicAudioProcessing(
         this.m_audioContext, this.m_audioVolumeStorage
     );
+    private readonly m_settingsService;
 
-    public constructor()
+    public constructor(_settings: SettingService)
     {
         console.debug("[UserMedia] > constructor");
 
         this.handleDevicesList();
+
+        this.m_settingsService = _settings;
     }
 
     public get deviceStorage(): UserMediaDeviceStorage
@@ -106,20 +110,17 @@ export class UserMediaService
 
         this.m_micStateModel.setState(MicState.LOADING);
 
+        const micSettings = this.m_settingsService.getSettingsSnapshot().audio.mic;
+
         const constraints = {
             audio: {
-                noiseSuppression: true,
-                echoCancellation: true,
-                autoGainControl: true
+                noiseSuppression: micSettings.processing.enableNoiseSuppression,
+                echoCancellation: micSettings.processing.enableEchoCancellation,
+                autoGainControl: micSettings.gain.enableAutoGainControl
             }, video: false
         };
 
         (constraints.audio as MediaTrackConstraints).deviceId = { ideal: deviceId };
-
-        // Применяем настройки шумоподавления и эхоподавления.
-        //(constraints.audio as MediaTrackConstraints).noiseSuppression = this.ui.checkboxEnableNoiseSuppression.checked;
-        //(constraints.audio as MediaTrackConstraints).echoCancellation = this.ui.checkboxEnableEchoCancellation.checked;
-        //(constraints.audio as MediaTrackConstraints).autoGainControl = this.ui.checkboxEnableAutoGainControl.checked;
 
         // Workaround: on Chromium on first page visit
         // when we don't have permission for devices id.
@@ -569,8 +570,14 @@ export class UserMediaService
 
     private handleMicOutput(): void
     {
-        // For debug - mic auto listening.
-        this.m_micAudioProcessing.listenOutput();
+        const micListening = this.m_settingsService.getSettingsSnapshot().audio.mic.enableMicListening;
+        if (micListening)
+        {
+            this.m_micAudioProcessing.listenOutput();
+        } else
+        {
+            this.m_micAudioProcessing.stopListenOutput();
+        }
     }
 
     private handleMicNoiseGate(): void
@@ -595,10 +602,12 @@ export class UserMediaService
     private handleMicManualGain(): void
     {
         const gain = this.m_settingsService.getSettingsSnapshot().audio.mic.gain;
-        if (gain.enableManualGainControl) {
+        if (gain.enableManualGainControl)
+        {
             this.m_micAudioProcessing.connectGain();
             this.m_micAudioProcessing.setGainValue(gain.manualGain);
-        } else {
+        } else
+        {
             this.m_micAudioProcessing.disconnectGain();
         }
     }
