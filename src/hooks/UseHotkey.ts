@@ -1,4 +1,10 @@
-import { useState, useEffect, useCallback, Key } from 'react';
+/*
+    SPDX-FileCopyrightText: 2025-2026 Sergey Katunin <sulmpx60@yandex.ru>
+
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
+import { useEffect, useState } from 'react';
 
 enum KeyState
 {
@@ -9,7 +15,7 @@ enum KeyState
 
 type Callback = () => void;
 
-export function useHotkey(key: string, onPressed?: Callback, onReleased?: Callback): KeyState
+export function useHotkey(codeKey: string, onPressed?: Callback, onReleased?: Callback): KeyState
 {
     const [keyState, setKeyState] = useState<KeyState>(KeyState.RELEASED);
     const [actionOnRelease, setActionOnRelease] = useState<boolean>(false);
@@ -17,9 +23,17 @@ export function useHotkey(key: string, onPressed?: Callback, onReleased?: Callba
     // Subscribe to key events.
     useEffect(() =>
     {
+        const checkEvent = (ev: KeyboardEvent): boolean =>
+        {
+            const targetIsBodyOrButton = (ev.target === document.body
+                || (ev.target as Element).tagName === "BUTTON");
+
+            return (ev.code === codeKey && targetIsBodyOrButton);
+        };
+
         const handleKeyDown = (ev: KeyboardEvent): void =>
         {
-            if (ev.key === key && ev.target === document.body)
+            if (checkEvent(ev))
             {
                 setKeyState(prev => (prev === KeyState.RELEASED)
                     ? KeyState.PRESSED
@@ -29,7 +43,7 @@ export function useHotkey(key: string, onPressed?: Callback, onReleased?: Callba
 
         const handleKeyUp = (ev: KeyboardEvent): void =>
         {
-            if (ev.key === key && ev.target === document.body)
+            if (checkEvent(ev))
             {
                 setKeyState(KeyState.RELEASED);
             }
@@ -43,7 +57,7 @@ export function useHotkey(key: string, onPressed?: Callback, onReleased?: Callba
             document.body.removeEventListener("keydown", handleKeyDown);
             document.body.removeEventListener("keyup", handleKeyUp);
         };
-    }, [key]);
+    }, [codeKey]);
 
     // Do actions.
     useEffect(() =>
