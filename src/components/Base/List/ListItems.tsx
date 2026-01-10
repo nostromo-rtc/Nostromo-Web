@@ -209,9 +209,14 @@ export const ListItemInput: React.FC<ListItemInputProps> = ({
     );
 };
 
+export interface ListItemSelectOption {
+    label: string;
+    value: string;
+}
+
 interface ListItemSelectProps extends ListItemWithValueProps<string>
 {
-    options: string[];
+    options: ListItemSelectOption[];
     hasDefaultValue?: boolean;
 }
 
@@ -271,11 +276,11 @@ export const ListItemSelect: React.FC<ListItemSelectProps> = ({
         onValueChange(ev.target.value);
     };
 
-    const selectOptionsItemsToMap = (item: string, index: number): JSX.Element =>
+    const selectOptionsItemsToMap = (item: ListItemSelectOption, index: number): JSX.Element =>
     {
         return (
-            <MenuItem value={item} key={index}>
-                <span className="v-align-middle">{item}</span>
+            <MenuItem value={item.value} key={index}>
+                <span className="v-align-middle">{item.label}</span>
             </MenuItem>
         );
     };

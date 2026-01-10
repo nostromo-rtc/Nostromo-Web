@@ -8,10 +8,10 @@
 
 import React, { useRef, useState } from "react";
 
-import { List } from "../../Base/List/List";
-import { ListItemButton, ListItemInput, ListItemSelect, ListItemSwitch } from "../../Base/List/ListItems";
 import { VideoCodec } from "../../../services/RoomService";
 import { NumericConstants as NC } from "../../../utils/NumericConstants";
+import { List } from "../../Base/List/List";
+import { ListItemButton, ListItemInput, ListItemSelect, ListItemSelectOption, ListItemSwitch } from "../../Base/List/ListItems";
 
 export const CreateRoom: React.FC = () =>
 {
@@ -43,7 +43,11 @@ export const CreateRoom: React.FC = () =>
         console.log("Symmetrical mode ? ", symmetricalMode);
     };
 
-    const videoCodecs: string[] = Object.values(VideoCodec);
+    const videoCodecs: ListItemSelectOption[] = Object.values(VideoCodec).map(item =>
+    {
+        const option: ListItemSelectOption = { label: item as string, value: item as string };
+        return option;
+    });
 
     return (
         <List className="flex-auto">
