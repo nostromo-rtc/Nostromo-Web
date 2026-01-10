@@ -9,16 +9,13 @@ import React, { useContext, useState } from "react";
 import { SettingsContext, UserMediaServiceContext } from "../../../AppWrapper";
 import { ISettings } from "../../../services/Settings/Settings";
 import { useSettings } from "../../../services/Settings/SettingsService";
-import { useAudioVolumeStorage } from "../../../services/UserMediaService/AudioVolumeStorage";
 import { MicState, useMicStateModel } from "../../../services/UserMediaService/MicStateModel";
 import { useUserMediaDeviceStorage } from "../../../services/UserMediaService/UserMediaDeviceStorage";
-import { useUserMediaStreamStorage } from "../../../services/UserMediaService/UserMediaStreamStorage";
 import { NumericConstants as NC } from "../../../utils/NumericConstants";
 import { List } from "../../Base/List/List";
 import { ListItemButton, ListItemSelect, ListItemSelectOption, ListItemSlider, ListItemSwitch } from "../../Base/List/ListItems";
 import { SettingsCategoryProps } from "../SettingsParametersList";
-
-const ZERO_VOLUME = 0;
+import { VolumeMeter } from "../VolumeMeter";
 
 export const AudioSettings: React.FC<SettingsCategoryProps> = ({ categoryName }) =>
 {
@@ -27,12 +24,6 @@ export const AudioSettings: React.FC<SettingsCategoryProps> = ({ categoryName })
 
     const userMediaService = useContext(UserMediaServiceContext);
     const micStateInfo = useMicStateModel(userMediaService.micStateModel);
-
-    const streams = useUserMediaStreamStorage(userMediaService.streamStorage);
-    const audioVolumeStorage = useAudioVolumeStorage(userMediaService.audioVolumeStorage);
-
-    const micStream = streams.find((s) => s.type === "mic");
-    const micVolume = audioVolumeStorage.find((i) => i.streamId === micStream?.stream.id);
 
     const mediaDevices = useUserMediaDeviceStorage(userMediaService.deviceStorage);
     const micList = mediaDevices.filter((dev) => dev.kind === "audioinput");
@@ -79,11 +70,7 @@ export const AudioSettings: React.FC<SettingsCategoryProps> = ({ categoryName })
                 onBtnClick={handleMicBtnClick}
             />
             <p className="settings-group-label">Проверка звука</p>
-            <div id="volume-meter-container">
-                <div id="volume-meter">
-                    <div id="volume-meter-level" style={{ width: `${micVolume?.volume ?? ZERO_VOLUME}%` }}></div>
-                </div>
-            </div>
+            <VolumeMeter userMediaService={userMediaService} />
             <ListItemSwitch
                 label={"Включить прослушивание микрофона"}
                 description={"Позволяет проверить звук микрофона."}
