@@ -105,7 +105,7 @@ export class MicAudioProcessing
     {
         if (this.m_micNode !== undefined)
         {
-            //this.disconnectVolumeMeter();
+            this.disconnectVolumeMeter();
             this.disconnectGain();
             //this.disconnectNoiseGate();
             this.stopListenOutput();
@@ -147,7 +147,7 @@ export class MicAudioProcessing
         }
     }
 
-    /*public disconnectVolumeMeter(): void
+    public disconnectVolumeMeter(): void
     {
         if (this.m_micNode && this.m_volumeMeterNode && this.m_isVolumeMeterConnected)
         {
@@ -160,7 +160,7 @@ export class MicAudioProcessing
 
             console.debug(`[${CLASS_NAME}] disconnectVolumeMeter`);
         }
-    }*/
+    }
 
     public listenOutput(): void
     {
