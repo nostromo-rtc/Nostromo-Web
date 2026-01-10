@@ -549,7 +549,7 @@ export class UserMediaService
             this.m_micStateModel.disableMic();
 
             // Удалим ноду с микрофонным потоком.
-            //this.m_micAudioProcessing.destroyMicNode();
+            this.m_micAudioProcessing.destroyMicNode();
         }
         else if (streamInfo.type === "display")
         {
