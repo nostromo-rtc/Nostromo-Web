@@ -25,12 +25,35 @@ export const VolumeMeter: React.FC<VolumeMeterProps> = ({ userMediaService }) =>
     const audioVolumeStorage = useAudioVolumeStorage(userMediaService.audioVolumeStorage);
 
     const micStream = streams.find((s) => s.type === "mic");
-    const micVolume = audioVolumeStorage.find((i) => i.streamId === micStream?.stream.id);
+    const micVolume = audioVolumeStorage.find(
+        (i) => i.streamId === micStream?.stream.id
+    )?.volume ?? ZERO_VOLUME;
+
+    const getVolumeMeterLevelClassName = (): string =>
+    {
+        const mediumLevel = 50;
+        const highLevel = 80;
+
+        if (micVolume > mediumLevel && micVolume <= highLevel)
+        {
+            return "volume-meter-level-medium";
+        }
+        else if (micVolume > highLevel)
+        {
+            return "volume-meter-level-high";
+        }
+
+        return "volume-meter-level-low";
+    };
 
     return (
         <div id="volume-meter-container">
             <div id="volume-meter">
-                <div id="volume-meter-level" style={{ width: `${micVolume?.volume ?? ZERO_VOLUME}%` }}></div>
+                <div id="volume-meter-level"
+                    className={getVolumeMeterLevelClassName()}
+                    style={{
+                        width: `${micVolume}%`
+                    }}></div>
             </div>
         </div>
     );
