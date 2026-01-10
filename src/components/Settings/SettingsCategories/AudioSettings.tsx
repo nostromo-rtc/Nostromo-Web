@@ -33,6 +33,24 @@ export const AudioSettings: React.FC<SettingsCategoryProps> = ({ categoryName })
     const isMicDisabled = micStateInfo.state === MicState.DISABLED;
     // TODO: disable button and select with this
     const isBtnDisabled = (micStateInfo.state === MicState.LOADING || micList.length === NC.EMPTY_LENGTH);
+
+    const getMicStatusLabel = (): string =>
+    {
+        switch (micStateInfo.state)
+        {
+            case MicState.DISABLED:
+                return "Микрофон не используется";
+            case MicState.PAUSED:
+                return "Микрофон захвачен, но выключен (на паузе)";
+            case MicState.WORKING:
+                return "В данный момент микрофон захвачен и используется";
+            case MicState.LOADING:
+                return "Микрофон захватывается...";
+            default:
+                return "Неизвестный статус микрофона";
+        }
+    };
+
     const handleMicBtnClick = async (): Promise<void> =>
     {
         if (isMicDisabled)
@@ -65,7 +83,7 @@ export const AudioSettings: React.FC<SettingsCategoryProps> = ({ categoryName })
                 })}
             />
             <ListItemButton
-                label={isMicDisabled ? "Микрофон не используется" : "В данный момент микрофон захвачен и используется"}
+                label={getMicStatusLabel()}
                 btnLabel={isMicDisabled ? "Захватить микрофон" : "Прекратить захват"}
                 onBtnClick={handleMicBtnClick}
             />
