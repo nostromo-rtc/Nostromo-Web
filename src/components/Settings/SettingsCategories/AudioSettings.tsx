@@ -152,10 +152,12 @@ export const AudioSettings: React.FC<SettingsCategoryProps> = ({ categoryName })
                     });
                 }}
             />
-            {/* TODO: выставить правильный диапазон для этого ползунка */}
             <ListItemSlider
                 label={"Коэффициент усиления"}
                 value={settings.audio.mic.gain.manualGain}
+                min={1}
+                max={10}
+                step={0.1}
                 onValueChange={(val) =>
                 {
                     settingsService.setSettings((prev: ISettings) =>
@@ -178,11 +180,13 @@ export const AudioSettings: React.FC<SettingsCategoryProps> = ({ categoryName })
                     });
                 }}
             />
-            {/* TODO: выставить правильный диапазон для этого ползунка */}
             <ListItemSlider
                 label={"Пороговое значение (дБ)"}
                 showSeparator={false}
                 value={settings.audio.mic.noiseGate.noiseGateThreshold}
+                min={-100}
+                max={0}
+                step={1}
                 onValueChange={(val) =>
                 {
                     settingsService.setSettings((prev: ISettings) =>
@@ -191,10 +195,12 @@ export const AudioSettings: React.FC<SettingsCategoryProps> = ({ categoryName })
                     });
                 }}
             />
-            {/* TODO: выставить правильный диапазон для этого ползунка */}
             <ListItemSlider
                 label={"Задержка (сек.)"}
                 value={settings.audio.mic.noiseGate.noiseGateDelay}
+                min={0}
+                max={0.3}
+                step={0.01}
                 onValueChange={(val) =>
                 {
                     settingsService.setSettings((prev: ISettings) =>
