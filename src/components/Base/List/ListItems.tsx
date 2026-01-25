@@ -380,7 +380,10 @@ export const ListItemSlider: React.FC<ListItemSliderProps> = ({
             {...props}
         >
             <label className="list-item-slider-label-row">
-                <p className="list-item-label text-wrap">{label}</p>
+                <p className="list-item-label text-wrap">
+                    {label}
+                    <span>{value}</span>
+                </p>
                 <div className="list-item-slider-container">
                     <Slider
                         value={value}

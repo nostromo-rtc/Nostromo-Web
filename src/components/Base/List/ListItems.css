@@ -34,6 +34,7 @@
     flex: auto;
     padding: 0;
     margin: 0;
+    justify-content: space-between;
 }
 
 .list-item-select-label
@@ -79,7 +80,6 @@
 .list-item-slider-container
 {
     display: inline-flex;
-    padding-right: 8px;
     box-sizing: border-box;
     width: 100%;
 }
