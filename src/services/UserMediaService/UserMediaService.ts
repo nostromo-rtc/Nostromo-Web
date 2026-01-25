@@ -590,12 +590,16 @@ export class UserMediaService
             this.m_micAudioProcessing.disconnectNoiseGate();
     }*/
 
-    /*private handleMicManualGain(): void
+    private handleMicManualGain(): void
     {
-        this.ui.checkboxEnableManualGainControl.checked ?
-            this.m_micAudioProcessing.connectGain() :
+        const gain = this.m_settingsService.getSettingsSnapshot().audio.mic.gain;
+        if (gain.enableManualGainControl) {
+            this.m_micAudioProcessing.connectGain();
+            this.m_micAudioProcessing.setGainValue(gain.manualGain);
+        } else {
             this.m_micAudioProcessing.disconnectGain();
-    }*/
+        }
+    }
 
     private async handleMicAudioProcessing(micStream: MediaStream): Promise<MediaStream>
     {
@@ -617,7 +621,7 @@ export class UserMediaService
         this.handleVolumeMeter();
         this.handleMicOutput();
         //this.handleMicNoiseGate();
-        //this.handleMicManualGain();
+        this.handleMicManualGain();
 
         return this.m_micAudioProcessing.getOutputStream();
     }

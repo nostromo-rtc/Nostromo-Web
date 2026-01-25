@@ -38,7 +38,6 @@ export class MicAudioProcessing
     /** Усиление звука, является эффектом. */
     private readonly m_gainNode: GainNode;
 
-
     // TODO: states in enum (not ready, ready, connected, etc)
 
     private m_isOutputListening = false;
@@ -244,8 +243,6 @@ export class MicAudioProcessing
         {
             //this.ui.manualGainRange.addEventListener("change", this.onChangeGainRange);
 
-            //this.gainNode.gain.value = Number(this.ui.manualGainRange.value);
-
             this.addLastProcessingNode(this.m_gainNode);
             this.m_isGainNodeConnected = true;
 
@@ -264,6 +261,11 @@ export class MicAudioProcessing
 
             console.debug(`[${CLASS_NAME}] disconnectGain`);
         }
+    }
+
+    public setGainValue(value: number): void
+    {
+        this.m_gainNode.gain.value = value;
     }
 
     public getOutputStream(): MediaStream
@@ -286,11 +288,6 @@ export class MicAudioProcessing
             this.noiseGateNode.parameters.get("attack")!.value = Number(this.ui.delayRange.value);
             this.noiseGateNode.parameters.get("release")!.value = Number(this.ui.delayRange.value);
         }
-    };
-
-    private onChangeGainRange = () =>
-    {
-        this.gainNode.gain.value = Number(this.ui.manualGainRange.value);
     };*/
 
     private addLastProcessingNode(newNode: AudioNode): void
