@@ -408,9 +408,9 @@ export class UserMediaService
         return new AudioContext();
     }
 
-    /** 
-     * Prepare device list 
-     * and connect `devicechange` event handler. 
+    /**
+     * Prepare device list
+     * and connect `devicechange` event handler.
      */
     private handleDevicesList(): void
     {
@@ -433,7 +433,7 @@ export class UserMediaService
         console.debug("[UserMedia] > getUserMedia", streamConstraints);
         const mediaStream: MediaStream = await navigator.mediaDevices.getUserMedia(streamConstraints);
 
-        // Update devices list after get permissions 
+        // Update devices list after get permissions
         // to get real id of device.
         const deviceId = await this.updateDevicesAfterGettingPermissions(
             mediaStream,
@@ -481,7 +481,7 @@ export class UserMediaService
     }
 
     /**
-     * Update devices list after getting permissions 
+     * Update devices list after getting permissions
      * with workarounds for Firefox and Chromium.
      * @returns deviceId - real id of captured device.
      */
@@ -583,12 +583,24 @@ export class UserMediaService
         }
     }
 
-    /*private handleMicNoiseGate(): void
+    private handleMicNoiseGate(): void
     {
-        this.ui.checkboxEnableNoiseGate.checked ?
-            this.m_micAudioProcessing.connectNoiseGate() :
+        const noiseGate = this.m_settingsService.getSettingsSnapshot().audio.mic.noiseGate;
+
+        if (noiseGate.enableNoiseGate)
+        {
+            this.m_micAudioProcessing.connectNoiseGate();
+            this.m_micAudioProcessing.setNoiseGateParams({
+                attack: noiseGate.noiseGateDelay,
+                release: noiseGate.noiseGateDelay,
+                threshold: noiseGate.noiseGateThreshold
+            });
+        }
+        else
+        {
             this.m_micAudioProcessing.disconnectNoiseGate();
-    }*/
+        }
+    }
 
     private handleMicManualGain(): void
     {
@@ -610,17 +622,17 @@ export class UserMediaService
         }
 
         // Проверяем, готов ли NoiseGate, и если нет, то инициализируем эту ноду.
-        /*if (!this.m_micAudioProcessing.isNoiseGateReady)
+        if (!this.m_micAudioProcessing.isNoiseGateReady)
         {
             await this.m_micAudioProcessing.initNoiseGate();
-        }*/
+        }
 
         // Инициализируем ноду с микрофонным потоком для последующей обработки.
         await this.m_micAudioProcessing.initMicNode(micStream);
 
         this.handleVolumeMeter();
         this.handleMicOutput();
-        //this.handleMicNoiseGate();
+        this.handleMicNoiseGate();
         this.handleMicManualGain();
 
         return this.m_micAudioProcessing.getOutputStream();

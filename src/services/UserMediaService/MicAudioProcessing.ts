@@ -8,7 +8,7 @@ import { WorkerUrl } from "worker-url";
 import { DoublyLinkedList } from "../../utils/DoublyLinkedList";
 import { NumericConstants } from "../../utils/NumericConstants";
 import { AudioVolumeStorage } from "./AudioVolumeStorage";
-//import { NoiseGateOptions, NoiseGateParams } from "../AudioWorklets/NoiseGate";
+import { NoiseGateOptions, NoiseGateParams } from "../AudioWorklets/NoiseGate";
 
 const CLASS_NAME = "MicAudioProcessing";
 
@@ -33,7 +33,7 @@ export class MicAudioProcessing
     private readonly m_processingNodesList = new DoublyLinkedList<AudioNode>();
 
     /** Шумовой порог, является эффектом. */
-    //private m_noiseGateNode?: AudioWorkletNode;
+    private m_noiseGateNode?: AudioWorkletNode;
 
     /** Усиление звука, является эффектом. */
     private readonly m_gainNode: GainNode;
@@ -42,11 +42,11 @@ export class MicAudioProcessing
 
     private m_isOutputListening = false;
     private m_isVolumeMeterConnected = false;
-    //private m_isNoiseGateConnected = false;
+    private m_isNoiseGateConnected = false;
     private m_isGainNodeConnected = false;
 
     private m_isVolumeMeterReady = false;
-    //private m_isNoiseGateReady = false;
+    private m_isNoiseGateReady = false;
 
     public constructor(ctx: AudioContext, audioVolumeStorage: AudioVolumeStorage)
     {
@@ -63,6 +63,11 @@ export class MicAudioProcessing
         return this.m_isVolumeMeterReady;
     }
 
+    public get isNoiseGateReady(): boolean
+    {
+        return this.m_isNoiseGateReady;
+    }
+
     public async initVolumeMeter(): Promise<void>
     {
         const workletUrl = new WorkerUrl(new URL("../AudioWorklets/VolumeMeter.ts", import.meta.url), {
@@ -74,19 +79,16 @@ export class MicAudioProcessing
         this.m_isVolumeMeterReady = true;
     }
 
-    /*public async initNoiseGate(): Promise<void>
+    public async initNoiseGate(): Promise<void>
     {
-        const workletUrl = new WorkerUrl(new URL("./AudioWorklets/NoiseGate.ts", import.meta.url), {
-            name: "public/NoiseGateWorklet", customPath: () =>
-            {
-                return new URL("NoiseGateWorklet.js", window.location.origin);
-            }
+        const workletUrl = new WorkerUrl(new URL("../AudioWorklets/NoiseGate.ts", import.meta.url), {
+            name: "NoiseGateWorklet"
         });
 
         await this.m_ctx.audioWorklet.addModule(workletUrl);
 
-        this.isNoiseGateReady = true;
-    }*/
+        this.m_isNoiseGateReady = true;
+    }
 
     public async initMicNode(stream: MediaStream): Promise<void>
     {
@@ -106,7 +108,7 @@ export class MicAudioProcessing
         {
             this.disconnectVolumeMeter();
             this.disconnectGain();
-            //this.disconnectNoiseGate();
+            this.disconnectNoiseGate();
             this.stopListenOutput();
 
             this.removeProcessingNode(this.m_micNode);
@@ -183,59 +185,82 @@ export class MicAudioProcessing
         }
     }
 
-    /*public connectNoiseGate()
+    public connectNoiseGate(): void
     {
-        if (this.isNoiseGateReady && this.noiseGateNode === undefined)
+        if (this.m_isNoiseGateReady && this.m_noiseGateNode === undefined)
         {
             const noiseGateOptions: NoiseGateOptions = { contextSampleRate: this.m_ctx.sampleRate };
-            const noiseGateParams: NoiseGateParams = {
-                threshold: Number(this.ui.thresholdRange.value),
-                attack: Number(this.ui.delayRange.value),
-                release: Number(this.ui.delayRange.value)
-            };
 
-            this.noiseGateNode = new AudioWorkletNode(this.m_ctx, "noise-gate", {
-                parameterData: noiseGateParams,
+            this.m_noiseGateNode = new AudioWorkletNode(this.m_ctx, "noise-gate", {
                 processorOptions: noiseGateOptions
             });
-
-            this.ui.thresholdRange.addEventListener("change", this.onChangeNoiseGateThresholdRange);
-            this.ui.delayRange.addEventListener("change", this.onChangeNoiseGateDelayRange);
         }
 
-        if (this.micNode && this.noiseGateNode && !this.isNoiseGateConnected)
+        if (this.m_micNode && this.m_noiseGateNode && !this.m_isNoiseGateConnected)
         {
-            if (this.isGainNodeConnected)
+            if (this.m_isGainNodeConnected)
             {
-                this.addBeforeProcessingNode(this.gainNode, this.noiseGateNode);
+                this.addBeforeProcessingNode(this.m_gainNode, this.m_noiseGateNode);
             }
             else
             {
-                this.addLastProcessingNode(this.noiseGateNode);
+                this.addLastProcessingNode(this.m_noiseGateNode);
             }
 
-            this.isNoiseGateConnected = true;
+            this.m_isNoiseGateConnected = true;
 
-            console.debug(`[${this.CLASS_NAME}] connectNoiseGate`);
+            console.debug(`[${CLASS_NAME}] connectNoiseGate`);
         }
     }
 
-    public disconnectNoiseGate()
+    public disconnectNoiseGate(): void
     {
-        if (this.micNode && this.noiseGateNode && this.isNoiseGateConnected)
+        if (this.m_micNode && this.m_noiseGateNode && this.m_isNoiseGateConnected)
         {
-            this.removeProcessingNode(this.noiseGateNode);
+            this.removeProcessingNode(this.m_noiseGateNode);
 
-            this.ui.thresholdRange.removeEventListener("change", this.onChangeNoiseGateThresholdRange);
-            this.ui.delayRange.removeEventListener("change", this.onChangeNoiseGateDelayRange);
+            this.m_noiseGateNode = undefined;
 
-            this.noiseGateNode = undefined;
+            this.m_isNoiseGateConnected = false;
 
-            this.isNoiseGateConnected = false;
-
-            console.debug(`[${this.CLASS_NAME}] disconnectNoiseGate`);
+            console.debug(`[${CLASS_NAME}] disconnectNoiseGate`);
         }
-    }*/
+    }
+
+    public setNoiseGateParams(params: NoiseGateParams): void
+    {
+        if (!this.m_noiseGateNode)
+        {
+            return;
+        }
+
+        if (params.attack != null)
+        {
+            const attack = this.m_noiseGateNode.parameters.get("attack");
+            if (attack && attack.value !== params.attack)
+            {
+                attack.value = params.attack;
+            }
+        }
+
+        if (params.release != null)
+        {
+            const release = this.m_noiseGateNode.parameters.get("release");
+            if (release && release.value !== params.release)
+            {
+                release.value = params.release;
+            }
+        }
+
+        if (params.threshold != null)
+        {
+            const threshold = this.m_noiseGateNode.parameters.get("threshold");
+            if (threshold && threshold.value !== params.threshold)
+            {
+                threshold.value = params.threshold;
+            }
+        }
+    }
 
     public connectGain(): void
     {
@@ -272,23 +297,6 @@ export class MicAudioProcessing
     {
         return this.m_outputNode.mediaStream;
     }
-
-    /*private onChangeNoiseGateThresholdRange = () =>
-    {
-        if (this.noiseGateNode)
-        {
-            this.noiseGateNode.parameters.get("threshold")!.value = Number(this.ui.thresholdRange.value);
-        }
-    };
-
-    private onChangeNoiseGateDelayRange = () =>
-    {
-        if (this.noiseGateNode)
-        {
-            this.noiseGateNode.parameters.get("attack")!.value = Number(this.ui.delayRange.value);
-            this.noiseGateNode.parameters.get("release")!.value = Number(this.ui.delayRange.value);
-        }
-    };*/
 
     private addLastProcessingNode(newNode: AudioNode): void
     {
