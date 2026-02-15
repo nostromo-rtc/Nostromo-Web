@@ -68,7 +68,7 @@ export const SettingsParametersList: React.FC<SettingsParametersListProps> = ({
         case categories.general.id:
             return <GeneralSettings categoryName={categories.general.name} />;
         case categories.audio.id:
-            return <AudioSettings categoryName={categories.general.name} />;
+            return <AudioSettings categoryName={categories.audio.name} />;
         case categories.video.id:
             return <></>;
         case categories.display.id:
