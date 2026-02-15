@@ -7,7 +7,7 @@
 import React, { useContext, useState } from "react";
 
 import { SettingsContext, UserMediaServiceContext } from "../../../AppWrapper";
-import { ISettings } from "../../../services/Settings/Settings";
+import { ISettings, NoiseGateParamsSpecs } from "../../../services/Settings/Settings";
 import { useSettings } from "../../../services/Settings/SettingsService";
 import { MicState, useMicStateModel } from "../../../services/UserMediaService/MicStateModel";
 import { useUserMediaDeviceStorage } from "../../../services/UserMediaService/UserMediaDeviceStorage";
@@ -184,8 +184,8 @@ export const AudioSettings: React.FC<SettingsCategoryProps> = ({ categoryName })
                 label={"Пороговое значение (дБ)"}
                 showSeparator={false}
                 value={settings.audio.mic.noiseGate.noiseGateThreshold}
-                min={-100}
-                max={0}
+                min={NoiseGateParamsSpecs.threshold.min}
+                max={NoiseGateParamsSpecs.threshold.max}
                 step={1}
                 onValueChange={(val) =>
                 {
@@ -198,8 +198,8 @@ export const AudioSettings: React.FC<SettingsCategoryProps> = ({ categoryName })
             <ListItemSlider
                 label={"Задержка (сек.)"}
                 value={settings.audio.mic.noiseGate.noiseGateDelay}
-                min={0}
-                max={0.3}
+                min={NoiseGateParamsSpecs.attack.min}
+                max={NoiseGateParamsSpecs.attack.max}
                 step={0.01}
                 onValueChange={(val) =>
                 {
