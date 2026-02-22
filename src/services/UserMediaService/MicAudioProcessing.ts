@@ -5,48 +5,49 @@
 */
 
 import { WorkerUrl } from "worker-url";
+
 import { DoublyLinkedList } from "../../utils/DoublyLinkedList";
 import { NumericConstants } from "../../utils/NumericConstants";
-import { AudioVolumeStorage } from "./AudioVolumeStorage";
 import { NoiseGateOptions, NoiseGateParams } from "../AudioWorklets/NoiseGate";
+import { AudioVolumeStorage } from "./AudioVolumeStorage";
 
 const CLASS_NAME = "MicAudioProcessing";
+
+enum AudioNodeState
+{
+    NOT_READY = 0,
+    DISCONNECTED = 1,
+    CONNECTED = 2
+}
 
 export class MicAudioProcessing
 {
     private readonly m_ctx: AudioContext;
     private readonly m_audioVolumeStorage: AudioVolumeStorage;
 
-    /** Микрофон (источник, вход). */
-    private m_micNode?: MediaStreamAudioSourceNode;
-
-    /** Индикатор громкости, не является эффектом. */
-    private m_volumeMeterNode?: AudioWorkletNode;
-
-    /** Нода для вывода звука в outputNode. */
-    private readonly m_outputNodeDestination: MediaStreamAudioDestinationNode;
-
-    /** Выходной звук. */
-    private readonly m_outputNode: MediaStreamAudioSourceNode;
-
-    /** Двусвязный список нод-эффектов. */
+    /** Doubly linked list for node effects */
     private readonly m_processingNodesList = new DoublyLinkedList<AudioNode>();
 
-    /** Шумовой порог, является эффектом. */
-    private m_noiseGateNode?: AudioWorkletNode;
+    /** Destination node for output node */
+    private readonly m_outputNodeDestination: MediaStreamAudioDestinationNode;
+    private readonly m_outputNode: MediaStreamAudioSourceNode;
 
-    /** Усиление звука, является эффектом. */
+    /** Manual gain node effect */
     private readonly m_gainNode: GainNode;
 
-    // TODO: states in enum (not ready, ready, connected, etc)
+    /** Microphone (input source) */
+    private m_micNode?: MediaStreamAudioSourceNode;
+
+    /** Volume meter (not effect) */
+    private m_volumeMeterNode?: AudioWorkletNode;
+
+    /** Noise gate effect */
+    private m_noiseGateNode?: AudioWorkletNode;
 
     private m_isOutputListening = false;
-    private m_isVolumeMeterConnected = false;
-    private m_isNoiseGateConnected = false;
-    private m_isGainNodeConnected = false;
-
-    private m_isVolumeMeterReady = false;
-    private m_isNoiseGateReady = false;
+    private m_volumeMeterState = AudioNodeState.NOT_READY;
+    private m_noiseGateState = AudioNodeState.NOT_READY;
+    private m_gainState = AudioNodeState.DISCONNECTED;
 
     public constructor(ctx: AudioContext, audioVolumeStorage: AudioVolumeStorage)
     {
@@ -60,12 +61,12 @@ export class MicAudioProcessing
 
     public get isVolumeMeterReady(): boolean
     {
-        return this.m_isVolumeMeterReady;
+        return this.m_volumeMeterState !== AudioNodeState.NOT_READY;
     }
 
     public get isNoiseGateReady(): boolean
     {
-        return this.m_isNoiseGateReady;
+        return this.m_noiseGateState !== AudioNodeState.NOT_READY;
     }
 
     public async initVolumeMeter(): Promise<void>
@@ -76,7 +77,7 @@ export class MicAudioProcessing
 
         await this.m_ctx.audioWorklet.addModule(workletUrl);
 
-        this.m_isVolumeMeterReady = true;
+        this.m_volumeMeterState = AudioNodeState.DISCONNECTED;
     }
 
     public async initNoiseGate(): Promise<void>
@@ -87,7 +88,7 @@ export class MicAudioProcessing
 
         await this.m_ctx.audioWorklet.addModule(workletUrl);
 
-        this.m_isNoiseGateReady = true;
+        this.m_noiseGateState = AudioNodeState.DISCONNECTED;
     }
 
     public async initMicNode(stream: MediaStream): Promise<void>
@@ -104,90 +105,107 @@ export class MicAudioProcessing
 
     public destroyMicNode(): void
     {
-        if (this.m_micNode !== undefined)
+        if (!this.m_micNode)
         {
-            this.disconnectVolumeMeter();
-            this.disconnectGain();
-            this.disconnectNoiseGate();
-            this.stopListenOutput();
-
-            this.removeProcessingNode(this.m_micNode);
-
-            this.m_micNode.mediaStream.getAudioTracks()[NumericConstants.ZERO_IDX].stop();
-
-            this.m_micNode = undefined;
-
-            console.debug(`[${CLASS_NAME}] destroyMicNode`);
+            return;
         }
+
+        this.stopListenOutput();
+
+        this.disconnectVolumeMeter();
+        this.disconnectGain();
+        this.disconnectNoiseGate();
+
+        this.removeProcessingNode(this.m_micNode);
+
+        this.m_micNode.mediaStream.getAudioTracks()[NumericConstants.ZERO_IDX].stop();
+
+        this.m_micNode = undefined;
+
+        console.debug(`[${CLASS_NAME}] destroyMicNode`);
     }
 
     public connectVolumeMeter(): void
     {
         const scaleFactor = 100;
 
-        if (this.m_isVolumeMeterReady && this.m_volumeMeterNode === undefined)
+        if (this.m_volumeMeterState === AudioNodeState.DISCONNECTED
+            && this.m_volumeMeterNode === undefined)
         {
             this.m_volumeMeterNode = new AudioWorkletNode(this.m_ctx, "volume-meter");
         }
 
-        if (this.m_micNode && this.m_volumeMeterNode && !this.m_isVolumeMeterConnected)
+        if (!this.m_micNode
+            || !this.m_volumeMeterNode
+            || this.m_volumeMeterState !== AudioNodeState.DISCONNECTED)
         {
-            const streamId = this.m_micNode.mediaStream.id;
-
-            this.m_volumeMeterNode.port.onmessage = ({ data }) =>
-            {
-                this.m_audioVolumeStorage.setAudioVolumeInfo({
-                    streamId, volume: data * scaleFactor
-                });
-            };
-
-            this.m_outputNode.connect(this.m_volumeMeterNode);
-            this.m_isVolumeMeterConnected = true;
-
-            console.debug(`[${CLASS_NAME}] connectVolumeMeter`);
+            return;
         }
+
+        const streamId = this.m_micNode.mediaStream.id;
+
+        this.m_volumeMeterNode.port.onmessage = ({ data }) =>
+        {
+            this.m_audioVolumeStorage.setAudioVolumeInfo({
+                streamId, volume: data * scaleFactor
+            });
+        };
+
+        this.m_outputNode.connect(this.m_volumeMeterNode);
+        this.m_volumeMeterState = AudioNodeState.CONNECTED;
+
+        console.debug(`[${CLASS_NAME}] connectVolumeMeter`);
     }
 
     public disconnectVolumeMeter(): void
     {
-        if (this.m_micNode && this.m_volumeMeterNode && this.m_isVolumeMeterConnected)
+        if (!this.m_micNode
+            || !this.m_volumeMeterNode
+            || this.m_volumeMeterState !== AudioNodeState.CONNECTED)
         {
-            this.m_outputNode.disconnect(this.m_volumeMeterNode);
-
-            this.m_volumeMeterNode.port.close();
-            this.m_volumeMeterNode = undefined;
-
-            this.m_isVolumeMeterConnected = false;
-
-            console.debug(`[${CLASS_NAME}] disconnectVolumeMeter`);
+            return;
         }
+
+        this.m_outputNode.disconnect(this.m_volumeMeterNode);
+
+        this.m_volumeMeterNode.port.close();
+        this.m_volumeMeterNode = undefined;
+
+        this.m_volumeMeterState = AudioNodeState.DISCONNECTED;
+
+        console.debug(`[${CLASS_NAME}] disconnectVolumeMeter`);
     }
 
     public listenOutput(): void
     {
-        if (this.m_micNode && !this.m_isOutputListening)
+        if (!this.m_micNode || this.m_isOutputListening)
         {
-            this.m_outputNode.connect(this.m_ctx.destination);
-            this.m_isOutputListening = true;
-
-            console.debug(`[${CLASS_NAME}] listenOutput`);
+            return;
         }
+
+        this.m_outputNode.connect(this.m_ctx.destination);
+        this.m_isOutputListening = true;
+
+        console.debug(`[${CLASS_NAME}] listenOutput`);
     }
 
     public stopListenOutput(): void
     {
-        if (this.m_micNode && this.m_isOutputListening)
+        if (!this.m_micNode || !this.m_isOutputListening)
         {
-            this.m_outputNode.disconnect(this.m_ctx.destination);
-            this.m_isOutputListening = false;
-
-            console.debug(`[${CLASS_NAME}] stopListenOutput`);
+            return;
         }
+
+        this.m_outputNode.disconnect(this.m_ctx.destination);
+        this.m_isOutputListening = false;
+
+        console.debug(`[${CLASS_NAME}] stopListenOutput`);
     }
 
     public connectNoiseGate(): void
     {
-        if (this.m_isNoiseGateReady && this.m_noiseGateNode === undefined)
+        if (this.m_noiseGateState === AudioNodeState.DISCONNECTED
+            && this.m_noiseGateNode === undefined)
         {
             const noiseGateOptions: NoiseGateOptions = { contextSampleRate: this.m_ctx.sampleRate };
 
@@ -196,35 +214,44 @@ export class MicAudioProcessing
             });
         }
 
-        if (this.m_micNode && this.m_noiseGateNode && !this.m_isNoiseGateConnected)
+        if (!this.m_micNode
+            || !this.m_noiseGateNode
+            || this.m_noiseGateState !== AudioNodeState.DISCONNECTED)
         {
-            if (this.m_isGainNodeConnected)
-            {
-                this.addBeforeProcessingNode(this.m_gainNode, this.m_noiseGateNode);
-            }
-            else
-            {
-                this.addLastProcessingNode(this.m_noiseGateNode);
-            }
-
-            this.m_isNoiseGateConnected = true;
-
-            console.debug(`[${CLASS_NAME}] connectNoiseGate`);
+            return;
         }
+
+        if (this.m_gainState === AudioNodeState.CONNECTED)
+        {
+            this.addBeforeProcessingNode(this.m_gainNode, this.m_noiseGateNode);
+        }
+        else
+        {
+            this.addLastProcessingNode(this.m_noiseGateNode);
+        }
+
+        this.m_noiseGateState = AudioNodeState.CONNECTED;
+
+        console.debug(`[${CLASS_NAME}] connectNoiseGate`);
     }
 
     public disconnectNoiseGate(): void
     {
-        if (this.m_micNode && this.m_noiseGateNode && this.m_isNoiseGateConnected)
+        if (!this.m_micNode
+            || !this.m_noiseGateNode
+            || this.m_noiseGateState !== AudioNodeState.CONNECTED
+        )
         {
-            this.removeProcessingNode(this.m_noiseGateNode);
-
-            this.m_noiseGateNode = undefined;
-
-            this.m_isNoiseGateConnected = false;
-
-            console.debug(`[${CLASS_NAME}] disconnectNoiseGate`);
+            return;
         }
+
+        this.removeProcessingNode(this.m_noiseGateNode);
+
+        this.m_noiseGateNode = undefined;
+
+        this.m_noiseGateState = AudioNodeState.DISCONNECTED;
+
+        console.debug(`[${CLASS_NAME}] disconnectNoiseGate`);
     }
 
     public setNoiseGateParams(params: NoiseGateParams): void
@@ -264,28 +291,36 @@ export class MicAudioProcessing
 
     public connectGain(): void
     {
-        if (this.m_micNode && !this.m_isGainNodeConnected)
+        if (!this.m_micNode
+            || this.m_gainState !== AudioNodeState.DISCONNECTED
+        )
         {
-            //this.ui.manualGainRange.addEventListener("change", this.onChangeGainRange);
-
-            this.addLastProcessingNode(this.m_gainNode);
-            this.m_isGainNodeConnected = true;
-
-            console.debug(`[${CLASS_NAME}] connectGain`);
+            return;
         }
+
+        //this.ui.manualGainRange.addEventListener("change", this.onChangeGainRange);
+
+        this.addLastProcessingNode(this.m_gainNode);
+        this.m_gainState = AudioNodeState.CONNECTED;
+
+        console.debug(`[${CLASS_NAME}] connectGain`);
     }
 
     public disconnectGain(): void
     {
-        if (this.m_micNode && this.m_isGainNodeConnected)
+        if (!this.m_micNode
+            || this.m_gainState !== AudioNodeState.CONNECTED
+        )
         {
-            //this.ui.manualGainRange.removeEventListener("change", this.onChangeGainRange);
-
-            this.removeProcessingNode(this.m_gainNode);
-            this.m_isGainNodeConnected = false;
-
-            console.debug(`[${CLASS_NAME}] disconnectGain`);
+            return;
         }
+
+        //this.ui.manualGainRange.removeEventListener("change", this.onChangeGainRange);
+
+        this.removeProcessingNode(this.m_gainNode);
+        this.m_gainState = AudioNodeState.DISCONNECTED;
+
+        console.debug(`[${CLASS_NAME}] disconnectGain`);
     }
 
     public setGainValue(value: number): void
@@ -330,16 +365,15 @@ export class MicAudioProcessing
     {
         const lastNode = this.m_processingNodesList.getLast();
 
-        // Если список пуст.
+        // If list is empty.
         if (lastNode === undefined)
         {
             return;
         }
 
-        // Отключаем исходящие соединения.
         node.disconnect();
 
-        // Если удаляемый узел находится в конце.
+        // If removed node is last one.
         if (node === lastNode)
         {
             this.m_processingNodesList.removeLast();
@@ -352,7 +386,7 @@ export class MicAudioProcessing
                 prevNode.connect(this.m_outputNodeDestination);
             }
         }
-        else // Если в середине
+        else // If not
         {
             const [prevNode, nextNode] = this.m_processingNodesList.getNeighboringNodes(node);
 
