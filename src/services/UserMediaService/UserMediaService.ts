@@ -122,11 +122,6 @@ export class UserMediaService
 
         (constraints.audio as MediaTrackConstraints).deviceId = { ideal: deviceId };
 
-        // Применяем настройки шумоподавления и эхоподавления.
-        //(constraints.audio as MediaTrackConstraints).noiseSuppression = this.ui.checkboxEnableNoiseSuppression.checked;
-        //(constraints.audio as MediaTrackConstraints).echoCancellation = this.ui.checkboxEnableEchoCancellation.checked;
-        //(constraints.audio as MediaTrackConstraints).autoGainControl = this.ui.checkboxEnableAutoGainControl.checked;
-
         // Workaround: on Chromium on first page visit
         // when we don't have permission for devices id.
         if (deviceId === "")
