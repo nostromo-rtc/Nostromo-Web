@@ -5,7 +5,6 @@
 */
 
 //import { UiSound } from "../../legacy/src/rooms/scripts/UI";
-//import { MicAudioProcessing } from "../../legacy/src/rooms/scripts/MicAudioProcessing";
 //import { UnsupportedError } from "../../legacy/src/rooms/scripts/AppError";
 
 import { NumericConstants } from "../../utils/NumericConstants";
