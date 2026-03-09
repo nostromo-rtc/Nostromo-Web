@@ -425,7 +425,7 @@ export class UserMediaService
     ): Promise<string>
     {
         console.debug("[UserMedia] > getUserMedia", streamConstraints);
-        const mediaStream: MediaStream = await navigator.mediaDevices.getUserMedia(streamConstraints);
+        let mediaStream: MediaStream = await navigator.mediaDevices.getUserMedia(streamConstraints);
 
         // Update devices list after get permissions
         // to get real id of device.
@@ -446,7 +446,8 @@ export class UserMediaService
 
         if (streamConstraints.audio as boolean)
         {
-            const proccessedStream = (await this.handleMicAudioProcessing(mediaStream)).clone();
+            const processedStream = (await this.handleMicAudioProcessing(mediaStream)).clone();
+            mediaStream = processedStream;
 
             console.debug("[UserMedia] > Captured mic settings:",
                 mediaStream.getAudioTracks()[NumericConstants.ZERO_IDX].getSettings()
