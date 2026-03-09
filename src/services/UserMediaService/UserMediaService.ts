@@ -571,9 +571,11 @@ export class UserMediaService
     private handleMicOutput(): void
     {
         const micListening = this.m_settingsService.getSettingsSnapshot().audio.mic.enableMicListening;
-        if (micListening) {
+        if (micListening)
+        {
             this.m_micAudioProcessing.listenOutput();
-        } else {
+        } else
+        {
             this.m_micAudioProcessing.stopListenOutput();
         }
     }
@@ -600,10 +602,12 @@ export class UserMediaService
     private handleMicManualGain(): void
     {
         const gain = this.m_settingsService.getSettingsSnapshot().audio.mic.gain;
-        if (gain.enableManualGainControl) {
+        if (gain.enableManualGainControl)
+        {
             this.m_micAudioProcessing.connectGain();
             this.m_micAudioProcessing.setGainValue(gain.manualGain);
-        } else {
+        } else
+        {
             this.m_micAudioProcessing.disconnectGain();
         }
     }
