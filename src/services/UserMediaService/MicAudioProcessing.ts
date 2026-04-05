@@ -7,6 +7,7 @@
 import { WorkerUrl } from "worker-url";
 import { DoublyLinkedList } from "../../utils/DoublyLinkedList";
 import { NumericConstants } from "../../utils/NumericConstants";
+import { AudioVolumeStorage } from "./AudioVolumeStorage";
 import { NoiseGateOptions, NoiseGateParams } from "../AudioWorklets/NoiseGate";
 
 const CLASS_NAME = "MicAudioProcessing";
@@ -14,6 +15,7 @@ const CLASS_NAME = "MicAudioProcessing";
 export class MicAudioProcessing
 {
     private readonly m_ctx: AudioContext;
+    private readonly m_audioVolumeStorage: AudioVolumeStorage;
 
     /** Микрофон (источник, вход). */
     private m_micNode?: MediaStreamAudioSourceNode;
@@ -46,9 +48,10 @@ export class MicAudioProcessing
     private m_isVolumeMeterReady = false;
     private m_isNoiseGateReady = false;
 
-    public constructor(ctx: AudioContext)
+    public constructor(ctx: AudioContext, audioVolumeStorage: AudioVolumeStorage)
     {
         this.m_ctx = ctx;
+        this.m_audioVolumeStorage = audioVolumeStorage;
 
         this.m_outputNodeDestination = this.m_ctx.createMediaStreamDestination();
         this.m_outputNode = this.m_ctx.createMediaStreamSource(this.m_outputNodeDestination.stream);
@@ -120,20 +123,24 @@ export class MicAudioProcessing
 
     public connectVolumeMeter(): void
     {
-        const scaleFactor = 500;
+        const scaleFactor = 100;
 
         if (this.m_isVolumeMeterReady && this.m_volumeMeterNode === undefined)
         {
             this.m_volumeMeterNode = new AudioWorkletNode(this.m_ctx, "volume-meter");
-
-            this.m_volumeMeterNode.port.onmessage = ({ data }) =>
-            {
-                console.debug(data * scaleFactor);
-            };
         }
 
         if (this.m_micNode && this.m_volumeMeterNode && !this.m_isVolumeMeterConnected)
         {
+            const streamId = this.m_micNode.mediaStream.id;
+
+            this.m_volumeMeterNode.port.onmessage = ({ data }) =>
+            {
+                this.m_audioVolumeStorage.setAudioVolumeInfo({
+                    streamId, volume: data * scaleFactor
+                });
+            };
+
             this.m_outputNode.connect(this.m_volumeMeterNode);
             this.m_isVolumeMeterConnected = true;
 

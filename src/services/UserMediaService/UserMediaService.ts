@@ -8,6 +8,7 @@
 //import { UnsupportedError } from "../../legacy/src/rooms/scripts/AppError";
 
 import { NumericConstants } from "../../utils/NumericConstants";
+import { AudioVolumeStorage } from "./AudioVolumeStorage";
 import { CamState, CamStatesModel } from "./CamStatesModel";
 import { DisplayState, DisplayStateModel } from "./DisplayStateModel";
 import { MicAudioProcessing } from "./MicAudioProcessing";
@@ -49,8 +50,12 @@ export class UserMediaService
     private readonly m_micStateModel = new MicStateModel();
     private readonly m_displayStateModel = new DisplayStateModel();
     private readonly m_camStatesModel = new CamStatesModel();
+    private readonly m_audioVolumeStorage = new AudioVolumeStorage();
     private readonly m_audioContext: AudioContext = this.createAudioContext();
-    private readonly m_micAudioProcessing: MicAudioProcessing = new MicAudioProcessing(this.m_audioContext);
+    private readonly m_micAudioProcessing: MicAudioProcessing = new MicAudioProcessing(
+        this.m_audioContext, this.m_audioVolumeStorage
+    );
+
     public constructor()
     {
         console.debug("[UserMedia] > constructor");
@@ -86,6 +91,11 @@ export class UserMediaService
     public get camStatesModel(): CamStatesModel
     {
         return this.m_camStatesModel;
+    }
+
+    public get audioVolumeStorage(): AudioVolumeStorage
+    {
+        return this.m_audioVolumeStorage;
     }
 
     public async getMic(deviceId: string): Promise<boolean>

@@ -5,18 +5,21 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
+import "./VideoLayout.css";
+
 import Button from "@mui/material/Button";
-import { FC, memo, useCallback, useEffect, useState } from "react";
+import { FC, memo, useCallback, useContext, useEffect, useState } from "react";
 import { FaDesktop } from "react-icons/fa";
 import { MdNavigateBefore, MdNavigateNext } from "react-icons/md";
 import { useResizeDetector } from "react-resize-detector";
 
+import { UserMediaServiceContext } from "../../../AppWrapper";
+import { MicState, useMicStateModel } from "../../../services/UserMediaService/MicStateModel";
+import { NumericConstants as NC } from "../../../utils/NumericConstants";
+import { AudioVolumeBorder } from "./AudioVolumeBorder";
 import { Video } from "./Video";
 import { calculateLastPageIdx, calculateVideoItemSize, ElementSize, VideoLayoutItem, VideoLayoutItemInfo, VideoLayoutMatrixState, VideoList } from "./VideoLayoutItem";
 
-import { NumericConstants as NC } from "../../../utils/NumericConstants";
-
-import "./VideoLayout.css";
 
 // Minimal video item width.
 const MIN_ITEM_WIDTH = 320;
@@ -89,6 +92,9 @@ function calculateVideoItemSizeForPage(layoutWidth: number, layoutHeight: number
 
 const VideoLayout: FC<VideoLayoutProps> = ({ videoList }) =>
 {
+    const userMediaService = useContext(UserMediaServiceContext);
+    const micStateInfo = useMicStateModel(userMediaService.micStateModel);
+
     const [matrixState, setMatrixState] = useState<VideoLayoutMatrixState>({
         itemCount: MIN_ITEM_COUNT,
         videoItemSize: { width: MIN_ITEM_WIDTH, height: MIN_ITEM_HEIGHT },
@@ -194,6 +200,9 @@ const VideoLayout: FC<VideoLayoutProps> = ({ videoList }) =>
                     height: matrixState.videoItemSize.height
                 }}
             >
+                {micStateInfo.state === MicState.WORKING
+                    ? <AudioVolumeBorder userMediaService={userMediaService} />
+                    : <></>}
                 {
                     !video.streamInfo?.stream ?
                         <span className="v-align-middle">{video.label}</span> :
