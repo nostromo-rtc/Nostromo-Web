@@ -4,12 +4,13 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
+import "./SettingsParametersList.css";
+
 import React from "react";
 
 import { ISettingsCategories } from "../../pages/SettingsLayer";
+import { AudioSettings } from "./SettingsCategories/AudioSettings";
 import { GeneralSettings } from "./SettingsCategories/GeneralSettings";
-
-import "./SettingsParametersList.css";
 
 interface SettingsParametersListProps
 {
@@ -28,21 +29,6 @@ export const SettingsParametersList: React.FC<SettingsParametersListProps> = ({
 }) =>
 {
     /*
-        if (paramValue.type === "Slider")
-        {
-            elements.push(
-                <ListItemSlider
-                    key={parameterId}
-                    label={parametersInfoMap[parameterId].name + ": " + groupMap[parameter].toString()}
-                    description={parametersInfoMap[parameterId].description}
-                    value={Number(groupMap[parameter])}
-                    onValueChange={(val) =>
-                    {
-                        handleParameterChange(section, group, parameter, val);
-                    }}
-                />
-            );
-        }
         else if (paramValue.type === "Input")
         {
             elements.push(
@@ -77,14 +63,12 @@ export const SettingsParametersList: React.FC<SettingsParametersListProps> = ({
         }
     };*/
 
-    // <p className="settings-group-label" key={groupId}>{group}</p>
-
     switch (selectedCategoryId)
     {
         case categories.general.id:
             return <GeneralSettings categoryName={categories.general.name} />;
         case categories.audio.id:
-            return <></>;
+            return <AudioSettings categoryName={categories.audio.name} />;
         case categories.video.id:
             return <></>;
         case categories.display.id:

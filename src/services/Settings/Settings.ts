@@ -4,6 +4,14 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
+// When changing the values here,
+// don't forget to change them also in 'NoiseGate' AudioWorklet.
+export const NoiseGateParamsSpecs = {
+    attack: {default: 0.2, min: 0, max: 0.3},
+    release: {default: 0.2, min: 0, max: 0.3},
+    threshold: {default: -50, min: -100, max: 0},
+} as const;
+
 export interface ISettings
 {
     general:
@@ -18,6 +26,7 @@ export interface ISettings
     {
         mic:
         {
+            enableMicListening: boolean;
             processing:
             {
                 enableNoiseSuppression: boolean;
@@ -68,6 +77,7 @@ export const DefaultSettings: ISettings =
     {
         mic:
         {
+            enableMicListening: false,
             processing:
             {
                 enableNoiseSuppression: true,
@@ -82,8 +92,8 @@ export const DefaultSettings: ISettings =
             noiseGate:
             {
                 enableNoiseGate: false,
-                noiseGateDelay: 0.2,
-                noiseGateThreshold: -50,
+                noiseGateDelay: NoiseGateParamsSpecs.attack.default,
+                noiseGateThreshold: NoiseGateParamsSpecs.threshold.default,
             }
         }
     },
