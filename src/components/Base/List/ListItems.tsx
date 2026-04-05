@@ -313,11 +313,19 @@ export const ListItemSelect: React.FC<ListItemSelectProps> = ({
     );
 };
 
-type ListItemSliderProps = ListItemWithValueProps<number>;
+interface ListItemSliderProps extends ListItemWithValueProps<number>
+{
+    min: number;
+    max: number;
+    step: number;
+}
 
 export const ListItemSlider: React.FC<ListItemSliderProps> = ({
     label,
     value,
+    min,
+    max,
+    step,
     onValueChange,
     ...props
 }) =>
@@ -376,6 +384,9 @@ export const ListItemSlider: React.FC<ListItemSliderProps> = ({
                 <div className="list-item-slider-container">
                     <Slider
                         value={value}
+                        min={min}
+                        max={max}
+                        step={step}
                         onChange={handleSliderChange}
                         onKeyDown={handleSliderKeyDown}
                         valueLabelDisplay="auto"
