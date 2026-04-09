@@ -9,11 +9,12 @@
 import "./RoomList.css";
 
 import { PublicRoomInfo } from "nostromo-shared/types/RoomTypes";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 
+import { SocketManagerContext } from "../../AppWrapper";
 import { List } from "../../components/Base/List/List";
 import { SearchPanel } from "../../components/Base/List/SearchPanel";
-import { LoadedRoomList } from "../../services/RoomService";
+import { useRoomListModel } from "../../services/SocketService/RoomListModel";
 import { NumericConstants as NC } from "../../utils/NumericConstants";
 
 export interface RoomListProps
@@ -29,12 +30,9 @@ export interface RoomListProps
 export const RoomList: React.FC<RoomListProps> = ({ roomListToMap, className = "" }) =>
 {
     const [filter, setFilter] = useState<string>("");
-    const [roomsList, setRoomsList] = useState<PublicRoomInfo[]>([]);
 
-    useEffect(() =>
-    {
-        setRoomsList(LoadedRoomList);
-    }, []);
+    const socketManager = useContext(SocketManagerContext);
+    const roomsList = useRoomListModel(socketManager.generalSocketService.roomListModel);
 
     const roomNameFilter = (room: PublicRoomInfo): boolean =>
     {

@@ -2,24 +2,6 @@
 
 import { UserInfo } from "nostromo-shared/types/RoomTypes";
 
-export const LoadedRoomList: PublicRoomInfo[] = [
-    { id: "G_OShinfHXD", name: "Главная", videoCodec: VideoCodec.H264 },
-    { id: "NV6oozYIm2T", name: "Netrunners", videoCodec: VideoCodec.H264 },
-    { id: "Jqd0wDUDONo", name: "edu", videoCodec: VideoCodec.H264 },
-    { id: "Y3OG7r9Qh6s", name: "Статус МОС", videoCodec: VideoCodec.H264 },
-    { id: "q61oq10dUu5", name: "g", videoCodec: VideoCodec.H264 },
-    { id: "3tzcDFnVEWz", name: "infedu", videoCodec: VideoCodec.H264 },
-    { id: "9KT5a-wPftO", name: "mos-research", videoCodec: VideoCodec.H264 },
-    { id: "KjWPqLcbHRi", name: "mos-devel", videoCodec: VideoCodec.H264 },
-    { id: "inSdz0nbvA4", name: "vp9", videoCodec: VideoCodec.H264 },
-    { id: "_efhN2j8tp1", name: "Предприятие 3826", videoCodec: VideoCodec.H264 },
-    { id: "meD6afojFJY", name: "fam", videoCodec: VideoCodec.H264 },
-    { id: "zaogu1TOQmu", name: "cco", videoCodec: VideoCodec.H264 },
-    { id: "OkpHvA4_FxH", name: "hh", videoCodec: VideoCodec.H264 },
-    { id: "_N4fIk3RfAe", name: "forall", videoCodec: VideoCodec.H264 },
-    { id: "uMxk3nLNQP5", name: "Clio", videoCodec: VideoCodec.H264 },
-];
-
 export const LoadedUserList: UserInfo[] = [
     { id: "id111", name: "Первый" },
     { id: "id222", name: "Второй" },
