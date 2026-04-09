@@ -11,7 +11,7 @@ import App from "./App";
 
 import { useHotkey } from "./hooks/UseHotkey";
 
-import { GeneralSocketService } from "./services/GeneralSocketService/GeneralSocketService";
+import { SocketManager } from "./services/SocketService/SocketManager";
 import { CamStatesNotificationsService } from "./services/Notifications/CamStatesNotificationsService";
 import { DisplayStateNotificationsService } from "./services/Notifications/DisplayStateNotificationsService";
 import { MicStateNotificationsService } from "./services/Notifications/MicStateNotificationsService";
@@ -22,12 +22,12 @@ import { UserMediaService } from "./services/UserMediaService/UserMediaService";
 const settingService = new SettingService();
 const userMediaService = new UserMediaService(settingService);
 const notificationService = new NotificationsService();
-const generalSocketService = new GeneralSocketService();
+const socketManager = new SocketManager();
 
 export const SettingsContext = createContext<SettingService>(settingService);
 export const UserMediaServiceContext = createContext<UserMediaService>(userMediaService);
 export const NotificationsContext = createContext<NotificationsService>(notificationService);
-export const GeneralSocketServiceContext = createContext<GeneralSocketService>(generalSocketService);
+export const SocketManagerContext = createContext<SocketManager>(socketManager);
 
 const micStateNotificationsService = new MicStateNotificationsService(
     userMediaService,

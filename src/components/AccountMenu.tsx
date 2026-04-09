@@ -12,8 +12,8 @@ import { BiChevronDown, BiChevronUp } from "react-icons/bi";
 import { MdEdit, MdSettings } from "react-icons/md";
 
 import { SetShowSettingsContext } from "../App";
-import { GeneralSocketServiceContext } from "../AppWrapper";
-import { useUserModel } from "../services/GeneralSocketService/UserModel";
+import { SocketManagerContext } from "../AppWrapper";
+import { useUserModel } from "../services/SocketService/UserModel";
 import { doNotHandleEvent } from "../utils/Utils";
 import { TextEditDialog } from "./Dialog/TextEditDialog";
 import { MenuItemWithIcon } from "./Menu/MenuItems";
@@ -26,7 +26,8 @@ export const AccountMenu: React.FC = () =>
     const btnRef = useRef<HTMLButtonElement>(null);
     const [open, setOpen] = useState<boolean>(false);
 
-    const generalSocketService = useContext(GeneralSocketServiceContext);
+    const socketManager = useContext(SocketManagerContext);
+    const generalSocketService = socketManager.generalSocketService;
     const userInfo = useUserModel(generalSocketService.userModel);
 
     const [nameEditDialogOpen, setNameEditDialogOpen] = useState<boolean>(false);

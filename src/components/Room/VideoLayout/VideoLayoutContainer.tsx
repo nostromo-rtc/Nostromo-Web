@@ -12,8 +12,8 @@ import { Button } from "@mui/material";
 import React, { MouseEventHandler, useContext, useState } from 'react';
 import { LuLayoutGrid } from "react-icons/lu";
 
-import { GeneralSocketServiceContext, UserMediaServiceContext } from "../../../AppWrapper";
-import { useUserModel } from "../../../services/GeneralSocketService/UserModel";
+import { SocketManagerContext, UserMediaServiceContext } from "../../../AppWrapper";
+import { useUserModel } from "../../../services/SocketService/UserModel";
 import { useUserMediaStreamStorage } from "../../../services/UserMediaService/UserMediaStreamStorage";
 import { NumericConstants } from "../../../utils/NumericConstants";
 import { Tooltip } from '../../Tooltip';
@@ -27,10 +27,10 @@ export const VideoLayoutContainer: React.FC = () =>
 {
     const [asymmetricLayout, setAsymmetricLayout] = useState<boolean>(false);
 
-    const generalSocketService = useContext(GeneralSocketServiceContext);
+    const socketManager = useContext(SocketManagerContext);
     const userMediaService = useContext(UserMediaServiceContext);
 
-    const userInfo = useUserModel(generalSocketService.userModel);
+    const userInfo = useUserModel(socketManager.generalSocketService.userModel);
     const streams = useUserMediaStreamStorage(userMediaService.streamStorage);
 
     const videoList: VideoList = [];
