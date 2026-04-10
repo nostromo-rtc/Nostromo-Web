@@ -40,7 +40,7 @@
     "jest": "^27.4.3",
     "jest-resolve": "^27.4.2",
     "jest-watch-typeahead": "^1.0.0",
-    "mediasoup-client": "^3.6.57",
+    "mediasoup-client": "^3.15.7",
     "mini-css-extract-plugin": "^2.4.5",
     "nostromo-shared": "git+https://git@gitlab.com/nostromo-rtc/nostromo-shared.git#new-ui",
     "plyr": "^3.7.2",
