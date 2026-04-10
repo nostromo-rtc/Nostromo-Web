@@ -7,6 +7,7 @@
 
 import "./Message.css";
 
+import { ChatFileInfo, ChatMessage } from "nostromo-shared/types/RoomTypes";
 import { FC } from "react";
 
 import { NumericConstants as NC } from "../../../../utils/NumericConstants";
@@ -14,22 +15,8 @@ import { getTimestamp } from "../../../../utils/Utils";
 import { FileMessageContent } from "./FileMessageContent";
 import { StyledMessageContent } from "./StyledMessageContent";
 
-/** Информация о файле в чате. */
-export interface ChatFileInfo
-{
-    fileId: string;
-    name: string;
-    size: number;
-}
 const USER_ID_PRECISION = 4;
-/** Информация о сообщении в чате. */
-interface ChatMessage
-{
-    userId: string;
-    type: "file" | "text";
-    datetime: number;
-    content: ChatFileInfo | string;
-}
+
 interface MessageProps
 {
     message: ChatMessage;

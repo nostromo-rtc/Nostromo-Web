@@ -9,6 +9,7 @@
 import "./Chat.css";
 
 import { Button } from '@mui/material';
+import { ChatMessage } from "nostromo-shared/types/RoomTypes";
 import React, { ChangeEventHandler, useEffect, useRef, useState } from 'react';
 import { ImAttachment } from 'react-icons/im';
 import { MdSend } from 'react-icons/md';
@@ -17,16 +18,7 @@ import { NumericConstants as NC } from "../../../utils/NumericConstants";
 import { ReactDispatch, isEmptyString } from "../../../utils/Utils";
 import { Tooltip } from '../../Tooltip';
 import { Message } from './Message/Message';
-import { ChatFileInfo, LoadFileInfo, UploadingFilesQueue } from './UploadingFilesQueue';
-
-/** Информация о сообщении в чате. */
-interface ChatMessage
-{
-    userId: string;
-    type: "file" | "text";
-    datetime: number;
-    content: ChatFileInfo | string;
-}
+import { LoadFileInfo, UploadingFilesQueue } from './UploadingFilesQueue';
 
 interface ChatProps
 {

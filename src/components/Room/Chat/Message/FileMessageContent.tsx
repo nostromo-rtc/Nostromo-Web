@@ -6,12 +6,12 @@
 
 import "./FileMessageContent.css";
 
+import { ChatFileInfo } from "nostromo-shared/types/RoomTypes";
 import { FC } from "react";
 import { Link } from "react-router-dom";
 
 import { NumericConstants as NC } from "../../../../utils/NumericConstants";
 import { PrefixConstants } from "../../../../utils/Utils";
-import { ChatFileInfo } from "./Message";
 
 interface FileMessageContentProps
 {
