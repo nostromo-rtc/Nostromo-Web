@@ -5,12 +5,13 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
+import "./MainLayer.css";
+
 import { createContext, useContext, useState } from "react";
+
+import { SetShowAdminPanelContext, SetShowSettingsContext } from "../App";
 import { Navbar } from "../components/Navbar";
 import { PageRouter } from "../components/PageRouter";
-
-import "./MainLayer.css";
-import { SetShowAdminPanelContext, SetShowSettingsContext } from "../App";
 
 // Объект React Context.
 // eslint-disable-next-line @typescript-eslint/naming-convention

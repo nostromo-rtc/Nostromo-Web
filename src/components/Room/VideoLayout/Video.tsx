@@ -1,6 +1,6 @@
 import React, { VideoHTMLAttributes, useEffect, useRef } from 'react';
 
-interface VideoProps extends VideoHTMLAttributes<HTMLVideoElement> 
+interface VideoProps extends VideoHTMLAttributes<HTMLVideoElement>
 {
     srcObject?: MediaStream;
 }
@@ -11,7 +11,7 @@ export const Video: React.FC<VideoProps> = ({ srcObject, ...props }) =>
 
     useEffect(() =>
     {
-        if (!videoRef.current || !srcObject) 
+        if (!videoRef.current || !srcObject)
         {
             return;
         }

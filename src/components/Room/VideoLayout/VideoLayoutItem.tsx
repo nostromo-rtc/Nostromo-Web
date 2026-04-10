@@ -5,12 +5,12 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
+import "./VideoLayoutItem.css";
+
 import { HTMLAttributes, ReactNode } from "react";
 
 import { MediaStreamInfo } from "../../../services/UserMediaService/UserMediaStreamStorage";
 import { NumericConstants as NC } from "../../../utils/NumericConstants";
-
-import "./VideoLayoutItem.css";
 
 export interface VideoLayoutItemInfo
 {

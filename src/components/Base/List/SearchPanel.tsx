@@ -6,10 +6,11 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
+import "./SearchPanel.css";
 
 import React, { ChangeEventHandler } from "react";
+
 import { Input } from "../Input";
-import "./SearchPanel.css";
 
 interface SearchPanelProps extends React.HTMLAttributes<HTMLDivElement>
 {

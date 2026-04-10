@@ -7,12 +7,12 @@
 import React, { useContext, useRef, useState } from "react";
 
 import { SettingsContext } from "../../../AppWrapper";
+import { ISettings } from "../../../services/Settings/Settings";
 import { useSettings } from "../../../services/Settings/SettingsService";
 import { List } from "../../Base/List/List";
 import { ListItemButton, ListItemSwitch } from "../../Base/List/ListItems";
 import { RestoreSettingsDialog } from "../RestoreSettingsDialog";
 import { SettingsCategoryProps } from "../SettingsParametersList";
-import { ISettings } from "../../../services/Settings/Settings";
 
 export const GeneralSettings: React.FC<SettingsCategoryProps> = ({ categoryName }) =>
 {

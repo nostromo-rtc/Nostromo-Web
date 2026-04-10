@@ -5,11 +5,13 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
+import "./UploadingFilesQueue.css";
+
 import { MouseEventHandler, useRef } from "react";
 import { FcFile } from "react-icons/fc";
+
 import { NumericConstants as NC } from "../../../utils/NumericConstants";
 import { PrefixConstants, ReactDispatch } from "../../../utils/Utils";
-import "./UploadingFilesQueue.css";
 
 // TODO: Не забыть убрать отсюда после наладки работы с NS Shared
 export interface ChatFileInfo

@@ -4,11 +4,13 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
+import "./FileMessageContent.css";
+
 import { FC } from "react";
 import { Link } from "react-router-dom";
+
 import { NumericConstants as NC } from "../../../../utils/NumericConstants";
 import { PrefixConstants } from "../../../../utils/Utils";
-import "./FileMessageContent.css";
 import { ChatFileInfo } from "./Message";
 
 interface FileMessageContentProps

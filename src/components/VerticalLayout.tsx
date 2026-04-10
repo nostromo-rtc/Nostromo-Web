@@ -1,7 +1,7 @@
-import React, { ReactNode, useRef, useState } from "react";
-
 import "./Header.css";
 import "./VerticalLayout.css";
+
+import React, { ReactNode, useRef, useState } from "react";
 
 type DivPointerEventHandler = React.PointerEventHandler<HTMLDivElement>;
 

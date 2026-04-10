@@ -5,6 +5,8 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
+import "./NotificationLayer.css";
+
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { VscError, VscInfo, VscWarning } from "react-icons/vsc";
 
@@ -13,8 +15,6 @@ import { ModalNotification } from "../components/Base/Notification/ModalNotifica
 import { PopupNotification } from "../components/Base/Notification/PopupNotification";
 import { Notification, NotificationSeverity, NotificationType, useNotifications } from "../services/NotificationsService";
 import { useSettings } from "../services/Settings/SettingsService";
-
-import "./NotificationLayer.css";
 
 const PANEL_HEIGHT_COEFFICIENT = 0.8;
 

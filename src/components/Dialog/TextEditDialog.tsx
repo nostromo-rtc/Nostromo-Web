@@ -5,14 +5,14 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
-import React, { ChangeEventHandler, KeyboardEventHandler, MouseEventHandler, useState } from "react";
+import "./TextEditDialog.css";
 
 import { Button } from "@mui/material";
+import React, { ChangeEventHandler, KeyboardEventHandler, MouseEventHandler, useState } from "react";
+
 import { doNotHandleEvent } from "../../utils/Utils";
 import { FocusTrap } from "../Base/FocusTrap";
 import { Input } from "../Base/Input";
-
-import "./TextEditDialog.css";
 
 interface TextEditDialogBaseProps
 {

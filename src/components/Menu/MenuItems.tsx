@@ -4,13 +4,15 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
+import "./MenuItems.css";
+
 import { Divider, MenuItem, MenuItemProps, SelectChangeEvent, Slider } from "@mui/material";
 import { ReactElement, useRef, useState } from "react";
 import { MdCheckBox, MdCheckBoxOutlineBlank, MdInfoOutline, MdRadioButtonChecked, MdRadioButtonUnchecked } from "react-icons/md";
+
 import { moveFocus } from "../../utils/FocusUtils";
 import { NumericConstants as NC } from "../../utils/NumericConstants";
 import { Select } from "../Base/Select";
-import "./MenuItems.css";
 
 type LiFocusHandler = React.FocusEventHandler<HTMLLIElement>;
 type LiKeyboardEventHandler = React.KeyboardEventHandler<HTMLLIElement>;

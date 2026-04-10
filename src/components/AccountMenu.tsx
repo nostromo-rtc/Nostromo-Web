@@ -4,21 +4,20 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
+import "./AccountMenu.css";
+
 import { Avatar, Button, Divider, Menu as MuiMenu } from "@mui/material";
 import React, { ReactEventHandler, useContext, useRef, useState } from "react";
 import { BiChevronDown, BiChevronUp } from "react-icons/bi";
 import { MdEdit, MdSettings } from "react-icons/md";
 
 import { SetShowSettingsContext } from "../App";
-import { TextEditDialog } from "./Dialog/TextEditDialog";
-import { MenuItemWithIcon } from "./Menu/MenuItems";
-import { Tooltip } from "./Tooltip";
-
 import { GeneralSocketServiceContext } from "../AppWrapper";
 import { useUserModel } from "../services/GeneralSocketService/UserModel";
 import { doNotHandleEvent } from "../utils/Utils";
-
-import "./AccountMenu.css";
+import { TextEditDialog } from "./Dialog/TextEditDialog";
+import { MenuItemWithIcon } from "./Menu/MenuItems";
+import { Tooltip } from "./Tooltip";
 
 export const AccountMenu: React.FC = () =>
 {

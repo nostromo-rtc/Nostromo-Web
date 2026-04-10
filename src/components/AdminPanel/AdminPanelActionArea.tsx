@@ -6,10 +6,10 @@
 
 import React from "react";
 
-import { BlockByIP } from "./AdminPanelActions/BlockByIP";
-import { ManageRooms } from "./AdminPanelActions/ManageRooms";
-import { CreateRoom } from "./AdminPanelActions/CreateRoom";
 import { IAdminPanelCategories } from "../../pages/AdminPanelLayer";
+import { BlockByIP } from "./AdminPanelActions/BlockByIP";
+import { CreateRoom } from "./AdminPanelActions/CreateRoom";
+import { ManageRooms } from "./AdminPanelActions/ManageRooms";
 
 interface AdminPanelActionAreaProps
 {

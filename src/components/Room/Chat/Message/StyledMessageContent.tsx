@@ -4,9 +4,11 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
-import { FC, Fragment } from "react";
-import { NumericConstants as NC } from "../../../../utils/NumericConstants";
 import "./StyledMessageContent.css";
+
+import { FC, Fragment } from "react";
+
+import { NumericConstants as NC } from "../../../../utils/NumericConstants";
 
 const URL_RE = /[\S.]+\.\S{1,}[\w|/|#]/g;                          //!< Ссылки
 const INLINE_CODE_OPEN_TAG_RE = /(\s|^)(`\n?)[^`]/;                //!< Метка начала блока отображения кода в пределах 1 строки

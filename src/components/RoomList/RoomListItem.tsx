@@ -6,14 +6,14 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
-import React, { KeyboardEventHandler, MouseEventHandler, forwardRef } from "react";
+import "./RoomListItem.css";
 
 import { Avatar } from "@mui/material";
+import { KeyboardEventHandler, MouseEventHandler, forwardRef } from "react";
+
 import { PublicRoomInfo } from "../../services/RoomService";
 import { NumericConstants as NC } from "../../utils/NumericConstants";
 import { ListItem, ListItemProps } from "../Base/List/ListItems";
-
-import "./RoomListItem.css";
 
 interface RoomListItemProps extends ListItemProps
 {

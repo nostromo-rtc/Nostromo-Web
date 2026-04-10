@@ -1,8 +1,10 @@
+import "./SettingsParametersList.css";
+
 import { Button } from "@mui/material";
 import { FC, useEffect, useRef } from "react";
 import { CiWarning } from "react-icons/ci";
+
 import { FocusTrap } from "../Base/FocusTrap";
-import "./SettingsParametersList.css";
 
 interface RestoreSettingsDialogProps
 {

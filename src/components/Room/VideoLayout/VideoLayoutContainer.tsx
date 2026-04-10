@@ -6,21 +6,20 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
+import "./VideoLayoutContainer.css";
+
 import { Button } from "@mui/material";
 import React, { MouseEventHandler, useContext, useState } from 'react';
 import { LuLayoutGrid } from "react-icons/lu";
-
-import { Tooltip } from '../../Tooltip';
-import { MemoizedVideoAsymmetricLayout } from './VideoAsymmetricLayout';
-import { MemoizedVideoLayout } from "./VideoLayout";
-import { VideoList } from './VideoLayoutItem';
 
 import { GeneralSocketServiceContext, UserMediaServiceContext } from "../../../AppWrapper";
 import { useUserModel } from "../../../services/GeneralSocketService/UserModel";
 import { useUserMediaStreamStorage } from "../../../services/UserMediaService/UserMediaStreamStorage";
 import { NumericConstants } from "../../../utils/NumericConstants";
-
-import "./VideoLayoutContainer.css";
+import { Tooltip } from '../../Tooltip';
+import { MemoizedVideoAsymmetricLayout } from './VideoAsymmetricLayout';
+import { MemoizedVideoLayout } from "./VideoLayout";
+import { VideoList } from './VideoLayoutItem';
 
 const CAM_ID_SHORT_LENGTH = 4;
 

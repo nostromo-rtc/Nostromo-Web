@@ -5,11 +5,13 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
+import "./Message.css";
+
 import { FC } from "react";
+
 import { NumericConstants as NC } from "../../../../utils/NumericConstants";
 import { getTimestamp } from "../../../../utils/Utils";
 import { FileMessageContent } from "./FileMessageContent";
-import "./Message.css";
 import { StyledMessageContent } from "./StyledMessageContent";
 
 /** Информация о файле в чате. */

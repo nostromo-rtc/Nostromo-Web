@@ -5,6 +5,8 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
+import "./SettingsLayer.css";
+
 import React, { useContext, useEffect, useState } from "react";
 
 import { SetShowSettingsContext } from "../App";
@@ -12,10 +14,7 @@ import { FocusTrap } from "../components/Base/FocusTrap";
 import { ListEntry, SidebarList } from "../components/Base/SidebarList";
 import { SidebarView, SidebarViewMainArea } from "../components/Base/SidebarView";
 import { SettingsParametersList } from "../components/Settings/SettingsParametersList";
-
 import { NumericConstants as NC } from "../utils/NumericConstants";
-
-import "./SettingsLayer.css";
 
 export interface ISettingsCategories
 {

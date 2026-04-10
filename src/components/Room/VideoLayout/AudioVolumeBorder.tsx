@@ -8,9 +8,9 @@ import "./AudioVolumeBorder.css";
 
 import React from "react";
 
+import { useAudioVolumeStorage } from "../../../services/UserMediaService/AudioVolumeStorage";
 import { UserMediaService } from "../../../services/UserMediaService/UserMediaService";
 import { useUserMediaStreamStorage } from "../../../services/UserMediaService/UserMediaStreamStorage";
-import { useAudioVolumeStorage } from "../../../services/UserMediaService/AudioVolumeStorage";
 
 const ZERO_VOLUME = 0;
 

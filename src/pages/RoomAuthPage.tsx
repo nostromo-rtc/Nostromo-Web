@@ -1,9 +1,10 @@
-import React, { FormEvent, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { Header } from "../components/Header";
-
 import "../App.css";
 import "./RoomAuthPage.css";
+
+import React, { FormEvent, useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+
+import { Header } from "../components/Header";
 
 interface Params
 {

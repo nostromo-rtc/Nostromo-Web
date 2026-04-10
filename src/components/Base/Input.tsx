@@ -5,9 +5,10 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
-import React, { forwardRef, useState, KeyboardEventHandler, MouseEventHandler, RefObject, HTMLInputTypeAttribute } from "react";
 import "./Input.css";
+
 import { Button } from "@mui/material";
+import React, { forwardRef, HTMLInputTypeAttribute, KeyboardEventHandler, MouseEventHandler, RefObject, useState } from "react";
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 
 interface InputBaseProps extends React.HTMLAttributes<HTMLInputElement>

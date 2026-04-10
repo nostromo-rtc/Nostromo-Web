@@ -6,13 +6,15 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
-import { MouseEventHandler, useEffect, useRef, useState } from "react";
+import "./ManageUsers.css";
 
 import { Avatar, Button, Divider } from "@mui/material";
 import { UserInfo } from "nostromo-shared/types/RoomTypes";
+import { MouseEventHandler, useEffect, useRef, useState } from "react";
 import { BiBlock, BiDotsHorizontalRounded, BiEditAlt, BiMicrophoneOff, BiUserX, BiVideoOff } from "react-icons/bi";
 import { MdOutlineStopScreenShare } from "react-icons/md";
 import { RiArrowGoBackLine } from "react-icons/ri";
+
 import { LoadedUserList, PublicRoomInfo } from "../../../services/RoomService";
 import { NumericConstants as NC } from "../../../utils/NumericConstants";
 import { getToggleFunc } from "../../../utils/Utils";
@@ -23,8 +25,6 @@ import { TextEditDialog } from "../../Dialog/TextEditDialog";
 import { AnchorPosition, Menu, MenuList } from "../../Menu/Menu";
 import { MenuItemCheckbox, MenuItemWithIcon } from "../../Menu/MenuItems";
 import { Tooltip } from "../../Tooltip";
-
-import "./ManageUsers.css";
 
 interface ManageUsersListItemProps
 {

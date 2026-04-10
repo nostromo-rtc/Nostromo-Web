@@ -4,14 +4,13 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
+import "./SidebarList.css";
+
 import React, { FocusEventHandler } from "react";
 
 import { List } from "../Base/List/List";
 import { ListSectionLabel } from "../Base/List/ListItems";
-
 import { NumericConstants as NC } from "../../utils/NumericConstants";
-
-import "./SidebarList.css";
 
 export interface ListEntry
 {

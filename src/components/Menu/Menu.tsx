@@ -4,12 +4,12 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
-import { ClickAwayListener, Grow, MenuList as MuiMenuList, Paper, Popper } from "@mui/material";
+import "./Menu.css";
+
+import { ClickAwayListener, Grow, MenuList as MuiMenuList, Paper, Popper, PopperPlacementType } from "@mui/material";
 import React, { ReactNode, useEffect, useRef } from "react";
-import { PopperPlacementType } from "@mui/material";
 
 import { doNotHandleEvent } from "../../utils/Utils";
-import "./Menu.css";
 
 type DivKeyboardEventHandler = React.KeyboardEventHandler<HTMLDivElement>;
 

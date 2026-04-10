@@ -6,15 +6,15 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
-import { FC, MouseEventHandler, ReactNode, useState } from "react";
+import "./SidebarView.css";
 
 import { Button } from "@mui/material";
+import { FC, MouseEventHandler, ReactNode, useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import { TfiMenu } from "react-icons/tfi";
+
 import { NumericConstants as NC } from "../../utils/NumericConstants";
 import { Tooltip } from "../Tooltip";
-
-import "./SidebarView.css";
 
 interface SidebarViewMainAreaProps
 {

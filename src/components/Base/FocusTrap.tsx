@@ -1,6 +1,6 @@
-import React, { ReactNode, useEffect, useRef } from "react";
-
 import "./FocusTrap.css";
+
+import React, { ReactNode, useEffect, useRef } from "react";
 
 type DivKeyboardEventHandler = React.KeyboardEventHandler<HTMLDivElement>;
 

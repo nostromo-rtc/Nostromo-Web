@@ -6,18 +6,20 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
+import "./VideoAsymmetricLayout.css";
+import "./VideoLayout.css";
+
 import Button from "@mui/material/Button";
 import { FC, KeyboardEventHandler, MouseEventHandler, memo, useCallback, useEffect, useRef, useState } from "react";
 import { BsCameraVideoFill } from "react-icons/bs";
 import { MdNavigateNext } from "react-icons/md";
 import { useResizeDetector } from "react-resize-detector";
+
 import { NumericConstants as NC } from "../../../utils/NumericConstants";
 import { List } from "../../Base/List/List";
 import { ListItem } from "../../Base/List/ListItems";
-import "./VideoAsymmetricLayout.css";
-import "./VideoLayout.css";
-import { VideoLayoutItem, VideoLayoutItemInfo, VideoLayoutMatrixState, VideoList, calculateLastPageIdx, calculateVideoItemSize } from "./VideoLayoutItem";
 import { Video } from "./Video";
+import { VideoLayoutItem, VideoLayoutItemInfo, VideoLayoutMatrixState, VideoList, calculateLastPageIdx, calculateVideoItemSize } from "./VideoLayoutItem";
 
 // Minimal video item width.
 const MIN_ITEM_WIDTH = 155;

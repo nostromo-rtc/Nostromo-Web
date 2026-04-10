@@ -1,9 +1,10 @@
+import "./Header.css";
+
 import React from "react";
 
-import "./Header.css";
+import { AccountMenu } from "./AccountMenu";
 import { RoomHeaderToolbar, RoomHeaderToolbarProps } from "./Room/RoomHeaderToolbar";
 import { Tooltip } from "./Tooltip";
-import { AccountMenu } from "./AccountMenu";
 
 interface HeaderParams
 {

@@ -5,16 +5,15 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
-import React from 'react';
-import { NavLink } from 'react-router-dom';
 import logo from '../assets/nostromo-logo.svg';
-
 import "./Navbar.css";
-import { Tooltip } from "./Tooltip";
 
-import { MdSettings } from "react-icons/md";
-import { MdOutlineAdminPanelSettings } from "react-icons/md"
 import Button from "@mui/material/Button";
+import React from 'react';
+import { MdOutlineAdminPanelSettings, MdSettings } from "react-icons/md";
+import { NavLink } from 'react-router-dom';
+
+import { Tooltip } from "./Tooltip";
 
 interface NavbarProps
 {

@@ -6,10 +6,11 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
-import React, { forwardRef } from "react";
 import "./Switch.css";
 
+import React, { forwardRef } from "react";
 import { RiCheckboxCircleFill, RiCloseCircleFill } from "react-icons/ri";
+
 import { NumericConstants as NC } from "../../utils/NumericConstants";
 
 interface SwitchProps

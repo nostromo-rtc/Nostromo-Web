@@ -6,12 +6,13 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
+import "./DropArea.css";
+
 import React from "react";
 import { GiFiles } from "react-icons/gi";
 
-import "./DropArea.css";
-import { LoadFileInfo } from "./UploadingFilesQueue";
 import { ReactDispatch } from "../../../utils/Utils";
+import { LoadFileInfo } from "./UploadingFilesQueue";
 
 type DivDragEventHandler = React.DragEventHandler<HTMLDivElement>;
 

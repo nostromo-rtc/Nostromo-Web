@@ -6,14 +6,16 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
+import "./Chat.css";
+
 import { Button } from '@mui/material';
 import React, { ChangeEventHandler, useEffect, useRef, useState } from 'react';
 import { ImAttachment } from 'react-icons/im';
 import { MdSend } from 'react-icons/md';
+
 import { NumericConstants as NC } from "../../../utils/NumericConstants";
 import { ReactDispatch, isEmptyString } from "../../../utils/Utils";
 import { Tooltip } from '../../Tooltip';
-import "./Chat.css";
 import { Message } from './Message/Message';
 import { ChatFileInfo, LoadFileInfo, UploadingFilesQueue } from './UploadingFilesQueue';
 

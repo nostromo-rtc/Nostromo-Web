@@ -5,6 +5,8 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
+import "./AdminPanelLayer.css";
+
 import { useContext, useState } from "react";
 
 import { SetShowAdminPanelContext } from "../App";
@@ -12,10 +14,7 @@ import { AdminPanelActionArea } from "../components/AdminPanel/AdminPanelActionA
 import { FocusTrap } from "../components/Base/FocusTrap";
 import { ListEntry, SidebarList } from "../components/Base/SidebarList";
 import { SidebarView, SidebarViewMainArea } from "../components/Base/SidebarView";
-
 import { NumericConstants as NC } from "../utils/NumericConstants";
-
-import "./AdminPanelLayer.css";
 
 export interface IAdminPanelCategories
 {

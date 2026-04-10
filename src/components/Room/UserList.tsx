@@ -4,17 +4,18 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
-import { useEffect, useState } from "react";
 import "./UserList.css";
 
 import { Avatar, Divider } from "@mui/material";
 import { UserInfo } from "nostromo-shared/types/RoomTypes";
+import { useEffect, useState } from "react";
 import { HiHashtag, HiIdentification } from "react-icons/hi";
+
 import { getToggleFunc } from "../../utils/Utils";
-import { AnchorPosition, Menu, MenuList } from "../Menu/Menu";
-import { MenuItemCheckbox, MenuItemSlider, MenuItemWithIcon, MenuSectionLabel } from "../Menu/MenuItems";
 import { List } from "../Base/List/List";
 import { ListItem } from "../Base/List/ListItems";
+import { AnchorPosition, Menu, MenuList } from "../Menu/Menu";
+import { MenuItemCheckbox, MenuItemSlider, MenuItemWithIcon, MenuSectionLabel } from "../Menu/MenuItems";
 
 type DivClickEventHandler = React.MouseEventHandler<HTMLDivElement>;
 

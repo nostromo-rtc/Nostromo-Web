@@ -6,14 +6,16 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
+import "./PopupNotification.css";
+
 import { Button } from "@mui/material";
 import React, { MouseEventHandler, useCallback, useEffect, useRef, useState } from "react";
 import { MdClose } from "react-icons/md";
-import { getTimestamp } from "../../../utils/Utils";
+
 import { DO_NOT_STOP_AUTOCLOSE_TIMER, StopAutocloseTimerSemaphore } from "../../../pages/NotificationLayer";
 import { Notification, NotificationSeverity } from "../../../services/NotificationsService";
+import { getTimestamp } from "../../../utils/Utils";
 import { ModalNotification } from "./ModalNotification";
-import "./PopupNotification.css";
 
 const DISABLE_TIMER = 0;
 

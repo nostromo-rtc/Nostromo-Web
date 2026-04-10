@@ -4,9 +4,13 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
+import "../App.css";
+import "./RoomPage.css";
+
 import { Link } from "@mui/material";
 import React, { useContext, useEffect, useState } from "react";
 
+import { UserMediaServiceContext } from "../AppWrapper";
 import { Header } from "../components/Header";
 import { RoomActionPanel } from "../components/Room/ActionPanel/RoomActionPanel";
 import { Chat } from "../components/Room/Chat/Chat";
@@ -17,13 +21,8 @@ import { RoomHeaderToolbarProps } from "../components/Room/RoomHeaderToolbar";
 import { UserList } from "../components/Room/UserList";
 import { VideoLayoutContainer } from "../components/Room/VideoLayout/VideoLayoutContainer";
 import { VerticalLayout } from "../components/VerticalLayout";
-
-import { UserMediaServiceContext } from "../AppWrapper";
 import { SoundState, useSoundStateModel } from "../services/UserMediaService/SoundStateModel";
 import { DndVisibleContext } from "./MainLayer";
-
-import "../App.css";
-import "./RoomPage.css";
 
 export const RoomPage: React.FC = () =>
 {

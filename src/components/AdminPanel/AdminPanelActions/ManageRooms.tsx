@@ -6,11 +6,13 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
-import React, { MouseEventHandler, useRef, useState } from "react";
+import "./ManageRooms.css";
 
 import { Button, Divider } from "@mui/material";
+import React, { MouseEventHandler, useRef, useState } from "react";
 import { BiCommentX, BiDotsHorizontalRounded, BiEditAlt, BiLink, BiLock, BiTaskX, BiTrash, BiUserX } from "react-icons/bi";
 import { HiUser } from "react-icons/hi";
+
 import { PublicRoomInfo } from "../../../services/RoomService";
 import { NumericConstants as NC } from "../../../utils/NumericConstants";
 import { getToggleFunc } from "../../../utils/Utils";
@@ -21,8 +23,6 @@ import { RoomList } from "../../RoomList/RoomList";
 import { RoomListItem } from "../../RoomList/RoomListItem";
 import { Tooltip } from "../../Tooltip";
 import { ManageUsers } from "./ManageUsers";
-
-import "./ManageRooms.css";
 
 interface ManageRoomsListItemProps
 {

@@ -6,15 +6,17 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
+import "./ModalNotification.css";
+
 import { Button } from "@mui/material";
 import React, { MouseEventHandler, useEffect, useRef } from "react";
 import { MdClose } from "react-icons/md";
+
 import { StopAutocloseTimerSemaphore } from "../../../pages/NotificationLayer";
 import { Notification, NotificationSeverity } from "../../../services/NotificationsService";
 import { getTimestamp } from "../../../utils/Utils";
 import { Tooltip } from "../../Tooltip";
 import { FocusTrap } from "../FocusTrap";
-import "./ModalNotification.css";
 
 interface ModalNotificationProps
 {

@@ -4,12 +4,12 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
-import React from "react";
-
 import "./RoomHeaderToolbar.css";
 
 import { Button } from "@mui/material";
+import React from "react";
 import { BsChatTextFill, BsPeopleFill } from "react-icons/bs";
+
 import { ReactDispatch } from "../../utils/Utils";
 import { Tooltip } from "../Tooltip";
 
