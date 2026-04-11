@@ -52,7 +52,7 @@ export class UserMediaStreamStorage extends AbstractExternalStorage
         this.notifyListeners();
     }
 
-    public getStateSnapshot(): ReadonlyMediaStreamInfoList
+    public getSnapshot(): ReadonlyMediaStreamInfoList
     {
         return this.m_streams;
     }
@@ -62,6 +62,6 @@ export function useUserMediaStreamStorage(service: UserMediaStreamStorage): Read
 {
     return useSyncExternalStore(
         (listener: () => void) => service.subscribe(listener),
-        () => service.getStateSnapshot()
+        () => service.getSnapshot()
     );
 }

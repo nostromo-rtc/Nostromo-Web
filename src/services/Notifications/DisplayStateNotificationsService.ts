@@ -33,7 +33,7 @@ export class DisplayStateNotificationsService
 
     private handleChangeState(): void
     {
-        const displayState = this.m_userMediaService.displayStateModel.getStateSnapshot();
+        const displayState = this.m_userMediaService.displayStateModel.getSnapshot();
 
         if (displayState === DisplayState.IDLE
             && this.m_prevDisplayState === DisplayState.LOADING)

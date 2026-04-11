@@ -33,8 +33,8 @@ export class MicStateNotificationsService
 
     private handleChangeMicState(): void
     {
-        const micState = this.m_userMediaService.micStateModel.getStateSnapshot();
-        const devices = this.m_userMediaService.deviceStorage.getDevicesSnapshot();
+        const micState = this.m_userMediaService.micStateModel.getSnapshot();
+        const devices = this.m_userMediaService.deviceStorage.getSnapshot();
         let micLabel = devices.find((dev) => dev.deviceId === micState.id)?.label;
 
         if (micLabel === undefined)

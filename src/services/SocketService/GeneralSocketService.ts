@@ -56,7 +56,7 @@ export class GeneralSocketService extends SocketService
 
     public setUserName(name: string): void
     {
-        if (name === this.m_userModel.getStateSnapshot().name)
+        if (name === this.m_userModel.getSnapshot().name)
         {
             return;
         }

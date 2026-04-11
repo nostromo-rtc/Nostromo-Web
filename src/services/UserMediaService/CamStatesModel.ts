@@ -47,7 +47,7 @@ export class CamStatesModel extends AbstractExternalStorage
         this.notifyListeners();
     }
 
-    public getStateSnapshot(): ReadonlyCamStateInfoList
+    public getSnapshot(): ReadonlyCamStateInfoList
     {
         return this.m_camStates;
     }
@@ -57,6 +57,6 @@ export function useCamStatesModel(service: CamStatesModel): ReadonlyCamStateInfo
 {
     return useSyncExternalStore(
         (listener: () => void) => service.subscribe(listener),
-        () => service.getStateSnapshot()
+        () => service.getSnapshot()
     );
 }

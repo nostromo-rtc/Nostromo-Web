@@ -33,7 +33,7 @@ export class CamStatesNotificationsService
 
     private handleChangeState(): void
     {
-        const camStates = this.m_userMediaService.camStatesModel.getStateSnapshot();
+        const camStates = this.m_userMediaService.camStatesModel.getSnapshot();
 
         if (this.m_prevCamStates === null)
         {
@@ -41,7 +41,7 @@ export class CamStatesNotificationsService
             return;
         }
 
-        const devices = this.m_userMediaService.deviceStorage.getDevicesSnapshot();
+        const devices = this.m_userMediaService.deviceStorage.getSnapshot();
 
         const getCamLabel = (id: string): string =>
         {

@@ -73,10 +73,10 @@ export class UserMediaDeviceStorage extends AbstractExternalStorage
 
         this.notifyListeners();
 
-        return this.getDevicesSnapshot();
+        return this.getSnapshot();
     }
 
-    public getDevicesSnapshot(): ReadonlyMediaDeviceInfoList
+    public getSnapshot(): ReadonlyMediaDeviceInfoList
     {
         return this.m_mediaDevices;
     }
@@ -86,6 +86,6 @@ export function useUserMediaDeviceStorage(service: UserMediaDeviceStorage): Read
 {
     return useSyncExternalStore(
         (listener: () => void) => service.subscribe(listener),
-        () => service.getDevicesSnapshot()
+        () => service.getSnapshot()
     );
 }

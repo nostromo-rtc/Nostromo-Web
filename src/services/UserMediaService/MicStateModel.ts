@@ -65,7 +65,7 @@ export class MicStateModel extends AbstractExternalStorage
         this.notifyListeners();
     }
 
-    public getStateSnapshot(): Readonly<MicStateInfo>
+    public getSnapshot(): Readonly<MicStateInfo>
     {
         return this.m_micStateInfo;
     }
@@ -75,6 +75,6 @@ export function useMicStateModel(service: MicStateModel): Readonly<MicStateInfo>
 {
     return useSyncExternalStore(
         (listener: () => void) => service.subscribe(listener),
-        () => service.getStateSnapshot()
+        () => service.getSnapshot()
     );
 }

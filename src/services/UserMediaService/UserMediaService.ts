@@ -110,7 +110,7 @@ export class UserMediaService
 
         this.m_micStateModel.setState(MicState.LOADING);
 
-        const micSettings = this.m_settingsService.getSettingsSnapshot().audio.mic;
+        const micSettings = this.m_settingsService.getSnapshot().audio.mic;
 
         const constraints = {
             audio: {
@@ -155,7 +155,7 @@ export class UserMediaService
 
     public stopMic(): void
     {
-        const streamInfo = this.m_streamStorage.getStateSnapshot().find(
+        const streamInfo = this.m_streamStorage.getSnapshot().find(
             (s) => s.type === "mic"
         );
 
@@ -189,7 +189,7 @@ export class UserMediaService
     /** Toggle mic pause. */
     public toggleMic(): void
     {
-        const micState = this.m_micStateModel.getStateSnapshot().state;
+        const micState = this.m_micStateModel.getSnapshot().state;
 
         if (micState === MicState.PAUSED)
         {
@@ -211,7 +211,7 @@ export class UserMediaService
 
         if (deviceId !== "")
         {
-            const currentCamState = this.m_camStatesModel.getStateSnapshot().find(
+            const currentCamState = this.m_camStatesModel.getSnapshot().find(
                 (c) => c.id === deviceId
             );
 
@@ -281,7 +281,7 @@ export class UserMediaService
 
     public stopCam(deviceId: string): void
     {
-        const streamInfo = this.m_streamStorage.getStateSnapshot().find(
+        const streamInfo = this.m_streamStorage.getSnapshot().find(
             (s) => s.deviceId === deviceId
         );
 
@@ -296,7 +296,7 @@ export class UserMediaService
 
     public stopAllCams(): void
     {
-        const camStreams = this.m_streamStorage.getStateSnapshot().filter(
+        const camStreams = this.m_streamStorage.getSnapshot().filter(
             (s) => s.type === "cam"
         );
 
@@ -379,7 +379,7 @@ export class UserMediaService
     /** Stop screensharing. */
     public stopDisplay(): void
     {
-        const streamInfo = this.m_streamStorage.getStateSnapshot().find(
+        const streamInfo = this.m_streamStorage.getSnapshot().find(
             (s) => s.type === "display"
         );
 
@@ -435,7 +435,7 @@ export class UserMediaService
         );
 
         // We already have stream from this device.
-        if (this.m_streamStorage.getStateSnapshot().findIndex(
+        if (this.m_streamStorage.getSnapshot().findIndex(
             s => s.deviceId === deviceId
         ) !== NumericConstants.NOT_FOUND_IDX)
         {
@@ -570,7 +570,7 @@ export class UserMediaService
 
     private handleMicOutput(): void
     {
-        const micListening = this.m_settingsService.getSettingsSnapshot().audio.mic.enableMicListening;
+        const micListening = this.m_settingsService.getSnapshot().audio.mic.enableMicListening;
         if (micListening)
         {
             this.m_micAudioProcessing.listenOutput();
@@ -582,7 +582,7 @@ export class UserMediaService
 
     private handleMicNoiseGate(): void
     {
-        const noiseGate = this.m_settingsService.getSettingsSnapshot().audio.mic.noiseGate;
+        const noiseGate = this.m_settingsService.getSnapshot().audio.mic.noiseGate;
 
         if (noiseGate.enableNoiseGate)
         {
@@ -601,7 +601,7 @@ export class UserMediaService
 
     private handleMicManualGain(): void
     {
-        const gain = this.m_settingsService.getSettingsSnapshot().audio.mic.gain;
+        const gain = this.m_settingsService.getSnapshot().audio.mic.gain;
         if (gain.enableManualGainControl)
         {
             this.m_micAudioProcessing.connectGain();

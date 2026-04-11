@@ -67,7 +67,7 @@ export class SettingService extends AbstractExternalStorage
         this.notifyListeners();
     }
 
-    public getSettingsSnapshot(): Readonly<ISettings>
+    public getSnapshot(): Readonly<ISettings>
     {
         return this.shapshot;
     }
@@ -82,6 +82,6 @@ export function useSettings(service: SettingService): Readonly<ISettings>
 {
     return useSyncExternalStore(
         (listener: () => void) => service.subscribe(listener),
-        () => service.getSettingsSnapshot()
+        () => service.getSnapshot()
     );
 }

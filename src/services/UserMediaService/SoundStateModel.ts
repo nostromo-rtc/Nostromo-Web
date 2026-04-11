@@ -33,7 +33,7 @@ export class SoundStateModel extends AbstractExternalStorage
         this.notifyListeners();
     }
 
-    public getStateSnapshot(): SoundState
+    public getSnapshot(): SoundState
     {
         return this.m_soundState;
     }
@@ -43,6 +43,6 @@ export function useSoundStateModel(service: SoundStateModel): SoundState
 {
     return useSyncExternalStore(
         (listener: () => void) => service.subscribe(listener),
-        () => service.getStateSnapshot()
+        () => service.getSnapshot()
     );
 }

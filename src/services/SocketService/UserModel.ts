@@ -50,7 +50,7 @@ export class UserModel extends AbstractExternalStorage
         this.notifyListeners();
     }
 
-    public getStateSnapshot(): Readonly<UserInfo>
+    public getSnapshot(): Readonly<UserInfo>
     {
         return this.m_userInfo;
     }
@@ -60,6 +60,6 @@ export function useUserModel(service: UserModel): Readonly<UserInfo>
 {
     return useSyncExternalStore(
         (listener: () => void) => service.subscribe(listener),
-        () => service.getStateSnapshot()
+        () => service.getSnapshot()
     );
 }

@@ -30,7 +30,7 @@ export class DisplayStateModel extends AbstractExternalStorage
         this.notifyListeners();
     }
 
-    public getStateSnapshot(): DisplayState
+    public getSnapshot(): DisplayState
     {
         return this.m_displayState;
     }
@@ -40,6 +40,6 @@ export function useDisplayStateModel(service: DisplayStateModel): DisplayState
 {
     return useSyncExternalStore(
         (listener: () => void) => service.subscribe(listener),
-        () => service.getStateSnapshot()
+        () => service.getSnapshot()
     );
 }
