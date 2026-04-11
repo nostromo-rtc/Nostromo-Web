@@ -7,6 +7,7 @@
 import "./RoomListPage.css";
 
 import { Button } from "@mui/material";
+import { PublicRoomInfo } from "nostromo-shared/types/RoomTypes";
 import React, { useEffect } from "react";
 import { IoLogInOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
@@ -15,7 +16,6 @@ import { Header } from "../components/Header";
 import { RoomList } from "../components/RoomList/RoomList";
 import { RoomListItem } from "../components/RoomList/RoomListItem";
 import { Tooltip } from "../components/Tooltip";
-import { PublicRoomInfo } from "../services/RoomService";
 import { NumericConstants as NC } from "../utils/NumericConstants";
 
 export const RoomListPage: React.FC = () =>

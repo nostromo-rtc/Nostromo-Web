@@ -7,8 +7,8 @@
 */
 
 import React, { useRef, useState } from "react";
+import { VideoCodec } from "nostromo-shared/types/RoomTypes";
 
-import { VideoCodec } from "../../../services/RoomService";
 import { NumericConstants as NC } from "../../../utils/NumericConstants";
 import { List } from "../../Base/List/List";
 import { ListItemButton, ListItemInput, ListItemSelect, ListItemSelectOption, ListItemSwitch } from "../../Base/List/ListItems";

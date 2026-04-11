@@ -1,22 +1,6 @@
 //TODO: Пока тут просто хранятся данные о комнатах. Потом можно будет тут реализовать связь фронта с бэком
 
-export type UserInfo = {
-    id: string,
-    name: string;
-};
-export enum VideoCodec
-{
-    VP9 = 'VP9',
-    VP8 = 'VP8',
-    H264 = 'H264'
-}
-
-export interface PublicRoomInfo
-{
-    id: string;
-    name: string;
-    videoCodec: VideoCodec;
-}
+import { UserInfo } from "nostromo-shared/types/RoomTypes";
 
 export const LoadedRoomList: PublicRoomInfo[] = [
     { id: "G_OShinfHXD", name: "Главная", videoCodec: VideoCodec.H264 },

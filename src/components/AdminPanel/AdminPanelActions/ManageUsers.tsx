@@ -9,13 +9,13 @@
 import "./ManageUsers.css";
 
 import { Avatar, Button, Divider } from "@mui/material";
-import { UserInfo } from "nostromo-shared/types/RoomTypes";
+import { PublicRoomInfo, UserInfo } from "nostromo-shared/types/RoomTypes";
 import { MouseEventHandler, useEffect, useRef, useState } from "react";
 import { BiBlock, BiDotsHorizontalRounded, BiEditAlt, BiMicrophoneOff, BiUserX, BiVideoOff } from "react-icons/bi";
 import { MdOutlineStopScreenShare } from "react-icons/md";
 import { RiArrowGoBackLine } from "react-icons/ri";
 
-import { LoadedUserList, PublicRoomInfo } from "../../../services/RoomService";
+import { LoadedUserList } from "../../../services/RoomService";
 import { NumericConstants as NC } from "../../../utils/NumericConstants";
 import { getToggleFunc } from "../../../utils/Utils";
 import { List } from "../../Base/List/List";

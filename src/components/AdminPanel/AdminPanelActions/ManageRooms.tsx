@@ -9,11 +9,11 @@
 import "./ManageRooms.css";
 
 import { Button, Divider } from "@mui/material";
+import { PublicRoomInfo } from "nostromo-shared/types/RoomTypes";
 import React, { MouseEventHandler, useRef, useState } from "react";
 import { BiCommentX, BiDotsHorizontalRounded, BiEditAlt, BiLink, BiLock, BiTaskX, BiTrash, BiUserX } from "react-icons/bi";
 import { HiUser } from "react-icons/hi";
 
-import { PublicRoomInfo } from "../../../services/RoomService";
 import { NumericConstants as NC } from "../../../utils/NumericConstants";
 import { getToggleFunc } from "../../../utils/Utils";
 import { TextEditDialog } from "../../Dialog/TextEditDialog";

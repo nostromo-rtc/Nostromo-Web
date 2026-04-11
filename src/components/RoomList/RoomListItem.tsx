@@ -9,9 +9,9 @@
 import "./RoomListItem.css";
 
 import { Avatar } from "@mui/material";
+import { PublicRoomInfo } from "nostromo-shared/types/RoomTypes";
 import { KeyboardEventHandler, MouseEventHandler, forwardRef } from "react";
 
-import { PublicRoomInfo } from "../../services/RoomService";
 import { NumericConstants as NC } from "../../utils/NumericConstants";
 import { ListItem, ListItemProps } from "../Base/List/ListItems";
 

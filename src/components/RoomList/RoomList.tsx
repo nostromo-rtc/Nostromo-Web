@@ -8,11 +8,12 @@
 
 import "./RoomList.css";
 
+import { PublicRoomInfo } from "nostromo-shared/types/RoomTypes";
 import React, { useEffect, useState } from "react";
 
 import { List } from "../../components/Base/List/List";
 import { SearchPanel } from "../../components/Base/List/SearchPanel";
-import { LoadedRoomList, PublicRoomInfo } from "../../services/RoomService";
+import { LoadedRoomList } from "../../services/RoomService";
 import { NumericConstants as NC } from "../../utils/NumericConstants";
 
 export interface RoomListProps
