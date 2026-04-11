@@ -13,9 +13,11 @@ export interface AudioVolumeInfo
     volume: number;
 }
 
+type ReadonlyAudioVolumeInfoList = readonly Readonly<AudioVolumeInfo>[];
+
 export class AudioVolumeStorage extends AbstractExternalStorage
 {
-    private m_volumeStates: AudioVolumeInfo[] = [];
+    private m_volumeStates: ReadonlyAudioVolumeInfoList = [];
 
     public constructor()
     {
@@ -40,13 +42,13 @@ export class AudioVolumeStorage extends AbstractExternalStorage
         this.notifyListeners();
     }
 
-    public getStateSnapshot(): AudioVolumeInfo[]
+    public getStateSnapshot(): ReadonlyAudioVolumeInfoList
     {
         return this.m_volumeStates;
     }
 }
 
-export function useAudioVolumeStorage(service: AudioVolumeStorage): AudioVolumeInfo[]
+export function useAudioVolumeStorage(service: AudioVolumeStorage): ReadonlyAudioVolumeInfoList
 {
     return useSyncExternalStore(
         (listener: () => void) => service.subscribe(listener),

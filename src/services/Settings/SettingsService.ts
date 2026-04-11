@@ -17,12 +17,12 @@ export type ParameterType = "Input" | "Select" | "Slider" | "Switch" | "Unknown"
 export type ParameterValue = boolean | number | string;
 export const LOCAL_STORAGE_SETTINGS = "nostromo-settings";
 
-type SettingsSetCallback = (prev: ISettings) => void;
+type SettingsSetCallback = (prev: Readonly<ISettings>) => void;
 
 export class SettingService extends AbstractExternalStorage
 {
     private currentSettings: ISettings = DefaultSettings;
-    private shapshot: ISettings = DefaultSettings;
+    private shapshot: Readonly<ISettings> = DefaultSettings;
 
     public constructor()
     {
@@ -67,7 +67,7 @@ export class SettingService extends AbstractExternalStorage
         this.notifyListeners();
     }
 
-    public getSettingsSnapshot(): ISettings
+    public getSettingsSnapshot(): Readonly<ISettings>
     {
         return this.shapshot;
     }
@@ -78,7 +78,7 @@ export class SettingService extends AbstractExternalStorage
     }
 }
 
-export function useSettings(service: SettingService): ISettings
+export function useSettings(service: SettingService): Readonly<ISettings>
 {
     return useSyncExternalStore(
         (listener: () => void) => service.subscribe(listener),

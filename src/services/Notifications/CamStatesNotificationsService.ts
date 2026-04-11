@@ -5,14 +5,14 @@
 */
 
 import { NotificationsService, NotificationSeverity } from "../NotificationsService";
-import { CamState, CamStateInfo } from "../UserMediaService/CamStatesModel";
+import { CamState, ReadonlyCamStateInfoList } from "../UserMediaService/CamStatesModel";
 import { UserMediaService } from "../UserMediaService/UserMediaService";
 
 export class CamStatesNotificationsService
 {
     private readonly m_userMediaService: UserMediaService;
     private readonly m_notificationService: NotificationsService;
-    private m_prevCamStates: CamStateInfo[] | null = null;
+    private m_prevCamStates: ReadonlyCamStateInfoList | null = null;
 
     // TODO: add SoundAlertService
     public constructor(

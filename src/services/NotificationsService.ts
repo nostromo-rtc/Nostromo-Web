@@ -6,7 +6,6 @@
 */
 
 import { useSyncExternalStore } from "react";
-import { cloneObject } from "../utils/Utils";
 import { AbstractExternalStorage } from "../utils/AbstractExternalStorage";
 
 const ID_START_VALUE = 0;
@@ -47,13 +46,13 @@ export interface Notification extends NotificationBase
     id: number;
 }
 
+type ReadonlyNotificationList = readonly Readonly<Notification>[];
+
 export class NotificationsService extends AbstractExternalStorage
 {
     private m_id = ID_START_VALUE;
 
-    private m_notifications: Notification[] = [];
-
-    private m_snapshot: Notification[] = [];
+    private m_notifications: ReadonlyNotificationList = [];
 
     public constructor()
     {
@@ -62,36 +61,29 @@ export class NotificationsService extends AbstractExternalStorage
 
     public add(notification: NewNotificationBase): void
     {
-        this.m_notifications.push({
+        this.m_notifications = this.m_notifications.concat({
             ...notification,
             severity: notification.severity ?? NotificationSeverity.INFO,
             type: notification.type ?? NotificationType.POPUP,
             datetime: notification.datetime ?? new Date().getTime(),
             id: this.m_id++
         });
-        this.saveSnapshot();
         this.notifyListeners();
     }
 
     public remove(id: number): void
     {
         this.m_notifications = this.m_notifications.filter(p => p.id !== id);
-        this.saveSnapshot();
         this.notifyListeners();
     }
 
-    public getSnapshot(): Notification[]
+    public getSnapshot(): ReadonlyNotificationList
     {
-        return this.m_snapshot;
-    }
-
-    protected saveSnapshot(): void
-    {
-        this.m_snapshot = cloneObject(this.m_notifications);
+        return this.m_notifications;
     }
 }
 
-export function useNotifications(service: NotificationsService): Notification[]
+export function useNotifications(service: NotificationsService): ReadonlyNotificationList
 {
     return useSyncExternalStore(
         (listener: () => void) => service.subscribe(listener),

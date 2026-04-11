@@ -17,7 +17,7 @@ export type UserInfo = {
 
 export class UserModel extends AbstractExternalStorage
 {
-    private m_userInfo: UserInfo = {
+    private m_userInfo: Readonly<UserInfo> = {
         id: "",
         name: "Гость",
         role: "user"
@@ -50,13 +50,13 @@ export class UserModel extends AbstractExternalStorage
         this.notifyListeners();
     }
 
-    public getStateSnapshot(): UserInfo
+    public getStateSnapshot(): Readonly<UserInfo>
     {
         return this.m_userInfo;
     }
 }
 
-export function useUserModel(service: UserModel): UserInfo
+export function useUserModel(service: UserModel): Readonly<UserInfo>
 {
     return useSyncExternalStore(
         (listener: () => void) => service.subscribe(listener),

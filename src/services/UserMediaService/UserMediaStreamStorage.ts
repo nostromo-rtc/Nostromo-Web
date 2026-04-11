@@ -17,9 +17,11 @@ export interface MediaStreamInfo
     deviceId?: string;
 }
 
+type ReadonlyMediaStreamInfoList = readonly Readonly<MediaStreamInfo>[];
+
 export class UserMediaStreamStorage extends AbstractExternalStorage
 {
-    private m_streams: MediaStreamInfo[] = [];
+    private m_streams: ReadonlyMediaStreamInfoList = [];
 
     public constructor()
     {
@@ -50,13 +52,13 @@ export class UserMediaStreamStorage extends AbstractExternalStorage
         this.notifyListeners();
     }
 
-    public getStateSnapshot(): MediaStreamInfo[]
+    public getStateSnapshot(): ReadonlyMediaStreamInfoList
     {
         return this.m_streams;
     }
 }
 
-export function useUserMediaStreamStorage(service: UserMediaStreamStorage): MediaStreamInfo[]
+export function useUserMediaStreamStorage(service: UserMediaStreamStorage): ReadonlyMediaStreamInfoList
 {
     return useSyncExternalStore(
         (listener: () => void) => service.subscribe(listener),

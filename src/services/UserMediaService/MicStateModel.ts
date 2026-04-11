@@ -25,7 +25,7 @@ export type MicStateInfo = {
 export class MicStateModel extends AbstractExternalStorage
 {
     // Is sound active (not muted).
-    private m_micStateInfo: MicStateInfo = {
+    private m_micStateInfo: Readonly<MicStateInfo> = {
         id: null,
         state: MicState.DISABLED
     };
@@ -65,13 +65,13 @@ export class MicStateModel extends AbstractExternalStorage
         this.notifyListeners();
     }
 
-    public getStateSnapshot(): MicStateInfo
+    public getStateSnapshot(): Readonly<MicStateInfo>
     {
         return this.m_micStateInfo;
     }
 }
 
-export function useMicStateModel(service: MicStateModel): MicStateInfo
+export function useMicStateModel(service: MicStateModel): Readonly<MicStateInfo>
 {
     return useSyncExternalStore(
         (listener: () => void) => service.subscribe(listener),

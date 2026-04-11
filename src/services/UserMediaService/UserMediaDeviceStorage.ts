@@ -16,20 +16,22 @@ export interface MediaDeviceInfo
     kind: MediaDeviceKind;
 }
 
+type ReadonlyMediaDeviceInfoList = readonly Readonly<MediaDeviceInfo>[];
+
 export class UserMediaDeviceStorage extends AbstractExternalStorage
 {
-    private m_mediaDevices: MediaDeviceInfo[] = [];
+    private m_mediaDevices: ReadonlyMediaDeviceInfoList = [];
 
     public constructor()
     {
         super();
     }
 
-    public async enumerateDevices(): Promise<MediaDeviceInfo[]>
+    public async enumerateDevices(): Promise<ReadonlyMediaDeviceInfoList>
     {
         const mediaDevices = await navigator.mediaDevices.enumerateDevices();
 
-        this.m_mediaDevices = [];
+        const handledMediaDevices: MediaDeviceInfo[] = [];
 
         let audioDeviceCounter = 1;
         let videoDeviceCounter = 1;
@@ -59,7 +61,7 @@ export class UserMediaDeviceStorage extends AbstractExternalStorage
                 label = "Как в системе";
             }
 
-            this.m_mediaDevices.push({
+            handledMediaDevices.push({
                 deviceId: device.deviceId,
                 groupId: device.groupId,
                 kind: device.kind,
@@ -67,18 +69,20 @@ export class UserMediaDeviceStorage extends AbstractExternalStorage
             });
         }
 
+        this.m_mediaDevices = handledMediaDevices;
+
         this.notifyListeners();
 
         return this.getDevicesSnapshot();
     }
 
-    public getDevicesSnapshot(): MediaDeviceInfo[]
+    public getDevicesSnapshot(): ReadonlyMediaDeviceInfoList
     {
         return this.m_mediaDevices;
     }
 }
 
-export function useUserMediaDeviceStorage(service: UserMediaDeviceStorage): MediaDeviceInfo[]
+export function useUserMediaDeviceStorage(service: UserMediaDeviceStorage): ReadonlyMediaDeviceInfoList
 {
     return useSyncExternalStore(
         (listener: () => void) => service.subscribe(listener),

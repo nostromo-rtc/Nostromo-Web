@@ -18,9 +18,11 @@ export type CamStateInfo = {
     state: CamState;
 };
 
+export type ReadonlyCamStateInfoList = readonly Readonly<CamStateInfo>[];
+
 export class CamStatesModel extends AbstractExternalStorage
 {
-    private m_camStates: CamStateInfo[] = [];
+    private m_camStates: ReadonlyCamStateInfoList = [];
 
     public constructor()
     {
@@ -45,13 +47,13 @@ export class CamStatesModel extends AbstractExternalStorage
         this.notifyListeners();
     }
 
-    public getStateSnapshot(): CamStateInfo[]
+    public getStateSnapshot(): ReadonlyCamStateInfoList
     {
         return this.m_camStates;
     }
 }
 
-export function useCamStatesModel(service: CamStatesModel): CamStateInfo[]
+export function useCamStatesModel(service: CamStatesModel): ReadonlyCamStateInfoList
 {
     return useSyncExternalStore(
         (listener: () => void) => service.subscribe(listener),
