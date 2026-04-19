@@ -11,9 +11,11 @@ export const PageRouter: React.FC = () =>
             <Route element={<RoomListPage />} path="/" />
             <Route path="/r">
                 <Route element={<RoomWrapperPage />} path=":id" />
+                <Route element={<RoomListPage />} path="" />
             </Route>
             <Route path="/rooms">
                 <Route element={<RoomWrapperPage />} path=":id" />
+                <Route element={<RoomListPage />} path="" />
             </Route>
         </Routes>
     );
