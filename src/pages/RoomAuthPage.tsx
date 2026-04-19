@@ -7,32 +7,25 @@ import { Header } from "../components/Header";
 
 interface RoomAuthPageParams
 {
+    errorAuthStatus: boolean;
     roomName: string;
-    onSuccess: () => void;
+    onSubmitPassword: (password: string) => void;
 }
 
-export const RoomAuthPage: React.FC<RoomAuthPageParams> = ({ roomName, onSuccess }) =>
+export const RoomAuthPage: React.FC<RoomAuthPageParams> = ({ errorAuthStatus, roomName, onSubmitPassword }) =>
 {
-    const [showError, setShowError] = useState(false);
-    const [pass, setPass] = useState("");
+    const [password, setPassword] = useState("");
 
     const onSubmit = (ev: FormEvent<HTMLFormElement>): void =>
     {
         ev.preventDefault();
 
-        if (pass === "test")
-        {
-            onSuccess();
-        }
-        else
-        {
-            setShowError(true);
-        }
+        onSubmitPassword(password);
     };
 
     const formComponent = (
         <form id="auth" autoComplete="on" onSubmit={onSubmit}>
-            {showError ? <span className="m-a" id="status">Неправильный пароль!</span> : <></>}
+            {errorAuthStatus ? <span className="m-a" id="status">Неправильный пароль!</span> : <></>}
             <span className="m-a">Вход в комнату</span>
             <span className="m-a" id="room-name" title={roomName}>{roomName}</span>
             <input
@@ -40,9 +33,9 @@ export const RoomAuthPage: React.FC<RoomAuthPageParams> = ({ roomName, onSuccess
                 type="password"
                 name="password"
                 placeholder="Введите пароль"
-                value={pass}
+                value={password}
                 onChange={
-                    (ev) => { setPass(ev.target.value); }
+                    (ev) => { setPassword(ev.target.value); }
                 }
             />
             <input id="btn-join" type="submit" value="Войти" />
