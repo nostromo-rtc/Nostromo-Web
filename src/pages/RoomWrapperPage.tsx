@@ -6,8 +6,8 @@
 
 import "../App.css";
 
-import React, { useContext, useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import React, { useContext, useEffect, useState } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 import { SocketManagerContext } from "../AppWrapper";
 import { useAuth } from "../hooks/UseAuth";
@@ -19,6 +19,7 @@ export const RoomWrapperPage: React.FC = () =>
 {
     const { id } = useParams();
     const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
 
     const socketManager = useContext(SocketManagerContext);
     const generalSocketService = socketManager.generalSocketService;
@@ -36,10 +37,14 @@ export const RoomWrapperPage: React.FC = () =>
         setReady(true);
     };
 
-    if (id === undefined)
+    // Fallback to main page if room not found
+    useEffect(() =>
     {
-        return <p>"404"</p>;
-    }
+        if (id === undefined || auth === "not-found")
+        {
+            navigate("/");
+        }
+    }, [id, auth, navigate]);
 
     if (auth === "true" || ready)
     {
