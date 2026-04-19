@@ -2,63 +2,63 @@ import "../App.css";
 import "./RoomAuthPage.css";
 
 import React, { FormEvent, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 
 import { Header } from "../components/Header";
 
-interface Params
+interface RoomAuthPageParams
 {
-    setAuth: (isAuth: boolean) => void;
+    roomName: string;
+    onSuccess: () => void;
 }
 
-export const RoomAuthPage: React.FC<Params> = ({ setAuth }) =>
+export const RoomAuthPage: React.FC<RoomAuthPageParams> = ({ roomName, onSuccess }) =>
 {
-    const { id } = useParams();
-    const [status, setStatus] = useState(true);
+    const [showError, setShowError] = useState(false);
     const [pass, setPass] = useState("");
-
-    const roomName = "Тестовая";
 
     const onSubmit = (ev: FormEvent<HTMLFormElement>): void =>
     {
+        ev.preventDefault();
+
         if (pass === "test")
         {
-            setAuth(true);
+            onSuccess();
         }
         else
         {
-            setStatus(false);
+            setShowError(true);
         }
-        ev.preventDefault();
     };
+
+    const formComponent = (
+        <form id="auth" autoComplete="on" onSubmit={onSubmit}>
+            {showError ? <span className="m-a" id="status">Неправильный пароль!</span> : <></>}
+            <span className="m-a">Вход в комнату</span>
+            <span className="m-a" id="room-name" title={roomName}>{roomName}</span>
+            <input
+                id="pass"
+                type="password"
+                name="password"
+                placeholder="Введите пароль"
+                value={pass}
+                onChange={
+                    (ev) => { setPass(ev.target.value); }
+                }
+            />
+            <input id="btn-join" type="submit" value="Войти" />
+        </form>
+    );
 
     useEffect(() =>
     {
-        document.title = "Nostromo - Авторизация в комнате";
-    }, []);
+        document.title = `Nostromo - Авторизация в комнате - ${roomName}`;
+    }, [roomName]);
 
     return (
         <>
-            <Header title="Авторизация в комнате" />
+            <Header title={`Авторизация в комнате - ${roomName}`} />
             <div id="main">
-                <form id="auth" autoComplete="on" onSubmit={onSubmit}>
-                    {!status ? <span className="m-a" id="status">Неправильный пароль!</span> : <></>}
-                    <span className="m-a">Вход в комнату</span>
-                    <span className="m-a" id="room-name" title={roomName}>{roomName}</span>
-                    <input type="text" name="username" defaultValue={id} hidden />
-                    <input
-                        id="pass"
-                        type="password"
-                        name="password"
-                        placeholder="Введите пароль"
-                        value={pass}
-                        onChange={
-                            (ev) => { setPass(ev.target.value); }
-                        }
-                    />
-                    { /* TODO: это пока заглушка, нужно привязать нормальное действие */}
-                    <input id="btn-join" type="submit" value="Войти" />
-                </form>
+                {formComponent}
             </div>
         </>
     );
