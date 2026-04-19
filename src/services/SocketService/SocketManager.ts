@@ -6,12 +6,14 @@
 
 import { Manager } from "socket.io-client";
 
+import { isDevWithoutBackend } from "../../utils/Utils";
 import { GeneralSocketService } from "./GeneralSocketService";
 
 export class SocketManager
 {
     private readonly m_manager: Manager = new Manager(process.env.REACT_APP_BACKEND_PATH, {
-        'transports': ['websocket']
+        'transports': ['websocket'],
+        'autoConnect': !isDevWithoutBackend()
     });
 
     private readonly m_generalSocketService: GeneralSocketService;
