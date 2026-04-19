@@ -107,3 +107,12 @@ export function overrideValues(target: object, override: object): void
         }
     }
 }
+
+/**
+ * Is development mode without backend path.
+ */
+export function isDevWithoutBackend(): boolean
+{
+    return (process.env.NODE_ENV === "development"
+            && process.env.REACT_APP_BACKEND_PATH === undefined);
+}
