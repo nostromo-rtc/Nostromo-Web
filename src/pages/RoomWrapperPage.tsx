@@ -15,6 +15,9 @@ import { useRoomListModel } from "../services/SocketService/RoomListModel";
 import { RoomAuthPage } from "./RoomAuthPage";
 import { RoomPage } from "./RoomPage";
 
+const ZERO = 0;
+const ONE = 1;
+
 export const RoomWrapperPage: React.FC = () =>
 {
     const { id } = useParams();
@@ -27,14 +30,14 @@ export const RoomWrapperPage: React.FC = () =>
     const roomName = roomList.find((r) => r.id === id)?.name ?? "unknown";
 
     const path = (id != null) ? `/api/r/${id}` : "";
-    const password = searchParams.get("p");
+    const [password, setPassword] = useState<string | null>(searchParams.get("p"));
 
+    const [falseAuthCound, setFalseAuthCount] = useState<number>(ZERO);
     const auth = useAuth(path, password);
-    const [ready, setReady] = useState(false);
 
-    const onSuccess = (): void =>
+    const onSubmitPassword = (pass: string): void =>
     {
-        setReady(true);
+        setPassword(pass);
     };
 
     // Fallback to main page if room not found
@@ -46,13 +49,26 @@ export const RoomWrapperPage: React.FC = () =>
         }
     }, [id, auth, navigate]);
 
-    if (auth === "true" || ready)
+    // Increase false auth count
+    useEffect(() =>
+    {
+        if (auth === "false")
+        {
+            setFalseAuthCount(prev => prev + ONE);
+        }
+    }, [auth]);
+
+    if (auth === "true")
     {
         return <RoomPage roomName={roomName} />;
     }
-    else if (auth === "false")
+    else if (auth === "false" || falseAuthCound > ONE)
     {
-        return <RoomAuthPage roomName={roomName} onSuccess={onSuccess} />;
+        return <RoomAuthPage
+            errorAuthStatus={falseAuthCound > ONE}
+            roomName={roomName}
+            onSubmitPassword={onSubmitPassword}
+        />;
     }
     else
     {
