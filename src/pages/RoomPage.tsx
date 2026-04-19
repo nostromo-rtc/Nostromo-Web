@@ -24,12 +24,15 @@ import { VerticalLayout } from "../components/VerticalLayout";
 import { SoundState, useSoundStateModel } from "../services/UserMediaService/SoundStateModel";
 import { DndVisibleContext } from "./MainLayer";
 
-export const RoomPage: React.FC = () =>
+interface RoomPageParams
+{
+    roomName: string;
+}
+
+export const RoomPage: React.FC<RoomPageParams> = ({roomName}) =>
 {
     // TODO: наверное стоит поместить это в контекст, так как много где применяется.
     const transitionDuration = 100;
-
-    const roomName = "Тестовая";
 
     const userMediaService = useContext(UserMediaServiceContext);
     const soundState = useSoundStateModel(userMediaService.soundStateModel);
@@ -109,7 +112,7 @@ export const RoomPage: React.FC = () =>
     useEffect(() =>
     {
         document.title = `Nostromo - Комната "${roomName}"`;
-    }, []);
+    }, [roomName]);
 
     return (
         <>
