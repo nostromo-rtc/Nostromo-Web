@@ -95,6 +95,8 @@ const VideoLayout: FC<VideoLayoutProps> = ({ videoList }) =>
     const userMediaService = useContext(UserMediaServiceContext);
     const micStateInfo = useMicStateModel(userMediaService.micStateModel);
 
+    const [layoutReady, setLayoutReady] = useState(false);
+
     const [matrixState, setMatrixState] = useState<VideoLayoutMatrixState>({
         itemCount: MIN_ITEM_COUNT,
         videoItemSize: { width: MIN_ITEM_WIDTH, height: MIN_ITEM_HEIGHT },
@@ -154,6 +156,15 @@ const VideoLayout: FC<VideoLayoutProps> = ({ videoList }) =>
     {
         updateMatrixState();
     }, [videoList, updateMatrixState]);
+
+    // Do not render layout until layout's height and width are ready
+    useEffect(() =>
+    {
+        if (!layoutReady && layoutWidth !== undefined && layoutHeight !== undefined)
+        {
+            setLayoutReady(true);
+        }
+    }, [layoutHeight, layoutWidth, layoutReady]);
 
     const handleChangePageClick = (next: boolean): void =>
     {
@@ -276,7 +287,9 @@ const VideoLayout: FC<VideoLayoutProps> = ({ videoList }) =>
     return (
         <div className="video-layout-wrapper">
             {prevPageBtn}
-            <div className="video-layout" ref={layoutRef}>
+            <div className="video-layout" ref={layoutRef}
+                style={{ visibility: layoutReady ? "visible" : "hidden" }}
+            >
                 {getMatrixFromVideoList(videoList).map(matrixToMap)}
             </div>
             {nextPageBtn}
