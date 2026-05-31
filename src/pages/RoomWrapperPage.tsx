@@ -10,6 +10,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 import { SocketManagerContext } from "../AppWrapper";
+import { Header } from "../components/Header";
 import { useAuth } from "../hooks/UseAuth";
 import { useRoomListModel } from "../services/SocketService/RoomListModel";
 import { RoomAuthPage } from "./RoomAuthPage";
@@ -35,6 +36,8 @@ export const RoomWrapperPage: React.FC = () =>
     const [falseAuthCound, setFalseAuthCount] = useState<number>(ZERO);
     const auth = useAuth(path, password);
 
+    const [showLoadingLabel, setShowLoadingLabel] = useState(false);
+
     const onSubmitPassword = (pass: string): void =>
     {
         setPassword(pass);
@@ -58,6 +61,17 @@ export const RoomWrapperPage: React.FC = () =>
         }
     }, [auth]);
 
+    useEffect(() => {
+        if (auth === "loading")
+        {
+            const delay = 200;
+            const timer = setTimeout(() => {
+                setShowLoadingLabel(true);
+            }, delay);
+            return () => { clearTimeout(timer) };
+        }
+    }, [auth])
+
     if (auth === "true")
     {
         return <RoomPage roomName={roomName} />;
@@ -73,9 +87,12 @@ export const RoomWrapperPage: React.FC = () =>
     else
     {
         return (
-            <div id="main">
-                <span className="m-a">Ожидание ответа от сервера...</span>
-            </div>
+            <>
+                <Header title={`Авторизация в комнате - ${roomName}`} />
+                <div id="main">
+                    {showLoadingLabel ? <span className="m-a">Ожидание ответа от сервера...</span> : <></>}
+                </div>
+            </>
         );
     }
 };
