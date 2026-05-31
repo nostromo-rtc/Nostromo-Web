@@ -1,3 +1,9 @@
+/*
+    SPDX-FileCopyrightText: 2022-2026 Sergey Katunin <sulmpx60@yandex.ru>
+
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
 import "../App.css";
 import "./RoomAuthPage.css";
 
