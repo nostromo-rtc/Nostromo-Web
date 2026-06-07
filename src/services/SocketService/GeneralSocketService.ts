@@ -5,7 +5,7 @@
 */
 
 import { RoomNameInfo } from "nostromo-shared/types/AdminTypes";
-import { PublicRoomInfo, VideoCodec } from "nostromo-shared/types/RoomTypes";
+import { PublicRoomInfo, UserInfoWithRole, VideoCodec } from "nostromo-shared/types/RoomTypes";
 import { SocketEvents as SE } from "nostromo-shared/types/SocketEvents";
 import { Socket } from "socket.io-client";
 
@@ -25,9 +25,8 @@ export class GeneralSocketService extends SocketService
 
         if (isDevWithoutBackend())
         {
-            // TODO: get id from server
-            this.m_userModel.setId("UsgHhiGI6UDkitt8GTUOl");
-            this.m_userModel.setName("User");
+            this.m_userModel.setId("testUserId");
+            this.m_userModel.setName("TestUser");
 
             const rooms: PublicRoomInfo[] = [
                 { id: "G_OShinfHXD", name: "Главная", videoCodec: VideoCodec.H264 },
@@ -41,6 +40,7 @@ export class GeneralSocketService extends SocketService
             return;
         }
 
+        void this.refreshUserInfo();
         this.subscribeOnRoomList();
     }
 
@@ -62,6 +62,23 @@ export class GeneralSocketService extends SocketService
         }
 
         this.m_userModel.setName(name);
+    }
+
+    public async refreshUserInfo(): Promise<void>
+    {
+        const path = `${process.env.REACT_APP_BACKEND_PATH ?? ""}/api/userinfo`;
+        const res = await fetch(path);
+
+        const HTTP_OK = 200;
+
+        if (res.status === HTTP_OK)
+        {
+            const userInfo = await res.json() as UserInfoWithRole;
+
+            this.m_userModel.setId(userInfo.id);
+            this.m_userModel.setName(userInfo.name);
+            this.m_userModel.setRole(userInfo.role);
+        }
     }
 
     private subscribeOnRoomList(): void
