@@ -9,10 +9,12 @@ import logo from '../assets/nostromo-logo.svg';
 import "./Navbar.css";
 
 import Button from "@mui/material/Button";
-import React from 'react';
+import React, { useContext } from 'react';
 import { MdOutlineAdminPanelSettings, MdSettings } from "react-icons/md";
 import { NavLink } from 'react-router-dom';
 
+import { SocketManagerContext } from "../AppWrapper";
+import { useUserModel } from "../services/SocketService/UserModel";
 import { Tooltip } from "./Tooltip";
 
 interface NavbarProps
@@ -23,6 +25,10 @@ interface NavbarProps
 
 export const Navbar: React.FC<NavbarProps> = ({ openSettings, openAdminPanel }) =>
 {
+    const socketManager = useContext(SocketManagerContext);
+    const generalSocketService = socketManager.generalSocketService;
+    const userInfo = useUserModel(generalSocketService.userModel);
+
     const openSettingsBtn =
         <Tooltip title="Настройки">
             <Button aria-label="Open settings"
@@ -53,7 +59,7 @@ export const Navbar: React.FC<NavbarProps> = ({ openSettings, openAdminPanel }) 
             </NavLink>
             <span className="nav-btn-underline"></span>
             <div className="vertical-expander"></div>
-            {openAdminPanelBtn}
+            {userInfo.role === "admin" ? openAdminPanelBtn : <></>}
             {openSettingsBtn}
         </div>
     );
