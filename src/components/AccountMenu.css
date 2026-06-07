@@ -131,6 +131,7 @@
     display: inline-flex;
     background-color: #6a7080;
     margin-top: 8px;
+    padding: 4px;
 }
 
 #account-menu-info-name

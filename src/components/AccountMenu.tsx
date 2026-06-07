@@ -14,6 +14,7 @@ import { MdEdit, MdSettings } from "react-icons/md";
 import { SetShowSettingsContext } from "../App";
 import { SocketManagerContext } from "../AppWrapper";
 import { useUserModel } from "../services/SocketService/UserModel";
+import { NumericConstants as NC } from "../utils/NumericConstants";
 import { doNotHandleEvent } from "../utils/Utils";
 import { TextEditDialog } from "./Dialog/TextEditDialog";
 import { MenuItemWithIcon } from "./Menu/MenuItems";
@@ -71,6 +72,28 @@ export const AccountMenu: React.FC = () =>
 
     const renameUserDescription = <>Введите желаемое имя, которое будут видеть остальные пользователи.</>;
 
+    const tooltipWithId = (
+        <Tooltip title="Ваш идентификатор в системе" placement="left">
+            <span id="account-menu-info-id">#{userInfo.id}</span>
+        </Tooltip>
+    );
+
+    const visibleRole = (): string =>
+    {
+        if (userInfo.role === "admin")
+        {
+            return "Администратор";
+        }
+        else if (userInfo.id.length === NC.EMPTY_LENGTH)
+        {
+            return "Гость";
+        }
+        else
+        {
+            return "Пользователь";
+        }
+    };
+
     return (
         <>
             <Button id="account-menu-btn" ref={btnRef} onClick={handleClick}>
@@ -104,11 +127,9 @@ export const AccountMenu: React.FC = () =>
                         <Tooltip title="Ваше имя" placement="left">
                             <span id="account-menu-info-name">{userInfo.name}</span>
                         </Tooltip>
-                        <Tooltip title="Ваш идентификатор в системе" placement="left">
-                            <span id="account-menu-info-id">#{userInfo.id}</span>
-                        </Tooltip>
+                        { userInfo.id.length > NC.EMPTY_LENGTH? tooltipWithId : <></>}
                         <Tooltip id="tooltip-account-menu-info-role" title="Ваша роль в системе" placement="left">
-                            <span id="account-menu-info-role">{userInfo.role === "user" ? "Пользователь" : "Администратор"}</span>
+                            <span id="account-menu-info-role">{visibleRole()}</span>
                         </Tooltip>
                     </div>
                 </div>
