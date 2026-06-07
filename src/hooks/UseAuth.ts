@@ -4,13 +4,18 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
-import { useEffect, useState } from 'react';
 import { Buffer } from "buffer";
+import { useContext, useEffect, useState } from 'react';
+
+import { SocketManagerContext } from "../AppWrapper";
 
 type RequestState = "false" | "loading" | "not-found" | "true";
 
 export function useAuth(path: string, password?: string | null): RequestState
 {
+    const socketManager = useContext(SocketManagerContext);
+    const generalSocketService = socketManager.generalSocketService;
+
     const [authorized, setAuthorized] = useState<RequestState>("loading");
 
     useEffect(() =>
@@ -43,10 +48,16 @@ export function useAuth(path: string, password?: string | null): RequestState
             }
 
             const HTTP_OK = 200;
+            const HTTP_CREATED = 201;
             const HTTP_NOT_FOUND = 404;
 
             if (res.status === HTTP_OK)
             {
+                setAuthorized("true");
+            }
+            else if (res.status === HTTP_CREATED)
+            {
+                await generalSocketService.refreshUserInfo();
                 setAuthorized("true");
             }
             else if (res.status === HTTP_NOT_FOUND)
@@ -61,7 +72,7 @@ export function useAuth(path: string, password?: string | null): RequestState
 
         void fetchRequest();
 
-    }, [path, password]);
+    }, [path, password, generalSocketService]);
 
     return authorized;
 }
