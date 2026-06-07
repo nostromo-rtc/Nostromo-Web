@@ -7,17 +7,11 @@
 import { useSyncExternalStore } from "react";
 import { AbstractExternalStorage } from "../../utils/AbstractExternalStorage";
 
-export type UserRole = "admin" | "user";
-
-export type UserInfo = {
-    id: string;
-    name: string;
-    role: UserRole;
-};
+import { UserRole, UserInfoWithRole } from "nostromo-shared/types/RoomTypes";
 
 export class UserModel extends AbstractExternalStorage
 {
-    private m_userInfo: Readonly<UserInfo> = {
+    private m_userInfo: Readonly<UserInfoWithRole> = {
         id: "",
         name: "Гость",
         role: "user"
@@ -43,20 +37,20 @@ export class UserModel extends AbstractExternalStorage
         this.setState({ ...this.m_userInfo, role });
     }
 
-    public setState(newState: UserInfo): void
+    public setState(newState: UserInfoWithRole): void
     {
         this.m_userInfo = newState;
 
         this.notifyListeners();
     }
 
-    public getSnapshot(): Readonly<UserInfo>
+    public getSnapshot(): Readonly<UserInfoWithRole>
     {
         return this.m_userInfo;
     }
 }
 
-export function useUserModel(service: UserModel): Readonly<UserInfo>
+export function useUserModel(service: UserModel): Readonly<UserInfoWithRole>
 {
     return useSyncExternalStore(
         (listener: () => void) => service.subscribe(listener),
