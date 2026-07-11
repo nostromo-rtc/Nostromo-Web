@@ -21,25 +21,16 @@ type DivClickEventHandler = React.MouseEventHandler<HTMLDivElement>;
 
 interface UserListProps
 {
+    onlineUserList: readonly UserInfo[];
     transitionDuration: number;
 }
 
 export const UserList: React.FC<UserListProps> = ({
+    onlineUserList,
     transitionDuration
 }) =>
 {
-    const [onlineUserList, setOnlineUserList] = useState<UserInfo[]>([]);
     const [offlineUserList, setOfflineUserList] = useState<UserInfo[]>([]);
-
-    useEffect(() =>
-    {
-        const newUserList: UserInfo[] = [
-            { id: "id111", name: "a_name1" },
-            { id: "id222", name: "b_name2" },
-            { id: "id333", name: "c_name3" }
-        ];
-        setOnlineUserList(newUserList);
-    }, []);
 
     return (
         <List id="user-list-container">
@@ -52,7 +43,7 @@ export const UserList: React.FC<UserListProps> = ({
 interface UserListSectionProps
 {
     sectionLabel: string;
-    list: UserInfo[];
+    list: readonly UserInfo[];
     transitionDuration: number;
 }
 
