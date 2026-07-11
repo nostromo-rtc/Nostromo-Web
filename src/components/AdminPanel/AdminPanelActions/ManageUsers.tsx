@@ -10,12 +10,11 @@ import "./ManageUsers.css";
 
 import { Avatar, Button, Divider } from "@mui/material";
 import { PublicRoomInfo, UserInfo } from "nostromo-shared/types/RoomTypes";
-import { MouseEventHandler, useEffect, useRef, useState } from "react";
+import { MouseEventHandler, useRef, useState } from "react";
 import { BiBlock, BiDotsHorizontalRounded, BiEditAlt, BiMicrophoneOff, BiUserX, BiVideoOff } from "react-icons/bi";
 import { MdOutlineStopScreenShare } from "react-icons/md";
 import { RiArrowGoBackLine } from "react-icons/ri";
 
-import { LoadedUserList } from "../../../services/RoomService";
 import { NumericConstants as NC } from "../../../utils/NumericConstants";
 import { getToggleFunc } from "../../../utils/Utils";
 import { List } from "../../Base/List/List";
@@ -227,11 +226,6 @@ const UserList: React.FC<UserListProps> = ({ userListToMap }) =>
 {
     const [filter, setFilter] = useState<string>("");
     const [usersList, setUsersList] = useState<UserInfo[]>([]);
-
-    useEffect(() =>
-    {
-        setUsersList(LoadedUserList);
-    }, []);
 
     const userNameFilter = (user: UserInfo): boolean =>
     {

@@ -11,23 +11,30 @@ import App from "./App";
 
 import { useHotkey } from "./hooks/UseHotkey";
 
-import { SocketManager } from "./services/SocketService/SocketManager";
 import { CamStatesNotificationsService } from "./services/Notifications/CamStatesNotificationsService";
 import { DisplayStateNotificationsService } from "./services/Notifications/DisplayStateNotificationsService";
 import { MicStateNotificationsService } from "./services/Notifications/MicStateNotificationsService";
 import { NotificationsService } from "./services/NotificationsService";
+import { RoomService } from "./services/RoomService/RoomService";
 import { SettingService } from "./services/Settings/SettingsService";
+import { SocketManager } from "./services/SocketService/SocketManager";
 import { UserMediaService } from "./services/UserMediaService/UserMediaService";
 
 const settingService = new SettingService();
 const userMediaService = new UserMediaService(settingService);
 const notificationService = new NotificationsService();
 const socketManager = new SocketManager();
+const roomService = new RoomService(
+    socketManager.roomSocketService,
+    socketManager.generalSocketService,
+    userMediaService
+);
 
 export const SettingsContext = createContext<SettingService>(settingService);
 export const UserMediaServiceContext = createContext<UserMediaService>(userMediaService);
 export const NotificationsContext = createContext<NotificationsService>(notificationService);
 export const SocketManagerContext = createContext<SocketManager>(socketManager);
+export const RoomServiceContext = createContext<RoomService>(roomService);
 
 const micStateNotificationsService = new MicStateNotificationsService(
     userMediaService,

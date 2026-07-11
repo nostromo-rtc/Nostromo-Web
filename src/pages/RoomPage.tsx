@@ -10,7 +10,7 @@ import "./RoomPage.css";
 import { Link } from "@mui/material";
 import React, { useContext, useEffect, useState } from "react";
 
-import { UserMediaServiceContext } from "../AppWrapper";
+import { RoomServiceContext, UserMediaServiceContext } from "../AppWrapper";
 import { Header } from "../components/Header";
 import { RoomActionPanel } from "../components/Room/ActionPanel/RoomActionPanel";
 import { Chat } from "../components/Room/Chat/Chat";
@@ -21,36 +21,29 @@ import { RoomHeaderToolbarProps } from "../components/Room/RoomHeaderToolbar";
 import { UserList } from "../components/Room/UserList";
 import { VideoLayoutContainer } from "../components/Room/VideoLayout/VideoLayoutContainer";
 import { VerticalLayout } from "../components/VerticalLayout";
+import { useUserListModel } from "../services/RoomService/UserListModel";
 import { SoundState, useSoundStateModel } from "../services/UserMediaService/SoundStateModel";
 import { DndVisibleContext } from "./MainLayer";
 
 interface RoomPageParams
 {
+    roomId: string;
     roomName: string;
 }
 
-export const RoomPage: React.FC<RoomPageParams> = ({roomName}) =>
+export const RoomPage: React.FC<RoomPageParams> = ({roomId, roomName}) =>
 {
     // TODO: наверное стоит поместить это в контекст, так как много где применяется.
     const transitionDuration = 100;
+
+    const roomService = useContext(RoomServiceContext);
+    const userList = useUserListModel(roomService.userListModel);
 
     const userMediaService = useContext(UserMediaServiceContext);
     const soundState = useSoundStateModel(userMediaService.soundStateModel);
 
     const [isFileUploading, setIsFileUploading] = useState<boolean>(false);
-    const [uploadingFilesQueue, setUploadingFilesQueue] = useState<LoadFileInfo[]>([
-        { file: { fileId: "hfg123", name: "Язык программирования C++", size: 16188070 }, progress: 0 },
-        { file: { fileId: "jhg812", name: "C++ лекции и упражнения", size: 150537513 }, progress: 0 },
-        { file: { fileId: "kjh306", name: "Современные операционные системы", size: 14280633 }, progress: 0 },
-        { file: { fileId: "lou785", name: "Т.1. Искусство программирования", size: 83673366 }, progress: 0 },
-        { file: { fileId: "nbo890", name: "Автоматное программирование", size: 1785979 }, progress: 0 },
-        { file: { fileId: "xcv519", name: "Паттерны проектирования", size: 68368155 }, progress: 0 },
-        { file: { fileId: "hfg623", name: "Некрономикон", size: 9999999999 }, progress: 0 },
-        { file: { fileId: "jhg312", name: "QT 5.10 Профессиональное программирование на C++", size: 103919024 }, progress: 0 },
-        { file: { fileId: "kjh366", name: "Т.2. Искусство программирования", size: 7235716 }, progress: 0 },
-        { file: { fileId: "loi785", name: "Т.3. Искусство программирования", size: 8612462 }, progress: 0 },
-        { file: { fileId: "nbv890", name: "Т.4. Искусство программирования", size: 99124812 }, progress: 0 }
-    ]);
+    const [uploadingFilesQueue, setUploadingFilesQueue] = useState<LoadFileInfo[]>([]);
 
     const [isUserListHidden, setIsUserListHidden] = useState(true);
     const [isChatHidden, setIsChatHidden] = useState(true);
@@ -114,6 +107,10 @@ export const RoomPage: React.FC<RoomPageParams> = ({roomName}) =>
         document.title = `Nostromo - Комната "${roomName}"`;
     }, [roomName]);
 
+    useEffect(() => {
+        roomService.join(roomId);
+    }, [roomService, roomId]);
+
     return (
         <>
             <Header title={roomName} roomToolbarProps={roomToolbarProps} />
@@ -125,7 +122,7 @@ export const RoomPage: React.FC<RoomPageParams> = ({roomName}) =>
                         upperContainer={callContainer}
                         lowerContainer={chatContainer}
                         upperMinHeight="200px" />}
-                {isUserListHidden ? <></> : <UserList transitionDuration={transitionDuration} />}
+                {isUserListHidden ? <></> : <UserList onlineUserList={userList} transitionDuration={transitionDuration} />}
             </div>
         </>
     );

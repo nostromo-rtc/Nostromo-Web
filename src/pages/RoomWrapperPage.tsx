@@ -72,9 +72,9 @@ export const RoomWrapperPage: React.FC = () =>
         }
     }, [auth])
 
-    if (auth === "true")
+    if (auth === "true" && id !== undefined)
     {
-        return <RoomPage roomName={roomName} />;
+        return <RoomPage roomId={id} roomName={roomName} />;
     }
     else if (auth === "false" || falseAuthCound > ONE)
     {
