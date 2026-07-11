@@ -8,6 +8,7 @@ import { Manager } from "socket.io-client";
 
 import { isDevWithoutBackend } from "../../utils/Utils";
 import { GeneralSocketService } from "./GeneralSocketService";
+import { RoomSocketService } from "./RoomSocketService";
 
 export class SocketManager
 {
@@ -17,14 +18,21 @@ export class SocketManager
     });
 
     private readonly m_generalSocketService: GeneralSocketService;
+    private readonly m_roomSocketService: RoomSocketService;
 
     public constructor()
     {
         this.m_generalSocketService = new GeneralSocketService(this.m_manager.socket("/"));
+        this.m_roomSocketService = new RoomSocketService(this.m_manager.socket("/room"));
     }
 
     public get generalSocketService(): GeneralSocketService
     {
         return this.m_generalSocketService;
+    }
+
+    public get roomSocketService(): RoomSocketService
+    {
+        return this.m_roomSocketService;
     }
 }
