@@ -5,7 +5,7 @@
 */
 
 import { RoomNameInfo } from "nostromo-shared/types/AdminTypes";
-import { PublicRoomInfo, UserInfoWithRole, VideoCodec } from "nostromo-shared/types/RoomTypes";
+import { PublicRoomInfo, UserInfo, UserInfoWithRole, VideoCodec } from "nostromo-shared/types/RoomTypes";
 import { SocketEvents as SE } from "nostromo-shared/types/SocketEvents";
 import { Socket } from "socket.io-client";
 
@@ -43,7 +43,9 @@ export class GeneralSocketService extends SocketService
         }
 
         void this.refreshUserInfo();
+
         this.subscribeOnRoomList();
+        this.subscribeOnUsernameChanges();
     }
 
     public get userModel(): UserModel
@@ -69,6 +71,7 @@ export class GeneralSocketService extends SocketService
         }
 
         this.m_userModel.setName(name);
+        this.m_socket.emit(SE.NewUsername, name);
     }
 
     public async refreshUserInfo(): Promise<void>
@@ -118,5 +121,20 @@ export class GeneralSocketService extends SocketService
         });
 
         this.m_socket.emit(SE.RoomList);
+    }
+
+    private subscribeOnUsernameChanges(): void
+    {
+        this.m_socket.on(SE.NewUsername, async (info: UserInfo) =>
+        {
+            if (info.id === this.m_userModel.getSnapshot().id)
+            {
+                await this.refreshUserInfo();
+            }
+            else
+            {
+                this.m_userListModel.updateUser(info);
+            }
+        });
     }
 }
