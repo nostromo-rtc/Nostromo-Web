@@ -8,9 +8,10 @@ import "../App.css";
 import "./RoomPage.css";
 
 import { Link } from "@mui/material";
+import { UserInfo } from "nostromo-shared/types/RoomTypes";
 import React, { useContext, useEffect, useState } from "react";
 
-import { RoomServiceContext, UserMediaServiceContext } from "../AppWrapper";
+import { RoomServiceContext, SocketManagerContext, UserMediaServiceContext } from "../AppWrapper";
 import { Header } from "../components/Header";
 import { RoomActionPanel } from "../components/Room/ActionPanel/RoomActionPanel";
 import { Chat } from "../components/Room/Chat/Chat";
@@ -21,7 +22,9 @@ import { RoomHeaderToolbarProps } from "../components/Room/RoomHeaderToolbar";
 import { UserList } from "../components/Room/UserList";
 import { VideoLayoutContainer } from "../components/Room/VideoLayout/VideoLayoutContainer";
 import { VerticalLayout } from "../components/VerticalLayout";
-import { useUserListModel } from "../services/RoomService/UserListModel";
+import { useRoomUserListModel } from "../services/RoomService/RoomUserListModel";
+import { useUserListModel } from "../services/SocketService/UserListModel";
+import { useUserModel } from "../services/SocketService/UserModel";
 import { SoundState, useSoundStateModel } from "../services/UserMediaService/SoundStateModel";
 import { DndVisibleContext } from "./MainLayer";
 
@@ -36,8 +39,16 @@ export const RoomPage: React.FC<RoomPageParams> = ({roomId, roomName}) =>
     // TODO: наверное стоит поместить это в контекст, так как много где применяется.
     const transitionDuration = 100;
 
+    const socketManager = useContext(SocketManagerContext);
+    const userInfo: UserInfo = useUserModel(socketManager.generalSocketService.userModel);
+    const userList = useUserListModel(socketManager.generalSocketService.userListModel);
+
     const roomService = useContext(RoomServiceContext);
-    const userList = useUserListModel(roomService.userListModel);
+    const onlineUserList = useRoomUserListModel(roomService.onlineUserListModel);
+
+    const onlineUserListWithInfo = [userInfo].concat(userList).filter((u) => {
+        return onlineUserList.some(onlineUserId => onlineUserId === u.id);
+    });
 
     const userMediaService = useContext(UserMediaServiceContext);
     const soundState = useSoundStateModel(userMediaService.soundStateModel);
@@ -122,7 +133,7 @@ export const RoomPage: React.FC<RoomPageParams> = ({roomId, roomName}) =>
                         upperContainer={callContainer}
                         lowerContainer={chatContainer}
                         upperMinHeight="200px" />}
-                {isUserListHidden ? <></> : <UserList onlineUserList={userList} transitionDuration={transitionDuration} />}
+                {isUserListHidden ? <></> : <UserList onlineUserList={onlineUserListWithInfo} transitionDuration={transitionDuration} />}
             </div>
         </>
     );
