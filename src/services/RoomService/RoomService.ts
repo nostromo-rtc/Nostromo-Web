@@ -11,7 +11,7 @@ import { PrefixConstants } from "../../utils/Utils";
 import { GeneralSocketService } from "../SocketService/GeneralSocketService";
 import { RoomSocketService } from "../SocketService/RoomSocketService";
 import { UserMediaService } from "../UserMediaService/UserMediaService";
-import { UserListModel } from "./UserListModel";
+import { RoomUserListModel } from "./RoomUserListModel";
 
 export class RoomService
 {
@@ -19,7 +19,7 @@ export class RoomService
     private readonly m_generalSocketService: GeneralSocketService;
     private readonly m_userMediaService: UserMediaService;
 
-    private readonly m_userListModel: UserListModel = new UserListModel();
+    private readonly m_onlineUserListModel: RoomUserListModel = new RoomUserListModel();
     private m_roomId = "";
     private m_isAllowedToSpeak = true;
 
@@ -34,9 +34,9 @@ export class RoomService
         this.m_userMediaService = userMediaService;
     }
 
-    public get userListModel(): UserListModel
+    public get onlineUserListModel(): RoomUserListModel
     {
-        return this.m_userListModel;
+        return this.m_onlineUserListModel;
     }
 
     public join(roomId: string): void
@@ -48,8 +48,8 @@ export class RoomService
         this.m_roomSocket.joinRoom(roomId);
 
         // TODO: move this to moment when user will be ready (SE.Ready)
-        const user = this.m_generalSocketService.userModel.getSnapshot();
-        this.m_userListModel.addUser(user);
+        const userId = this.m_generalSocketService.userModel.getSnapshot().id;
+        this.m_onlineUserListModel.addUser(userId);
     }
 
     private subscribeToAfterJoinedEvents(): void
@@ -183,7 +183,7 @@ export class RoomService
 
         this.m_roomSocket.on(SE.NewUser, (user: UserInfo) =>
         {
-            this.m_userListModel.addUser(user);
+            this.m_onlineUserListModel.addUser(user.id);
 
             // UI - add video for user in
             // this.pauseAndPlayEventsPlayerHandler(id, streamId);
@@ -203,6 +203,7 @@ export class RoomService
         this.m_roomSocket.on(SE.UserDisconnected, (remoteUserId: string) =>
         {
             console.info("[Room] > remoteUser disconnected:", `[${remoteUserId}]`);
+            this.m_onlineUserListModel.removeUser(remoteUserId);
 
             // this.ui.removeVideos(remoteUserId);
             // this.ui.playSound(UiSound.left);
