@@ -9,15 +9,17 @@ import { PublicRoomInfo, UserInfoWithRole, VideoCodec } from "nostromo-shared/ty
 import { SocketEvents as SE } from "nostromo-shared/types/SocketEvents";
 import { Socket } from "socket.io-client";
 
+import { isDevWithoutBackend } from "../../utils/Utils";
 import { RoomListModel } from "./RoomListModel";
 import { SocketService } from "./SocketService";
+import { UserListModel } from "./UserListModel";
 import { UserModel } from "./UserModel";
-import { isDevWithoutBackend } from "../../utils/Utils";
 
 export class GeneralSocketService extends SocketService
 {
     private readonly m_userModel: UserModel = new UserModel();
     private readonly m_roomListModel: RoomListModel = new RoomListModel();
+    private readonly m_userListModel: UserListModel = new UserListModel();
 
     public constructor(socket: Socket)
     {
@@ -52,6 +54,11 @@ export class GeneralSocketService extends SocketService
     public get roomListModel(): RoomListModel
     {
         return this.m_roomListModel;
+    }
+
+    public get userListModel(): UserListModel
+    {
+        return this.m_userListModel;
     }
 
     public setUserName(name: string): void
