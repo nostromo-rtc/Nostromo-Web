@@ -7,6 +7,7 @@
 import { ChatMessage, NewConsumerInfo, NewWebRtcTransportInfo, UserInfo } from "nostromo-shared/types/RoomTypes";
 import { SocketEvents as SE } from "nostromo-shared/types/SocketEvents";
 
+import { NumericConstants as NC } from "../../utils/NumericConstants";
 import { PrefixConstants } from "../../utils/Utils";
 import { GeneralSocketService } from "../SocketService/GeneralSocketService";
 import { RoomSocketService } from "../SocketService/RoomSocketService";
@@ -183,6 +184,7 @@ export class RoomService
 
         this.m_roomSocket.on(SE.NewUser, (user: UserInfo) =>
         {
+            this.m_generalSocketService.userListModel.addUser(user);
             this.m_onlineUserListModel.addUser(user.id);
 
             // UI - add video for user in
@@ -211,10 +213,13 @@ export class RoomService
                 message.userId = "local";
             }*/
 
-            /*if (username)
+            // It can be offline user, so keep this user info in our list.
+            if (username != null && username.length > NC.EMPTY_LENGTH)
             {
-                this.ui.usernames.set(message.userId, username);
-            }*/
+                this.m_generalSocketService.userListModel.addUser(
+                    { id: message.userId, name: username }
+                );
+            }
 
             //this.ui.displayChatMessage(message);
 
