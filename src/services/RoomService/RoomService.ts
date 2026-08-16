@@ -194,12 +194,6 @@ export class RoomService
             }*/
         });
 
-        this.m_roomSocket.on(SE.NewUsername, (user: UserInfo) =>
-        {
-            // TODO: handle case with changing name of current user
-            this.m_userListModel.updateUser(user);
-        });
-
         this.m_roomSocket.on(SE.UserDisconnected, (remoteUserId: string) =>
         {
             console.info("[Room] > remoteUser disconnected:", `[${remoteUserId}]`);
